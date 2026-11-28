@@ -11,7 +11,6 @@
 //! `(created_at, id)` with the decoded cursor from `store::actions::decode_time_cursor`.
 
 use conveyor_domain::RunStatus;
-use conveyor_domain::work_package_spec::readiness;
 use conveyor_store as store;
 use conveyor_store::run::RunRecord;
 use serde_json::Value;
@@ -242,36 +241,9 @@ async fn runs_create(
         (Some(requested), _) => Some(requested),
         (None, on_card) => on_card,
     };
-    // SPEC_V2 §5.8 (D69): a work package starts only from an INVEST-ready spec. The card is a
-    // work package when its type is `delivery` or a `wbs_node(kind='work_package')` links it;
-    // an absent spec and an unmet criterion are the same run-start refusal, because both mean
-    // the work is not ready to start.
-    if store::work_package_spec::is_work_package_card_tx(&mut *tx, ctx.tenant, card.id)
-        .await
-        .map_err(|error| store_error(error, action))?
-    {
-        let spec = store::work_package_spec::get_tx(&mut *tx, ctx.tenant, card.id)
-            .await
-            .map_err(|error| spec_store_error(error, action))?
-            .ok_or_else(|| {
-                ActionError::new(
-                    422,
-                    "work_package_dor_unmet",
-                    "the work package has no spec; a run starts only from its INVEST-ready \
-                     definition of ready",
-                )
-            })?;
-        let ready = readiness(&spec.dor)
-            .map_err(|error| ActionError::new(422, "work_package_dor_unmet", error.to_string()))?;
-        if !ready {
-            return Err(ActionError::new(
-                422,
-                "work_package_dor_unmet",
-                "the work package's definition of ready is unmet; every INVEST criterion must \
-                 be met with evidence before a run starts",
-            ));
-        }
-    }
+    // SPEC_V2 §5.8 (D69): the work-package Definition-of-Ready gate lives in
+    // `create_bound_run_tx`, the one path this action and `cards.assign` share, so a handoff
+    // cannot start a run this explicit entry point would refuse.
     let (run, out) = create_bound_run_tx(
         &mut *tx,
         &ctx,
@@ -287,28 +259,6 @@ async fn runs_create(
     .await?;
 
     Ok(HandlerOutput::created(out).with_etag(run.run.version.etag()))
-}
-
-/// A work-package-spec read failure as this action's refusal.
-///
-/// The card was resolved in this tenant before the spec read, so a parent refusal can only be a
-/// race; it still maps through the shared parent rule rather than inventing a `500`.
-fn spec_store_error(
-    error: store::work_package_spec::WorkPackageSpecStoreError,
-    action: &str,
-) -> ActionError {
-    match error {
-        store::work_package_spec::WorkPackageSpecStoreError::Parent(parent) => {
-            crate::board::parent_error(parent, action)
-        }
-        store::work_package_spec::WorkPackageSpecStoreError::Id(error) => {
-            tracing::error!(%error, action, "a stored work-package spec carries an undecodable id");
-            ActionError::internal()
-        }
-        store::work_package_spec::WorkPackageSpecStoreError::Database(error) => {
-            store_error(error, action)
-        }
-    }
 }
 
 /// Move a queued run to `running`.

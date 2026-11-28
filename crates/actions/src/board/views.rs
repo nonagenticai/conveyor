@@ -19,6 +19,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use uuid::Uuid;
 
+use super::work_package_specs::WorkPackageSpecOut;
+
 /// CONTRACT §6's shared `IdIn` envelope: one row id, nothing else.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct IdIn {
@@ -390,6 +392,9 @@ pub struct CardView {
     pub task_lists: Vec<TaskListOut>,
     /// The card's values for the board's custom fields, in field order.
     pub custom_field_values: Vec<CustomFieldValueOut>,
+    /// The card's work-package spec and its derived DoD, when one is stored.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub work_package_spec: Option<WorkPackageSpecOut>,
 }
 
 /// One comment.

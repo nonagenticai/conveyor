@@ -432,10 +432,41 @@ async fn create_run(
     .await
 }
 
+/// Read the card's work-package spec (with its derived DoD) through `cards.spec_get`.
+async fn get_spec(
+    pg: &support::Pg,
+    seeded: &support::Seeded,
+    card: &str,
+) -> Result<InvokeOutcome, ActionError> {
+    call(
+        pg,
+        seeded,
+        request(seeded.user_id, "cards.spec_get", json!({ "card_id": card })),
+    )
+    .await
+}
+
+/// The DoD rows' `verified` flags by scenario key, as `cards.spec_get` returns them.
+fn dod_verified(body: &Value) -> std::collections::BTreeMap<String, bool> {
+    output(body)["dod"]
+        .as_array()
+        .expect("the DoD rows")
+        .iter()
+        .map(|row| {
+            (
+                text(row, "scenario"),
+                row["verified"].as_bool().expect("a verified flag"),
+            )
+        })
+        .collect()
+}
+
 /// Record an approved `card_done` gate whose `meta` is exactly `meta`.
 ///
-/// `approvals.request` can only store typed `{kind, id}` evidence, but §5.8's scenario evidence
-/// is `{scenario, run_id|step_id}`; the fixture therefore writes the decided row the gate reads.
+/// `approvals.request` now writes per-scenario evidence through `scenario_evidence` (see
+/// [`request_scenario_gate`]); this fixture stays for the `meta` shapes the product writer must
+/// refuse — a foreign card's run, a numeric id, a waiver-only row — which the gate still has to
+/// judge when a stored row carries them.
 async fn approve_gate(pg: &support::Pg, seeded: &support::Seeded, card: &str, meta: Value) {
     let card_id = Uuid::parse_str(card).expect("the card id");
     sqlx::query(
@@ -463,6 +494,31 @@ async fn record_run_step(pg: &support::Pg, seeded: &support::Seeded, run: &str) 
     .await
     .expect("the run's step");
     step.to_string()
+}
+
+/// Open a `card_done` gate with per-scenario evidence through the real product writer.
+async fn request_scenario_gate(
+    pg: &support::Pg,
+    seeded: &support::Seeded,
+    card: &str,
+    scenario_evidence: Value,
+) -> Result<InvokeOutcome, ActionError> {
+    call(
+        pg,
+        seeded,
+        request(
+            seeded.user_id,
+            "approvals.request",
+            json!({
+                "card_id": card,
+                "gate": "card_done",
+                "kind": "card_dod",
+                "require_evidence": true,
+                "scenario_evidence": scenario_evidence,
+            }),
+        ),
+    )
+    .await
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
@@ -587,11 +643,113 @@ async fn a_work_package_with_every_scenario_evidenced_enters_done() {
     )
     .await;
 
+    // Every scenario is verified by this card's own run and step — the read model and the gate
+    // read the same rows, so `cards.spec_get` reports both verified before the move.
+    let spec = get_spec(&pg, &seeded, &card).await.expect("read the spec");
+    assert_eq!(spec.status, 200, "{}", spec.body);
+    let verified = dod_verified(&spec.body);
+    assert_eq!(verified.get("the-first-part"), Some(&true), "{spec:?}");
+    assert_eq!(verified.get("the-second-part"), Some(&true), "{spec:?}");
+
     let moved = move_to_done(&pg, &seeded, &card, version, &done)
         .await
         .expect("every scenario is evidenced by this card's run");
     assert_eq!(moved.status, 200, "{}", moved.body);
     assert_eq!(output(&moved.body)["list_id"], done);
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_scenario_evidenced_by_another_cards_run_reads_unverified_and_is_refused() {
+    let (pg, seeded) = fixture().await;
+    seed_delivery_card_type(&pg, &seeded).await;
+    let (board, active, done) = board_and_lanes(&pg, &seeded).await;
+    let (card, version) = create_card_of_type(&pg, &seeded, &board, &active, "delivery").await;
+    put_spec(&pg, &seeded, &card, ready_dor())
+        .await
+        .expect("a ready spec is stored");
+
+    // A run of a *different* card in the same tenant: a real run, but not this work package's.
+    let (other, _other_version) = create_card(&pg, &seeded, &board, &active).await;
+    let other_run = create_run(&pg, &seeded, &other)
+        .await
+        .expect("a plain card starts a run");
+    assert_eq!(other_run.status, 201, "{}", other_run.body);
+    let other_run_id = text(output(&other_run.body), "id");
+
+    // The gate cites the foreign run for the first scenario; the second names nothing.
+    approve_gate(
+        &pg,
+        &seeded,
+        &card,
+        json!({"evidence": [
+            {"scenario": "the-first-part", "run_id": other_run_id},
+        ]}),
+    )
+    .await;
+
+    // The read model is the gate's projection: neither row is verified by another card's run.
+    let spec = get_spec(&pg, &seeded, &card).await.expect("read the spec");
+    assert_eq!(spec.status, 200, "{}", spec.body);
+    let verified = dod_verified(&spec.body);
+    assert_eq!(verified.get("the-first-part"), Some(&false), "{spec:?}");
+    assert_eq!(verified.get("the-second-part"), Some(&false), "{spec:?}");
+
+    let refused = move_to_done(&pg, &seeded, &card, version, &done)
+        .await
+        .expect_err("another card's run never verifies this card's scenario");
+    assert_eq!(refused.status, 422, "{}", refused.detail);
+    assert_eq!(refused.code, "work_package_evidence_unmet");
+    assert!(
+        refused.detail.contains("the-first-part"),
+        "the refusal names the unverified scenario: {}",
+        refused.detail
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_numeric_run_id_is_never_evidence() {
+    let (pg, seeded) = fixture().await;
+    seed_delivery_card_type(&pg, &seeded).await;
+    let (board, active, done) = board_and_lanes(&pg, &seeded).await;
+    let (card, version) = create_card_of_type(&pg, &seeded, &board, &active, "delivery").await;
+    put_spec(&pg, &seeded, &card, ready_dor())
+        .await
+        .expect("a ready spec is stored");
+    let run = create_run(&pg, &seeded, &card)
+        .await
+        .expect("a ready work package starts");
+    assert_eq!(run.status, 201, "{}", run.body);
+    let run_id = text(output(&run.body), "id");
+
+    // The first scenario cites a number (the domain's lax rule would accept it); the second
+    // cites this card's own run, so only the second row can be verified.
+    approve_gate(
+        &pg,
+        &seeded,
+        &card,
+        json!({"evidence": [
+            {"scenario": "the-first-part", "run_id": 42},
+            {"scenario_id": "the-second-part", "run_id": run_id},
+        ]}),
+    )
+    .await;
+
+    let spec = get_spec(&pg, &seeded, &card).await.expect("read the spec");
+    assert_eq!(spec.status, 200, "{}", spec.body);
+    let verified = dod_verified(&spec.body);
+    assert_eq!(verified.get("the-first-part"), Some(&false), "{spec:?}");
+    assert_eq!(verified.get("the-second-part"), Some(&true), "{spec:?}");
+
+    let refused = move_to_done(&pg, &seeded, &card, version, &done)
+        .await
+        .expect_err("a numeric id cannot name a run");
+    assert_eq!(refused.status, 422, "{}", refused.detail);
+    assert_eq!(refused.code, "work_package_evidence_unmet");
+    assert!(
+        refused.detail.contains("the-first-part"),
+        "the refusal names the numeric-id scenario: {}",
+        refused.detail
+    );
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
@@ -646,4 +804,294 @@ async fn a_waiver_does_not_excuse_a_missing_spec() {
         "the refusal names the missing spec: {}",
         refused.detail
     );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_waiver_moves_a_work_package_with_a_spec_to_done() {
+    let (pg, seeded) = fixture().await;
+    seed_delivery_card_type(&pg, &seeded).await;
+    let (board, active, done) = board_and_lanes(&pg, &seeded).await;
+    let (card, version) = create_card_of_type(&pg, &seeded, &board, &active, "delivery").await;
+    put_spec(&pg, &seeded, &card, ready_dor())
+        .await
+        .expect("a ready spec is stored");
+    approve_gate(
+        &pg,
+        &seeded,
+        &card,
+        json!({"evidence_waiver": "the acceptance was verified by inspection"}),
+    )
+    .await;
+
+    let moved = move_to_done(&pg, &seeded, &card, version, &done)
+        .await
+        .expect("a non-empty waiver excuses the per-scenario evidence");
+    assert_eq!(moved.status, 200, "{}", moved.body);
+    assert_eq!(output(&moved.body)["list_id"], done);
+}
+
+// ── The product writer for per-scenario evidence, and the read / birth guards ──────────────
+
+/// §5.8's evidence now has a product writer: `approvals.request` accepts `scenario_evidence`,
+/// validates the run/step is the gated card's, stores the done gate's own shape in
+/// `meta.evidence`, and that stored gate is what lets the card enter done.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn scenario_evidence_written_through_approvals_request_permits_done() {
+    let (pg, seeded) = fixture().await;
+    seed_delivery_card_type(&pg, &seeded).await;
+    let (board, active, done) = board_and_lanes(&pg, &seeded).await;
+    let (card, version) = create_card_of_type(&pg, &seeded, &board, &active, "delivery").await;
+    put_spec(&pg, &seeded, &card, ready_dor())
+        .await
+        .expect("a ready spec is stored");
+    let run = create_run(&pg, &seeded, &card)
+        .await
+        .expect("a ready work package starts");
+    assert_eq!(run.status, 201, "{}", run.body);
+    let run_id = text(output(&run.body), "id");
+    let step_id = record_run_step(&pg, &seeded, &run_id).await;
+
+    let requested = request_scenario_gate(
+        &pg,
+        &seeded,
+        &card,
+        json!([
+            {"scenario": "the-first-part", "run_id": run_id},
+            {"scenario": "the-second-part", "step_id": step_id},
+        ]),
+    )
+    .await
+    .expect("the product writer accepts per-scenario evidence");
+    assert_eq!(requested.status, 200, "{}", requested.body);
+    let stored = output(&requested.body)["evidence"]
+        .as_array()
+        .expect("the gate's stored evidence");
+    assert_eq!(stored.len(), 2, "{}", requested.body);
+    assert_eq!(stored[0]["scenario"], "the-first-part");
+    assert_eq!(stored[0]["run_id"], run_id);
+    assert_eq!(stored[1]["scenario"], "the-second-part");
+    assert_eq!(stored[1]["step_id"], step_id);
+
+    let gate = text(output(&requested.body), "id");
+    approve(&pg, &seeded, &gate).await;
+    let moved = move_to_done(&pg, &seeded, &card, version, &done)
+        .await
+        .expect("the done gate accepts the evidence the product writer stored");
+    assert_eq!(moved.status, 200, "{}", moved.body);
+    assert_eq!(output(&moved.body)["list_id"], done);
+}
+
+/// The writer refuses another card's run where the defect is introduced — at request time, naming
+/// the scenario — instead of storing a gate the `done` move would later reject.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn scenario_evidence_naming_another_cards_run_is_refused_at_request_time() {
+    let (pg, seeded) = fixture().await;
+    seed_delivery_card_type(&pg, &seeded).await;
+    let (board, active, _done) = board_and_lanes(&pg, &seeded).await;
+    let (card, _version) = create_card_of_type(&pg, &seeded, &board, &active, "delivery").await;
+
+    let (other, _other_version) = create_card(&pg, &seeded, &board, &active).await;
+    let other_run = create_run(&pg, &seeded, &other)
+        .await
+        .expect("a plain card starts a run");
+    assert_eq!(other_run.status, 201, "{}", other_run.body);
+    let other_run_id = text(output(&other_run.body), "id");
+
+    let refused = request_scenario_gate(
+        &pg,
+        &seeded,
+        &card,
+        json!([{"scenario": "the-first-part", "run_id": other_run_id}]),
+    )
+    .await
+    .expect_err("another card's run never evidences this card's scenario");
+    assert_eq!(refused.status, 422, "{}", refused.detail);
+    assert_eq!(refused.code, "gate_evidence_not_live");
+    assert!(
+        refused.detail.contains("the-first-part"),
+        "the refusal names the scenario: {}",
+        refused.detail
+    );
+
+    let gates: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM approval
+          WHERE tenant_id = $1 AND card_id = $2 AND gate = 'card_done'",
+    )
+    .bind(seeded.tenant_id)
+    .bind(Uuid::parse_str(&card).expect("the card id"))
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("count the card's gates");
+    assert_eq!(gates, 0, "a refused request writes no gate row");
+}
+
+/// Per-scenario evidence is anchored to a card: a run-scoped request without `card_id` is a
+/// schema-level refusal, because a run alone does not name whose scenario it proves.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn scenario_evidence_requires_the_gate_card() {
+    let (pg, seeded) = fixture().await;
+    let (board, active, _done) = board_and_lanes(&pg, &seeded).await;
+    let (card, _version) = create_card(&pg, &seeded, &board, &active).await;
+    let run = create_run(&pg, &seeded, &card)
+        .await
+        .expect("a plain card starts a run");
+    assert_eq!(run.status, 201, "{}", run.body);
+    let run_id = text(output(&run.body), "id");
+
+    let refused = call(
+        &pg,
+        &seeded,
+        request(
+            seeded.user_id,
+            "approvals.request",
+            json!({
+                "run_id": run_id,
+                "gate": "card_done",
+                "kind": "card_dod",
+                "scenario_evidence": [
+                    {"scenario": "the-first-part", "run_id": run_id},
+                ],
+            }),
+        ),
+    )
+    .await
+    .expect_err("scenario evidence without a card has no subject");
+    assert_eq!(refused.status, 422, "{}", refused.detail);
+    assert_eq!(refused.code, "action-invalid-input");
+    assert_eq!(refused.errors[0].field, "card_id", "{:?}", refused.errors);
+}
+
+/// `cards.get` carries the same spec document `cards.spec_get` serves — the stored spec, the
+/// parsed scenarios and the DoD derived from the approved `card_done` evidence — so a card read
+/// shows what the close gate will judge.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn cards_get_carries_the_spec_and_its_derived_dod() {
+    let (pg, seeded) = fixture().await;
+    seed_delivery_card_type(&pg, &seeded).await;
+    let (board, active, _done) = board_and_lanes(&pg, &seeded).await;
+    let (card, _version) = create_card_of_type(&pg, &seeded, &board, &active, "delivery").await;
+    put_spec(&pg, &seeded, &card, ready_dor())
+        .await
+        .expect("a ready spec is stored");
+    let run = create_run(&pg, &seeded, &card)
+        .await
+        .expect("a ready work package starts");
+    assert_eq!(run.status, 201, "{}", run.body);
+    let run_id = text(output(&run.body), "id");
+    let step_id = record_run_step(&pg, &seeded, &run_id).await;
+
+    let requested = request_scenario_gate(
+        &pg,
+        &seeded,
+        &card,
+        json!([
+            {"scenario": "the-first-part", "run_id": run_id},
+            {"scenario": "the-second-part", "step_id": step_id},
+        ]),
+    )
+    .await
+    .expect("open the per-scenario gate");
+    let gate = text(output(&requested.body), "id");
+    approve(&pg, &seeded, &gate).await;
+
+    let view = call(
+        &pg,
+        &seeded,
+        request(seeded.user_id, "cards.get", json!({ "id": card })),
+    )
+    .await
+    .expect("read the card");
+    assert_eq!(view.status, 200, "{}", view.body);
+    let spec = &output(&view.body)["work_package_spec"];
+    assert_eq!(spec["spec"]["card_id"], card.as_str(), "{}", view.body);
+    assert_eq!(spec["spec"]["story_persona"], "a delivery team");
+    assert_eq!(
+        spec["scenarios"].as_array().map(Vec::len),
+        Some(2),
+        "{}",
+        view.body
+    );
+    assert_eq!(spec["scenarios"][0]["key"], "the-first-part");
+    let verified: std::collections::BTreeMap<String, bool> = spec["dod"]
+        .as_array()
+        .expect("the DoD rows")
+        .iter()
+        .map(|row| {
+            (
+                text(row, "scenario"),
+                row["verified"].as_bool().expect("a verified flag"),
+            )
+        })
+        .collect();
+    assert_eq!(verified.get("the-first-part"), Some(&true), "{view:?}");
+    assert_eq!(verified.get("the-second-part"), Some(&true), "{view:?}");
+}
+
+/// §5.8: a work package is not born in `done`; it moves there through the `card_done` gate, and a
+/// create in the done lane would bypass the move the gate judges.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_work_package_is_not_born_in_a_done_lane() {
+    let (pg, seeded) = fixture().await;
+    seed_delivery_card_type(&pg, &seeded).await;
+    let (board, _active, done) = board_and_lanes(&pg, &seeded).await;
+
+    let refused = call(
+        &pg,
+        &seeded,
+        request(
+            seeded.user_id,
+            "cards.create",
+            json!({
+                "board_id": board,
+                "list_id": done,
+                "name": format!("A work package born finished {}", Uuid::now_v7().simple()),
+                "card_type_code": "delivery",
+            }),
+        ),
+    )
+    .await
+    .expect_err("a work package cannot be created in done");
+    assert_eq!(refused.status, 409, "{}", refused.detail);
+    assert_eq!(refused.code, "card-create-not-allowed");
+    assert!(
+        refused.detail.contains("card_done"),
+        "the refusal names the gate it would bypass: {}",
+        refused.detail
+    );
+
+    let cards: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM card WHERE tenant_id = $1 AND list_id = $2")
+            .bind(seeded.tenant_id)
+            .bind(Uuid::parse_str(&done).expect("the done lane id"))
+            .fetch_one(&pg.super_pool)
+            .await
+            .expect("count the done lane's cards");
+    assert_eq!(cards, 0, "a refused create writes no card");
+}
+
+/// The refusal is the work package's alone: the card type's code decides it, so a `feature` card
+/// keeps the pre-existing behaviour of being creatable in any non-archive lane.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_non_delivery_card_may_be_created_in_a_done_lane() {
+    let (pg, seeded) = fixture().await;
+    let (board, _active, done) = board_and_lanes(&pg, &seeded).await;
+
+    let created = call(
+        &pg,
+        &seeded,
+        request(
+            seeded.user_id,
+            "cards.create",
+            json!({
+                "board_id": board,
+                "list_id": done,
+                "name": format!("A finished feature {}", Uuid::now_v7().simple()),
+                "card_type_code": "feature",
+            }),
+        ),
+    )
+    .await
+    .expect("a non-delivery card keeps its behaviour");
+    assert_eq!(created.status, 201, "{}", created.body);
+    assert_eq!(output(&created.body)["list_id"], done);
 }

@@ -24,7 +24,7 @@ use conveyor_domain::{
     TenantId,
 };
 use conveyor_store as store;
-use serde_json::Value;
+use serde_json::{Value, json};
 use sqlx::PgConnection;
 use uuid::Uuid;
 
@@ -34,8 +34,9 @@ use crate::views::Page;
 
 use super::views::{
     ApprovalDecideIn, ApprovalDecisionOut, ApprovalListIn, ApprovalOut, ApprovalRequestIn,
+    ScenarioEvidenceIn,
 };
-use super::{approval_error, invalid};
+use super::{approval_error, invalid, store_error};
 
 /// `approval.approved` (S06 §5.6) — the gate reached its quorum.
 pub const APPROVAL_APPROVED: &str = "approval.approved";
@@ -583,19 +584,39 @@ async fn approvals_request(
         .as_deref()
         .map(str::trim)
         .filter(|reason| !reason.is_empty());
-    let evidence = crate::pm::resolve_evidence(
+    // §5.8: a work package's `card_done` gate carries one evidence object per acceptance
+    // scenario (`{scenario, run_id|step_id}`). The typed `{kind, id}` list has no product writer
+    // for that shape, so it is validated here — ownership included, at request time — and
+    // appended to the same `meta.evidence` array the done gate reads.
+    let scenario = resolve_scenario_evidence(
+        &mut *tx,
+        ctx.tenant,
+        input.card_id,
+        &input.scenario_evidence,
+    )
+    .await?;
+    // The typed resolution refuses only an empty typed list, so it is asked to require evidence
+    // only when nothing else supplies it: scenario evidence counts, and a waiver excuses the
+    // requirement only when there is no evidence at all. `required_kinds` is enforced inside the
+    // resolver either way, so a scenario entry never substitutes for a required typed kind.
+    let require_typed =
+        require && input.evidence.is_empty() && scenario.is_empty() && waiver.is_none();
+    let mut evidence = crate::pm::resolve_evidence(
         &mut *tx,
         ctx.tenant,
         &input.evidence,
-        require && !(input.evidence.is_empty() && waiver.is_some()),
+        require_typed,
         &input.required_kinds,
         input.pinned_spec_sha256.as_deref(),
     )
     .await?;
+    let scenario_supplied = !scenario.is_empty();
+    evidence.extend(scenario);
     if !evidence.is_empty() {
         meta.insert("evidence".to_owned(), Value::Array(evidence));
     }
     if require
+        && !scenario_supplied
         && input.evidence.is_empty()
         && let Some(reason) = waiver
     {
@@ -632,6 +653,76 @@ async fn approvals_request(
             ActionError::internal()
         })?;
     Ok(approval_out(&record))
+}
+
+/// Resolve `approvals.request`'s per-scenario evidence into the done gate's `meta.evidence` shape.
+///
+/// Each item names an acceptance scenario of the gated card's spec and exactly one of a run or a
+/// step of **that same card**. Ownership is checked here, at request time, so a gate can never
+/// cite another card's run and only discover it at the `done` move; the refusal names the
+/// scenario. The returned objects are `{scenario, run_id}` or `{scenario, step_id}` — exactly what
+/// [`crate::board::work_package_specs::verified_dod_tx`] verifies.
+async fn resolve_scenario_evidence(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    card_id: Option<Uuid>,
+    items: &[ScenarioEvidenceIn],
+) -> Result<Vec<Value>, ActionError> {
+    if items.is_empty() {
+        return Ok(Vec::new());
+    }
+    // A scenario is a property of one card's spec, so the card is what anchors the evidence; a
+    // run or step alone would let the gate name a proof nobody can place.
+    let Some(card_id) = card_id else {
+        return Err(invalid(
+            "card_id",
+            "missing",
+            "per-scenario evidence needs the gate's card_id; a run or step alone does not name \
+             the card whose scenario it proves",
+        ));
+    };
+    let mut out = Vec::with_capacity(items.len());
+    for item in items {
+        let scenario = item.scenario.trim();
+        if scenario.is_empty() {
+            return Err(invalid(
+                "scenario_evidence",
+                "missing",
+                "each per-scenario evidence item needs a scenario key",
+            ));
+        }
+        let (run_id, step_id) = match (item.run_id, item.step_id) {
+            (Some(run_id), None) => (Some(run_id), None),
+            (None, Some(step_id)) => (None, Some(step_id)),
+            _ => {
+                return Err(invalid(
+                    "scenario_evidence",
+                    "invalid_value",
+                    format!("scenario {scenario:?} needs exactly one of run_id or step_id"),
+                ));
+            }
+        };
+        let owned = store::work_package_spec::evidence_on_card_tx(
+            &mut *conn, tenant, card_id, run_id, step_id,
+        )
+        .await
+        .map_err(|error| store_error(error, "approvals.request"))?;
+        if !owned {
+            return Err(ActionError::new(
+                422,
+                "gate_evidence_not_live",
+                format!(
+                    "scenario {scenario:?} names a run or step that is not this card's; only \
+                     the gated card's own run or step verifies its scenario"
+                ),
+            ));
+        }
+        out.push(match run_id {
+            Some(run_id) => json!({ "scenario": scenario, "run_id": run_id }),
+            None => json!({ "scenario": scenario, "step_id": step_id }),
+        });
+    }
+    Ok(out)
 }
 
 /// The gate a destructive action passes before it reaches a backend.

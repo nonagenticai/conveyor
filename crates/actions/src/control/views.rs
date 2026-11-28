@@ -303,6 +303,19 @@ pub struct ApprovalDecideIn {
     pub delegation_ref: Option<Uuid>,
 }
 
+/// One acceptance scenario's proof for a work package's `card_done` gate.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ScenarioEvidenceIn {
+    /// The scenario key from the card's work-package spec.
+    pub scenario: String,
+    /// A run of the gate's card that exercises the scenario.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub run_id: Option<Uuid>,
+    /// A step of one of the gate's card's runs that exercises the scenario.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub step_id: Option<Uuid>,
+}
+
 /// `approvals.request` — a question posed for a human to decide (S06b §5).
 ///
 /// This is the agent's only path to a person, and it is how a project mid-run asks something
@@ -384,6 +397,9 @@ pub struct ApprovalRequestIn {
     /// The typed evidence the gate resolves against (T3, #74). Stored in `meta.evidence`.
     #[serde(default)]
     pub evidence: Vec<crate::pm::EvidenceRef>,
+    /// Per-scenario evidence for a work package's `card_done` gate: each item names a scenario and a run or step of that same card, appended to `meta.evidence` in the shape the done gate reads.
+    #[serde(default)]
+    pub scenario_evidence: Vec<ScenarioEvidenceIn>,
     /// Refuse an empty evidence list when true.
     #[serde(default)]
     pub require_evidence: bool,

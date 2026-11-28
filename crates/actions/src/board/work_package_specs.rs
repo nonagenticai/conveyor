@@ -4,11 +4,13 @@
 //! A work package carries exactly one spec: its BDD user story, the Gherkin `feature` document
 //! and the INVEST Definition-of-Ready evidence. The parsed scenarios and the acceptance DoD are
 //! derived on every read — the scenarios from the stored feature, the DoD rows from the approved
-//! `card_done` gate's evidence — and never stored, because a second copy would be a second home.
+//! `card_done` gate's evidence, verified against runs and steps of *this* card ([`verified_dod_tx`])
+//! — and never stored, because a second copy would be a second home.
 //!
 //! **Applicability.** Either action serves any card: a spec may be authored before the card is
 //! known to be a work package, and a card type may add criteria. Which cards *need* a spec is the
-//! run-start gate's decision (`runs.create`), never a card-type check here.
+//! run-start gate's decision (`create_bound_run_tx`, shared by `runs.create` and `cards.assign`),
+//! never a card-type check here.
 //!
 //! `cards.spec_get` reads the spec with its parsed scenarios and the computed DoD;
 //! `cards.spec_put` validates the story, the feature and the DoR's shape, then upserts the row
@@ -17,7 +19,7 @@
 
 use conveyor_domain::TenantId;
 use conveyor_domain::work_package_spec::{
-    DodRow, Scenario, SpecError, WorkPackageSpecIn, dod, readiness, validate,
+    DodRow, Scenario, SpecError, WorkPackageSpecIn, readiness, validate,
 };
 use conveyor_store as store;
 use conveyor_store::work_package_spec::{
@@ -142,7 +144,8 @@ pub(crate) async fn cards_spec_get(
         .ok_or_else(|| ActionError::resource_not_found("work-package spec"))?;
     let scenarios = parse_stored(&record)?;
     let evidence = gate_evidence_tx(&mut *tx, ctx.tenant, record.card_id, "cards.spec_get").await?;
-    let out = spec_out(&record, scenarios, &evidence);
+    let rows = verified_dod_tx(&mut *tx, ctx.tenant, record.card_id, &scenarios, &evidence).await?;
+    let out = spec_out(&record, scenarios, rows);
     Ok(HandlerOutput::ok(out).with_etag(etag_of(record.version)))
 }
 
@@ -222,8 +225,31 @@ pub(crate) async fn cards_spec_put(
     .map_err(|error| spec_store_error(error, "cards.spec_put"))?;
 
     let evidence = gate_evidence_tx(&mut *tx, ctx.tenant, saved.card_id, "cards.spec_put").await?;
-    let out = spec_out(&saved, scenarios, &evidence);
+    let rows = verified_dod_tx(&mut *tx, ctx.tenant, saved.card_id, &scenarios, &evidence).await?;
+    let out = spec_out(&saved, scenarios, rows);
     Ok(HandlerOutput::ok(out).with_etag(etag_of(saved.version)))
+}
+
+/// One card's work-package document for `cards.get`, or `None` when it has no spec.
+///
+/// This is the same `WorkPackageSpecOut` `cards.spec_get` returns — the stored spec, its parsed
+/// scenarios and the DoD derived from the approved `card_done` evidence — so the card read model
+/// carries exactly what the spec read does rather than a second projection.
+pub(crate) async fn card_spec_out_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    card_id: Uuid,
+) -> Result<Option<WorkPackageSpecOut>, ActionError> {
+    let Some(record) = store::work_package_spec::get_tx(&mut *conn, tenant, card_id)
+        .await
+        .map_err(|error| spec_store_error(error, "cards.get"))?
+    else {
+        return Ok(None);
+    };
+    let scenarios = parse_stored(&record)?;
+    let evidence = gate_evidence_tx(&mut *conn, tenant, record.card_id, "cards.get").await?;
+    let rows = verified_dod_tx(&mut *conn, tenant, record.card_id, &scenarios, &evidence).await?;
+    Ok(Some(spec_out(&record, scenarios, rows)))
 }
 
 /// The stored spec as the wire document returns it.
@@ -265,9 +291,8 @@ fn dod_out(row: &DodRow) -> DodRowOut {
 fn spec_out(
     record: &WorkPackageSpecRecord,
     scenarios: Vec<Scenario>,
-    evidence: &[Value],
+    rows: Vec<DodRow>,
 ) -> WorkPackageSpecOut {
-    let rows = dod(&scenarios, evidence);
     WorkPackageSpecOut {
         spec: spec_view(record),
         scenarios: scenarios.iter().map(scenario_out).collect(),
@@ -312,6 +337,80 @@ async fn gate_evidence_tx(
     Ok(meta
         .and_then(|meta| meta.get("evidence").and_then(Value::as_array).cloned())
         .unwrap_or_default())
+}
+
+/// Derive one verified Definition-of-Done row per scenario from the gate's evidence.
+///
+/// This is the one DoD projection: `cards.spec_get`, `cards.spec_put` and the `done` move
+/// (`assert_card_done_tx`) all read it, so what an author sees is exactly what the gate judges.
+///
+/// An evidence object verifies a scenario only when **both** halves hold:
+/// - it names the scenario key as a string, in `scenario` or `scenario_id`; and
+/// - it carries a `run_id` or `step_id` that is a **string** parsed as a UUID and belonging to
+///   `card_id` in this tenant ([`store::work_package_spec::evidence_on_card_tx`]).
+///
+/// The domain's [`conveyor_domain::work_package_spec::dod`] accepts any id and assumes the
+/// caller checked ownership; this helper is that caller. A numeric id is never a row id and so
+/// never matches, and a run or step of another card never verifies this card's scenario. Rows
+/// are returned in scenario order, one per scenario, and only matched objects are attached.
+pub(crate) async fn verified_dod_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    card_id: Uuid,
+    scenarios: &[Scenario],
+    evidence: &[Value],
+) -> Result<Vec<DodRow>, ActionError> {
+    let mut rows = Vec::with_capacity(scenarios.len());
+    for scenario in scenarios {
+        let mut matched = Vec::new();
+        for item in evidence {
+            if evidence_scenario(item) != Some(scenario.key.as_str()) {
+                continue;
+            }
+            let (run_id, step_id) = evidence_verification(item);
+            if run_id.is_none() && step_id.is_none() {
+                continue;
+            }
+            if store::work_package_spec::evidence_on_card_tx(
+                &mut *conn, tenant, card_id, run_id, step_id,
+            )
+            .await
+            .map_err(|error| store_error(error, "work_package_spec"))?
+            {
+                matched.push(item.clone());
+            }
+        }
+        rows.push(DodRow {
+            scenario: scenario.key.clone(),
+            verified: !matched.is_empty(),
+            evidence: matched,
+        });
+    }
+    Ok(rows)
+}
+
+/// The scenario key an evidence object names, in `scenario` or `scenario_id`; a non-string
+/// (a number, an object) names nothing.
+fn evidence_scenario(item: &Value) -> Option<&str> {
+    let object = item.as_object()?;
+    ["scenario", "scenario_id"]
+        .iter()
+        .find_map(|field| object.get(*field).and_then(Value::as_str))
+}
+
+/// The `run_id` and `step_id` an evidence object carries, parsed as row ids.
+///
+/// Only a string that parses as a UUID names a row; a numeric or otherwise malformed id cannot
+/// own anything, so it is never evidence.
+fn evidence_verification(item: &Value) -> (Option<Uuid>, Option<Uuid>) {
+    let object = item.as_object();
+    let id = |field: &str| {
+        object
+            .and_then(|object| object.get(field))
+            .and_then(Value::as_str)
+            .and_then(|text| Uuid::parse_str(text).ok())
+    };
+    (id("run_id"), id("step_id"))
 }
 
 /// A spec-store failure: a missing card is a `404`, an undecodable stored id is a `500`.

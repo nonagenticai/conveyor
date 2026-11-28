@@ -40,6 +40,7 @@ use crate::spec::HandlerOutput;
 use crate::views::Page;
 
 use super::CARD_DONE_GATE;
+use super::work_package_specs::verified_dod_tx;
 
 /// The card type code that marks a handoff card: a `delivery` card enters a work lane only
 /// with a job binding (v1-p66-1). The marker is the card type's code, never the project type —
@@ -165,8 +166,10 @@ async fn work_package_scenarios_tx(
 /// The work-package half of the `done` gate (SPEC_V2 §5.8, D69).
 ///
 /// A non-empty waiver satisfies the per-scenario requirement (the governance audit reads the
-/// same `meta.evidence_waiver`); otherwise every scenario key needs an evidence object whose
-/// run or step belongs to this card.
+/// same `meta.evidence_waiver`); the spec is still required, and the caller has already refused
+/// a missing one. Otherwise every DoD row must be verified: the rows come from
+/// [`verified_dod_tx`], the same projection `cards.spec_get` returns, so a scenario is done only
+/// where the read model says it is, and evidence of another card's run or step never counts.
 async fn assert_work_package_done_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
@@ -178,62 +181,19 @@ async fn assert_work_package_done_tx(
     if !waiver.is_empty() {
         return Ok(());
     }
-    for scenario in scenarios {
-        let mut verified = false;
-        for item in evidence {
-            if evidence_scenario(item) != Some(scenario.key.as_str()) {
-                continue;
-            }
-            let (run_id, step_id) = evidence_verification(item);
-            if run_id.is_none() && step_id.is_none() {
-                continue;
-            }
-            if store::work_package_spec::evidence_on_card_tx(
-                &mut *conn, tenant, card.id, run_id, step_id,
-            )
-            .await
-            .map_err(|error| store_error(error, "cards.move"))?
-            {
-                verified = true;
-                break;
-            }
-        }
-        if !verified {
-            return Err(ActionError::new(
-                422,
-                "work_package_evidence_unmet",
-                format!(
-                    "the work package's scenario '{}' has no evidence naming it with a run or \
-                     step of this card",
-                    scenario.key
-                ),
-            ));
-        }
+    let rows = verified_dod_tx(conn, tenant, card.id, scenarios, evidence).await?;
+    if let Some(row) = rows.iter().find(|row| !row.verified) {
+        return Err(ActionError::new(
+            422,
+            "work_package_evidence_unmet",
+            format!(
+                "the work package's scenario '{}' has no evidence naming it with a run or step \
+                 of this card",
+                row.scenario
+            ),
+        ));
     }
     Ok(())
-}
-
-/// The scenario key an evidence object names, in `scenario` or `scenario_id`.
-fn evidence_scenario(item: &serde_json::Value) -> Option<&str> {
-    let object = item.as_object()?;
-    ["scenario", "scenario_id"]
-        .iter()
-        .find_map(|field| object.get(*field).and_then(serde_json::Value::as_str))
-}
-
-/// The `run_id` and `step_id` an evidence object carries, parsed as row ids.
-///
-/// The domain's evidence rule accepts a number as "carries a verification", but a numeric id
-/// cannot name a row; ownership therefore reads a string UUID only.
-fn evidence_verification(item: &serde_json::Value) -> (Option<Uuid>, Option<Uuid>) {
-    let object = item.as_object();
-    let id = |field: &str| {
-        object
-            .and_then(|object| object.get(field))
-            .and_then(serde_json::Value::as_str)
-            .and_then(|text| Uuid::parse_str(text).ok())
-    };
-    (id("run_id"), id("step_id"))
 }
 
 /// A work-package-spec store failure as an action refusal: the card was resolved in-tenant
@@ -468,6 +428,17 @@ pub(crate) async fn cards_create(
                     "no card type with this code exists in this tenant",
                 )
             })?;
+
+    // A work package is not born in `done` (SPEC_V2 §5.8): its Definition of Done is judged only
+    // by the approved `card_done` gate at the `done` move, so a create already in that lane would
+    // enter finished work without ever passing it. Non-delivery cards keep their behaviour.
+    if card_type.code.as_str() == DELIVERY_CARD_TYPE && lane.list.kind == ListKind::Done {
+        return Err(ActionError::new(
+            409,
+            "card-create-not-allowed",
+            "a work package is not born in done; it moves through the card_done gate",
+        ));
+    }
 
     let job_binding_id = match input.job_binding_id {
         None => None,
