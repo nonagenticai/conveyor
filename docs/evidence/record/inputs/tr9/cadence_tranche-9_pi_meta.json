@@ -1,0 +1,96 @@
+{
+  "id": "01a222b4-5097-7fee-94ac-e7adeb1bb79c",
+  "meta": {
+    "tranche_id": "01a1e9e1-20dd-7cda-bd8b-e4fabe1d5db9",
+    "tranche_number": 9,
+    "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+    "pi_plan": {
+      "scope": [
+        "S18",
+        "S20",
+        "S21"
+      ],
+      "period": "tranche-9",
+      "capacity": {
+        "projects": [
+          "S18",
+          "S20",
+          "S21"
+        ],
+        "read_agents_max": 6,
+        "build_concurrency": 1,
+        "live_record_writer": 1
+      },
+      "evidence": [
+        "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+        "01a1e9e1-20dd-7cda-bd8b-e4fabe1d5db9",
+        "docs/evidence/rework/tranche-9/refinement-wsjf.json",
+        "docs/evidence/rework-register.json"
+      ],
+      "wip_limit": {
+        "open_batches": 2,
+        "open_cards_per_writer": 1
+      },
+      "objectives": [
+        {
+          "id": "O1",
+          "committed": true,
+          "statement": "S20 is accepted and closed through its closure gate with a published closure review.",
+          "business_value": 7
+        },
+        {
+          "id": "O2",
+          "committed": true,
+          "statement": "S21 is accepted on evidence with its authored set and both output bodies published, staying active.",
+          "business_value": 9
+        },
+        {
+          "id": "O3",
+          "committed": true,
+          "statement": "S18 is reworked to the standard with its WBS deliverable carrying the refinement's integers, staying active.",
+          "business_value": 9
+        },
+        {
+          "id": "O4",
+          "committed": false,
+          "statement": "The tranche-9 exit gate exits 0 on three fresh receipts and hands a green tranche to the #755 review.",
+          "business_value": 8
+        }
+      ],
+      "refinement": {
+        "cadence_id": "01a222b4-513e-761c-af98-64ef0334e89b"
+      },
+      "dependencies": [
+        {
+          "to": "S13",
+          "from": "S18",
+          "note": "S18 declares depends_on S13, delivered by tranche 8 (#952)"
+        },
+        {
+          "to": "S15",
+          "from": "S18",
+          "note": "S18 declares depends_on S15, delivered by tranche 7 (#951)"
+        },
+        {
+          "to": "S13",
+          "from": "S21",
+          "note": "S21 declares depends_on S13, delivered by tranche 8 (#952)"
+        },
+        {
+          "to": "S15",
+          "from": "S21",
+          "note": "S21 declares depends_on S15, delivered by tranche 7 (#951)"
+        },
+        {
+          "to": "S19",
+          "from": "S20",
+          "note": "S20 declares depends_on S19, delivered by tranche 8 (#952)"
+        }
+      ]
+    },
+    "documents": {
+      "pi-plan": "01a222b4-5dee-7060-a889-af69cf6d2ddf",
+      "pi-objectives": "01a222b4-5eb7-777f-b317-c0e445e762d7"
+    }
+  }
+}

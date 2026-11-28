@@ -1,0 +1,26 @@
+{
+  "schema": "conveyor-lesson/v1",
+  "tranche": 9,
+  "tranche_id": "01a1e9e1-20dd-7cda-bd8b-e4fabe1d5db9",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "cadence_id": "01a222b4-5278-757b-aa65-184fd4d5de28",
+  "finding_key": "k1",
+  "action": "programme_lessons.propose",
+  "input": "docs/evidence/record/inputs/tr9/lesson_tranche-9_k1.json",
+  "planned_at": "2026-11-28",
+  "why": "acceptance/programme/S18.toml, S20.toml and S21.toml each run the `lessons` check; it requires a lesson with a statement and evidence on the tranche's own retro cadence. Tranche 8 carried lesson:tranche-8:k1; tranche 9 had none, so the check would have been red for all three members.",
+  "result": {
+    "id": "01a222b5-1061-79dc-be2f-b1bff735a0e0",
+    "state": "proposed",
+    "source": "retro",
+    "finding_key": "k1",
+    "cadence_id": "01a222b4-5278-757b-aa65-184fd4d5de28",
+    "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+    "independent_count": 2,
+    "created_at": "2026-11-28T15:10:21.276332+00:00"
+  },
+  "verified": {
+    "lessons_list": "programme_lessons.list on the replay copy returns the row",
+    "snapshot": "msp.json of the fresh snapshot carries finding_key k1 on cadence 01a222b4-5278 with a non-empty evidence list"
+  }
+}

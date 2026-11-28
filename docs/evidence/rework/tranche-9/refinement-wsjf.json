@@ -1,0 +1,42 @@
+{
+  "schema": "conveyor-pi-refinement-wsjf/v1",
+  "tranche": 9,
+  "tranche_id": "01a1e9e1-20dd-7cda-bd8b-e4fabe1d5db9",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "period": "tranche-9",
+  "recorded_at": "2026-11-28",
+  "members": {
+    "S20": {
+      "business_value": 7,
+      "time_criticality": 5,
+      "risk_reduction": 6,
+      "job_size": 5
+    },
+    "S21": {
+      "business_value": 9,
+      "time_criticality": 6,
+      "risk_reduction": 7,
+      "job_size": 8
+    },
+    "S18": {
+      "business_value": 9,
+      "time_criticality": 6,
+      "risk_reduction": 9,
+      "job_size": 13
+    }
+  },
+  "order": ["S20", "S21", "S18"],
+  "reordered": [
+    {
+      "item": "S20 first, then S21, then S18",
+      "from": "the seed's membership order (S18, S20, S21)",
+      "to": "S20, S21, S18",
+      "why": "S20 is the smallest member and carries the tranche's only P0 plus the never-published closure review, so it clears first; S21 is built and owes acceptance evidence; S18 is the largest job and declares S13 and S15 as dependencies."
+    }
+  ],
+  "reestimate": {
+    "S18": "11 open packages (3 P1, 8 P2)",
+    "S20": "13 open packages (1 P0, 4 P1, 8 P2)",
+    "S21": "11 open packages (3 P1, 8 P2)"
+  }
+}

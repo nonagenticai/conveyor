@@ -1,0 +1,3 @@
+# Evidence — tranche-9 lesson
+
+Proposes the tranche-9 lesson against the `retro` cadence row. The lesson is measured on S20: a project whose record says `closed` while its acceptance manifest pins it `active` cannot be reworked green, because `check_project` fails the pin and `closes_project` returns false, so the closure review the register demands can never be published. The manifest must state the record's measured status (or carry no pin), and the pack then supplies the closure content the factory requires. Its evidence is the verifier and batch functions that produce the contradiction, the manifest that carries it, and the before/after proof recorded in this tranche's `s20-pin.json`.

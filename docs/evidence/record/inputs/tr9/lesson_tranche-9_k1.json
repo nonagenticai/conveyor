@@ -1,0 +1,16 @@
+{
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "cadence_id": "01a222b4-5278-757b-aa65-184fd4d5de28",
+  "finding_key": "k1",
+  "statement": "A project whose record says closed while its acceptance manifest pins it active cannot be reworked green: check_project fails the pin as P0 and closes_project returns false, so the closure review the register demands can never be published. The manifest must state the record's measured status — or carry no pin and let the closure content decide — before any pack is preflighted.",
+  "evidence": [
+    {
+      "kind": "path",
+      "value": "scripts/verify-project.py#check_project"
+    },
+    {
+      "kind": "path",
+      "value": "acceptance/programme/S20.toml"
+    }
+  ]
+}
