@@ -1,31 +1,31 @@
 {
   "actions_invoked": [
     {
-      "line": 1808,
+      "line": 1848,
       "name": "approvals.decide"
+    },
+    {
+      "line": 6888,
+      "name": "approvals.decide"
+    },
+    {
+      "line": 6675,
+      "name": "approvals.list"
+    },
+    {
+      "line": 6676,
+      "name": "approvals.list"
     },
     {
       "line": 6848,
-      "name": "approvals.decide"
-    },
-    {
-      "line": 6635,
-      "name": "approvals.list"
-    },
-    {
-      "line": 6636,
-      "name": "approvals.list"
-    },
-    {
-      "line": 6808,
       "name": "approvals.request"
     },
     {
-      "line": 1708,
+      "line": 1748,
       "name": "architecture.artifacts_entries"
     },
     {
-      "line": 1709,
+      "line": 1749,
       "name": "architecture.artifacts_links"
     },
     {
@@ -33,131 +33,131 @@
       "name": "card_types.list"
     },
     {
-      "line": 425,
+      "line": 446,
       "name": "cards.claim"
     },
     {
-      "line": 409,
+      "line": 430,
       "name": "cards.comment"
     },
     {
-      "line": 357,
+      "line": 378,
       "name": "cards.create"
     },
     {
-      "line": 386,
+      "line": 407,
       "name": "cards.move"
     },
     {
-      "line": 440,
+      "line": 461,
       "name": "cards.release"
     },
     {
-      "line": 3045,
+      "line": 3085,
       "name": "documents.compose"
     },
     {
-      "line": 3532,
+      "line": 3572,
       "name": "documents.compose"
     },
     {
-      "line": 3327,
+      "line": 3367,
       "name": "documents.create"
     },
     {
-      "line": 3398,
+      "line": 3438,
       "name": "documents.delete"
     },
     {
-      "line": 3344,
+      "line": 3384,
       "name": "documents.download"
     },
     {
-      "line": 3377,
+      "line": 3417,
       "name": "documents.download"
     },
     {
-      "line": 3067,
+      "line": 3107,
       "name": "documents.get"
     },
     {
-      "line": 3362,
+      "line": 3402,
       "name": "documents.get"
     },
     {
-      "line": 1567,
+      "line": 1607,
       "name": "documents.list"
     },
     {
-      "line": 1590,
+      "line": 1630,
       "name": "documents.list"
     },
     {
-      "line": 1617,
+      "line": 1657,
       "name": "documents.list"
     },
     {
-      "line": 3295,
+      "line": 3335,
       "name": "documents.list"
     },
     {
-      "line": 3429,
+      "line": 3469,
       "name": "documents.preview"
     },
     {
-      "line": 3475,
+      "line": 3515,
       "name": "documents.return"
     },
     {
-      "line": 3216,
+      "line": 3256,
       "name": "documents.revision_get"
     },
     {
-      "line": 3177,
+      "line": 3217,
       "name": "documents.revision_list"
     },
     {
-      "line": 6716,
+      "line": 6756,
       "name": "procedures.ingest_process"
     },
     {
-      "line": 6708,
+      "line": 6748,
       "name": "procedures.ingest_rdf"
     },
     {
-      "line": 6724,
+      "line": 6764,
       "name": "procedures.ingest_sop"
     },
     {
-      "line": 6592,
+      "line": 6632,
       "name": "procedures.list"
     },
     {
-      "line": 6921,
+      "line": 6961,
       "name": "procedures.publish"
     },
     {
-      "line": 6769,
+      "line": 6809,
       "name": "procedures.review_source"
     },
     {
-      "line": 6751,
+      "line": 6791,
       "name": "procedures.validate"
     },
     {
-      "line": 1831,
+      "line": 1871,
       "name": "process_runs.start"
     },
     {
-      "line": 6615,
+      "line": 6655,
       "name": "processes.get"
     },
     {
-      "line": 6595,
+      "line": 6635,
       "name": "processes.list"
     },
     {
-      "line": 6923,
+      "line": 6963,
       "name": "processes.publish"
     },
     {
@@ -165,31 +165,31 @@
       "name": "programmes.list"
     },
     {
-      "line": 1044,
+      "line": 1084,
       "name": "programmes.list"
     },
     {
-      "line": 1112,
+      "line": 1152,
       "name": "programmes.refresh"
     },
     {
-      "line": 2976,
+      "line": 3016,
       "name": "projects.close"
     },
     {
-      "line": 2837,
+      "line": 2877,
       "name": "projects.create"
     },
     {
-      "line": 1781,
+      "line": 1821,
       "name": "runs.cancel"
     },
     {
-      "line": 1759,
+      "line": 1799,
       "name": "runs.get"
     },
     {
-      "line": 1736,
+      "line": 1776,
       "name": "runs.list"
     }
   ],
@@ -422,8 +422,8 @@
           803,
           819
         ],
-        "open": 8,
-        "ready": 4,
+        "open": 6,
+        "ready": 2,
         "unknown": 0
       }
     },
@@ -724,12 +724,13 @@
       "tranche": 5,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           4,
-          604
+          604,
+          952
         ],
-        "open": 0,
+        "open": 1,
         "ready": 0,
         "unknown": 0
       }
@@ -1163,7 +1164,7 @@
       "tranche": 10,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           6,
           26,
@@ -1179,9 +1180,10 @@
           459,
           468,
           470,
-          471
+          471,
+          964
         ],
-        "open": 0,
+        "open": 1,
         "ready": 0,
         "unknown": 0
       }
@@ -1218,16 +1220,17 @@
       "tranche": 8,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           7,
           136,
           179,
           198,
           620,
-          626
+          626,
+          952
         ],
-        "open": 0,
+        "open": 1,
         "ready": 0,
         "unknown": 0
       }
@@ -1264,12 +1267,13 @@
       "tranche": 11,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 2,
         "numbers": [
           8,
-          29
+          29,
+          963
         ],
-        "open": 1,
+        "open": 2,
         "ready": 0,
         "unknown": 0
       }
@@ -1309,7 +1313,7 @@
       "tranche": 7,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           9
         ],
@@ -1439,14 +1443,14 @@
       "tranche": 9,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 2,
         "numbers": [
           12,
           30,
-          938
+          954
         ],
         "open": 2,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1482,13 +1486,14 @@
       "tranche": 8,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 2,
         "numbers": [
           13,
-          31
+          31,
+          952
         ],
-        "open": 1,
-        "ready": 1,
+        "open": 2,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1525,11 +1530,12 @@
       "tranche": 9,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
-          14
+          14,
+          954
         ],
-        "open": 0,
+        "open": 1,
         "ready": 0,
         "unknown": 0
       }
@@ -1571,7 +1577,7 @@
       "tranche": 9,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           15,
           581,
@@ -1582,9 +1588,10 @@
           649,
           656,
           697,
-          734
+          734,
+          954
         ],
-        "open": 0,
+        "open": 1,
         "ready": 0,
         "unknown": 0
       }
@@ -1989,11 +1996,12 @@
       "tranche": 12,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
-          86
+          86,
+          961
         ],
-        "open": 0,
+        "open": 1,
         "ready": 0,
         "unknown": 0
       }
@@ -2421,13 +2429,15 @@
       "tranche": 10,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           77,
-          653
+          653,
+          962,
+          964
         ],
-        "open": 0,
-        "ready": 0,
+        "open": 2,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -2464,11 +2474,12 @@
       "tranche": 11,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
-          80
+          80,
+          963
         ],
-        "open": 0,
+        "open": 1,
         "ready": 0,
         "unknown": 0
       }
@@ -2553,11 +2564,12 @@
       "tranche": 11,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
-          79
+          79,
+          963
         ],
-        "open": 0,
+        "open": 1,
         "ready": 0,
         "unknown": 0
       }
@@ -2880,8 +2892,8 @@
       },
       "total": 52,
       "uncovered": [],
-      "with_open_units": 6,
-      "without_open_units": 46
+      "with_open_units": 15,
+      "without_open_units": 37
     },
     "screens": {
       "actions_invoked": 39,

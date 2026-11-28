@@ -8,9 +8,13 @@
 # changes; run it by hand only to reproduce a failure or to refresh before a publish.
 #
 # ⛔ PUBLIC-SAFE BY CONSTRUCTION. The registry is published on a public site, so it carries the
-# number, a redacted title, the state, the labels and the URL only. Issue BODIES and AUTHOR
-# LOGINS are never written; titles pass the same redaction as the snapshot (home paths, emails,
-# credential-shaped strings, IPs).
+# number, a redacted title, the state, the labels, the URL and — for a `unit` issue only — a
+# fixed-vocabulary readiness summary derived by `scripts/ci/issue_contract.py`. Issue BODIES and
+# AUTHOR LOGINS are never written; titles pass the same redaction as the snapshot (home paths,
+# emails, credential-shaped strings, IPs).
+#
+# The `body` field is requested from `gh issue list` solely to derive the readiness counts and is
+# dropped before the registry is written.
 #
 # Usage: scripts/fetch-issues.sh [out]
 #   out defaults to docs/design/data/issues.json
@@ -28,7 +32,7 @@ trap 'rm -f "$tmp"' EXIT
 gh issue list \
   --state all \
   --limit 500 \
-  --json number,title,state,labels,url,updatedAt \
+  --json number,title,state,labels,url,updatedAt,body \
   > "$tmp"
 
 python3 - "$tmp" "$out" "$root" <<'PY'
@@ -40,6 +44,8 @@ import sys
 src, dst, root = sys.argv[1], sys.argv[2], sys.argv[3]
 sys.path.insert(0, os.path.join(root, "scripts"))
 from private_refs import redact  # noqa: E402
+sys.path.insert(0, os.path.join(root, "scripts", "ci"))
+import issue_contract  # noqa: E402
 tenant = os.environ.get("CONVEYOR_TENANT") or "nonagentic"
 HOME_PATH = re.compile(r"(?:/Users/[A-Za-z0-9._-]+|/home/[A-Za-z0-9._-]+|~/)[^\s\"']*")
 EMAIL = re.compile(r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}")
@@ -61,19 +67,23 @@ def clean(text):
 
 rows = []
 for issue in json.load(open(src, encoding="utf-8")):
-    rows.append(
-        {
-            "number": issue["number"],
-            "title": clean(issue["title"]),
-            "state": issue["state"],
-            "url": issue["url"],
-            "updatedAt": issue.get("updatedAt"),
-            "labels": [
-                {"name": label["name"], "color": label.get("color", "")}
-                for label in issue.get("labels", [])
-            ],
-        }
-    )
+    labels = [
+        {"name": label["name"], "color": label.get("color", "")}
+        for label in issue.get("labels", [])
+    ]
+    row = {
+        "number": issue["number"],
+        "title": clean(issue["title"]),
+        "state": issue["state"],
+        "url": issue["url"],
+        "updatedAt": issue.get("updatedAt"),
+        "labels": labels,
+    }
+    # SPEC_V2 §5.8 (D69): a unit row publishes the fixed-vocabulary readiness summary. The body
+    # it is derived from stays in this process; `readiness_summary` returns counts only.
+    if any(label["name"] == "unit" for label in labels):
+        row["readiness"] = issue_contract.readiness_summary(issue.get("body") or "")
+    rows.append(row)
 
 registry = {
     "schema": "issue-registry/v1",

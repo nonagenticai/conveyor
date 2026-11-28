@@ -18,6 +18,9 @@ THE RULES (docs/plans/03-DELIVERY.md § "Issue content contract", SPEC_V2 §5.8)
 - A unit created on/after `STORY_SINCE` carries one `## User story` (`As a …, I want …, so
   that …`) and, per part, a Gherkin `Scenario:` with a `@verify=<id>` tag; the Definition of done
   has one table row per scenario, keyed by that id.
+- The public progress record publishes `readiness_summary` — the same derivations as counts and
+  booleans under `unit-readiness/v1` — so it can show whether a unit uses the standard without
+  publishing one word of its body.
 
 FORWARD-ONLY
 ------------
@@ -89,6 +92,12 @@ SCENARIO_RE = re.compile(r"^\s*Scenario(?: Outline)?:\s*(.+?)\s*$", re.M | re.I)
 # The tag that ties a scenario to its test or the issue's `Verify:` line. The id never contains a
 # space, so the line rule above remains the only place the command itself appears.
 VERIFY_TAG_RE = re.compile(r"@verify[=:]\s*([A-Za-z0-9._:/-]+)", re.I)
+
+# The public readiness summary's schema (SPEC_V2 §5.8, D69): fixed vocabulary counts, never body
+# text. `scripts/fetch-issues.sh` writes one per `unit` row; the design view renders it.
+READINESS_SCHEMA = "unit-readiness/v1"
+# A DoD evidence cell the author has not filled yet, at any case and however trimmed.
+UNDONE_DOD_CELLS = frozenset({"to fill", "—", "-"})
 
 # The template's generic DoR text (`.github/ISSUE_TEMPLATE/unit.md`). A row whose evidence is the
 # template's restatement is not the unit's own evidence. The comparison is on the evidence after the
@@ -231,6 +240,50 @@ def _normalise_evidence(text: str) -> str:
     return text.strip(" .;:")
 
 
+def _dor_states(body: str) -> dict[str, str]:
+    """Per INVEST criterion: `missing`, `restatement` or `evidence`.
+
+    The one derivation both the claim gate (`invest_gaps`) and the public readiness summary
+    (`dor_criteria`) read, so a row can never be ready for one reader and not the other. A
+    criterion is `missing` with no bold label, `restatement` when any labelled row carries the
+    template's generic text (or its `<…>` placeholder), and `evidence` only when every labelled
+    row names this unit's own facts.
+    """
+    content = section_lines(body, "Definition of ready")
+    states = {criterion: "missing" for criterion in INVEST_CRITERIA}
+    if content is None:
+        return states
+    for criterion, phrases in TEMPLATE_DOR_PHRASES:
+        rows = [line for line in content if _criterion_line(line, criterion)]
+        if not rows:
+            continue
+        state = "evidence"
+        for line in rows:
+            evidence = _dor_evidence(line, criterion)
+            normalised = _normalise_evidence(evidence)
+            if (
+                not normalised
+                or evidence.lstrip().startswith("<")
+                or any(normalised == _normalise_evidence(phrase) for phrase in phrases)
+            ):
+                state = "restatement"
+                break
+        states[criterion] = state
+    return states
+
+
+def dor_criteria(body: str) -> dict[str, bool]:
+    """The six INVEST tests, each evidenced by this unit's own facts (SPEC_V2 §5.8).
+
+    The boolean view of `_dor_states` for readers that count rather than report: the public
+    readiness summary publishes these, never the rows' text.
+    """
+    return {
+        criterion.lower(): state == "evidence"
+        for criterion, state in _dor_states(body).items()
+    }
+
+
 def invest_gaps(body: str) -> list[str]:
     """The INVEST criteria the `## Definition of ready` section does not name, or only restates.
 
@@ -239,33 +292,14 @@ def invest_gaps(body: str) -> list[str]:
     instead of this unit's own facts. A row may state the definition and then append the unit's
     facts — only the definition alone (or the template's `<…>` placeholder) is a gap.
     """
-    content = section_lines(body, "Definition of ready")
-    if content is None:
+    if section_lines(body, "Definition of ready") is None:
         return []
-    missing = [
-        criterion
-        for criterion in INVEST_CRITERIA
-        if not any(_criterion_line(line, criterion) for line in content)
-    ]
+    states = _dor_states(body)
+    missing = [criterion for criterion in INVEST_CRITERIA if states[criterion] == "missing"]
     gaps = [f"the DoR does not name INVEST: {', '.join(missing)}"] if missing else []
-    for criterion, phrases in TEMPLATE_DOR_PHRASES:
-        if criterion in missing:
-            continue
-        for line in content:
-            if not _criterion_line(line, criterion):
-                continue
-            evidence = _dor_evidence(line, criterion)
-            normalised = _normalise_evidence(evidence)
-            if not normalised or evidence.lstrip().startswith("<"):
-                gaps.append(
-                    f"the DoR row for {criterion} is the template's restatement, not evidence"
-                )
-                break
-            if any(normalised == _normalise_evidence(phrase) for phrase in phrases):
-                gaps.append(
-                    f"the DoR row for {criterion} is the template's restatement, not evidence"
-                )
-                break
+    for criterion in INVEST_CRITERIA:
+        if states[criterion] == "restatement":
+            gaps.append(f"the DoR row for {criterion} is the template's restatement, not evidence")
     return gaps
 
 
@@ -379,6 +413,73 @@ def dod_gaps(body: str) -> list[str]:
         if not any(_cell_names(cell, verify_id) for cell in first_cells):
             gaps.append(f"the DoD has no row for `{verify_id}`")
     return gaps
+
+
+def _dod_counts(body: str) -> dict[str, int]:
+    """The DoD table's data rows, and how many carry a filled evidence cell.
+
+    Counts every table in the section, each table's first row as its header (the `Evidence`
+    column when a header names one, else the second cell). A cell still reading `to fill`, `—`
+    or `-` is unfilled: a template row must not read as evidence.
+    """
+    content = section_lines(body, "Definition of done")
+    if content is None:
+        return {"rows": 0, "evidenced": 0}
+    tables: list[list[list[str]]] = []
+    current: list[list[str]] = []
+    for line in content:
+        stripped = line.strip()
+        if stripped.startswith("|"):
+            current.append([cell.strip() for cell in stripped.strip("|").split("|")])
+        elif current:
+            tables.append(current)
+            current = []
+    if current:
+        tables.append(current)
+    rows = 0
+    evidenced = 0
+    for table in tables:
+        header = table[0] if table else []
+        evidence_index = next(
+            (index for index, cell in enumerate(header) if "evidence" in cell.lower()), 1
+        )
+        for cells in table[1:]:
+            if cells and all(re.fullmatch(r":?-{3,}:?", cell) for cell in cells):
+                continue
+            rows += 1
+            value = cells[evidence_index] if evidence_index < len(cells) else ""
+            normalised = _normalise_evidence(value)
+            if normalised and normalised not in UNDONE_DOD_CELLS:
+                evidenced += 1
+    return {"rows": rows, "evidenced": evidenced}
+
+
+def readiness_summary(body: str) -> dict:
+    """The public-safe readiness of one unit body (SPEC_V2 §5.8, D69).
+
+    Fixed-vocabulary values only — counts and booleans — so the published registry can show
+    whether a unit carries the story/Gherkin/INVEST/DoD standard without a word of the body.
+    `parts` counts the `### P` blocks, `scenarios` the `Scenario:` lines across the Parts
+    section, and `verified` caps each part's `@verify` tags at its scenario count (the same
+    measure `scenario_gaps` refuses below). The DoR booleans and DoD counts share the gate's
+    own derivation, so the public record and the claim gate can never disagree.
+    """
+    parts_text = "\n".join(section_lines(body, "Parts and acceptance criteria") or [])
+    scenarios = 0
+    verified = 0
+    for _part, block in _part_blocks(body):
+        count = len(SCENARIO_RE.findall(block))
+        scenarios += count
+        verified += min(count, len(VERIFY_TAG_RE.findall(block)))
+    return {
+        "schema": READINESS_SCHEMA,
+        "story": not story_gaps(body),
+        "parts": len(PART_RE.findall(parts_text)),
+        "scenarios": scenarios,
+        "verified": verified,
+        "dor": dor_criteria(body),
+        "dod": _dod_counts(body),
+    }
 
 
 def contract_gaps(

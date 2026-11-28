@@ -453,6 +453,60 @@ if (failures.length === 0) ok("no email, credential, IP or home path in any file
 
 const issuesPath = path.join(dataDir, "issues.json");
 if (fs.existsSync(issuesPath)) {
+  // SPEC_V2 §5.8 (D69): a unit row publishes the fixed-vocabulary readiness summary. The shape
+  // is exact so the public view never has to guess at a key or a type; the body/author ban above
+  // is unchanged.
+  const READINESS_KEYS = ["schema", "story", "parts", "scenarios", "verified", "dor", "dod"];
+  const DOR_KEYS = ["independent", "negotiable", "valuable", "estimable", "small", "testable"];
+  const DOD_KEYS = ["rows", "evidenced"];
+  const isObject = (value) =>
+    !!value && typeof value === "object" && !Array.isArray(value);
+  const exactKeys = (value, expected) =>
+    isObject(value) &&
+    Object.keys(value).sort().join(",") === [...expected].sort().join(",");
+  const countOk = (value) => Number.isInteger(value) && value >= 0;
+  const readinessProblems = (readiness) => {
+    if (!exactKeys(readiness, READINESS_KEYS)) {
+      return [
+        `readiness key set is ${isObject(readiness) ? Object.keys(readiness).sort().join(",") || "(none)" : typeof readiness}, expected ${READINESS_KEYS.join(",")}`,
+      ];
+    }
+    const problems = [];
+    if (readiness.schema !== "unit-readiness/v1") {
+      problems.push("readiness.schema is not unit-readiness/v1");
+    }
+    if (typeof readiness.story !== "boolean") {
+      problems.push("readiness.story is not a boolean");
+    }
+    for (const key of ["parts", "scenarios", "verified"]) {
+      if (!countOk(readiness[key])) {
+        problems.push(`readiness.${key} is not a non-negative integer`);
+      }
+    }
+    if (!exactKeys(readiness.dor, DOR_KEYS)) {
+      problems.push(
+        `readiness.dor key set is ${isObject(readiness.dor) ? Object.keys(readiness.dor).sort().join(",") || "(none)" : typeof readiness.dor}, expected ${DOR_KEYS.join(",")}`,
+      );
+    } else {
+      for (const key of DOR_KEYS) {
+        if (typeof readiness.dor[key] !== "boolean") {
+          problems.push(`readiness.dor.${key} is not a boolean`);
+        }
+      }
+    }
+    if (!exactKeys(readiness.dod, DOD_KEYS)) {
+      problems.push(
+        `readiness.dod key set is ${isObject(readiness.dod) ? Object.keys(readiness.dod).sort().join(",") || "(none)" : typeof readiness.dod}, expected ${DOD_KEYS.join(",")}`,
+      );
+    } else {
+      for (const key of DOD_KEYS) {
+        if (!countOk(readiness.dod[key])) {
+          problems.push(`readiness.dod.${key} is not a non-negative integer`);
+        }
+      }
+    }
+    return problems;
+  };
   let issues;
   try {
     issues = JSON.parse(fs.readFileSync(issuesPath, "utf8"));
@@ -460,6 +514,8 @@ if (fs.existsSync(issuesPath)) {
     bad(`issues.json does not parse: ${error.message}`);
   }
   let leaked = 0;
+  let readinessBad = 0;
+  let unitRows = 0;
   for (const issue of (issues && issues.issues) || []) {
     for (const forbidden of ["body", "author"]) {
       if (Object.prototype.hasOwnProperty.call(issue, forbidden)) {
@@ -471,8 +527,31 @@ if (fs.existsSync(issuesPath)) {
     if (EMAIL.test(title) || TOKEN.test(title) || IP.test(title) || HOME_PATH.test(title)) {
       bad(`issues.json title #${issue.number} is not redacted`);
     }
+    const isUnit = (issue.labels || []).some(
+      (label) => label && label.name === "unit",
+    );
+    if (!isUnit) {
+      if (Object.prototype.hasOwnProperty.call(issue, "readiness")) {
+        readinessBad += 1;
+        bad(`issues.json #${issue.number} carries readiness but is not a unit row`);
+      }
+      continue;
+    }
+    unitRows += 1;
+    if (!Object.prototype.hasOwnProperty.call(issue, "readiness")) {
+      readinessBad += 1;
+      bad(`issues.json #${issue.number} is a unit row without readiness`);
+      continue;
+    }
+    for (const problem of readinessProblems(issue.readiness)) {
+      readinessBad += 1;
+      bad(`issues.json #${issue.number} ${problem}`);
+    }
   }
   if (leaked === 0) ok("issues.json carries no bodies or authors");
+  if (readinessBad === 0) {
+    ok(`issues.json readiness is exact on ${unitRows} unit row(s) and absent elsewhere`);
+  }
 }
 
 const organisationPath = path.join(dataDir, "organisation.json");

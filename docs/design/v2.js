@@ -330,6 +330,27 @@ window.installV2 = function (api, enterprise) {
     );
   }
 
+  // SPEC_V2 §5.8 (D69): the public-safe readiness summary a `unit` registry row carries —
+  // story flag, part/scenario counts, the six INVEST booleans and the DoD row/evidence counts.
+  // Values only, never body text; an issue the registry carries no summary for reads "—".
+  function readinessText(issue) {
+    const row = (issue || {}).readiness;
+    if (!row || typeof row !== "object") return "—";
+    const dor = row.dor || {};
+    const dod = row.dod || {};
+    const count = (value) => (Number.isFinite(Number(value)) ? Number(value) : 0);
+    const met = ["independent", "negotiable", "valuable", "estimable", "small", "testable"].filter(
+      (key) => dor[key] === true,
+    ).length;
+    const parts = count(row.parts);
+    const scenarios = count(row.scenarios);
+    return `story ${row.story === true ? "✓" : "✗"} · ${parts} part${
+      parts === 1 ? "" : "s"
+    } · ${scenarios} scenario${scenarios === 1 ? "" : "s"} (${count(
+      row.verified,
+    )} verified) · DoR ${met}/6 · DoD ${count(dod.evidenced)}/${count(dod.rows)} evidenced`;
+  }
+
   async function consoleIntake(projectId, issueNumber) {
     const project = cs.projects.find((row) => row.id === projectId);
     const data = cs.byProject[projectId];
@@ -692,6 +713,25 @@ window.installV2 = function (api, enterprise) {
       standards: window.CONVEYOR_STANDARDS || null,
       generated_at: null,
     };
+  }
+
+  // The unit detail's readiness line (SPEC_V2 §5.8, D69; #937): the route id is an issue number,
+  // joined to the registry this page already loads — the snapshot's programme registry, or the
+  // console's own read of data/issues.json. Values only, never the body; no row (or no summary
+  // on the row) reads "—".
+  function unitReadinessPanel(data, issueNumber) {
+    const registry = list((((data || {}).programme || {}).issue_registry || {}).issues);
+    const rows = registry.length ? registry : list(cs.issues);
+    const issue = rows.find((row) => String(row.number) === String(issueNumber));
+    return panel(
+      "Readiness · SPEC_V2 §5.8",
+      `${kv([
+        ["Unit", issueNumber ? `<span class="mono">#${E(issueNumber)}</span>` : "—"],
+        ["Summary", `<span class="mono">${E(readinessText(issue))}</span>`],
+      ])}${note(
+        `Derived from the issue body by <span class="mono">scripts/fetch-issues.sh</span> — story, part and scenario counts, the six INVEST tests and the DoD evidence rows. The body itself is never published.`,
+      )}`,
+    );
   }
 
   function deliveryTimeline() {
@@ -2601,12 +2641,12 @@ window.installV2 = function (api, enterprise) {
         `<tr><td><a class="e-project-link" href="${E(issue.url || consoleIssueUrl(issue.number))}" target="_blank" rel="noopener">#${E(issue.number)} ↗</a> <strong>${E(issue.title)}</strong></td><td>${B(
           issue.state === "CLOSED" ? "Closed" : issue.state === "OPEN" ? "Open" : issue.state,
           issue.state === "CLOSED" ? "" : "amber",
-        )}</td></tr>`,
+        )}</td><td><small class="mono">${E(readinessText(issue))}</small></td></tr>`,
     );
     const issuePanel = panel(
       `${project.key} · Linked issues`,
       issueRows.length
-        ? table(["Issue", "GitHub state"], issueRows)
+        ? table(["Issue", "GitHub state", "Readiness"], issueRows)
         : `<p class="muted">No GitHub issues are linked to this project. Intake a feedback issue below, or add issues to the project meta.</p>`,
       B(`${issues.filter((row) => row.state === "OPEN").length} open`, "green"),
     );
@@ -3671,14 +3711,14 @@ window.installV2 = function (api, enterprise) {
       return `<tr><td><a class="e-project-link" href="${E(issue.url || consoleIssueUrl(issue.number))}" target="_blank" rel="noopener">#${E(issue.number)} ↗</a> <strong>${E(issue.title)}</strong></td><td>${B(
         issue.state === "CLOSED" ? "Closed" : issue.state === "OPEN" ? "Open" : issue.state,
         issue.state === "CLOSED" ? "" : "amber",
-      )}</td><td>${
+      )}</td><td><small class="mono">${E(readinessText(issue))}</small></td><td>${
         card ? `<strong>${E(card.name)}</strong><small class="mono">${E(lane ? lane.name : "")}</small>` : `<span class="muted">— not intaken</span>`
       }</td><td>${action}</td></tr>`;
     });
     const issuePanel = panel(
       `${project.key} · GitHub issues`,
       issueRows.length
-        ? table(["Issue", "GitHub state", "Card", "Operate"], issueRows)
+        ? table(["Issue", "GitHub state", "Readiness", "Card", "Operate"], issueRows)
         : `<p class="muted">No GitHub issues are registered for this project.</p>`,
       B(`${issues.filter((row) => row.state === "OPEN").length} open`, "green"),
     );
@@ -6440,12 +6480,12 @@ window.installV2 = function (api, enterprise) {
     };
     const issueRows = issues.map(
       (issue) =>
-        `<tr><td><a class="e-project-link" href="${E(issue.url)}" target="_blank" rel="noopener">#${E(issue.number)} ↗</a> <strong>${E(issue.title)}</strong></td><td>${B(issue.state === "CLOSED" ? "Closed" : issue.state === "OPEN" ? "Open" : issue.state, issue.state === "CLOSED" ? "" : "amber")}${statusOf(issue) ? ` <small class="mono">${E(statusOf(issue))}</small>` : ""}</td><td>${cardCell(issue)}</td><td>${laneCell(issue)}</td><td>${runCell(issue)}</td><td>${evidenceCell(issue)}</td></tr>`,
+        `<tr><td><a class="e-project-link" href="${E(issue.url)}" target="_blank" rel="noopener">#${E(issue.number)} ↗</a> <strong>${E(issue.title)}</strong></td><td>${B(issue.state === "CLOSED" ? "Closed" : issue.state === "OPEN" ? "Open" : issue.state, issue.state === "CLOSED" ? "" : "amber")}${statusOf(issue) ? ` <small class="mono">${E(statusOf(issue))}</small>` : ""}</td><td><small class="mono">${E(readinessText(issue))}</small></td><td>${cardCell(issue)}</td><td>${laneCell(issue)}</td><td>${runCell(issue)}</td><td>${evidenceCell(issue)}</td></tr>`,
     );
     const issuePanel = panel(
       `${project.key} · GitHub issues`,
       issueRows.length
-        ? table(["Issue", "GitHub state", "Card", "Lane", "Run", "Evidence"], issueRows)
+        ? table(["Issue", "GitHub state", "Readiness", "Card", "Lane", "Run", "Evidence"], issueRows)
         : `<p class="muted">No GitHub issues are registered for this project.</p>`,
       B(`${open} open · ${closed} closed`),
     );
@@ -8221,7 +8261,8 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
           ),
         );
       }
-      return D.unitDetail(data, routeSegments()[1] || "");
+      const wanted = routeSegments()[1] || "";
+      return `${D.unitDetail(data, wanted)}${unitReadinessPanel(data, wanted)}`;
     },
     programme: programmeDefinitionPage,
     adm: architectureCapabilityPage,
