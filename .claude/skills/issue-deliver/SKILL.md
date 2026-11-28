@@ -29,9 +29,9 @@ The authority is `docs/plans/03-DELIVERY.md`. One issue = one branch = exactly o
    gh pr create --base main --head issue/N-<slug> \
      --title "#N <issue title>" --body-file -
    ```
-   Body: `Closes #N`, What, Why/source, acceptance evidence (command → result → sha), Resume,
-   Risks — the shape in `.github/pull_request_template.md`. Never a draft, never a second PR,
-   never a push "to see CI".
+   Body: `Closes #N`, What, Why/source, acceptance evidence (one row per scenario key: command →
+   result → sha), Resume, Risks — the shape in `.github/pull_request_template.md`. Never a draft,
+   never a second PR, never a push "to see CI".
 6. **CI**: one run should follow (the budget is two: the PR run and the merge run). A docs-only PR
    is the ~1-minute path — checks and build skipped; its **merge run is still a full suite until
    #32**. Red → fix locally and push the same branch (a second run is legitimate). Red twice →
@@ -39,9 +39,14 @@ The authority is `docs/plans/03-DELIVERY.md`. One issue = one branch = exactly o
    requires it — then the handoff; stop pushing. Before blaming the PR, check `main`: if main is
    red on the same job, this issue is the messenger — record it, do not "fix" someone else's red.
 7. **Definition-of-done gate — before merge.** Verify against the PR head sha:
-   - every scenario id in the issue has a row in the PR's evidence table (command → result → sha);
+   - every scenario key (its `@verify` id) in the issue maps to a row in the PR's evidence table
+     with the command, its result and the sha; a scenario with no row, or a row with no
+     command → result → sha, is an open DoD item;
    - the gate passed at that exact sha;
-   - the tests named per part exist and ran; none skipped;
+   - the six INVEST rows still hold at the PR head: no new `blocked-by`, the diff stays inside the
+     unit's files (Independent), the story's `so that` is what the PR delivers (Valuable), and
+     every scenario ran (Testable) — one issue, one PR (Small);
+   - the tests named per scenario exist and ran; none skipped;
    - the issue's docs/migrations/lock DoD items are handled;
    - every CARRIED-BY-#9 part was re-checked on merged main (or is explicitly deferred to the
      post-train sweep, named in the PR);

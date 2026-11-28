@@ -57,11 +57,23 @@ live register, not a plan's status label, decides whether the project is propose
 5. **Write the contract body, not a summary.** Every section, in order:
    Goal (one sentence, the remaining outcome) · Plan/audit source (links) · References (table with
    the ref it resolves at) · Baseline (sha + date + doc blob shas) · Current state (one row per part:
-   DONE / PARTIAL / ABSENT / CARRIED-BY-#9, with evidence) · Parts and acceptance criteria (one
-   subsection per plan Deliverable/Build-order item or audit `W`/`V`, each with at least one
-   `Given/When/Then` and a mandatory `Verify:` command or `path::test`) · Dependencies (typed:
-   `blocked-by` / `acceptance-blocked-by` / `blocks` / `related`, each with its source and state;
-   blockers are issues; deployment is #18) · Definition of ready · Definition of done · Out
+   DONE / PARTIAL / ABSENT / CARRIED-BY-#9, with evidence) · User story (**exactly one per unit**:
+   `As a …, I want …, so that …`, all three clauses non-blank; the value is the observable benefit
+   or the named gap, never a restatement of the implementation) · Parts and acceptance criteria (one
+   subsection per plan Deliverable/Build-order item or audit `W`/`V`; every `### P` part carries at
+   least one Gherkin block — `Feature:`, one or more `Scenario:`s with `Given`/`When`/`Then`
+   (`And`/`But`), and a `@verify=<id>` tag above each, the id carrying no space — followed by a
+   mandatory `Verify:` line for each scenario with the exact command or `path::test`;
+   `Scenario Outline` is expanded, each example a scenario) · Dependencies (typed: `blocked-by` /
+   `acceptance-blocked-by` / `blocks` / `related`, each with its source and state; blockers are
+   issues; deployment is #18) · Definition of ready (the six INVEST rows, each with **this unit's
+   own evidence**, never the template's phrase: Independent — no `blocked-by`, lands without
+   another unit's files; Negotiable — outcome fixed, implementation settled at delivery; Valuable
+   — the `so that` names a benefit or a named gap; Estimable — the baseline and every file are
+   named; Small — one issue, one branch, one PR; Testable — every scenario carries `@verify` and a
+   `Verify:`) · Definition of done (a table with **one row per scenario**, keyed by its `@verify`
+   id, each naming the evidence and the `Verify:` that passed at the PR head; one row per part, or
+   a prose checklist, is not the DoD) · Out
    of scope (including the audit's scope corrections) · Deployment prerequisite · Open questions ·
    Evidence at completion (empty table).
    One paraphrased sentence per part; the plan and audit are linked, never pasted.
@@ -72,11 +84,20 @@ live register, not a plan's status label, decides whether the project is propose
    placeholder).
 
 6. **Self-check before create** — all must pass; fix the body, do not create yet:
-   - every required heading is present;
+   - every required heading is present, including exactly one `## User story`;
+   - the story's three clauses (`As a …`, `I want …`, `so that …`) are all non-blank;
    - the four `## Programme` rows are present and non-empty, each naming a live row/document or
      `pending #N`;
    - every cited path resolves at its ref (`git cat-file -e`), every `#N` resolves;
-   - every part has ≥1 scenario carrying a `Verify:` command or test target;
+   - every `### P` part has ≥1 `Scenario:` with `Given`/`When`/`Then` and a `@verify=<id>` (no
+     space in the id) plus a `Verify:` command or test target; every id is unique;
+   - the DoD table has one row per scenario key (its `@verify` id) and a `Verify:` column — a
+     per-part table or a prose checklist is not the DoD;
+   - the six INVEST rows are present and each names this issue's evidence, not the template's
+     generic phrase (`board.py` refuses a unit created on/after 2026-11-28);
+   - `python3 scripts/ci/board.py --contract-body /tmp/body.md` exits 0 — necessary, not
+     sufficient: the gate checks presence and shape, while this checklist checks that every row
+     and every `Verify:` carries this unit's real evidence;
    - the chosen state label matches the Dependencies table (`status:blocked` iff a `blocked-by` is
      open; an `acceptance-blocked-by` alone must not block);
    - no sentence is copied from the plan or audit (`git grep -F` a sample);
@@ -128,3 +149,6 @@ live register, not a plan's status label, decides whether the project is propose
 - Create a batch without checking each item against the live train.
 - Pad the body with analysis that is already in the plan — link it.
 - Create an issue whose acceptance is prose with no `Verify:` line.
+- Create an issue with no `## User story`, a part with no Gherkin `Scenario:`/`@verify`, or a DoD
+  that is one row per part instead of one row per scenario.
+- Write an INVEST row as the template's generic phrase; the row names this unit's own evidence.

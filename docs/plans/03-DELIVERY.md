@@ -70,23 +70,34 @@ shape is `.github/ISSUE_TEMPLATE/unit.md`; the rules are:
 - **References.** Every spec/plan/audit/code/test reference is a path that resolves at the ref it
   names, or an issue number that resolves. Cite `path:symbol`; line numbers only when re-verified at
   the baseline. A path the issue must create is marked `to create`.
+- **User story.** Exactly one per unit: `As a <role>, I want <capability>, so that <value>`. All
+  three clauses are non-blank; the role is a live actor, and the value is the observable benefit or
+  the named gap the work removes, never a restatement of the implementation. The parts below are the
+  unit's acceptance groups.
 - **Parts.** One part per plan Deliverable/Build-order item or audit `W`/`V` id. Each part states its
   measured state — **DONE / PARTIAL / ABSENT / CARRIED-BY-#9** — with evidence, and carries at least
-  one BDD scenario.
-- **INVEST.** Every part is a user story that passes the six tests, and the `## Definition of ready`
-  section names each one: **Independent** (lands without another unit's files), **Negotiable**
-  (outcome fixed, implementation settled at delivery), **Valuable** (maps to a benefit or removes a
-  named gap), **Estimable** (baseline and files named), **Small** (one issue, one PR), **Testable**
-  (every part has a `Verify:`). A part that fails a test is split or re-scoped before the claim;
-  `board.py --dor` refuses a unit created on/after 2026-11-28 whose DoR does not name all six.
-- **Acceptance-based DoD.** The `## Definition of done` section is a table with one row per part,
-  each naming the evidence and the `Verify:` that passed at the PR head. A prose checklist is not
-  the DoD. The project-level counterpart is the `definition-of-ready` and `definition-of-done`
-  output in `seed/output-standard.json`; this contract is the unit-level instance of it.
-- **BDD acceptance.** `Given <state>, when <action>, then <observable outcome>` with a mandatory
-  `Verify:` line: an exact command or `path::test`. A scenario without a verification is not
-  acceptance; "works correctly" is not a criterion. A deployment-gated scenario says so and names its
-  gate.
+  one Gherkin scenario: a `Scenario:` block with `Given`/`When`/`Then` and a `@verify=<id>` tag.
+- **INVEST.** The `## Definition of ready` names each of the six tests with the unit's own evidence —
+  the files, the typed dependency, the benefit, the measured baseline — not the template's
+  restatement: **Independent** (lands without another unit's files), **Negotiable** (outcome fixed,
+  implementation settled at delivery), **Valuable** (maps to a benefit or removes a named gap),
+  **Estimable** (baseline and files named), **Small** (one issue, one PR), **Testable** (every
+  scenario carries `@verify` and a `Verify:`). A unit that fails a test is split or re-scoped before
+  the claim; `board.py --dor` refuses a unit created on/after 2026-11-28 whose DoR does not name all
+  six.
+- **Acceptance-based DoD.** The `## Definition of done` table has one row per scenario, keyed by the
+  scenario's `@verify` id, each naming the evidence and the `Verify:` that passed at the PR head. A
+  prose checklist is not the DoD. The project-level counterpart is the `definition-of-ready` and
+  `definition-of-done` output in `seed/output-standard.json`; this contract is the unit-level
+  instance of it.
+- **BDD acceptance.** The block is Gherkin — `Feature:` and `Scenario:` with `Given`/`When`/`Then` —
+  and each scenario carries a `@verify=<id>` tag (a tag cannot contain spaces, so the id names the
+  scenario, never the command). The `Verify:` line carries the command: an exact command or
+  `path::test`. A scenario without an observable outcome or a verification is not acceptance; "works
+  correctly" is not a criterion. A deployment-gated scenario says so and names its gate.
+- **Forward-only.** The user story, the Gherkin acceptance and the per-scenario DoD apply to units
+  created on/after 2026-11-28, except #930, which predates the merge; an existing unit gains the
+  shape at its next claim, in the same edit as the `## Claim` block.
 - **Dependencies — four relations, never one.** `blocked-by` (cannot start), `acceptance-blocked-by`
   (build now, the live scenario waits), `blocks`, `related`. Each edge cites its source (plan
   `depends_on`, the `00-INDEX.md` row, a quoted plan precondition, the audit's order). Blockers are
@@ -96,15 +107,16 @@ shape is `.github/ISSUE_TEMPLATE/unit.md`; the rules are:
   not a copy of the plan.
 
 **Definition of ready** — the claim gate: baseline and doc blob shas named · every reference resolves
-· every part has a scenario with a `Verify:` · every part passes INVEST and the DoR names the six
-criteria (issues created on/after 2026-11-28) · dependencies complete, typed and cited ·
+· one user story with all three clauses non-blank · every part has at least one Gherkin scenario
+with a `@verify=<id>` and a `Verify:` command · the DoR names the six INVEST criteria with the
+unit's own evidence (issues created on/after 2026-11-28) · dependencies complete, typed and cited ·
 `Blocker: #N` present iff `status:blocked` · programme fields present and resolvable (issues
 created on/after 2026-11-18) · one-PR scope, file-disjoint or sequenced · scope corrections
 applied.
 
-**Definition of done** — the merge gate: an acceptance-criteria table with one row per part, each
-row carrying its evidence and its `Verify:` at the PR head · the repo gate is green at the exact
-head · tests added/updated per part,
+**Definition of done** — the merge gate: an acceptance-criteria table with one row per scenario,
+keyed by its `@verify` id, each row carrying its evidence and the `Verify:` that passed at the PR
+head · the repo gate is green at the exact head · tests added/updated per part,
 none skipped · docs updated · migrations/ledger and `--check-lock` handled when touched · a unit
 that closes the slice's last open issue updates that slice's `scripts/v2-slice-artefacts.json` row
 to the measured shape (tables/actions/modules) and runs

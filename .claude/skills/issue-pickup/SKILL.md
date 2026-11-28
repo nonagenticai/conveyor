@@ -48,17 +48,33 @@ the plan inside a branch. Read the body and check:
 
 ```bash
 gh issue view N --json body --jq .body > /tmp/issue-N.md
-grep -E '^## (References|Baseline|Current state|Parts and acceptance criteria|Dependencies|Definition of ready|Definition of done)' /tmp/issue-N.md
-grep -c 'Verify:' /tmp/issue-N.md          # at least one per `### P` part
+grep -E '^## (User story|References|Baseline|Current state|Parts and acceptance criteria|Dependencies|Definition of ready|Definition of done)' /tmp/issue-N.md
+grep -c 'Scenario:' /tmp/issue-N.md        # at least one per `### P` part
+grep -c '@verify=' /tmp/issue-N.md         # one per scenario; the id has no spaces
+grep -c 'Verify:' /tmp/issue-N.md          # one per scenario: the exact command
 grep -E '^`?Blocker: #[0-9]+' /tmp/issue-N.md  # present iff the label is status:blocked
-python3 scripts/ci/board.py --repo <owner/name> --dor N  # Programme gate; exit 1 names the gaps
+python3 scripts/ci/board.py --repo <owner/name> --dor N  # Programme + INVEST/DoD; exit 1 names the gaps
 ```
 
 - a blocker line must start the line (the template's placeholder is not a blocker); its number must
   be an issue, not a PR;
-
-- the Programme gate is `--dor N`: it exits 1 for a `unit` issue created on/after 2026-11-18 whose
-  `## Programme` section is missing or has an empty field, and 0 for an earlier issue (forward-only);
+- exactly one `## User story`, all three clauses (`As a …`, `I want …`, `so that …`) non-blank; a
+  unit is one story, never one per part;
+- every `### P` part has ≥1 Gherkin `Scenario:` (`Given`/`When`/`Then`) with a `@verify=<id>` tag
+  and a `Verify:` line; a scenario missing either is a draft, not acceptance;
+- the six INVEST rows are present and each names **this issue's evidence**, never the template's
+  generic phrase: Independent (no `blocked-by`, lands without another unit's files), Negotiable
+  (outcome fixed, implementation settled at delivery), Valuable (the `so that` names a benefit or
+  a named gap), Estimable (baseline and every file named), Small (one issue, one PR), Testable
+  (every scenario carries `@verify`);
+- the DoD table has one row per scenario key (its `@verify` id); a per-part table or a prose
+  checklist is not the DoD;
+- the gate is `--dor N`: it exits 1 for a `unit` issue created on/after 2026-11-18 whose
+  `## Programme` section is missing or has an empty field, and for one created on/after 2026-11-28
+  whose DoR omits an INVEST criterion or restates the template, whose `## User story` is missing
+  or not in `As a …, I want …, so that …` form, whose part has no `Scenario:`/`@verify`, or whose
+  DoD has no row for a scenario id; #930 is exempt until it closes, and an earlier issue is
+  exempt (forward-only);
 - a `status:blocked` issue whose every `Blocker:` names a **closed** issue is a stale block, not a
   claimable one: run `python3 scripts/ci/board.py --repo <owner/name>` (apply mode) to release it,
   re-read the label, then claim. Never claim while the label is `status:blocked`;
@@ -66,8 +82,9 @@ python3 scripts/ci/board.py --repo <owner/name> --dor N  # Programme gate; exit 
   (`gh issue view N --json number,state`);
 - the Dependencies table agrees with the label: `status:blocked` iff an open `blocked-by`; an
   `acceptance-blocked-by` alone is claimable (the live scenario waits; construction does not);
-- any failure → post the exact gaps as a comment and do not create a branch. Fix the body yourself
-  if you are its author.
+- any failure — a missing story, a part with no Gherkin scenario or `@verify`, a generic INVEST
+  row, a DoD with no row for a scenario — → post the exact gaps as a comment and do not create a
+  branch. Fix the body yourself if you are its author.
 
 ### Claim
 

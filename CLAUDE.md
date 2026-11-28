@@ -46,6 +46,7 @@ this repository does not reach the cluster (conveyor#803).
 | Flow protection: blocked cards, triage, remedy, escalation | `kanban-coach` |
 | Systemic improvement: the six Gets, instrument, measurement, adoption | `kata` |
 | Queue truth, claim, issue body, PR mechanics | `issue-pickup`, `issue-sweep`, `issue-create`, `issue-deliver` |
+| The delivery-item standard: one story, Gherkin `@verify` per scenario, INVEST DoR, per-scenario DoD | `bdd-delivery` |
 | Charter, advance, gate and close a delivery unit as a `development_project` row | `delivery-unit` |
 | Reconcile issue/PR/CI facts into the unit record; never invent the live digest | `programme-sync` |
 
