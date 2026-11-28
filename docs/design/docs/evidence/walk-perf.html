@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>The walk's performance record (W7) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/walk-perf.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="the-walks-performance-record-w7">The walk's performance record (W7)</h1>
+<p>Measured 2026-11-28 for S4 (#817) against the deployed game host <code>https://game.nonagentic.ai/</code> with a real <code>conveyor-e2e</code> sign-in, and against the local harness where noted. Every number is printed by <code>apps/walk/e2e/deployed/perf.spec.ts</code>; nothing here is estimated.</p>
+<h2 id="protocol">Protocol</h2>
+<pre class="bash"><code>cd apps/walk
+BASE_URL=https://game.nonagentic.ai E2E_USER=conveyor-e2e E2E_PASS=… \
+  npx playwright test e2e/deployed/perf.spec.ts          # shell bytes + frames
+SOAK=1 … npx playwright test e2e/deployed/perf.spec.ts --grep soak   # the five-minute soak</code></pre>
+<ul>
+<li><strong>Shell bytes</strong> are measured after a cold load (CDP <code>Network.setCacheDisabled</code>), summing <code>encodedBodySize</code> over same-origin <code>.js</code>/<code>.css</code> plus the document. A cache hit reports <code>transferSize</code> 0 but still carries <code>encodedBodySize</code>, so a warm reload cannot understate it.</li>
+<li><strong>Frames</strong> are 300 <code>requestAnimationFrame</code> deltas over five seconds; the first two are discarded as the mount cost.</li>
+<li><strong>Soak</strong> is five minutes of navigation across six rooms with the SSE stream open, and a heap reading after a forced CDP <code>HeapProfiler.collectGarbage</code>, so it measures retained memory rather than uncollected garbage.</li>
+</ul>
+<h2 id="results">Results</h2>
+<table>
+<thead>
+<tr>
+<th>Budget (<code>GEMBA-WALK-SPEC.md</code> §9)</th>
+<th>Budget</th>
+<th>Measured</th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Shell + entrance, JS/HTML/CSS, gzip, excluding wasm</td>
+<td>≤ 250 KB</td>
+<td><strong>36.2 KB</strong> (25 resources; document 810 B)</td>
+<td><strong>met</strong> (14.5 % of budget)</td>
+</tr>
+<tr>
+<td>No frame over 50 ms after the first two</td>
+<td>≤ 50 ms</td>
+<td>p95 <strong>16.7 ms</strong>, worst <strong>16.8 ms</strong> (300 frames)</td>
+<td><strong>met</strong> (60 fps)</td>
+</tr>
+<tr>
+<td>A five-minute soak within 1.5× the first-load heap</td>
+<td>≤ 1.5×</td>
+<td><strong>1.059×</strong> (3,786,641 → 4,011,855 B over 702 visits, warm baseline)</td>
+<td><strong>met</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="the-soak-what-the-budget-was-actually-measuring">The soak: what the budget was actually measuring</h3>
+<p>Two corrections were made after the first version of this record, both measured on the deployed origin with a real <code>conveyor-e2e</code> sign-in and forced GC at every reading.</p>
+<p><strong>1 — the metric was a floor.</strong> Chrome reports <code>performance.memory.usedJSHeapSize</code> as exactly <code>10000000</code> for any heap under 10 MB unless <code>--enable-precise-memory-info</code> is set, and <code>playwright-core</code> 1.65.0 sets no such switch. The same page reads <code>10000000</code> without it and <code>2623436</code> with it. <code>playwright.config.ts</code> now sets it (#916).</p>
+<p><strong>2 — the baseline was taken before session history existed.</strong> Every in-app navigation adds one <code>pushState</code> entry; Chrome caps the list at 50. Measured on the shipped client:</p>
+<table>
+<thead>
+<tr>
+<th>Experiment</th>
+<th>Δ (after forced GC)</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>60 s idle on <code>/plan</code></td>
+<td><strong>−520 B</strong></td>
+<td>flat; the frame loop is not a retainer</td>
+</tr>
+<tr>
+<td>50 full reloads of <code>/plan</code></td>
+<td><strong>−36,380 B</strong></td>
+<td>flat; a reload resets the client</td>
+</tr>
+<tr>
+<td>48 in-app navigations</td>
+<td><strong>+698,358 B</strong></td>
+<td>DOM nodes 63 → 63; <code>history.length</code> 4 → <strong>50</strong></td>
+</tr>
+<tr>
+<td>70 in-app navigations</td>
+<td><strong>+644,986 B</strong></td>
+<td><code>history.length</code> already <strong>50</strong>; growth stopped</td>
+</tr>
+</tbody>
+</table>
+<p>The 48- and 70-navigation runs land within 53 KB of each other while one performed 22 more navigations: growth halts exactly at the history cap. The earlier record's "time-bound, ~7.4 KB/s, SSE-driven" reading did not reproduce — an idle minute is flat — and the earlier control (+444,903 B in 60 s) could not be reproduced on the shipped client in four attempts.</p>
+<p>So the budget compared a first-load heap taken at <strong>0</strong> history entries to a settled heap at <strong>50</strong>, which any <code>pushState</code> SPA exceeds by construction. <code>perf.spec.ts</code> now fills the cap with a 50-navigation warm-up, asserts <code>history.length === 50</code>, and only then reads the baseline.</p>
+<table>
+<thead>
+<tr>
+<th>Run</th>
+<th>Baseline</th>
+<th>First → last (B)</th>
+<th>Visits</th>
+<th>Ratio</th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cold (as first recorded)</td>
+<td>0 entries</td>
+<td>2,560,361 → 4,850,904</td>
+<td>726</td>
+<td>1.89×</td>
+<td>not met — protocol</td>
+</tr>
+<tr>
+<td>Cold, precise metric</td>
+<td>0 entries</td>
+<td>2,795,646 → 4,347,762</td>
+<td>708</td>
+<td>1.555×</td>
+<td>not met — protocol</td>
+</tr>
+<tr>
+<td><strong>Warm (shipped protocol)</strong></td>
+<td><strong>50 entries</strong></td>
+<td><strong>3,786,641 → 4,011,855</strong></td>
+<td><strong>702</strong></td>
+<td><strong>1.059×</strong></td>
+<td><strong>met</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Retention across a five-minute, 702-navigation session is therefore ~225 KB. There is no leak; the two defects #916 did fix — the precise-memory switch and a render generation that stops a stale render overwriting a newer screen — are both kept, and the first is what made this number readable.</p>
+<p>Two caveats stated rather than hidden: the frame p50 is not recorded (the p95 above is), and the SPEC §8 16 px gutter is not separately measured — the 390 px/200 % zoom measurement lives in <code>walk-a11y.md</code>.</p>
+<h2 id="consequence-for-the-p6-gate">Consequence for the P6 gate</h2>
+<p>All three performance budgets are met. The soak is met <strong>after</strong> the protocol correction above and not before it; the first version of this record said "not met", and that verdict was the protocol's, not the client's. S4 records the P6 performance criterion as passed. Primacy remains the owner's decision and is not claimed here.</p>
+<h2 id="re-running">Re-running</h2>
+<pre class="bash"><code>cd apps/walk &amp;&amp; BASE_URL=https://game.nonagentic.ai E2E_USER=… E2E_PASS=… \
+  npx playwright test e2e/deployed/perf.spec.ts</code></pre>
+<p>The shell-byte and frame tests run in the deployed suite; the soak is opt-in (<code>SOAK=1</code>) so the default deployed run stays short.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/walk-perf.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

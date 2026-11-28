@@ -3800,6 +3800,33 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {
+      "title": "The walk's accessibility record (W7)",
+      "path": "docs/evidence/walk-a11y.html",
+      "source": "docs/evidence/walk-a11y.md",
+      "section": "Evidence",
+      "sha256": "37d4e390cbdaf9d703e75cfc5785d1905cc5750e0c51a1a712b7069f1da3af7d",
+      "bytes": 3172,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/walk-a11y.md"
+    },
+    {
+      "title": "The walk's slice-gate audit (W6)",
+      "path": "docs/evidence/walk-gate-audit.html",
+      "source": "docs/evidence/walk-gate-audit.md",
+      "section": "Evidence",
+      "sha256": "11f78ed4c0d6e064b6cf288e4ea49ec911934541774638e219099f8fc63b13e9",
+      "bytes": 7756,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/walk-gate-audit.md"
+    },
+    {
+      "title": "The walk's performance record (W7)",
+      "path": "docs/evidence/walk-perf.html",
+      "source": "docs/evidence/walk-perf.md",
+      "section": "Evidence",
+      "sha256": "2b93f3e6835244bad754ad98c2cbe11f1fc5009469c3588c7d940b44f9393885",
+      "bytes": 5107,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/walk-perf.md"
+    },
+    {
       "title": "GEMBA-WALK — the epic publish (deployment-gated)",
       "path": "docs/evidence/walk-record/publish-epic-deferred.html",
       "source": "docs/evidence/walk-record/publish-epic-deferred.md",
@@ -4380,8 +4407,8 @@
       "path": "docs/plans/inception/GEMBA-WALK/07-governance-and-evidence.html",
       "source": "docs/plans/inception/GEMBA-WALK/07-governance-and-evidence.md",
       "section": "Plans",
-      "sha256": "d396a46870747f01609dac7d307b526e45b9491ce82596c12f182a135fc4b0a8",
-      "bytes": 15000,
+      "sha256": "8d11bda2a0544305011d8b5e3d6b3b8ba3c523e19dc8bc70b10e7e59538e1807",
+      "bytes": 19176,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/GEMBA-WALK/07-governance-and-evidence.md"
     },
     {

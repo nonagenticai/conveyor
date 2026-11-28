@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>The walk's slice-gate audit (W6) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/walk-gate-audit.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="the-walks-slice-gate-audit-w6">The walk's slice-gate audit (W6)</h1>
+<p>Measured 2026-11-28 at <code>main@8430123a782d02907332acd5fc964561a2a4abc9</code> for S4 (#817), against the 56-route census (<code>docs/evidence/walk-census.json</code>) and <code>apps/web</code> at the same sha.</p>
+<h2 id="1-the-rule">1. The rule</h2>
+<p><code>docs/plans/GEMBA-WALK-SPEC.md</code> §14: a destination may not claim to be implemented from its route alone, and a capability the server lacks is the honest gate — never a fabricated surface. The plan's W6 asks a narrower question: <strong>does every gate the walk renders match what <code>apps/web</code> renders at the same sha, and is every difference owned by a slice or a recorded decision?</strong></p>
+<p>Two kinds of non-live state are possible, and they are not the same thing:</p>
+<ul>
+<li>a <strong>role gate</strong> — the action is absent from <em>this role's</em> manifest (<code>ctx.hasAction(name)</code> is false). It is derived at runtime and cannot drift from the app, which gates the same way.</li>
+<li>a <strong>slice gate</strong> — the capability does not exist yet for <em>anyone</em>, so the screen says so in prose.</li>
+</ul>
+<h2 id="2-the-measured-census">2. The measured census</h2>
+<p>40 destination modules were read (38 top-level plus <code>v1/boards.js</code> and <code>v1/cockpit.js</code>):</p>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Count</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ctx.hasAction</code> only</td>
+<td>25</td>
+<td>role-gated; no hardcoded promise</td>
+</tr>
+<tr>
+<td>non-manifest condition</td>
+<td>3</td>
+<td><code>measure.js</code>, <code>copilot.js</code>, <code>sources.js</code> — examined in §4</td>
+</tr>
+<tr>
+<td>no non-live state at all</td>
+<td>12</td>
+<td>the screen renders its read directly</td>
+</tr>
+</tbody>
+</table>
+<p>The 12 with no non-live state: <code>agents</code>, <code>decisions</code>, <code>execution</code>, <code>jobs</code>, <code>meetings</code>, <code>organisation</code>, <code>plan</code>, <code>project-types</code>, <code>runs</code>, <code>validation</code>, <code>v1/boards</code>, <code>v1/cockpit</code>.</p>
+<p>Several of them substitute an empty list when an action is absent (<code>decisions.js:69,72</code>, <code>meetings.js:65,68</code>, <code>plan.js:110-116</code>, <code>execution.js:66</code>, <code>project-types.js:38</code>, <code>jobs.js:196</code>, <code>organisation.js:214-216</code>, <code>runs.js:182</code>). §5 shows that this is <code>apps/web</code>'s own convention, not a walk defect.</p>
+<h2 id="3-the-role-gates-25">3. The role gates (25)</h2>
+<p>Each row is the condition that renders the non-live panel; every one is a manifest check.</p>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Condition</th>
+<th>Panel</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>adm</code></td>
+<td><code>!hasAction("architecture.profile_get")</code></td>
+<td>"ADM is planned"</td>
+</tr>
+<tr>
+<td><code>architecture</code></td>
+<td><code>!hasAction("models.list")</code></td>
+<td>"Architecture is planned"</td>
+</tr>
+<tr>
+<td><code>approvals</code></td>
+<td><code>!hasAction("approvals.list")</code></td>
+<td>"Approvals is planned"</td>
+</tr>
+<tr>
+<td><code>authoring</code></td>
+<td><code>!hasAction("authoring.intakes")</code>; <code>hasAction("authoring.intake")</code> for the row control</td>
+<td>"Authoring is planned"</td>
+</tr>
+<tr>
+<td><code>benchmarks</code></td>
+<td><code>!hasAction("benchmark_suites.list")</code>, <code>benchmark_runs.list</code>, <code>benchmark_runs.get</code></td>
+<td>"Benchmarks is planned"</td>
+</tr>
+<tr>
+<td><code>evals</code></td>
+<td><code>!hasAction("evals.list")</code>, <code>evals.get</code>; <code>evals.create</code> for the control</td>
+<td>"Evals is planned"</td>
+</tr>
+<tr>
+<td><code>feedback</code></td>
+<td><code>!hasAction("feedback.list")</code></td>
+<td>"Feedback is planned"</td>
+</tr>
+<tr>
+<td><code>improve</code></td>
+<td><code>!hasAction("kata.open")</code></td>
+<td>"Improve is planned"</td>
+</tr>
+<tr>
+<td><code>knowledge</code></td>
+<td><code>!hasAction("knowledge.query")</code>; <code>capabilities.list</code> for the select</td>
+<td>"Knowledge is planned"</td>
+</tr>
+<tr>
+<td><code>memory</code></td>
+<td><code>!hasAction("memory.recall")</code></td>
+<td>"Memory is planned"</td>
+</tr>
+<tr>
+<td><code>metering</code></td>
+<td><code>!hasAction("billing.summary")</code>; <code>metrics.usage</code>, <code>inference_usage.report</code> per section</td>
+<td>"Metering is planned"</td>
+</tr>
+<tr>
+<td><code>models</code></td>
+<td><code>!hasAction("models.list")</code>; <code>models.create</code> for the control</td>
+<td>"Models is planned"</td>
+</tr>
+<tr>
+<td><code>operations</code></td>
+<td><code>!hasAction("ops.pods")</code>; each section's own action</td>
+<td>"Operations is planned"</td>
+</tr>
+<tr>
+<td><code>platform</code></td>
+<td><code>!hasAction("ops.flux_status")</code>; each section's own action</td>
+<td>"Platform is planned"</td>
+</tr>
+<tr>
+<td><code>portfolio</code></td>
+<td><code>hasAction("programmes.create")</code> for the control</td>
+<td>role hint, no planned panel</td>
+</tr>
+<tr>
+<td><code>procedures</code></td>
+<td><code>!hasAction("procedures.list")</code>; <code>procedures.create</code> for the control</td>
+<td>"Procedures is planned"</td>
+</tr>
+<tr>
+<td><code>process-map</code></td>
+<td><code>!hasAction("process_maps.list")</code>; <code>process_maps.create</code></td>
+<td>"Process map is planned"</td>
+</tr>
+<tr>
+<td><code>processes</code></td>
+<td><code>!hasAction("processes.list")</code>; <code>processes.create</code></td>
+<td>"Processes is planned"</td>
+</tr>
+<tr>
+<td><code>programme</code></td>
+<td><code>!hasAction("programmes.list")</code></td>
+<td>"Not yet live — T10"</td>
+</tr>
+<tr>
+<td><code>prompt-audit</code></td>
+<td><code>!hasAction("prompt_audits.list")</code></td>
+<td>"Prompt audit is planned"</td>
+</tr>
+<tr>
+<td><code>requirements</code></td>
+<td><code>!hasAction("requirements.list")</code>; <code>requirements.create</code></td>
+<td>"Requirements is planned"</td>
+</tr>
+<tr>
+<td><code>search</code></td>
+<td><code>!hasAction("search.query")</code></td>
+<td>"Search is planned"</td>
+</tr>
+<tr>
+<td><code>settings</code></td>
+<td><code>!hasAction("tenants.get")</code></td>
+<td>"Settings is planned"</td>
+</tr>
+<tr>
+<td><code>sources</code></td>
+<td><code>!hasAction("knowledge.query")</code>; <code>capabilities.list</code>; <code>authoring.assets</code></td>
+<td>"Sources &amp; retrieval is planned"</td>
+</tr>
+<tr>
+<td><code>tools</code></td>
+<td><code>!hasAction("tools.list")</code></td>
+<td>"Tools is planned" (T13 named in prose)</td>
+</tr>
+<tr>
+<td><code>usage</code></td>
+<td><code>!hasAction("metrics.usage")</code>; <code>billing.summary</code>, <code>inference_usage.report</code> per section</td>
+<td>"Usage is planned"</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-the-three-non-manifest-conditions">4. The three non-manifest conditions</h2>
+<p><strong><code>measure.js:57</code></strong> — the instruments list is filtered by <code>hasAction</code>, and an empty result renders "Measure is planned". The app does the same: <code>apps/web/src/screens/measure.rs:51-53</code> returns an empty vector when <code>metrics.usage</code> is absent. <strong>Match.</strong></p>
+<p><strong><code>copilot.js:56-62</code></strong> — the screen reads <code>/api/copilot/actions</code>; when the route is absent it names the S10 slice and says it will not invent a conversation. The app has a live chat transport (<code>apps/web/src/screens/copilot.rs:3</code>, <code>POST /api/copilot/conversations</code>). <strong>Deliberate divergence, sanctioned by <code>GEMBA-WALK-SPEC.md</code> §15</strong>, which lists chat as a non-goal for the walk. It is recorded here so it is a decision, not an omission; if the owner ever lifts that non-goal, this is the file and the line that changes.</p>
+<p><strong><code>sources.js:162-164</code></strong> — an empty asset read names T16/T17 in prose. The read itself is gated on <code>authoring.assets</code> and the app's <code>sources.rs:41-45</code> performs the same empty read. <strong>Match</strong>; the slice names are prose, not a promise.</p>
+<h2 id="5-the-empty-read-convention">5. The empty-read convention</h2>
+<p><code>apps/web</code> substitutes an empty list when an action is absent or unauthorised: <code>measure.rs:51-53</code> (<code>metrics.usage</code>), <code>sources.rs:32-34</code> (<code>capabilities.list</code>) and <code>:41-45</code> (<code>authoring.assets</code>), <code>plan.rs:41-52</code> (<code>wbs.list</code>, <code>baselines.list</code>, <code>registers.list</code>). The walk does the same in nine destinations (listed in §2). This is <strong>parity, not a defect</strong>: the walk's rule is "the same read contract as <code>apps/web</code>", and a divergence toward a stricter gate would be a visible difference between the two clients rather than an improvement. It is recorded so the next session does not re-litigate it.</p>
+<h2 id="6-findings">6. Findings</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Finding</th>
+<th>Class</th>
+<th>Owner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>F1</td>
+<td>The walk's copilot lists actions and does not carry the app's chat transport</td>
+<td>deliberate, SPEC §15 non-goal</td>
+<td>recorded here</td>
+</tr>
+<tr>
+<td>F2</td>
+<td>S1's board screen lacks seven write verbs the app carries: <code>cards.unarchive</code>, <code>cards.add_label</code>, <code>cards.remove_label</code>, <code>lists.update</code>, <code>lists.move</code>, <code>custom_fields.set_value</code>, <code>custom_fields.clear_value</code></td>
+<td>measured gap → follow-on</td>
+<td><strong>#912</strong></td>
+</tr>
+<tr>
+<td>F3</td>
+<td><code>/knowledge/sources</code> renders a fabricated title, submits an unbound query when <code>capabilities.list</code> is absent, and sends a nested <code>page</code> the actions ignore</td>
+<td>measured defect → defect unit</td>
+<td><strong>#910</strong></td>
+</tr>
+</tbody>
+</table>
+<p>F2 and F3 are follow-ons on the owning wings; S4 edits no sibling module. Both are linked above and carry their own Definition of Ready.</p>
+<h2 id="7-compliance-statement">7. Compliance statement</h2>
+<p>Every non-live state the walk renders is either (a) a runtime manifest check, which cannot drift from the app because both read the same manifest, or (b) one of the three conditions in §4, each compared with <code>apps/web</code> at the sha and either matching or recorded as a spec-sanctioned divergence. No slice gate is unowned, and no destination claims a surface the server does not have. The two S4 routes (<code>/boards</code>, <code>/card/:card_id</code>) have no non-live state; their writes are <code>hasAction</code>-gated.</p>
+<h2 id="8-re-running-the-audit">8. Re-running the audit</h2>
+<pre class="bash"><code>git grep -n &#39;is planned\|not in this role&#39; -- apps/walk/src/destinations
+git grep -n &#39;has_action&#39; -- apps/web/src/screens
+python3 scripts/build-walk-coverage.py --check --gate=P6 --report apps/walk/test-results/walk-report.json</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/walk-gate-audit.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
