@@ -1,0 +1,112 @@
+{
+  "schema": "conveyor-tranche-cadences-plan/v1",
+  "tranche": 12,
+  "tranche_id": "01a1e9e1-3c15-7bd6-9249-1327c195635d",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+  "note": "The inputs for the tranche-12 readiness step, in order. Each is written through scripts/programme-record.py (write + read-back + evidence); the returned ids are recorded in cadences.json beside this file. The four cadences are created first; the two PI documents are composed at project P0 and their ids are written into the pi row's meta.documents; the refinement row's meta carries T15's four WSJF integers, which rework-batch.py::wsjf_for reads and rework-content-check.py --wsjf must match. The tranche stays `planned` until #755 records the tranche-11 review; these rows are construction, never authorisation.",
+  "creates": [
+    {
+      "kind": "pi",
+      "period": "tranche-12",
+      "input": {
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "period": "tranche-12",
+        "meta": {
+          "tranche_id": "01a1e9e1-3c15-7bd6-9249-1327c195635d",
+          "tranche_number": 12,
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        },
+        "kind": "pi"
+      }
+    },
+    {
+      "kind": "refinement",
+      "period": "tranche-12",
+      "input": {
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "period": "tranche-12",
+        "meta": {
+          "tranche_id": "01a1e9e1-3c15-7bd6-9249-1327c195635d",
+          "tranche_number": 12,
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        },
+        "kind": "refinement"
+      }
+    },
+    {
+      "kind": "demo",
+      "period": "tranche-12",
+      "input": {
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "period": "tranche-12",
+        "meta": {
+          "tranche_id": "01a1e9e1-3c15-7bd6-9249-1327c195635d",
+          "tranche_number": 12,
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        },
+        "kind": "demo"
+      }
+    },
+    {
+      "kind": "retro",
+      "period": "tranche-12",
+      "input": {
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "period": "tranche-12",
+        "meta": {
+          "tranche_id": "01a1e9e1-3c15-7bd6-9249-1327c195635d",
+          "tranche_number": 12,
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        },
+        "kind": "retro"
+      }
+    }
+  ],
+  "refinement_update": {
+    "period": "tranche-12",
+    "meta": {
+      "tranche_id": "01a1e9e1-3c15-7bd6-9249-1327c195635d",
+      "tranche_number": 12,
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "refinement": {
+        "period": "tranche-12",
+        "reordered": [
+          {
+            "item": "T15 - the only member",
+            "from": "the seed's membership (T15)",
+            "to": "T15",
+            "why": "One member: no reorder is possible or needed. The readiness set and the pack are the whole increment, and the pack is preflighted before the factory runs."
+          }
+        ],
+        "reestimate": {
+          "T15": "10 open packages (1 P0: project_in_unauthorised_tranche; 2 P1: contract_missing, mandatory_artefacts; 7 P2: change-control, project-baseline, project-registers, project-wbs, architecture-artifact, compliance-review, phase-g)"
+        },
+        "wsjf_inputs": {
+          "T15": {
+            "business_value": 8,
+            "time_criticality": 5,
+            "risk_reduction": 8,
+            "job_size": 8
+          }
+        }
+      }
+    }
+  },
+  "documents": [
+    {
+      "kind": "pi-plan",
+      "title": "PI plan — tranche 12 (retrospective, 2026-11-28)",
+      "category": "pi-plan",
+      "project_key": "P0",
+      "body_file": "pi-plan.json"
+    },
+    {
+      "kind": "pi-objectives",
+      "title": "PI objectives — tranche 12 (retrospective, 2026-11-28)",
+      "category": "pi-objectives",
+      "project_key": "P0",
+      "body_file": "pi-objectives.json"
+    }
+  ]
+}

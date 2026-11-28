@@ -1,0 +1,10 @@
+{
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "period": "tranche-12",
+  "meta": {
+    "tranche_id": "01a1e9e1-3c15-7bd6-9249-1327c195635d",
+    "tranche_number": 12,
+    "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+  },
+  "kind": "refinement"
+}

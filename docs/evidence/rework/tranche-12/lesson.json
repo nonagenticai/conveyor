@@ -1,0 +1,25 @@
+{
+  "schema": "conveyor-lesson/v1",
+  "tranche": 12,
+  "tranche_id": "01a1e9e1-3c15-7bd6-9249-1327c195635d",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "cadence_id": "01a222e1-ef0d-7bf9-8480-a0f4a64133ee",
+  "finding_key": "k1",
+  "action": "programme_lessons.propose",
+  "input": "docs/evidence/record/inputs/tr12/lesson_tranche-12_k1.json",
+  "planned_at": "2026-11-28",
+  "why": "T15's `lessons` check is P1 and reads the tranche's own retro cadence. Tranche 11 had no tranche-12 lesson, so the check would have been red for T15. The lesson records the measured manifest trap: a closed project can carry an `active` pin and a gate text that says it is not built.",
+  "result": {
+    "id": "01a222e2-d4e6-76fe-a524-32355e0e920d",
+    "state": "proposed",
+    "source": "retro",
+    "finding_key": "k1",
+    "cadence_id": "01a222e1-ef0d-7bf9-8480-a0f4a64133ee",
+    "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+    "independent_count": 2
+  },
+  "verified": {
+    "lessons_list": "programme_lessons.list on the replay copy returns the row",
+    "snapshot": "msp.json of the fresh snapshot carries finding_key k1 on the retro cadence with a non-empty evidence list"
+  }
+}

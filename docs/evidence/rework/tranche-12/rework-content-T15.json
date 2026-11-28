@@ -1,0 +1,960 @@
+{
+ "charter": "# Charter — T15 Tool authoring and BYO (retrospective, 2026-11-28)\n\n- **Project:** T15 \"Tool authoring and BYO\", track v2, ADM phase G, capability plateau, tranche 12, plan `docs/SPEC_V2.md` §12. The record's only linked issue is #86, closed by PR #666 (merge `a2ef9194eb2c`).\n- **Sponsor:** the programme's sponsoring group, through the tranche-12 PI plan and the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`. Tranche 12's authorisation is not this pack's to give; the P0 package `project_in_unauthorised_tranche:T15` clears only on that authorisation.\n- **Objective:** a tool generated from an OpenAPI spec or a BYO MCP server is published, called by a job, and bounded by its effect ceiling and the tenant approval policy (SPEC_V2 §12).\n- **Scope:** toolkit import, remote-MCP discovery, tenant binding, publication approval and the promotion request. Out of scope are tenant code execution, a caller-supplied URL at call time, a second MCP server and a second OpenAPI reader.\n- **Governance:** the pack is authored under the ADM phase-G retrospective route; the Board's contract and the Phase-G review are recorded through this pack, and the closure review is the project's published decision.\n- **Acceptance:** measured by the seven A–D artefacts, the delivery contract, the Phase-G review, both declared outputs and the closure review; the receipt reads them at the pinned snapshot.",
+ "soaw": {
+  "title": "Statement of Architecture Work — T15 Tool authoring and BYO (retrospective, 2026-11-28)",
+  "body": {
+   "assignment": "The architecture work assigns T15 the tool estate's authoring front door: OpenAPI draft import, service-scaffold registration, remote-MCP discovery as a client, tenant-binding resolution in the broker and the promotion request. T13 owns the four tool aggregates and the call path; T14 imports the estate; T6 supplies service registration. This statement governs the retrospective record of a project the record marks closed and measured built, read at the 2026-11-28 snapshot under the standing delegation.",
+   "scope": "In scope are the draft lifecycle on governed_asset(kind='tool_draft'), toolkits.import_openapi, toolkits.import_mcp, tool_authoring.draft/validate/test/review, tools.publish/retire, tool_bindings.create/update/retire and toolkits.promote, with the approval_policy extension for approver kind, count and expiry. Out of scope are tenant code execution, a caller-supplied URL at call time, a second MCP server, a second OpenAPI reader, a second control plane and any archived kag binding.",
+   "responsibilities": "The programme architect authors this retrospective statement; the delivery team owns the code and the merged tests; the Architecture Board owns the delivery contract and its decision; platform security owns the review of egress, credentials and effect class; the programme manager owns the closure record. No role in this statement re-decides the build that PR #666 merged.",
+   "acceptance_criteria": "The gate reads: a tool generated from a spec is published and called by a job; publication approval defaults to a human and is tenant-configurable; a BYO MCP server is bound, narrowed and audited; a tenant cannot exceed its effect ceiling. The refusals are part of the acceptance: an unbounded draft is refused, an undeclared class defaults to read, and a destructive tool needs a named approver.",
+   "contract": "The delivery contract is this pack's delivery_contract: it names the commitments, the compliance route at the pinned snapshot, the Board's approval and the manifest acceptance/programme/T15.toml. It is approved under the standing delegation and does not reopen the delivered architecture.",
+   "retrospective": "This is the retrospective record of a delivered project, not a plan for new construction. Its work is to place the authored artefacts, the register rows, the Phase-G review and the closure review the record lacks, and to reconcile the manifest with the record's closed status. It manufactures no new acceptance and claims no run of a retired command."
+  }
+ },
+ "artifacts": [
+  {
+   "title": "Stakeholder Map — T15 Tool authoring and BYO (Phase A)",
+   "artifact_kind": "matrix",
+   "phase_code": "a",
+   "plateau": "psa",
+   "entries": [
+    {
+     "axis_a": "Sponsoring group",
+     "axis_b": "authorisation of tranche 12 and the close decision",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "decide",
+      "concerns": "Publication · Ceiling · Audit"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Tenant admin",
+     "axis_b": "binds tenant tools and sets the approval policy that publishes them",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "collaborate",
+      "concerns": "Publication · Ceiling · Tenancy"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Job author",
+     "axis_b": "imports a spec, binds a toolkit and calls it from a job",
+     "value": {
+      "influence": "medium",
+      "interest": "high",
+      "engagement": "collaborate",
+      "concerns": "Version · Ceiling"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Platform security",
+     "axis_b": "reviews egress, credential aliases, effect class and the BYO subset",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "consult",
+      "concerns": "Credential · Audit · Ceiling"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Operations",
+     "axis_b": "owns the published versions and the retirement path",
+     "value": {
+      "influence": "medium",
+      "interest": "medium",
+      "engagement": "consult",
+      "concerns": "Audit · Version"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Architecture Board",
+     "axis_b": "approves the contract and the Phase-G compliance review",
+     "value": {
+      "influence": "high",
+      "interest": "medium",
+      "engagement": "decide",
+      "concerns": "Publication · Version · Audit"
+     },
+     "position": 6
+    }
+   ],
+   "links": [
+    {
+     "to": "Driver/Goal/Objective Catalog — T15 Tool authoring and BYO (Phase A)",
+     "kind": "derivation"
+    },
+    {
+     "to": "Requirements Catalog — T15 Tool authoring and BYO (Phase A)",
+     "kind": "realization"
+    }
+   ],
+   "body": "# Stakeholder Map — T15 (Phase A)\n\n## Metadata\n\nType matrix, version 1, owner the T15 project (#86), reviewer the Architecture Board at the 2026-11-28 retrospective, phase A, plateau PSA, related project T15 in tranche 12. The matrix is the design's stakeholder table restated for the record set this pack authors.\n\n## Entries\n\nThe six rows pair each stakeholder with the concern it owns across publication, credential, ceiling, audit, version and tenancy. The engagement value records the role in the retrospective: the sponsoring group decides, the Board approves the contract, tenant admin and job author collaborate, and platform security and operations consult.\n\n## Links\n\nThe map derives from the Driver/Goal/Objective catalog's D1 (tenant tools without a platform release, under platform control) and is realized by the Requirements Catalog's R5 (human-default, tenant-configurable publication). Both targets are artefacts of this pack and are created before the map is linked.\n\n## Document\n\nThe source is `docs/plans/inception/T15/02-architecture-design.md` § Architecture artefacts; the close is recorded in `docs/plans/T15/closure-review.md`. The record's linked issue is #86, closed by PR #666 at merge `a2ef9194eb2c`."
+  },
+  {
+   "title": "Driver/Goal/Objective Catalog — T15 Tool authoring and BYO (Phase A)",
+   "artifact_kind": "catalog",
+   "phase_code": "a",
+   "plateau": "psa",
+   "entries": [
+    {
+     "axis_a": "D1 Tenant tools without a platform release, under platform control",
+     "axis_b": "G1 Self-service authoring under platform governance",
+     "value": {
+      "measure": "one authoring front door and no second control plane",
+      "owner": "the T15 project (#86)",
+      "source": "SPEC_V2 §11.5–§11.6, design Context and boundary"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "D1 Tenant tools without a platform release, under platform control",
+     "axis_b": "O1 Import a spec into a draft in one action",
+     "value": {
+      "measure": "one toolkits.import_openapi call produces draft tools with closed schemas and effect default read",
+      "owner": "#86",
+      "source": "design D2, SPEC_V2 §10.4"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "D1 Tenant tools without a platform release, under platform control",
+     "axis_b": "O2 Bind a remote MCP subset with no credential exposure",
+     "value": {
+      "measure": "import_mcp persists only bound operations; each call writes one tool_call with an alias and no secret",
+      "owner": "#86",
+      "source": "design D3, §11.5(2)"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "D1 Tenant tools without a platform release, under platform control",
+     "axis_b": "O3 Human-default, tenant-configurable publication approval",
+     "value": {
+      "measure": "no approval_policy row requires a person; a tenant row waives tools.publish with an audit",
+      "owner": "#86",
+      "source": "design D1, §5.4"
+     },
+     "position": 4
+    }
+   ],
+   "links": [
+    {
+     "to": "Stakeholder Map — T15 Tool authoring and BYO (Phase A)",
+     "kind": "realization"
+    },
+    {
+     "to": "Requirements Catalog — T15 Tool authoring and BYO (Phase A)",
+     "kind": "realization"
+    }
+   ],
+   "body": "# Driver/Goal/Objective Catalog — T15 (Phase A)\n\n## Metadata\n\nType catalog, version 1, owner the T15 project (#86), reviewer the Architecture Board at the 2026-11-28 retrospective, phase A, plateau PSA, related project T15. The catalog restates the design's driver, goal and three objectives as the record set the retrospective pack authors.\n\n## Entries\n\nOne driver governs the project: tenant tools without a platform release, under platform control. Its goal is self-service authoring under platform governance, and its three objectives are the single-action import, the bound MCP subset with no credential exposure, and human-default tenant-configurable publication. Each row carries the measure its acceptance reads.\n\n## Links\n\nThe catalog realizes the Stakeholder Map's six rows and is realized by the Requirements Catalog's seven requirements. Its D1 is the derivation source the stakeholder matrix names; the requirement catalog is created before the driver catalog's links are written.\n\n## Document\n\nThe source is `docs/plans/inception/T15/02-architecture-design.md` § Architecture artefacts (Driver/Goal/Objective) and § Decisions D1–D3. The acceptance gate is SPEC_V2 §12; the delivered evidence is PR #666."
+  },
+  {
+   "title": "Requirements Catalog — T15 Tool authoring and BYO (Phase A)",
+   "artifact_kind": "catalog",
+   "phase_code": "a",
+   "plateau": "psa",
+   "entries": [
+    {
+     "axis_a": "R-T15-1 OpenAPI draft import",
+     "axis_b": "toolkits.import_openapi parses a document into draft tools with closed schemas and effect default read",
+     "value": {
+      "carried_by": "toolkits.import_openapi",
+      "suite": "crates/actions/tests/tool_authoring.rs",
+      "section": "SPEC_V2 §11.5(1), §11.6(1)"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "R-T15-2 Service-scaffold registration",
+     "axis_b": "a workspace service registers its OpenAPI through the T6 scaffold path, not a second reader",
+     "value": {
+      "carried_by": "toolkits.import_openapi over the T6 path",
+      "suite": "crates/actions/tests/tool_authoring.rs::a_scaffolded_service_registers_its_own_openapi",
+      "section": "design §Context and boundary"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "R-T15-3 Remote MCP binding-scoped discovery",
+     "axis_b": "toolkits.import_mcp discovers a streamable-HTTP endpoint and persists only the bound subset",
+     "value": {
+      "carried_by": "toolkits.import_mcp",
+      "suite": "crates/actions/tests/byo_tools.rs",
+      "section": "SPEC_V2 §11.5(2), design D3"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "R-T15-4 Tenant binding narrowed by job, tenant and operation",
+     "axis_b": "tool_bindings.create writes scope job or tenant; the lower ceiling wins and no field raises it",
+     "value": {
+      "carried_by": "tool_bindings.create|update|retire",
+      "suite": "crates/actions/tests/tool_authoring.rs::the_publishing_job_cannot_widen_its_own_effect_ceiling",
+      "section": "SPEC_V2 §11.1, §11.4, design D4"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "R-T15-5 Human-default, tenant-configurable publication",
+     "axis_b": "tools.publish reads approval_policy; an absent row requires a person, a tenant row waives with an audit",
+     "value": {
+      "carried_by": "tools.publish + approval_policy",
+      "suite": "crates/actions/tests/tool_authoring.rs::publication_waits_for_a_human_by_default",
+      "section": "SPEC_V2 §5.4, §12, design D1/D6a"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "R-T15-6 Promotion via kata/development",
+     "axis_b": "toolkits.promote opens a kata or development request; no authoring action stamps a platform version",
+     "value": {
+      "carried_by": "toolkits.promote",
+      "suite": "crates/actions/tests/tool_authoring.rs::promotion_is_not_an_admin_toggle",
+      "section": "SPEC_V2 §11.5, design D5/D7"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "R-T15-7 One tool_call, no credential, drift opens a kata",
+     "axis_b": "every allowed call writes one tool_call with an alias only; a source change is a new import plus a kata",
+     "value": {
+      "carried_by": "the T13 broker and tools.call",
+      "suite": "crates/actions/tests/byo_tools.rs::only_the_bound_subset_is_callable_and_each_call_is_audited",
+      "section": "SPEC_V2 §11.3, §11.9"
+     },
+     "position": 7
+    }
+   ],
+   "links": [
+    {
+     "to": "Solution Concept Diagram — T15 Tool authoring and BYO (Phase A)",
+     "kind": "realization"
+    },
+    {
+     "to": "Driver/Goal/Objective Catalog — T15 Tool authoring and BYO (Phase A)",
+     "kind": "realization"
+    }
+   ],
+   "body": "# Requirements Catalog — T15 (Phase A)\n\n## Metadata\n\nType catalog, version 1, owner the T15 project (#86), reviewer the Architecture Board at the 2026-11-28 retrospective, phase A, plateau PSA, related project T15 in tranche 12. The seven requirements are the design's R-T15-1 to R7, each paired with the action and the test suite its acceptance names.\n\n## Entries\n\nThe catalog covers the OpenAPI draft import, the service-scaffold registration, the remote-MCP binding, the tenant binding and its narrowing rule, the human-default publication gate, the promotion request and the one-call audit. Each row names the carrying action and the merged test binary, so the requirement is read against evidence rather than prose.\n\n## Links\n\nThe catalog is realized by the Solution Concept Diagram's nine edges and realizes the Driver/Goal/Objective catalog's O1–O3. Its R5 is the requirement the Stakeholder Map's publication concern depends on, which is why the map links here rather than the reverse.\n\n## Document\n\nThe source is `docs/plans/inception/T15/02-architecture-design.md` § Architecture artefacts (Requirements) and § Acceptance; the merged tests are `crates/actions/tests/tool_authoring.rs` and `byo_tools.rs` at PR #666. The gate is SPEC_V2 §12."
+  },
+  {
+   "title": "Solution Concept Diagram — T15 Tool authoring and BYO (Phase A)",
+   "artifact_kind": "diagram",
+   "phase_code": "a",
+   "plateau": "psa",
+   "entries": [
+    {
+     "axis_a": "Source document (OpenAPI 3.1 or a service scaffold)",
+     "axis_b": "E1 derivation into a draft governed_asset(kind='tool_draft')",
+     "value": {
+      "edge": "E1",
+      "kind": "derivation",
+      "source": "design §Architecture artefacts solution concept"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Draft",
+     "axis_b": "E2 dependency on validation and replay before any publication",
+     "value": {
+      "edge": "E2",
+      "kind": "dependency",
+      "source": "design D2/§11.6"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Review",
+     "axis_b": "E3 dependency on approvals.request and approvals.decide",
+     "value": {
+      "edge": "E3",
+      "kind": "dependency",
+      "source": "design D1/§5.4"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Approval",
+     "axis_b": "E4 realization of toolkit@version and its tools",
+     "value": {
+      "edge": "E4",
+      "kind": "realization",
+      "source": "design D1/§11.6"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Version",
+     "axis_b": "E5 dependency into a tool_binding with a ceiling and a credential alias",
+     "value": {
+      "edge": "E5",
+      "kind": "dependency",
+      "source": "design D4/§11.8"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Binding",
+     "axis_b": "E6 realization of tools.call and one tool_call per call",
+     "value": {
+      "edge": "E6",
+      "kind": "realization",
+      "source": "design §11.3/§11.8"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "Tenant toolkit",
+     "axis_b": "E7 dependency into toolkits.promote and a kata/development request",
+     "value": {
+      "edge": "E7",
+      "kind": "dependency",
+      "source": "design D5/D7"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "approval_policy",
+     "axis_b": "E8 reuse of the per-tenant per-action publication gate",
+     "value": {
+      "edge": "E8",
+      "kind": "reuse",
+      "source": "design D1/D6a"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "secret",
+     "axis_b": "E9 reuse of the alias-only credential store, with no reveal path",
+     "value": {
+      "edge": "E9",
+      "kind": "reuse",
+      "source": "design §11.8"
+     },
+     "position": 9
+    }
+   ],
+   "links": [
+    {
+     "to": "Requirements Catalog — T15 Tool authoring and BYO (Phase A)",
+     "kind": "realization"
+    },
+    {
+     "to": "Technology Standards Catalog — T15 Tool authoring and BYO (Phase D)",
+     "kind": "reuse"
+    }
+   ],
+   "body": "# Solution Concept Diagram — T15 (Phase A)\n\n## Metadata\n\nType diagram, version 1, owner the T15 project (#86), reviewer the Architecture Board at the 2026-11-28 retrospective, phase A, plateau PSA, related project T15. The nine edges are the design's solution concept, restated as the derivation, dependency, realization and reuse paths the pack records.\n\n## Entries\n\nThe diagram starts at an OpenAPI document or a service scaffold and ends at an audited tool_call, passing through the draft lifecycle, the validation and replay, the approval gate, the immutable publication, the binding and its ceiling, and the promotion request. Two edges reuse existing stores: approval_policy for the gate and secret for the alias.\n\n## Links\n\nThe diagram realizes the Requirements Catalog's seven requirements and reuses the Technology Standards Catalog's approval_policy and secret rows. Its E4 is the realization the Business Capability Map's publication governance names, and E6 is the call path the data catalog records.\n\n## Document\n\nThe source is `docs/plans/inception/T15/02-architecture-design.md` § Architecture artefacts (Solution concept) and § Decisions D1–D7; the delivered route is PR #666. The acceptance is SPEC_V2 §12."
+  },
+  {
+   "title": "Business Capability Map — T15 Tool authoring and BYO (Phase B)",
+   "artifact_kind": "diagram",
+   "phase_code": "b",
+   "plateau": "hld",
+   "entries": [
+    {
+     "axis_a": "Tool authoring front door",
+     "axis_b": "the draft lifecycle, both BYO adapters and promotion as one capability",
+     "value": {
+      "level": 2,
+      "delivered_by": "toolkits.import_openapi|import_mcp, tool_authoring.*, toolkits.promote",
+      "surface": "toolkits.*, tool_authoring.*"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Publication governance",
+     "axis_b": "human-default, tenant-configurable approval and the Board's contract",
+     "value": {
+      "level": 2,
+      "delivered_by": "tools.publish|retire over approval_policy",
+      "surface": "approvals.request|decide, tools.publish"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Binding and ceiling",
+     "axis_b": "job and tenant bindings where the lower of job, tenant and operation effect wins",
+     "value": {
+      "level": 2,
+      "delivered_by": "the T13 broker plus tool_bindings.*",
+      "surface": "tool_bindings.create|update|retire, tools.call"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Credential sealing",
+     "axis_b": "alias-only credentials resolved at call time with no reveal path",
+     "value": {
+      "level": 2,
+      "delivered_by": "the secret store and the broker's alias resolution",
+      "surface": "secrets.create|get|list|rotate|delete"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Call and audit",
+     "axis_b": "one tool_call per call, no credential, and a source drift that opens a kata",
+     "value": {
+      "level": 2,
+      "delivered_by": "the T13 broker and tools.call",
+      "surface": "tools.probe, tools.call"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Promotion path",
+     "axis_b": "a kata or development request, never an admin toggle and never a platform version stamp",
+     "value": {
+      "level": 2,
+      "delivered_by": "toolkits.promote",
+      "surface": "toolkits.promote"
+     },
+     "position": 6
+    }
+   ],
+   "links": [
+    {
+     "to": "Requirements Catalog — T15 Tool authoring and BYO (Phase A)",
+     "kind": "derivation"
+    },
+    {
+     "to": "Data Entity/Data Component Catalog — T15 Tool authoring and BYO (Phase C)",
+     "kind": "dependency"
+    }
+   ],
+   "body": "# Business Capability Map — T15 (Phase B)\n\n## Metadata\n\nType diagram, version 1, owner the T15 project (#86), reviewer the Architecture Board at the 2026-11-28 retrospective, phase B, plateau HLD, related project T15 in tranche 12. The six capabilities are the front door, publication governance, binding and ceiling, credential sealing, call and audit, and promotion.\n\n## Entries\n\nThe map separates what T15 owns from what it reuses: the front door, the BYO adapters and the promotion request are T15's; the broker, the call path and the credential store are T13's and are reused rather than forked. The level-2 rows name the carrying surfaces so the map is read against the action catalogue rather than a drawing.\n\n## Links\n\nThe map derives from the Requirements Catalog's R-T15-4 and R-T15-5 and depends on the Data Entity/Data Component Catalog's tool, toolkit and binding rows. Its publication-governance row is the capability the Stakeholder Map's tenant-admin concern participates in.\n\n## Document\n\nThe source is `docs/plans/inception/T15/02-architecture-design.md` § Context and boundary and § Decisions; the delivered action surfaces are the registry at PR #666. The capability is acceptance-tested through SPEC_V2 §12."
+  },
+  {
+   "title": "Data Entity/Data Component Catalog — T15 Tool authoring and BYO (Phase C)",
+   "artifact_kind": "catalog",
+   "phase_code": "c",
+   "plateau": "hld",
+   "entries": [
+    {
+     "axis_a": "tool",
+     "axis_b": "one operation version: closed schemas, effect, idempotency, timeout, redaction, destination",
+     "value": {
+      "writer": "T13's tool actions",
+      "migration": "T13's base tables; T15 adds no tool column",
+      "note": "a tool is created only by publication"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "toolkit",
+     "axis_b": "immutable key@version with kind native|openapi|mcp, scope, source_asset_id and source_hash",
+     "value": {
+      "writer": "tools.publish, toolkits.import_*",
+      "migration": "T15 extension",
+      "note": "a source change is a new version"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "tool_binding",
+     "axis_b": "scope job|tenant, nullable job_binding_id, ceiling and credential alias",
+     "value": {
+      "writer": "tool_bindings.create|update|retire",
+      "migration": "T15 extension",
+      "note": "the lower ceiling wins and no field raises it"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "tool_call",
+     "axis_b": "one row per call; no credential field; the alias only",
+     "value": {
+      "writer": "the T13 broker",
+      "migration": "T13",
+      "note": "the audit is the call row"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "governed_asset",
+     "axis_b": "kind='tool_draft' extends the existing CHECK; a draft is not a published toolkit",
+     "value": {
+      "writer": "the draft lifecycle",
+      "migration": "T15 extension",
+      "note": "one record per fact (design D2)"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "approval_policy",
+     "axis_b": "per-tenant per-action publication gate; T15 adds approver kind, count and expiry",
+     "value": {
+      "writer": "approval_policies.set",
+      "migration": "0050 plus the T15 columns",
+      "note": "an absent row requires a person"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "secret",
+     "axis_b": "alias-only credential store with no reveal path",
+     "value": {
+      "writer": "secrets.*",
+      "migration": "0013",
+      "note": "the binding carries the alias, never the secret"
+     },
+     "position": 7
+    }
+   ],
+   "links": [
+    {
+     "to": "Business Capability Map — T15 Tool authoring and BYO (Phase B)",
+     "kind": "dependency"
+    },
+    {
+     "to": "Technology Standards Catalog — T15 Tool authoring and BYO (Phase D)",
+     "kind": "realization"
+    }
+   ],
+   "body": "# Data Entity/Data Component Catalog — T15 (Phase C)\n\n## Metadata\n\nType catalog, version 1, owner the T15 project (#86), reviewer the Architecture Board at the 2026-11-28 retrospective, phase C, plateau HLD, related project T15 in tranche 12. The seven rows are the aggregates and stores the authoring front door writes or reuses.\n\n## Entries\n\nThe catalog separates T15's extensions from T13's base: the tool, tool_call and broker tables are reused; the toolkit kind/scope/source columns, the binding scope, the tool_draft CHECK, and the approval-policy approver columns are T15's. The secret store is read by alias only, and the draft is never a published toolkit.\n\n## Links\n\nThe catalog depends on the Business Capability Map's binding and audit rows and is realized by the Technology Standards Catalog's RLS and migration rules. Its toolkit and binding rows are the entities the Solution Concept Diagram's E5 and E6 traverse.\n\n## Document\n\nThe source is `docs/plans/inception/T15/02-architecture-design.md` § Aggregates, tables and actions and § Migration and rollout; the delivered migration is PR #666. The tenant-scoped storage rule is SPEC_V2 §11.8."
+  },
+  {
+   "title": "Technology Standards Catalog — T15 Tool authoring and BYO (Phase D)",
+   "artifact_kind": "catalog",
+   "phase_code": "d",
+   "plateau": "hld",
+   "entries": [
+    {
+     "axis_a": "Postgres 18 with forced row-level security",
+     "axis_b": "the toolkit, binding, draft and call rows stay tenant-scoped",
+     "value": {
+      "rule": "RLS forced in the migration",
+      "check": "one tenant never reads another's toolkit or binding",
+      "owner": "the workspace migration pattern"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Rust workspace, one binary, one Postgres, no new port",
+     "axis_b": "the authoring front door adds tables, columns and actions only",
+     "value": {
+      "rule": "no new service and no new port; 8930 is the existing surface",
+      "check": "the action registry and the served-spec lock",
+      "owner": "the workspace"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "rmcp 3.9.0 as a client",
+     "axis_b": "streamable-HTTP sessions for a remote MCP server, bound subset only",
+     "value": {
+      "rule": "client only, never the agent platform's server as a dependency",
+      "check": "byo_tools.rs",
+      "owner": "T15"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "openapiv3 2.2.0 parse-or-refuse",
+     "axis_b": "a 3.1 document either imports with closed schemas or refuses with a typed error; 3.0 is the fallback",
+     "value": {
+      "rule": "never a silent partial import",
+      "check": "openapi31.rs",
+      "owner": "T15"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "approval_policy reuse",
+     "axis_b": "the publication gate is a policy row, not a second policy table",
+     "value": {
+      "rule": "absent row means a human; self-approval is forbidden",
+      "check": "the approval-policy fixtures",
+      "owner": "T6's policy surface"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "The four-rank Effect",
+     "axis_b": "read < write < spend < destructive, shared with actions",
+     "value": {
+      "rule": "a tool's ceiling uses the same rank as an action's",
+      "check": "the tool-side effect proof under #86",
+      "owner": "T13/T15"
+     },
+     "position": 6
+    }
+   ],
+   "links": [
+    {
+     "to": "Data Entity/Data Component Catalog — T15 Tool authoring and BYO (Phase C)",
+     "kind": "realization"
+    },
+    {
+     "to": "Solution Concept Diagram — T15 Tool authoring and BYO (Phase A)",
+     "kind": "reuse"
+    }
+   ],
+   "body": "# Technology Standards Catalog — T15 (Phase D)\n\n## Metadata\n\nType catalog, version 1, owner the T15 project (#86), reviewer the Architecture Board at the 2026-11-28 retrospective, phase D, plateau HLD, related project T15 in tranche 12. The six standards are the storage, runtime, MCP client, OpenAPI parser, approval-policy and effect-rank rules the delivered route follows.\n\n## Entries\n\nThe catalog fixes the platform choices the authoring front door must not re-litigate: Postgres 18 with forced RLS, one Rust binary and no new port, rmcp as a client, openapiv3 with parse-or-refuse for 3.1, approval_policy as the only publication gate, and the built four-rank Effect. Each row names its check so a standard is read against a test or a registry, not a preference.\n\n## Links\n\nThe catalog is realized by the Data Entity/Data Component Catalog's seven rows and reuses the Solution Concept Diagram's E8 and E9 edges. Its effect-rank row is the standard the Requirements Catalog's R-T15-4 ceiling rule depends on.\n\n## Document\n\nThe source is `docs/plans/inception/T15/02-architecture-design.md` § Decisions D6/D6a and § Migration and rollout; the merged proof is PR #666. The no-new-port rule is SPEC_V2 §10.6."
+  }
+ ],
+ "documents": [
+  {
+   "category": "architecture-artifact",
+   "title": "Architecture Artefact Index — T15 (retrospective, 2026-11-28)",
+   "body": "# Architecture Artefact Index — T15 (retrospective, 2026-11-28)\n\n## Metadata\n\nType index, version 1, owner the T15 project (#86), reviewer the Architecture Board at the 2026-11-28 retrospective, phase A–D, plateau PSA–HLD, related project T15 in tranche 12. The index names the seven artefacts this pack creates and the order the standard seeds them in.\n\n## Entries\n\n- Stakeholder Map (Phase A, matrix): the six stakeholders and their publication, credential, ceiling, audit, version and tenancy concerns.\n- Driver/Goal/Objective Catalog (Phase A, catalog): tenant tools without a platform release, under platform control.\n- Requirements Catalog (Phase A, catalog): R-T15-1 to R7 with their carrying actions and merged test binaries.\n- Solution Concept Diagram (Phase A, diagram): the nine derivation, dependency, realization and reuse edges from source document to audited call.\n- Business Capability Map (Phase B, diagram): the front door, publication governance, binding and ceiling, credential sealing, call and audit, and promotion.\n- Data Entity/Data Component Catalog (Phase C, catalog): the tool, toolkit, binding, call, draft, policy and secret rows.\n- Technology Standards Catalog (Phase D, catalog): Postgres 18 RLS, one binary, rmcp as a client, openapiv3 parse-or-refuse, approval_policy and the four-rank Effect.\n\n## Links\n\nThe index derives from the seven artefacts it names and is the document the close gate reads for the mandatory architecture-artifact category. Each artefact links to another artefact of the pack, so the set is a graph rather than seven orphans.\n\n## Document\n\nThe artefacts are created by this pack through architecture.artifacts_create and linked through architecture.artifacts_link at the pinned 2026-11-28 snapshot. The source design is docs/plans/inception/T15/02-architecture-design.md; the delivered route is PR #666."
+  }
+ ],
+ "registers": {
+  "risk": [
+   {
+    "code": "T15-R1",
+    "title": "OpenAPI 3.1 fidelity",
+    "body": "A 3.1 document the pinned openapiv3 2.2.0 cannot parse could import partially and leave a toolkit with missing operations. The design makes this a typed refusal and a 3.0 fallback, never a silent partial import.",
+    "status": "open",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/inception/T15/02-architecture-design.md#decisions"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the T15 project (#86)"
+    },
+    "probability": "medium",
+    "impact": 3,
+    "review_at": "2027-01-15",
+    "severity": "medium",
+    "response": "The parse-or-refuse fixture is the check; a 3.1 sample either imports with closed schemas or refuses with a typed error naming the unsupported construct."
+   },
+   {
+    "code": "T15-R2",
+    "title": "A binding could widen the ceiling",
+    "body": "A tenant binding that is checked before the job binding could make a read job call a write tool. The design resolves job then tenant and takes the minimum of job, tenant and operation effect; no field may raise it.",
+    "status": "open",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/inception/T15/02-architecture-design.md#decisions"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the T15 project (#86)"
+    },
+    "probability": "low",
+    "impact": 4,
+    "review_at": "2027-01-15",
+    "severity": "medium",
+    "response": "Refuse the call before the destination when the minimum ceiling is below the tool's effect; the gate suite attempts the widening."
+   },
+   {
+    "code": "T15-R3",
+    "title": "The tool-as-action namespace could leak",
+    "body": "An import that wrote an action_registry row would turn a tenant toolkit into a platform action and bypass the publication gate. Import must write toolkit and draft rows only.",
+    "status": "open",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/SPEC_V2.md#12"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the T15 project (#86)"
+    },
+    "probability": "low",
+    "impact": 4,
+    "review_at": "2027-01-15",
+    "severity": "medium",
+    "response": "The import path is checked to write no action row; the action registry count is the witness."
+   },
+   {
+    "code": "T15-R4",
+    "title": "MCP discovery could widen the bound subset",
+    "body": "Discovery that proxies the full remote list would make an unbound tool callable and defeat the narrowing. The import persists only the bound operations, pinned by source_hash.",
+    "status": "open",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/inception/T15/02-architecture-design.md#decisions"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the T15 project (#86)"
+    },
+    "probability": "medium",
+    "impact": 3,
+    "review_at": "2027-01-15",
+    "severity": "medium",
+    "response": "The unbound call is refused before the network and a drift is a new import plus a kata."
+   },
+   {
+    "code": "T15-R5",
+    "title": "A credential could reach the call ledger",
+    "body": "A tool_call that recorded the credential would put a secret in an audited row. The binding carries an alias and the call row has no credential field.",
+    "status": "open",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/SPEC_V2.md#12"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "platform security"
+    },
+    "probability": "low",
+    "impact": 5,
+    "review_at": "2027-01-15",
+    "severity": "high",
+    "response": "The alias is resolved at call time and the tool_call schema carries no credential; the BYO test asserts it."
+   },
+   {
+    "code": "T15-R6",
+    "title": "The publication gate could be unconfigurable",
+    "body": "An approval_policy row for tools.publish requires the action name to exist in the registry. The action is registered, and the absent-row default is a person.",
+    "status": "open",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/SPEC_V2.md#5.4",
+      "docs/SPEC_V2.md#12"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the T15 project (#86)"
+    },
+    "probability": "low",
+    "impact": 3,
+    "review_at": "2027-01-15",
+    "severity": "low",
+    "response": "The policy fixtures cover an absent row and a tenant waiver, and the publication test proves both."
+   }
+  ],
+  "issue": [
+   {
+    "code": "T15-I1",
+    "title": "Promotion is a request, not an admin toggle",
+    "body": "toolkits.promote opens a kata or development request. No authoring action stamps a platform version, so a promotion returns requested rather than a new platform version. This is a design refusal, not a delivery gap.",
+    "status": "closed",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/inception/T15/02-architecture-design.md#decisions"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the programme architect"
+    }
+   },
+   {
+    "code": "T15-I2",
+    "title": "The V1 /tools surface is not evidence for T15",
+    "body": "The V1 /tools route is the legacy surface and is not evidence for the V2 authoring front door. The V2 evidence is the merged tool_authoring and byo_tools suites at PR #666.",
+    "status": "closed",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/T15/evidence.md#gap"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the programme manager"
+    }
+   }
+  ],
+  "assumption": [
+   {
+    "code": "T15-A1",
+    "title": "T13's broker and tool tables are the base",
+    "body": "The authoring front door extends T13's tool, toolkit, tool_binding and tool_call aggregates rather than forking them. The record marks T13 closed and the delivered route uses those rows.",
+    "status": "satisfied",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/inception/T15/00-project-brief.md#dependencies"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the programme architect"
+    }
+   },
+   {
+    "code": "T15-A2",
+    "title": "T6's service registration path exists",
+    "body": "A scaffolded service registers its own OpenAPI through T6's path; T15 does not add a second reader or a second registry. T6 is closed in the record.",
+    "status": "satisfied",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/inception/T15/00-project-brief.md#dependencies"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the programme architect"
+    }
+   },
+   {
+    "code": "T15-A3",
+    "title": "approval_policy can carry the approver fields",
+    "body": "The design adds approver kind, count and expiry as columns on approval_policy rather than a second policy store. The delivered route uses the single table.",
+    "status": "satisfied",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/inception/T15/02-architecture-design.md#decisions"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "platform security"
+    }
+   }
+  ],
+  "dependency": [
+   {
+    "code": "T15-D1",
+    "title": "T13 — the tool aggregates and broker",
+    "body": "T13 owns tool, toolkit, tool_binding, tool_call and the call path. The record marks T13 closed in tranche 3; T15 reuses it.",
+    "status": "satisfied",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/inception/T15/00-project-brief.md#dependencies"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the programme manager"
+    }
+   },
+   {
+    "code": "T15-D2",
+    "title": "T6 — the approval policy and service registration",
+    "body": "T6 owns the approval-policy use and the service registration path. The record marks T6 closed in tranche 11; T15 reuses both.",
+    "status": "satisfied",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/inception/T15/00-project-brief.md#dependencies"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the programme manager"
+    }
+   },
+   {
+    "code": "T15-D3",
+    "title": "P0 — the programme definition",
+    "body": "P0 defines the programme, the tranches and the project row. It is closed in the record; T15's tranche 12 sits under it.",
+    "status": "satisfied",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/P0-programme-definition.md"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the programme manager"
+    }
+   },
+   {
+    "code": "T15-D4",
+    "title": "#86 — the delivery unit",
+    "body": "Issue #86 is T15's delivery unit, closed by PR #666 at merge a2ef9194eb2c. The retrospective pack does not reopen it.",
+    "status": "closed",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "https://github.com/nonagenticai/conveyor/issues/86"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the programme manager"
+    }
+   }
+  ],
+  "benefit": [
+   {
+    "code": "B2",
+    "title": "Less bespoke tooling",
+    "body": "The authoring front door and the BYO binding make every service a job uses a toolkit: a tenant publishes a spec or a bound MCP subset instead of bespoke glue. The measure is the tool_call ledger's per-toolkit counts at the review.",
+    "status": "identified",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/P0-programme-definition.md"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the BCM"
+    }
+   },
+   {
+    "code": "B6",
+    "title": "Predictable delivery",
+    "body": "The receipt, the tranche exit and the complete record set are the measurable half of predictable delivery: a tranche that cannot show a green receipt cannot be forecast. The measure is the receipt verdict and the exit at one snapshot sha.",
+    "status": "identified",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/P0-programme-definition.md"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the BCM"
+    }
+   }
+  ]
+ },
+ "delivery_contract": {
+  "title": "Delivery Contract — T15 Tool authoring and BYO (retrospective, 2026-11-28)",
+  "body": {
+   "commitments": "T15 delivers the tool authoring front door: import an OpenAPI document or a service scaffold into a draft, bind a remote MCP subset, validate and replay, publish behind the human-default approval gate, bind a job or tenant with the lower ceiling, audit every call as one tool_call, and promote through a kata or development request. No tenant code executes and no caller-supplied URL is called.",
+   "compliance": "Compliance is judged at the pinned 2026-11-28 snapshot against the record, which marks the project closed and measured built, and against the design's eight acceptance scenarios. The merged suites are crates/actions/tests/tool_authoring.rs and byo_tools.rs at PR #666. The design's original commands named rbuild; rbuild was retired by the owner on 2026-11-20, so this contract records the GitHub-hosted preflight as the replacement and claims no run of a retired command.",
+   "approval": "The contract is approved by the Board's architecture decision recorded through the Phase-G compliance review in this pack, under the standing delegation. The retrospective record restates the delivered contract; it does not ask the Board to approve a second time or to reopen the build.",
+   "manifest": "The acceptance manifest is acceptance/programme/T15.toml. It pins the project's closed status and carries the fifteen gate checks the receipt reads; the pin states the record, and the gate text states the delivered acceptance with the closure review.",
+   "acceptance_at": "Acceptance is read at the 2026-11-28 snapshot, the same snapshot the T15 receipt and the tranche-12 exit read. The receipt is the instrument: verdict green means every check passed at that head, and a green from an older head proves nothing about this one.",
+   "retrospective": "This contract is retrospective: it records a project already delivered on main by PR #666 (merge a2ef9194eb2c). Its obligations are the authorships and reconciliations the record set owes, not new construction, and its completion is the green receipt on the manifest.",
+   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+  }
+ },
+ "wbs_deliverable": {
+  "title": "Tool authoring and BYO — the spec→publish→call route, the tenant publication gate, the BYO MCP binding and the effect ceiling",
+  "business_value": 8,
+  "time_criticality": 5,
+  "risk_reduction": 8,
+  "job_size": 8
+ },
+ "review": {
+  "level": "compliant",
+  "findings": "This retrospective Phase-G review records the level compliant for the record set it assesses under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, and it names every open package this pack resolves or leaves standing rather than leaving them implicit. It clears contract_missing:T15 through the delivery contract and mandatory_artefacts:T15 through the seven A–D artefacts, the Statement of Architecture Work, the charter and both declared output bodies. It clears the four PMP packages — std-pmp-change-control-t15, std-pmp-project-baseline-t15, std-pmp-project-registers-t15 and std-pmp-project-wbs-t15 — through the charter, the scope, schedule and cost baselines the factory records, the five register kinds and the WBS deliverable carrying 8/5/8/8. It clears the three TOGAF packages — std-togaf-architecture-artifact-t15, std-togaf-compliance-review-t15 and std-togaf-phase-g-t15-g — through the seven linked artefacts, this review and the closure record. It does not clear project_in_unauthorised_tranche:T15: that P0 is the programme owner's authorisation act, which #755 records, and no pack may claim it. The manifest is reconciled to the record's closed status: the T15-project pin reads closed and the gate text states the delivered acceptance with the closure review, rather than the stale statement that the project is not built.",
+  "evidence": {
+   "manifest": "acceptance/programme/T15.toml",
+   "plan": "docs/SPEC_V2.md §12",
+   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+   "gate": "docs/plans/T15/closure-review.md § Decision"
+  }
+ },
+ "project_brief_output": "# Project Brief — T15 Tool authoring and BYO (retrospective, 2026-11-28)\n\n## Outcome\n\nA tool generated from an OpenAPI spec or a BYO MCP server is published, called by a job, and bounded by its effect ceiling and the tenant approval policy. The record marks the outcome delivered and measured built; this retrospective restates it for the authored set the close gate reads.\n\n## Boundary\n\nIn scope are toolkit import (draft toolkit and tool rows), remote-MCP discovery as a client, tenant-binding resolution in the broker and the promotion request, all as toolkit rows rather than new actions. Out of scope are executing tenant code, a caller-supplied URL at call time, the agent platform's MCP server as a dependency, any archived kag component, a second control plane and a second OpenAPI reader.\n\n## Reuse sources\n\nThe authoring front door reuses crates/actions/src/ingest.rs for OpenAPI parsing and the breaking-change diff, crates/actions/src/mcp.rs and rmcp for the streamable-HTTP client, migrations/0050_approval_policies.sql for the publication gate, migrations/0013_documents.sql for the alias-only credential store, and governed_asset for the draft lifecycle. No second reader, registry or policy table is created.\n\n## Inception units\n\nThe project's inception analysis is published as `01a1ee5f-51f8-7613-8d20-35d470d53ecc` and its architecture design as `01a1ee5f-5b42-70c5-9c35-86f977d14e85`, both at 2026-11-21. The brief itself is `01a1e008-4866-73b3-aff3-4b81913d1e23`; the inception gate is met and this pack does not re-open it.\n\n## Dependencies\n\nT15's declared dependencies are T13 (the tool aggregates and broker), T6 (the approval policy and service registration) and P0 (the programme definition). The record marks all three closed, so no open construction edge remains; the delivery unit #86 is closed by PR #666 at merge `a2ef9194eb2c`.\n\n## Acceptance\n\nThe project gate reads: a tool generated from a spec is published and called by a job; publication approval defaults to a human and is tenant-configurable; a BYO MCP server is bound, narrowed and audited; a tenant cannot exceed its effect ceiling. The merged scenarios in `crates/actions/tests/tool_authoring.rs` and `byo_tools.rs` are the evidence, and the closure review records the decision.\n\n## Capabilities\n\nThe project carries the development and design capabilities: the authoring surfaces a tenant or a job author uses to import, review and publish a toolkit, and the design surfaces the architect uses to shape the binding, ceiling and promotion rules. No other capability may grant a tool binding, and no capability bypasses the publication gate or the effect ceiling.\n\n## Plan\n\nThe plan is `docs/SPEC_V2.md` §11.5–§11.6 and §12 row T15, delivered as issue #86 in tranche 12. There is no separate S## slice file. The delivery route is the GitHub-hosted preflight and the PR's CI, not the retired rbuild command; the retrospective record set is this pack's work.",
+ "evidence_output": "# Evidence — T15 Tool authoring and BYO (retrospective, 2026-11-28)\n\n## Claim\n\nT15 delivers the tool authoring front door: a tool generated from a spec is published and called by a job, publication approval defaults to a human and is tenant-configurable, a BYO MCP server is bound, narrowed and audited, and a tenant cannot exceed its effect ceiling. The record marks the project closed and measured built; the delivered merge is PR #666 at `a2ef9194eb2c`.\n\n## Evidence\n\nThe merged scenarios are `crates/actions/tests/tool_authoring.rs::a_tool_generated_from_a_spec_is_published_and_called`, `::a_scaffolded_service_registers_its_own_openapi`, `::publication_waits_for_a_human_by_default`, `::a_tenant_policy_changes_the_publication_gate_without_a_code_change`, `::the_publishing_job_cannot_widen_its_own_effect_ceiling`, `::publication_refuses_an_unbounded_draft_and_defaults_the_class_to_read`, `::a_destructive_tool_needs_a_named_approver` and `crates/actions/tests/byo_tools.rs::only_the_bound_subset_is_callable_and_each_call_is_audited`, `::a_call_time_url_is_refused_and_a_byo_toolkit_is_tenant_scoped`.\n\n## Verification\n\nThe verification route is the GitHub-hosted preflight for the compile and lint verdict and the PR's `ci-public` as the final gate at the merge commit. The targeted binaries are `tool_authoring` and `byo_tools` in `conveyor-actions`, run through `~/.claude/scripts/cargo-guard.py` for an interactive check; rbuild was retired on 2026-11-20 and no retired command is claimed in this record.\n\n## Links\n\n- `docs/plans/inception/T15/00-project-brief.md`, `01-inception-analysis.md`, `02-architecture-design.md`\n- `docs/plans/T15/evidence.md`, `docs/plans/T15/closure-review.md`\n- Issue #86; PR #666; `acceptance/programme/T15.toml`; `docs/evidence/v2-coverage.md`\n\n## Gap\n\nThe V1 `/tools` surface is the legacy surface and is not evidence for T15. A promotion returns `requested`; no platform version is stamped. Caller-supplied URLs and an archived-kag binding are refused or unclaimed by design. No other delivery gap is named by the record; the remaining open package is the tranche authorisation, which is #755's act.",
+ "closure": "T15 is closed through the one gate the record carries: the project row is closed only after its charter, baselines, artefacts, registers, contract, WBS, Phase-G review, declared outputs and closure review exist, and the receipt on `acceptance/programme/T15.toml` is read against them at the 2026-11-28 snapshot. The close records the delivered acceptance, not a new build; the authorisation P0 `project_in_unauthorised_tranche:T15` is the tranche's act, not this pack's.",
+ "closure_review": "# Closure Review — T15 Tool authoring and BYO (retrospective, 2026-11-28)\n\n## Outcome vs acceptance\n\n| Acceptance criterion | Evidence | Result |\n|---|---|---|\n| A tool generated from a spec is published and called by a job | `tool_authoring.rs::a_tool_generated_from_a_spec_is_published_and_called`, `::a_scaffolded_service_registers_its_own_openapi` | pass |\n| Publication approval defaults to a human and is tenant-configurable | `tool_authoring.rs::publication_waits_for_a_human_by_default`, `::a_tenant_policy_changes_the_publication_gate_without_a_code_change` | pass |\n| A BYO MCP server is bound, narrowed and audited | `byo_tools.rs::only_the_bound_subset_is_callable_and_each_call_is_audited`, `::a_call_time_url_is_refused_and_a_byo_toolkit_is_tenant_scoped` | pass |\n| A tenant cannot exceed its effect ceiling | `tool_authoring.rs::the_publishing_job_cannot_widen_its_own_effect_ceiling`, `::publication_refuses_an_unbounded_draft_and_defaults_the_class_to_read`, `::a_destructive_tool_needs_a_named_approver` | pass |\n| The delivery is on main and gated | issue #86 closed by PR #666, merge `a2ef9194eb2c`; `actions:tools` exists in `docs/evidence/v2-coverage.md` | pass |\n\n## Evidence\n\nThe published inception set is the brief `01a1e008-4866-73b3-aff3-4b81913d1e23`, the analysis `01a1ee5f-51f8-7613-8d20-35d470d53ecc` and the design `01a1ee5f-5b42-70c5-9c35-86f977d14e85`. The delivery merge is PR #666 at `a2ef9194eb2c`, and the merged tool_authoring and byo_tools scenarios are the acceptance evidence. The record row is closed with measured status built.\n\n## Open items\n\nThe V1 `/tools` surface is the legacy surface and is not evidence for T15. A promotion returns `requested` and does not stamp a platform version, which is a design refusal. Caller-supplied URLs are refused and an archived-kag binding is not claimed. Tranche 12's authorisation is not claimed here; it is the #755 programme chain's act, and the P0 package remains until that decision is recorded.\n\n## Decision\n\nClose. Acceptance is met on the evidence above; the listed items are design refusals or other units' scope, and no tranche authorisation is manufactured. The closure is recorded through the phase-G gate under the standing delegation, and the receipt on acceptance/programme/T15.toml is the executable proof."
+}

@@ -1,0 +1,25 @@
+{
+  "schema": "conveyor-tranche-cadences/v1",
+  "tranche": 12,
+  "tranche_id": "01a1e9e1-3c15-7bd6-9249-1327c195635d",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+  "cadences": {
+    "pi": "01a222e1-ece8-74d3-aa15-b2dd57f9be5f",
+    "refinement": "01a222e1-edb2-797f-9d93-80964422b34f",
+    "demo": "01a222e1-ee63-742d-a9ad-95624a5f87ea",
+    "retro": "01a222e1-ef0d-7bf9-8480-a0f4a64133ee"
+  },
+  "documents": {
+    "pi-plan": "01a222e2-4939-767c-9536-4ca371526284",
+    "pi-objectives": "01a222e2-2b3e-72a8-b886-45d213dc0768"
+  },
+  "plan_approval": {
+    "approval_id": "01a222e2-a316-723c-afae-0fdde7df187a",
+    "gate": "cadences.approve_plan",
+    "status": "approved",
+    "decided_by_kind": "rule",
+    "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+  },
+  "verified": "cadences.list on the replay record shows all four rows at period tranche-12 with the pi row carrying meta.pi_plan and meta.documents and the refinement row carrying meta.refinement.wsjf_inputs; documents.get reads both PI outputs back with project P0, unit tranche-12 and published_at set; the plan gate is approved with a rule decision under the standing delegation"
+}

@@ -1,0 +1,30 @@
+{
+  "schema": "conveyor-pi-refinement-wsjf/v1",
+  "tranche": 12,
+  "tranche_id": "01a1e9e1-3c15-7bd6-9249-1327c195635d",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "period": "tranche-12",
+  "recorded_at": "2026-11-28",
+  "members": {
+    "T15": {
+      "business_value": 8,
+      "time_criticality": 5,
+      "risk_reduction": 8,
+      "job_size": 8
+    }
+  },
+  "order": [
+    "T15"
+  ],
+  "reordered": [
+    {
+      "item": "T15 - the only member",
+      "from": "the seed's membership (T15)",
+      "to": "T15",
+      "why": "One member: no reorder is possible or needed."
+    }
+  ],
+  "reestimate": {
+    "T15": "10 open packages (1 P0: project_in_unauthorised_tranche; 2 P1: contract_missing, mandatory_artefacts; 7 P2: change-control, project-baseline, project-registers, project-wbs, architecture-artifact, compliance-review, phase-g)"
+  }
+}

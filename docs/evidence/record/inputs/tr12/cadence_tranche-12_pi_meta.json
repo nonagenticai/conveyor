@@ -1,0 +1,76 @@
+{
+  "id": "01a222e1-ece8-74d3-aa15-b2dd57f9be5f",
+  "meta": {
+    "tranche_id": "01a1e9e1-3c15-7bd6-9249-1327c195635d",
+    "tranche_number": 12,
+    "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+    "pi_plan": {
+      "scope": [
+        "T15"
+      ],
+      "period": "tranche-12",
+      "capacity": {
+        "projects": [
+          "T15"
+        ],
+        "read_agents_max": 4,
+        "build_concurrency": 1,
+        "live_record_writer": 1
+      },
+      "evidence": [
+        "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+        "01a1e9e1-3c15-7bd6-9249-1327c195635d",
+        "docs/evidence/rework/tranche-12/refinement-wsjf.json",
+        "docs/evidence/rework-register.json"
+      ],
+      "wip_limit": {
+        "open_batches": 2,
+        "open_cards_per_writer": 1
+      },
+      "objectives": [
+        {
+          "id": "O1",
+          "committed": true,
+          "statement": "T15's already-delivered capability is recorded through its charter, baselines, WBS, registers, delivery contract, Phase-G review, seven A-D artefacts and closure review; the nine non-authorisation packages clear.",
+          "business_value": 8
+        },
+        {
+          "id": "O2",
+          "committed": true,
+          "statement": "The tranche-12 readiness rows exist and read back: four cadences, the PI and refinement metadata, two published PI documents at unit tranche-12, the plan approval and the retro lesson.",
+          "business_value": 8
+        },
+        {
+          "id": "O3",
+          "committed": false,
+          "statement": "The tranche-12 exit gate exits 0 on T15's fresh receipt and hands a green tranche to the #755 review.",
+          "business_value": 8
+        }
+      ],
+      "refinement": {
+        "cadence_id": "01a222e1-edb2-797f-9d93-80964422b34f"
+      },
+      "dependencies": [
+        {
+          "to": "T13",
+          "from": "T15",
+          "note": "T15 declares depends_on T13, closed (tranche 3)"
+        },
+        {
+          "to": "T6",
+          "from": "T15",
+          "note": "T15 declares depends_on T6, closed (tranche 11)"
+        },
+        {
+          "to": "P0",
+          "from": "T15",
+          "note": "T15 declares depends_on P0, closed (tranche 0)"
+        }
+      ]
+    },
+    "documents": {
+      "pi-plan": "01a222e2-4939-767c-9536-4ca371526284",
+      "pi-objectives": "01a222e2-2b3e-72a8-b886-45d213dc0768"
+    }
+  }
+}

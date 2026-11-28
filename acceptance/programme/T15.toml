@@ -1,14 +1,14 @@
 [project]
 key = "T15"
 name = "Tool authoring and BYO"
-gate = "T15 is NOT built, and its acceptance — `SPEC_V2` §12: 'a tool generated from a spec is published and called by a job; publication approval defaults to a human and is tenant-configurable; a BYO MCP server is bound, narrowed and audited; a tenant cannot exceed its effect ceiling' — is the condition on which it may be closed, not a claim that it is met."
+gate = "T15 is closed on delivered acceptance — `SPEC_V2` §12: 'a tool generated from a spec is published and called by a job; publication approval defaults to a human and is tenant-configurable; a BYO MCP server is bound, narrowed and audited; a tenant cannot exceed its effect ceiling' — delivered by PR #666 (merge `a2ef9194eb2c`) and recorded by the published closure review `01a2121b-2e58-7407-84a3-3329dc2c1a8c`; the record row is closed and measured built."
 gate_checks = ["T15-project", "T15-baseline", "T15-charter", "T15-contract", "T15-review", "T15-waivers", "T15-pi-cadence", "T15-pi-plan", "T15-pi-objectives", "T15-wsjf", "T15-demo-credits", "T15-lessons", "T15-product", "T15-artefact-standard", "T15-rework"]
 [[check]]
 id = "T15-project"
 check = "project"
-status = "active"
+status = "closed"
 severity = "P0"
-description = "T15 is active"
+description = "T15 is closed"
 
 [[check]]
 id = "T15-baseline"

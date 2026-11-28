@@ -1,0 +1,30 @@
+{
+  "id": "01a222e1-edb2-797f-9d93-80964422b34f",
+  "meta": {
+    "tranche_id": "01a1e9e1-3c15-7bd6-9249-1327c195635d",
+    "tranche_number": 12,
+    "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+    "refinement": {
+      "period": "tranche-12",
+      "reordered": [
+        {
+          "item": "T15 - the only member",
+          "from": "the seed's membership (T15)",
+          "to": "T15",
+          "why": "One member: no reorder is possible or needed. The readiness set and the pack are the whole increment, and the pack is preflighted before the factory runs."
+        }
+      ],
+      "reestimate": {
+        "T15": "10 open packages (1 P0: project_in_unauthorised_tranche; 2 P1: contract_missing, mandatory_artefacts; 7 P2: change-control, project-baseline, project-registers, project-wbs, architecture-artifact, compliance-review, phase-g)"
+      },
+      "wsjf_inputs": {
+        "T15": {
+          "business_value": 8,
+          "time_criticality": 5,
+          "risk_reduction": 8,
+          "job_size": 8
+        }
+      }
+    }
+  }
+}

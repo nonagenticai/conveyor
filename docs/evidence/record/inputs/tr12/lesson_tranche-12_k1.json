@@ -1,0 +1,16 @@
+{
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "cadence_id": "01a222e1-ef0d-7bf9-8480-a0f4a64133ee",
+  "finding_key": "k1",
+  "statement": "A project can be closed on a published closure review while its acceptance manifest still pins it active and its gate text says it is not built. The pin is machine-read and the text is not, so correcting the pin alone leaves a false statement in the acceptance record: reconcile both against the record and the closure review before any pack is preflighted.",
+  "evidence": [
+    {
+      "kind": "path",
+      "value": "acceptance/programme/T15.toml"
+    },
+    {
+      "kind": "path",
+      "value": "docs/plans/T15/closure-review.md"
+    }
+  ]
+}
