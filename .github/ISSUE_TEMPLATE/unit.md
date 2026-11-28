@@ -91,16 +91,29 @@ Requirement: <one sentence.>
 Blocker: #N — <a plain line, present iff this issue is `status:blocked`; say why.>
 
 ## Definition of ready
+- [ ] **Independent** — the unit lands without another unit's files; a real ordering is a typed dependency.
+- [ ] **Negotiable** — the outcome is fixed; the implementation is settled at delivery, not in the brief.
+- [ ] **Valuable** — the outcome maps to a benefit or removes a named gap.
+- [ ] **Estimable** — the baseline and every file are named.
+- [ ] **Small** — one issue, one branch, one PR.
+- [ ] **Testable** — every part has ≥1 BDD scenario with a `Verify:` command or test target.
 - [ ] Baseline named and the plan/audit blob shas recorded.
 - [ ] Every spec/plan/code/test reference resolves at its ref; every `#N` resolves.
-- [ ] Every part has ≥1 scenario with a `Verify:` command or test target.
 - [ ] Dependencies complete, typed and cited; `Blocker: #N` present iff `status:blocked`.
 - [ ] One-PR scope, file-disjoint from other ready issues or explicitly sequenced.
 - [ ] Scope corrections applied (no old-system shutdown/parity, no 348-flow retirement, no
       old-ledger import, no 218-item parity).
 
 ## Definition of done
-- [ ] Every scenario passes at the PR head; `Evidence at completion` has one row per scenario.
+
+The DoD is an acceptance-criteria table — **one row per part**, filled at close with the command,
+result and SHA. A prose checklist does not satisfy it.
+
+| Part / scenario | Evidence at completion | `Verify:` at the PR head |
+|---|---|---|
+| P1.1 | to fill | to fill |
+
+- [ ] Every scenario passes at the PR head; the table has one row per scenario.
 - [ ] Repo gate green at the exact head (`preflight.yml` for the compile/lint verdict, the PR's
       `ci-public` as the final gate; docs: `git diff --check` + links).
 - [ ] Tests added/updated per part; none skipped.

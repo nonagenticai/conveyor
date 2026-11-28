@@ -1269,8 +1269,11 @@ def resolve_documents(
     category: str | None = None,
     scope: str | None = None,
     require_heading: bool = True,
-) -> tuple[dict[str, Any], bool]:
-    """Resolve one heading against the published documents. Returns (source, heading_found).
+) -> tuple[dict[str, Any], bool, bool]:
+    """Resolve one heading against the published documents.
+
+    Returns `(source, heading_found, has_documents)`. `has_documents` is what separates a
+    document that exists but lacks the heading (`partial`) from no document at all (`absent`).
 
     `require_heading=False` is for a source that names its document category explicitly: the
     document itself is the section, and the category's own standard already guarantees its
@@ -1296,7 +1299,7 @@ def resolve_documents(
         "items": [{"id": str(doc.get("id")), "title": str(doc.get("title") or "")}
                   for doc in matched[:12]],
     }
-    return source, bool(matched)
+    return source, bool(matched), bool(docs)
 
 
 def gap_analysis_rows(
@@ -1424,12 +1427,12 @@ def resolve_section(
                 ))
                 wanted_scope = str((source.get("match") or {}).get("scope") or
                                    ("subject" if subject["kind"] in {"project", "card", "phase"} else "programme"))
-                document_source, heading_found = resolve_documents(
+                document_source, heading_found, has_documents = resolve_documents(
                     heading, template, subject, snapshot, outputs_dir, programme_projects,
                     wanted_category, wanted_scope,
                     require_heading=bool(source.get("require_heading", True)),
                 )
-                if not heading_found:
+                if not heading_found and has_documents:
                     missing_headings.add(heading)
                 resolved.append(document_source)
             elif kind == "computed":
@@ -1463,12 +1466,12 @@ def resolve_section(
     # skeleton) as the heading's evidence, which is how the business case's four headings
     # and every compliance review's Waivers heading passed while carrying no facts.
     if template.get("document_category") and not declared:
-        document_source, heading_found = resolve_documents(
+        document_source, heading_found, has_documents = resolve_documents(
             heading, template, subject, snapshot, outputs_dir, programme_projects,
         )
         if document_source["count"] > 0 or document_source.get("items"):
             resolved.append(document_source)
-        if not heading_found:
+        if not heading_found and has_documents:
             missing_headings.add(heading)
 
     evidence = [source for source in resolved if source["count"] > 0]
@@ -1565,12 +1568,50 @@ def section_not_applicable(
     return not phase_requirements(snapshot, phase)
 
 
+def project_class(standard: dict[str, Any], subject: dict[str, Any]) -> dict[str, Any] | None:
+    """The first standard class whose `when` facts all match the project.
+
+    The same derivation as `conveyor_domain::output_standard::class_for` (the register and the
+    close gate read it); a project no class declares is a register gap, not a silent exemption.
+    """
+    meta = subject.get("meta") or {}
+    facts = {
+        "key": subject.get("key"),
+        "track": meta.get("track"),
+        "status": subject.get("status"),
+        "measured_status": meta.get("measured_status"),
+    }
+    for item in standard.get("classes") or []:
+        when = item.get("when") or {}
+        if when and all(facts.get(key) == value for key, value in when.items()):
+            return item
+    return None
+
+
+def due_state(subject: dict[str, Any], through_tranche: int) -> str:
+    """`due`, `scheduled` or `excluded` for one subject.
+
+    The scope is declared in the standard (`scope.through_tranche`): a project in a tranche
+    beyond it is not yet due, so its artefacts stay `scheduled` and produce no finding. The
+    record keeps the honest absent status either way.
+    """
+    if subject["kind"] in {"project", "phase"}:
+        meta = subject.get("meta") or {}
+        if str(meta.get("measured_status") or "") == "archived":
+            return "excluded"
+        tranche = meta.get("tranche")
+        if isinstance(tranche, int) and tranche > through_tranche:
+            return "scheduled"
+    return "due"
+
+
 def applies(
     template: dict[str, Any],
     category: str,
     subject: dict[str, Any],
     snapshot: dict[str, Any],
     programme_projects: dict[str, set[str]],
+    class_by_key: dict[str, dict[str, Any] | None] | None = None,
 ) -> bool:
     if template.get("subject_kind") != subject["kind"]:
         return False
@@ -1602,34 +1643,33 @@ def applies(
         # ask an archived project to produce anything.
         if str(meta.get("measured_status") or "") == "archived":
             return False
-        if category == "closure-review" and str(subject.get("status") or "") not in {"closed", "archived"}:
-            # A closure review is due at closure; an active project is not missing one.
-            if str(meta.get("measured_status") or "") not in {"closed", "archived"}:
-                return False
-        declared = category in (meta.get("expected_outputs") or []) or category in (meta.get("closure_outputs") or [])
-        if declared:
-            return True
+        declared_class = (class_by_key or {}).get(str(subject.get("key")))
+        if declared_class is not None:
+            # One declaration: the class's `now` set, plus its `closure` set once the project
+            # is closing. The old mandatory-PMP blanket and the document-exists rule are gone:
+            # they made the due set grow every time a document was added.
+            due = set(declared_class.get("now") or [])
+            if str(subject.get("status") or "") in {"closed", "archived"} or str(
+                meta.get("measured_status") or ""
+            ) in {"closed", "archived"}:
+                due |= set(declared_class.get("closure") or [])
+            if category in due:
+                return True
+        # The TOGAF set follows the ADM tailoring (owner decision 2026-11-24): the E–H/conditional
+        # artefacts are the architecture track's, and a governed project owes the contract set its
+        # record declares. These rules stay after the class so a class is not the only declaration.
         if category in ARCHITECTURE_TRACK_CATEGORIES and not architecture_track(subject):
             return False
-        # PMP's artefacts are every project's artefacts, and TOGAF's contract and its Phase-G
-        # compliance review are what a delivery project cannot pass design without. Instancing
-        # them only when evidence already exists hid the very gaps the programme must rework.
-        if template.get("mandatory") and template.get("standard") == "PMP":
-            return True
-        if template.get("mandatory") and category in {"delivery-contract", "compliance-review"}:
-            return True
-        docs = documents_for(snapshot, subject, str(template.get("document_category") or category), "subject", programme_projects)
-        if docs:
-            return True
-        for source in (template.get("sources") or {}).values():
-            for item in source:
-                if item.get("kind") == "rows" and rows_for(snapshot, item, subject, category, subject.get("phase")):
-                    return True
         architecture = snapshot.get("architecture") or {}
-        governed = {str(contract.get("project_id")) for contract in architecture.get("contracts") or []}
+        governed = {
+            str(contract.get("project_id")) for contract in architecture.get("contracts") or []
+        }
         if category in TOGAF_PROJECT_CATEGORIES and subject["id"] in governed:
             return True
-        return False
+        declared = category in (meta.get("expected_outputs") or []) or category in (
+            meta.get("closure_outputs") or []
+        )
+        return bool(declared)
     return False
 
 
@@ -1690,13 +1730,21 @@ def build_instances(
     for project in programme_doc.get("projects") or []:
         programme_projects.setdefault(str(project.get("programme_id")), set()).add(str(project.get("id")))
     project_keys = {str(project.get("key")) for project in programme_doc.get("projects") or []}
+    class_by_key = {
+        str(project["key"]): project_class(std, project)
+        for project in subjects.get("project", [])
+    }
+    through_tranche = int((std.get("scope") or {}).get("through_tranche", 8))
     instances: list[dict[str, Any]] = []
     seen: set[str] = set()
     for category in std.get("categories") or []:
         template = std["templates"][category]
         for kind in ("programme", "capability", "tranche", "benefit", "phase", "artifact", "project", "card"):
             for subject in subjects.get(kind, []):
-                if not applies(template, category, subject, snapshot, programme_projects):
+                if not applies(
+                    template, category, subject, snapshot, programme_projects,
+                    class_by_key=class_by_key,
+                ):
                     continue
                 identifier = f"std-{slug(str(template['standard']))}-{slug(category)}-{slug(subject['key'])}"
                 if identifier in seen:
@@ -1769,11 +1817,14 @@ def build_instances(
                 # `check-standards.cjs` recomputes it; a section is not dropped from the
                 # artefact's honesty because it was declared optional.
                 evidenced = [section for section in sections if section["status"] == "evidenced"]
+                partial = [section for section in sections if section["status"] == "partial"]
                 if document_missing:
                     status = "absent"
                 elif len(evidenced) == len(sections):
                     status = "evidenced"
-                elif evidenced:
+                elif evidenced or partial:
+                    # A document that exists but lacks a required heading is PARTIAL, never
+                    # absent: zero `evidenced` sections is not the same as no document.
                     status = "partial"
                 else:
                     status = "absent"
@@ -1795,6 +1846,7 @@ def build_instances(
                         "project_key": subject.get("project_key", ""),
                     },
                     "status": status,
+                    "due_state": due_state(subject, through_tranche),
                     "sections": sections,
                     "gate": gate_state(template, category, subject, snapshot),
                     "package_key": package_key,
@@ -1845,29 +1897,14 @@ def build_findings(
     sha = str(manifest.get("git_sha") or "")
     if not re.fullmatch(r"[0-9a-f]{40}", sha):
         sha = "0" * 40
-    # A project does not start before its tranche is authorised (SPEC_V2 §8.3). An artefact of a
-    # project in a still-planned tranche is therefore not yet due: the record keeps the honest
-    # `absent` status, but the finding is planning work (P2), not a P0 gate failure. Without this
-    # a planned tranche's missing baselines would outrank the tranche the programme is actually
-    # working. A closed or authorised tranche keeps the full severity.
-    programme_doc = snapshot.get("programme") or {}
-    project_meta = {
-        str(project.get("key") or project.get("id")): (project.get("meta") or {})
-        for project in programme_doc.get("projects") or []
-    }
-    tranche_state = {
-        str(tranche.get("number")): str(tranche.get("state") or "")
-        for tranche in (snapshot.get("msp") or {}).get("tranches") or []
-    }
+    # An artefact outside the standard's declared scope (`scope.through_tranche`) is `scheduled`
+    # or `excluded`: the record keeps the honest absent status, and the register carries the
+    # planning signal. It is not a finding — a scheduled artefact has no work package to close,
+    # and a finding queue full of not-yet-due items is the noise this unit removes.
     for artefact in instances:
         if artefact["status"] == "evidenced" or not artefact["mandatory"]:
             continue
-        meta = project_meta.get(str(artefact["subject"].get("project_key") or ""), {})
-        tranche = meta.get("tranche")
-        state = tranche_state.get(str(tranche), "") if tranche is not None else ""
-        not_due = bool(state) and state not in {"closed", "in_review", "authorised", "active"}
-        archived = str(meta.get("measured_status") or "") == "archived"
-        if archived:
+        if artefact.get("due_state") != "due":
             continue
         covered = coverage_key(artefact["category"], artefact, covered_keys)
         artefact["covered_key"] = covered
@@ -1918,12 +1955,6 @@ def build_findings(
         )
         if SEVERITY_RANK.get(declared, 0) > SEVERITY_RANK[severity]:
             severity = declared
-        if not_due:
-            severity = "P2"
-        due_note = (
-            f" Not yet due: tranche {tranche} is {state or 'planned'}."
-            if not_due else ""
-        )
         evidence = []
         for section in artefact["sections"]:
             if section["status"] == "evidenced":
@@ -1960,7 +1991,6 @@ def build_findings(
             "problem": (
                 f"The {artefact['category']} artefact for {artefact['subject']['title']} is "
                 f"{artefact['status']}; missing required sections: {', '.join(missing)}."
-                + due_note
             ),
             "evidence": evidence,
             "failure_scenario": (
@@ -2281,12 +2311,21 @@ def build_document(
     if html_out is not None:
         html_out.mkdir(parents=True, exist_ok=True)
         (html_out / "index.html").write_text(render_index(instances, generated_at, git_sha), encoding="utf-8")
+    due = [item for item in instances if item.get("due_state") == "due"]
     summary = {
         "artefacts": len(instances),
         "mandatory": sum(1 for item in instances if item["mandatory"]),
         "evidenced": sum(1 for item in instances if item["status"] == "evidenced"),
         "partial": sum(1 for item in instances if item["status"] == "partial"),
         "absent": sum(1 for item in instances if item["status"] == "absent"),
+        # The due split is the number a programme can act on: an artefact outside the declared
+        # scope (a later tranche, an archived project) is `scheduled`/`excluded`, never a gap.
+        "due": len(due),
+        "scheduled": sum(1 for item in instances if item.get("due_state") == "scheduled"),
+        "excluded": sum(1 for item in instances if item.get("due_state") == "excluded"),
+        "due_evidenced": sum(1 for item in due if item["status"] == "evidenced"),
+        "due_partial": sum(1 for item in due if item["status"] == "partial"),
+        "due_absent": sum(1 for item in due if item["status"] == "absent"),
         "findings": len(findings),
     }
     by_standard: dict[str, dict[str, int]] = {}
@@ -3218,6 +3257,67 @@ def self_test_require_heading() -> None:
         )
 
 
+def self_test_due_set_and_status(outputs: Path, std: dict[str, Any]) -> None:
+    """The class is the due set, a missing document is absent (not partial), and a scheduled
+    project produces no finding.
+
+    Measured before the rule: a project artefact with no document at all read `partial` because
+    its document source had no heading to find; the record then said "a document exists but lacks
+    the heading" for a document that did not exist. The 78 absences this produced were read as
+    false absences; they are genuinely missing documents.
+    """
+    fixture = self_test_fixture()
+    fixture["programme"]["projects"].extend([
+        {"id": "p3", "key": "T99", "programme_id": "pg1", "status": "active",
+         "meta": {"track": "v2", "tranche": 9, "expected_outputs": [], "closure_outputs": []}},
+        {"id": "p4", "key": "ARCH", "programme_id": "pg1", "status": "closed",
+         "meta": {"track": "v2", "tranche": 1, "measured_status": "archived",
+                  "expected_outputs": [], "closure_outputs": []}},
+    ])
+    # A brief that exists but carries none of the required headings: the artefact is partial.
+    fixture["artefacts"]["documents"].append({
+        "id": "d8", "category": "project-brief", "project_id": "p1", "publishable": True,
+        "created_at": "2026-11-20T00:00:00Z", "title": "Brief without headings",
+    })
+    (outputs / "output-d8.html").write_text(
+        "<h1>A brief with no required heading</h1>", encoding="utf-8"
+    )
+    document, findings = generate(std, fixture, outputs, covered_keys=set())
+    rows = document["artefacts"]
+
+    def one(category: str, key: str) -> dict[str, Any]:
+        found = [row for row in rows
+                 if row["category"] == category and row["subject"]["key"] == key]
+        assert found, f"{category} for {key} must be instanced"
+        return found[0]
+
+    brief = one("project-brief", "P0")
+    assert brief["status"] == "partial", (
+        f"a document with none of the required headings is partial, got {brief['status']}"
+    )
+    wbs = one("project-wbs", "P0")
+    assert wbs["status"] == "absent", f"no document at all is absent, got {wbs['status']}"
+    assert all("a document exists" not in message
+               for section in wbs["sections"] for message in section["missing"]), (
+        "a missing document must not claim a document exists without the heading"
+    )
+    scheduled = [row for row in rows if row["subject"]["key"] == "T99"]
+    assert scheduled and all(row["due_state"] == "scheduled" for row in scheduled), (
+        "a project past the declared tranche scope is scheduled"
+    )
+    scheduled_ids = {row["id"] for row in scheduled}
+    assert not any(finding["id"] in scheduled_ids for finding in findings["findings"]), (
+        "a scheduled artefact must produce no finding"
+    )
+    assert not any(row["subject"]["key"] == "ARCH" for row in rows), (
+        "an archived project has no live artefacts"
+    )
+    # The E-H artefact stays on the architecture track: a v2 delivery project is not instanced.
+    assert not any(row["category"] == "gap-analysis" and row["subject"]["key"] == "T1"
+                   for row in rows), "gap-analysis is the architecture track's"
+    print("generate-standards: self-test case due-set-and-status OK")
+
+
 def self_test() -> int:
     fixture = self_test_fixture()
     std = json.loads(STANDARD_PATH.read_text(encoding="utf-8"))
@@ -3281,6 +3381,7 @@ def self_test() -> int:
         self_test_gap_analysis(outputs, std)
         self_test_section_cause(outputs, fixture)
         self_test_phase_requirements(outputs, std)
+        self_test_due_set_and_status(outputs, std)
         self_test_broken_source_finding(outputs, std)
     print(f"generate-standards: self-test OK ({len(document['artefacts'])} artefact instances)")
     return 0

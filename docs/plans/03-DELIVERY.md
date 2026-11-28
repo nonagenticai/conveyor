@@ -73,6 +73,16 @@ shape is `.github/ISSUE_TEMPLATE/unit.md`; the rules are:
 - **Parts.** One part per plan Deliverable/Build-order item or audit `W`/`V` id. Each part states its
   measured state — **DONE / PARTIAL / ABSENT / CARRIED-BY-#9** — with evidence, and carries at least
   one BDD scenario.
+- **INVEST.** Every part is a user story that passes the six tests, and the `## Definition of ready`
+  section names each one: **Independent** (lands without another unit's files), **Negotiable**
+  (outcome fixed, implementation settled at delivery), **Valuable** (maps to a benefit or removes a
+  named gap), **Estimable** (baseline and files named), **Small** (one issue, one PR), **Testable**
+  (every part has a `Verify:`). A part that fails a test is split or re-scoped before the claim;
+  `board.py --dor` refuses a unit created on/after 2026-11-28 whose DoR does not name all six.
+- **Acceptance-based DoD.** The `## Definition of done` section is a table with one row per part,
+  each naming the evidence and the `Verify:` that passed at the PR head. A prose checklist is not
+  the DoD. The project-level counterpart is the `definition-of-ready` and `definition-of-done`
+  output in `seed/output-standard.json`; this contract is the unit-level instance of it.
 - **BDD acceptance.** `Given <state>, when <action>, then <observable outcome>` with a mandatory
   `Verify:` line: an exact command or `path::test`. A scenario without a verification is not
   acceptance; "works correctly" is not a criterion. A deployment-gated scenario says so and names its
@@ -86,13 +96,15 @@ shape is `.github/ISSUE_TEMPLATE/unit.md`; the rules are:
   not a copy of the plan.
 
 **Definition of ready** — the claim gate: baseline and doc blob shas named · every reference resolves
-· every part has a scenario with a `Verify:` · dependencies complete, typed and cited ·
+· every part has a scenario with a `Verify:` · every part passes INVEST and the DoR names the six
+criteria (issues created on/after 2026-11-28) · dependencies complete, typed and cited ·
 `Blocker: #N` present iff `status:blocked` · programme fields present and resolvable (issues
 created on/after 2026-11-18) · one-PR scope, file-disjoint or sequenced · scope corrections
 applied.
 
-**Definition of done** — the merge gate: every scenario passes at the PR head with a row in
-`Evidence at completion` · the repo gate is green at the exact head · tests added/updated per part,
+**Definition of done** — the merge gate: an acceptance-criteria table with one row per part, each
+row carrying its evidence and its `Verify:` at the PR head · the repo gate is green at the exact
+head · tests added/updated per part,
 none skipped · docs updated · migrations/ledger and `--check-lock` handled when touched · a unit
 that closes the slice's last open issue updates that slice's `scripts/v2-slice-artefacts.json` row
 to the measured shape (tables/actions/modules) and runs

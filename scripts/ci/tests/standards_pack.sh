@@ -96,7 +96,12 @@ def missing_required(artefact):
     )
 
 
-unresolved = [a for a in artefacts if a.get("mandatory") and missing_required(a)]
+# A scheduled or excluded artefact is not work yet: it produces no finding, so it owes no
+# package. The page still carries it and its status, so the future tranche stays visible.
+unresolved = [
+    a for a in artefacts
+    if a.get("mandatory") and missing_required(a) and a.get("due_state", "due") == "due"
+]
 for artefact in unresolved:
     assert artefact.get("package_published") is True, f"{artefact['id']}: no published package"
     assert artefact.get("package_key") in set(keys), (

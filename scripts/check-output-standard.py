@@ -164,8 +164,8 @@ def read_json(path: Path) -> dict:
 
 def validate(std: dict) -> list[str]:
     errors: list[str] = []
-    if std.get("version") != 3:
-        errors.append(f"standard version is {std.get('version')!r}, expected 3")
+    if std.get("version") != 4:
+        errors.append(f"standard version is {std.get('version')!r}, expected 4")
 
     categories = std.get("categories")
     if not isinstance(categories, list) or not categories:
