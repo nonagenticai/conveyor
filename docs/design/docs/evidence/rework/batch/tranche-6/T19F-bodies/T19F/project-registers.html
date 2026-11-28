@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Project Registers — Decision-forum governance (follow-on) · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/T19F-bodies/T19F/project-registers.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="project-registers--decision-forum-governance-follow-on">Project Registers — Decision-forum governance (follow-on)</h1>
+<h2 id="risks">Risks</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The gate resolves the sitting&#39;s approval through approvals.list. At the 2026-11-27T00:10Z run the row was on the first page; later the same day 592 approvals had been created after it and the un-paged lookup missed it, although the row is present and approved in the record. This unit fixes the instrument: read_approval pages approvals.list (limit 200, following next_cursor) until the row is found. The residual risk is the paging cap and a record that grows past it, which the instrument reports as an absent row rather than a pass.&quot;,
+      &quot;code&quot;: &quot;T19F-R1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:33:55.777457+00:00&quot;,
+      &quot;id&quot;: &quot;01a22113-31c5-793c-a5f8-7d82f4cc3c0f&quot;,
+      &quot;impact&quot;: 2,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/T19F-meeting-bindings.md#P5&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the quality manager (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;high&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a210ba-b6cb-76cc-82a3-a2b45cfb498f&quot;,
+      &quot;response&quot;: &quot;The paging fix lands in this unit and the gate re-runs green (13/13) at the fixed head; if the approval is ever reported absent again, check the page cap and the record identity before touching the assertion.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-11&quot;,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The live gate&#39;s approval lookup does not page, so a busy record can hide the sitting&#39;s row&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:33:55.777457+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The gate asserts rows on the programme record through the recorder&#39;s transport. A replayed or restored database carries the rows only if the gate&#39;s own apply run wrote them there; a fresh database would show them absent. The evidence file names the run and the state file names the ids, so the dependency is visible, but a future reader must not mistake the state file for a fixture.&quot;,
+      &quot;code&quot;: &quot;T19F-R2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:33:55.91817+00:00&quot;,
+      &quot;id&quot;: &quot;01a22113-3251-74b7-88d5-83f13973c52b&quot;,
+      &quot;impact&quot;: 3,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/T19F-meeting-bindings.md#P5&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the release manager (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;medium&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a210ba-b6cb-76cc-82a3-a2b45cfb498f&quot;,
+      &quot;response&quot;: &quot;Record the record identity (replay container and database) alongside each gate run, and re-run --apply only when the record is intentionally rebuilt; never copy a state file across records.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-11&quot;,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The live gate depends on the record the transport reaches, not on a hermetic fixture&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:33:55.91817+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="issues">Issues</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The plan (#682\u2013#684) delivered the capability and its live proof, and the MSP/TOGAF/SAFe documents under docs/plans/T19F are contemporaneous. The programme record, however, carried no charter, baseline, contract, register set or Phase-G review for T19F. This pack adds that set at the 2026-11-27 snapshot without rewriting the delivery documents.&quot;,
+      &quot;code&quot;: &quot;T19F-I1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:33:56.059867+00:00&quot;,
+      &quot;id&quot;: &quot;01a22113-32de-7be4-a634-330c9c038859&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a210ba-b6cb-76cc-82a3-a2b45cfb498f&quot;,
+      &quot;response&quot;: &quot;This pack is the repair; the receipt at the pinned snapshot is the proof, and the tranche-6 review is the closure forum.&quot;,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The record carried no lifecycle set for T19F; this pack supplies it retrospectively&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:33:56.059867+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The plan records that T19F remains active and that its closure review accepts the delivered scope and defers closure to the tranche-6 review. The project row is therefore active at this snapshot, and the pack carries no closure keys. The tranche-6 review is the decision that closes it.&quot;,
+      &quot;code&quot;: &quot;T19F-I2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:33:56.198854+00:00&quot;,
+      &quot;id&quot;: &quot;01a22113-336a-7405-81b0-6da2e730db16&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a210ba-b6cb-76cc-82a3-a2b45cfb498f&quot;,
+      &quot;response&quot;: &quot;Close T19F in the tranche-6 review record and cite this deferral; do not close it in the rework factory, which would pre-empt the review.&quot;,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;low&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Closure is deferred to the tranche-6 review by the plan&#39;s own \u00a710&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:33:56.198854+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="assumptions">Assumptions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The delivery contract judges acceptance against the pinned snapshot; the checker refuses any id that appears nowhere in it. Every judgement in this pack is read from that snapshot, so if it is incomplete or stale for T19F the pack&#39;s facts and any re-close move with it.&quot;,
+      &quot;code&quot;: &quot;T19F-A1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:33:56.338151+00:00&quot;,
+      &quot;id&quot;: &quot;01a22113-33f5-7261-9a00-6ed14aec7571&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a210ba-b6cb-76cc-82a3-a2b45cfb498f&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;held&quot;,
+      &quot;title&quot;: &quot;The 2026-11-27 rework snapshot is the authoritative record for T19F&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:33:56.338151+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The plan&#39;s \u00a74.4 records that the direct path, the approval primitive, T19&#39;s arithmetic, the minutes gate and the retirement flag are untouched. The assumption is that no later slice silently routes the direct path through a sitting; the suite `the_direct_board_decide_path_still_works` is the guard.&quot;,
+      &quot;code&quot;: &quot;T19F-A2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:33:56.479775+00:00&quot;,
+      &quot;id&quot;: &quot;01a22113-3482-7c6f-a29f-c2a44555b8be&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a210ba-b6cb-76cc-82a3-a2b45cfb498f&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;held&quot;,
+      &quot;title&quot;: &quot;The direct architecture.board_decide path stays unchanged&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:33:56.479775+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The materialisation adds a cadence row lock rather than a stronger unique index, because T19&#39;s uq_meeting_live owns the slot rule and permits a second scheduled meeting. The assumption is that no migration later tightens that index without revisiting the materialisation contract.&quot;,
+      &quot;code&quot;: &quot;T19F-A3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:33:56.618735+00:00&quot;,
+      &quot;id&quot;: &quot;01a22113-350d-784f-9360-311fda17b38a&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a210ba-b6cb-76cc-82a3-a2b45cfb498f&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;held&quot;,
+      &quot;title&quot;: &quot;T19&#39;s uq_meeting_live remains the slot rule&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:33:56.618735+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="dependencies">Dependencies</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;T19 supplies the meeting and the session as the decision forum and the outcome arithmetic; T17 supplies the versioned authoring route. The plan&#39;s \u00a79 records these as provenance rather than a frozen order, and the tranche-5 review authorised tranche 6, which carries this project.&quot;,
+      &quot;code&quot;: &quot;T19F-D1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:33:56.760733+00:00&quot;,
+      &quot;id&quot;: &quot;01a22113-359c-760f-9485-5160dc341238&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a210ba-b6cb-76cc-82a3-a2b45cfb498f&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;met&quot;,
+      &quot;title&quot;: &quot;T19F depends on T19 and T17 and on the tranche-5 authority&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:33:56.760733+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The tranche-6 exit needs this project&#39;s receipt green; the tranche-6 review is the forum that closes it. Nothing after it in the tranche waits on its construction \u2014 the review waits on its receipt, which is the ordering the batch records.&quot;,
+      &quot;code&quot;: &quot;T19F-D2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:33:56.90391+00:00&quot;,
+      &quot;id&quot;: &quot;01a22113-362b-7086-92c5-fdcc5d6d3963&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a210ba-b6cb-76cc-82a3-a2b45cfb498f&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;T19F is the last delivery member of tranche 6&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:33:56.90391+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="benefits">Benefits</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;A policy change is a new immutable meeting_type version through the authoring route, and an in-flight meeting keeps the version it pinned. The benefit is an audit property: the policy a decision was taken under can be reconstructed from the meeting&#39;s pinned version, which the live gate asserts.&quot;,
+      &quot;code&quot;: &quot;T19F-B1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:33:57.043806+00:00&quot;,
+      &quot;id&quot;: &quot;01a22113-36b6-78a1-a4f3-bd86a570eab6&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a210ba-b6cb-76cc-82a3-a2b45cfb498f&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Forum policy changes without mutating history&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:33:57.043806+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The sitting&#39;s approval carries one approval_decision per qualifying seat with via=&#39;meeting&#39;, so the decision can be traced to the forum and the chair seat rather than to an unbound board call. The benefit is declared in the plan and asserted by the sitting checks in the live gate.&quot;,
+      &quot;code&quot;: &quot;T19F-B2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:33:57.183467+00:00&quot;,
+      &quot;id&quot;: &quot;01a22113-3742-7547-868f-2c85efe8c905&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a210ba-b6cb-76cc-82a3-a2b45cfb498f&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Board decisions are bound to the forum that took them&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:33:57.183467+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Materialising a cadence twice yields one non-cancelled meeting bound to the cadence&#39;s type and slot, and the row lock delivers the promise without changing T19&#39;s uq_meeting_live. The benefit is idempotence at the cadence boundary that the plan&#39;s P3 scenario records.&quot;,
+      &quot;code&quot;: &quot;T19F-B3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:33:57.324273+00:00&quot;,
+      &quot;id&quot;: &quot;01a22113-37cf-73e7-92a8-2555eeab4e54&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a210ba-b6cb-76cc-82a3-a2b45cfb498f&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;One meeting per cadence slot, without a stronger scheduling contract&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:33:57.324273+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="changes">Changes</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: &quot;01a22113-386c-72ea-a05a-e4d06902e55f&quot;,
+      &quot;body&quot;: &quot;The retrospective MSP/TOGAF/SAFe rework changed this project&#39;s record: its artefacts were re-versioned with documents and links, its register was written, and its schedule and cost baselines were taken. This change records that rework against the frozen scope baseline.&quot;,
+      &quot;code&quot;: &quot;CH-T19F-d38a51&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:34:10.428174+00:00&quot;,
+      &quot;id&quot;: &quot;01a22113-6b01-7977-bb8a-236503d38a51&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;change&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {
+        &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+        &quot;impact&quot;: {
+          &quot;scope&quot;: &quot;the retrospective rework&#39;s record acts&quot;
+        }
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a210ba-b6cb-76cc-82a3-a2b45cfb498f&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;approved&quot;,
+      &quot;title&quot;: &quot;The retrospective rework of T19F&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:34:10.804207+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-6/T19F-bodies/T19F/project-registers.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1244,6 +1244,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S06/acts.md"
     },
     {
+      "title": "S06b — retrospective rework acts (2026-11-28)",
+      "path": "docs/evidence/rework/S06b/acts.html",
+      "source": "docs/evidence/rework/S06b/acts.md",
+      "section": "Evidence",
+      "sha256": "426003fe5e8f6938b4c64a7b665b5db1a193b4fe2b1f50369e6ce1b286cda7d1",
+      "bytes": 179,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S06b/acts.md"
+    },
+    {
       "title": "S07 — retrospective rework acts (2026-11-25)",
       "path": "docs/evidence/rework/S07/acts.html",
       "source": "docs/evidence/rework/S07/acts.md",
@@ -1269,6 +1278,24 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "e0d136e28a50fac4cce07ed9c25dd6d48db5125fc4e8e0ec304fa9e1642c8a6f",
       "bytes": 434,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S09/acts.md"
+    },
+    {
+      "title": "S10 — retrospective rework acts (2026-11-28)",
+      "path": "docs/evidence/rework/S10/acts.html",
+      "source": "docs/evidence/rework/S10/acts.md",
+      "section": "Evidence",
+      "sha256": "72757d481487349e9430c81874b30b9af06cfbcc8352e7355191e587bdc16be9",
+      "bytes": 177,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S10/acts.md"
+    },
+    {
+      "title": "S11 — retrospective rework acts (2026-11-28)",
+      "path": "docs/evidence/rework/S11/acts.html",
+      "source": "docs/evidence/rework/S11/acts.md",
+      "section": "Evidence",
+      "sha256": "6f5dcef20f09b5eaf4975df1ceb54d773ecd48dae73539268a23c91d0db9378d",
+      "bytes": 177,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S11/acts.md"
     },
     {
       "title": "S17 — retrospective rework acts (2026-11-27)",
@@ -1404,6 +1431,15 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "1cc70423430b947dc727fc4600471ac7aeddcae12b8cc3e969da98bcec525ad9",
       "bytes": 434,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T19/acts.md"
+    },
+    {
+      "title": "T19F — retrospective rework acts (2026-11-28)",
+      "path": "docs/evidence/rework/T19F/acts.html",
+      "source": "docs/evidence/rework/T19F/acts.md",
+      "section": "Evidence",
+      "sha256": "2325bcc0f682b0192461aa8291e04a14432f08a26d005c170502c9599e756647",
+      "bytes": 373,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T19F/acts.md"
     },
     {
       "title": "T2 — retrospective rework acts (2026-11-21)",
@@ -2639,6 +2675,222 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-5/S06-bodies/S06/statement-of-architecture-work.md"
     },
     {
+      "title": "Change Control — Agent direct interface — the conveyor's own MCP surface",
+      "path": "docs/evidence/rework/batch/tranche-6/S06b-bodies/S06b/change-control.html",
+      "source": "docs/evidence/rework/batch/tranche-6/S06b-bodies/S06b/change-control.md",
+      "section": "Evidence",
+      "sha256": "02dcff41a4acf8bb2e6959d98ed04f902f0bb8c21daf40b144d8f7f0c45a9f1d",
+      "bytes": 5623,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/S06b-bodies/S06b/change-control.md"
+    },
+    {
+      "title": "Delivery Contract — Agent direct interface — the conveyor's own MCP surface",
+      "path": "docs/evidence/rework/batch/tranche-6/S06b-bodies/S06b/delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-6/S06b-bodies/S06b/delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "094309ba39e01ffe3556d3efee5f1ab053d42491b079978bff7bf6aca7f1eae1",
+      "bytes": 12190,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/S06b-bodies/S06b/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — Agent direct interface — the conveyor's own MCP surface",
+      "path": "docs/evidence/rework/batch/tranche-6/S06b-bodies/S06b/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-6/S06b-bodies/S06b/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "63490f182be494f9ec057bca3fd585f8a61440e900173d81b7b21d59dd022e86",
+      "bytes": 83206,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/S06b-bodies/S06b/project-baseline.md"
+    },
+    {
+      "title": "Project Registers — Agent direct interface — the conveyor's own MCP surface",
+      "path": "docs/evidence/rework/batch/tranche-6/S06b-bodies/S06b/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-6/S06b-bodies/S06b/project-registers.md",
+      "section": "Evidence",
+      "sha256": "1a6155f82d7c52d1f34de6894ce6bca85e5d6dd2ce381d6b33ffe94b11240685",
+      "bytes": 17546,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/S06b-bodies/S06b/project-registers.md"
+    },
+    {
+      "title": "Project Wbs — Agent direct interface — the conveyor's own MCP surface",
+      "path": "docs/evidence/rework/batch/tranche-6/S06b-bodies/S06b/project-wbs.html",
+      "source": "docs/evidence/rework/batch/tranche-6/S06b-bodies/S06b/project-wbs.md",
+      "section": "Evidence",
+      "sha256": "4e458416281ed40391ac7ef5c6c07f8f0acc4bdff502f5d2680344dcd11e999d",
+      "bytes": 3057,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/S06b-bodies/S06b/project-wbs.md"
+    },
+    {
+      "title": "Statement Of Architecture Work — Agent direct interface — the conveyor's own MCP surface",
+      "path": "docs/evidence/rework/batch/tranche-6/S06b-bodies/S06b/statement-of-architecture-work.html",
+      "source": "docs/evidence/rework/batch/tranche-6/S06b-bodies/S06b/statement-of-architecture-work.md",
+      "section": "Evidence",
+      "sha256": "1b477906cb6f1909efe34c54095d3a3d8e2aca4f8c91620c959903fb99e6bf37",
+      "bytes": 544526,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/S06b-bodies/S06b/statement-of-architecture-work.md"
+    },
+    {
+      "title": "Change Control — Copilot / AG-UI — one action surface, proposals, conversations",
+      "path": "docs/evidence/rework/batch/tranche-6/S10-bodies/S10/change-control.html",
+      "source": "docs/evidence/rework/batch/tranche-6/S10-bodies/S10/change-control.md",
+      "section": "Evidence",
+      "sha256": "d6de6a89323e8912379849c2d78a062135798bde4daa46c52b4d5580d6796c7d",
+      "bytes": 5622,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/S10-bodies/S10/change-control.md"
+    },
+    {
+      "title": "Delivery Contract — Copilot / AG-UI — one action surface, proposals, conversations",
+      "path": "docs/evidence/rework/batch/tranche-6/S10-bodies/S10/delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-6/S10-bodies/S10/delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "ae44280d8b71776115d917aed2a052df9934a9b1cdb610f8c04b3976e6728b79",
+      "bytes": 14379,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/S10-bodies/S10/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — Copilot / AG-UI — one action surface, proposals, conversations",
+      "path": "docs/evidence/rework/batch/tranche-6/S10-bodies/S10/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-6/S10-bodies/S10/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "cc01f4733c45d16e72545c62659d958369ad7b46a32ae3f760b1f776337bd281",
+      "bytes": 122288,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/S10-bodies/S10/project-baseline.md"
+    },
+    {
+      "title": "Project Registers — Copilot / AG-UI — one action surface, proposals, conversations",
+      "path": "docs/evidence/rework/batch/tranche-6/S10-bodies/S10/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-6/S10-bodies/S10/project-registers.md",
+      "section": "Evidence",
+      "sha256": "59dbf9cc3f418ff5bdbd16f6a9a0298747eea175ef5c8235b6ea38de039ec66f",
+      "bytes": 28384,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/S10-bodies/S10/project-registers.md"
+    },
+    {
+      "title": "Project Wbs — Copilot / AG-UI — one action surface, proposals, conversations",
+      "path": "docs/evidence/rework/batch/tranche-6/S10-bodies/S10/project-wbs.html",
+      "source": "docs/evidence/rework/batch/tranche-6/S10-bodies/S10/project-wbs.md",
+      "section": "Evidence",
+      "sha256": "d639ca075ec3541c559a96bbc63d1b2067be36b3d4c5fef3cf8750ac113e8f7f",
+      "bytes": 2998,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/S10-bodies/S10/project-wbs.md"
+    },
+    {
+      "title": "Statement Of Architecture Work — Copilot / AG-UI — one action surface, proposals, conversations",
+      "path": "docs/evidence/rework/batch/tranche-6/S10-bodies/S10/statement-of-architecture-work.html",
+      "source": "docs/evidence/rework/batch/tranche-6/S10-bodies/S10/statement-of-architecture-work.md",
+      "section": "Evidence",
+      "sha256": "56201eb124f1e506d59f314a0a5a7648b606c8a7739826b3a3940a6d52e2264c",
+      "bytes": 572928,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/S10-bodies/S10/statement-of-architecture-work.md"
+    },
+    {
+      "title": "Change Control — Processes, steps and SOPs — executable documentation",
+      "path": "docs/evidence/rework/batch/tranche-6/S11-bodies/S11/change-control.html",
+      "source": "docs/evidence/rework/batch/tranche-6/S11-bodies/S11/change-control.md",
+      "section": "Evidence",
+      "sha256": "771fdb8c04b3d8b0d89bd767e8f2e5fc502d825647df028492162c7191788d03",
+      "bytes": 5612,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/S11-bodies/S11/change-control.md"
+    },
+    {
+      "title": "Delivery Contract — Processes, steps and SOPs — executable documentation",
+      "path": "docs/evidence/rework/batch/tranche-6/S11-bodies/S11/delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-6/S11-bodies/S11/delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "3b760a31963233804d6424a367d5b4403a4fa401b0a94afd8faa5a5260740616",
+      "bytes": 13761,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/S11-bodies/S11/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — Processes, steps and SOPs — executable documentation",
+      "path": "docs/evidence/rework/batch/tranche-6/S11-bodies/S11/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-6/S11-bodies/S11/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "87b01deb684560f3747da99ba495ea7f6051bb643dc304e4df1c54e1acb33186",
+      "bytes": 107067,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/S11-bodies/S11/project-baseline.md"
+    },
+    {
+      "title": "Project Registers — Processes, steps and SOPs — executable documentation",
+      "path": "docs/evidence/rework/batch/tranche-6/S11-bodies/S11/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-6/S11-bodies/S11/project-registers.md",
+      "section": "Evidence",
+      "sha256": "6bb40ce4c4f656adcc6aefd40b1513cbb9c23d15a0e9550facb987eb7dea1c0a",
+      "bytes": 24800,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/S11-bodies/S11/project-registers.md"
+    },
+    {
+      "title": "Project Wbs — Processes, steps and SOPs — executable documentation",
+      "path": "docs/evidence/rework/batch/tranche-6/S11-bodies/S11/project-wbs.html",
+      "source": "docs/evidence/rework/batch/tranche-6/S11-bodies/S11/project-wbs.md",
+      "section": "Evidence",
+      "sha256": "4834f43ba70b51ce19378d61a1f39a6963e2382209b9068113d0656bb50f10fb",
+      "bytes": 3078,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/S11-bodies/S11/project-wbs.md"
+    },
+    {
+      "title": "Statement Of Architecture Work — Processes, steps and SOPs — executable documentation",
+      "path": "docs/evidence/rework/batch/tranche-6/S11-bodies/S11/statement-of-architecture-work.html",
+      "source": "docs/evidence/rework/batch/tranche-6/S11-bodies/S11/statement-of-architecture-work.md",
+      "section": "Evidence",
+      "sha256": "4a8202badf74d53bb17946c14c2b8bd66363a3b7f084dd14ab9e068496bb02e4",
+      "bytes": 592683,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/S11-bodies/S11/statement-of-architecture-work.md"
+    },
+    {
+      "title": "Change Control — Decision-forum governance (follow-on)",
+      "path": "docs/evidence/rework/batch/tranche-6/T19F-bodies/T19F/change-control.html",
+      "source": "docs/evidence/rework/batch/tranche-6/T19F-bodies/T19F/change-control.md",
+      "section": "Evidence",
+      "sha256": "e1b36d61d0ffb35f5625a121add8a3dbd68e0038417895ed572a83bb51bdfd50",
+      "bytes": 5603,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/T19F-bodies/T19F/change-control.md"
+    },
+    {
+      "title": "Delivery Contract — Decision-forum governance (follow-on)",
+      "path": "docs/evidence/rework/batch/tranche-6/T19F-bodies/T19F/delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-6/T19F-bodies/T19F/delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "fab89a515c68595ccc478e98ee08260c0cbe88bd2a5c806b7c5db71792c79ca9",
+      "bytes": 11219,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/T19F-bodies/T19F/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — Decision-forum governance (follow-on)",
+      "path": "docs/evidence/rework/batch/tranche-6/T19F-bodies/T19F/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-6/T19F-bodies/T19F/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "fa3f5392557adb31c3acc00f28cec14ec0bd2cf73de537c877ae142b2c2e0440",
+      "bytes": 78221,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/T19F-bodies/T19F/project-baseline.md"
+    },
+    {
+      "title": "Project Registers — Decision-forum governance (follow-on)",
+      "path": "docs/evidence/rework/batch/tranche-6/T19F-bodies/T19F/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-6/T19F-bodies/T19F/project-registers.md",
+      "section": "Evidence",
+      "sha256": "a27661fd9738c58b58d4da29d48200dc4017cbaa62eda68082886f144c709c1a",
+      "bytes": 16171,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/T19F-bodies/T19F/project-registers.md"
+    },
+    {
+      "title": "Project Wbs — Decision-forum governance (follow-on)",
+      "path": "docs/evidence/rework/batch/tranche-6/T19F-bodies/T19F/project-wbs.html",
+      "source": "docs/evidence/rework/batch/tranche-6/T19F-bodies/T19F/project-wbs.md",
+      "section": "Evidence",
+      "sha256": "a40c459c3f6cbaa9d742fd0d4d369a0119626c311015d0e8719c8683b850bb29",
+      "bytes": 3031,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/T19F-bodies/T19F/project-wbs.md"
+    },
+    {
+      "title": "Statement Of Architecture Work — Decision-forum governance (follow-on)",
+      "path": "docs/evidence/rework/batch/tranche-6/T19F-bodies/T19F/statement-of-architecture-work.html",
+      "source": "docs/evidence/rework/batch/tranche-6/T19F-bodies/T19F/statement-of-architecture-work.md",
+      "section": "Evidence",
+      "sha256": "ce3e37b6d4b149cab2f29f2d55aa5ba262091cbaf1afc7045cc6404fb5ccac84",
+      "bytes": 580626,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/T19F-bodies/T19F/statement-of-architecture-work.md"
+    },
+    {
       "title": "The full-fidelity snapshot loop",
       "path": "docs/evidence/rework/full-fidelity-snapshot.html",
       "source": "docs/evidence/rework/full-fidelity-snapshot.md",
@@ -2727,6 +2979,24 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "d40d3d715a11587ab3e1542ca4b359a29eaceb4153f8fad90bec343cb834b742",
       "bytes": 1167,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-5/tranche-review-evidence.md"
+    },
+    {
+      "title": "T19F closure acts",
+      "path": "docs/evidence/rework/tranche-6/t19f-closure-acts.html",
+      "source": "docs/evidence/rework/tranche-6/t19f-closure-acts.md",
+      "section": "Evidence",
+      "sha256": "2a472d502b8628c9abe3ff5ddd20aa070013b49ecbd83abacbccc2b3f462789c",
+      "bytes": 109,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-6/t19f-closure-acts.md"
+    },
+    {
+      "title": "Tranche 6 review — evidence",
+      "path": "docs/evidence/rework/tranche-6/tranche-review-evidence.html",
+      "source": "docs/evidence/rework/tranche-6/tranche-review-evidence.md",
+      "section": "Evidence",
+      "sha256": "dafb98b0054d09f694e1a48ec4fda07db000a8d27025319d12f200989605157c",
+      "bytes": 1637,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-6/tranche-review-evidence.md"
     },
     {
       "title": "S04 P4.1 — the live coding, worker and billing receipts",
