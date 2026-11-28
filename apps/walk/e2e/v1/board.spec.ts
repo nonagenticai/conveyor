@@ -120,3 +120,26 @@ test("a signed-out visit is the sign-in gate", async ({ page }) => {
   await page.goto("/boards");
   await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
 });
+
+// P1.1 — a refusal is the server's, shown verbatim in the sheet (SPEC §5).
+test("a refused create is the server's own words", async ({ page }) => {
+  await page.route("**/api/actions/projects.create/invocations", (route: any) =>
+    route.fulfill({
+      status: 422,
+      contentType: "application/problem+json",
+      body: JSON.stringify({
+        title: "Unprocessable Entity",
+        status: 422,
+        detail: "project_type_code must name a live type",
+      }),
+    }),
+  );
+  await page.goto("/boards");
+  await page.getByRole("button", { name: "New project" }).click();
+  const dialog = page.getByRole("dialog", { name: "New project" });
+  await dialog.getByLabel(/^Title/).fill("S4 new project");
+  await dialog.getByRole("button", { name: "Submit" }).click();
+  await expect(dialog.locator(".form-error")).toContainText(
+    "project_type_code must name a live type",
+  );
+});

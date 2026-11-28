@@ -186,3 +186,48 @@ test("a signed-out visit is the sign-in gate", async ({ page }) => {
   await page.goto(`/card/${CARD_ID}`);
   await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
 });
+
+// P1.1 — `runs.create` carries an Idempotency-Key, and `runs.start` takes the run's own id.
+test("a run is created with an idempotency key and a queued run is started by id", async ({ page }) => {
+  await stubCard(page);
+  let createdKey: string | undefined;
+  await page.route("**/api/actions/runs.create/invocations", async (route: any) => {
+    createdKey = route.request().headers()["idempotency-key"];
+    await json(route, { id: RUN_ID, card_id: CARD_ID, status: "queued" });
+  });
+  let started: any = null;
+  await page.route("**/api/actions/runs.start/invocations", async (route: any) => {
+    started = route.request().postDataJSON();
+    await json(route, {});
+  });
+  await page.goto(`/card/${CARD_ID}`);
+
+  await page.getByRole("button", { name: "New run" }).click();
+  await page.getByRole("dialog", { name: "New run" }).getByRole("button", { name: "Submit" }).click();
+  await expect.poll(() => createdKey).toBeTruthy();
+
+  await page.getByRole("button", { name: "Start" }).first().click();
+  await page.getByRole("dialog", { name: "Start run" }).getByRole("button", { name: "Submit" }).click();
+  await expect.poll(() => started?.id).toBe(RUN_ID);
+});
+
+// P1.1 — a refusal inside the cockpit sheet is the server's own words.
+test("a refused run is shown in the sheet, verbatim", async ({ page }) => {
+  await stubCard(page);
+  await page.route("**/api/actions/runs.create/invocations", (route: any) =>
+    route.fulfill({
+      status: 409,
+      contentType: "application/problem+json",
+      body: JSON.stringify({
+        title: "Conflict",
+        status: 409,
+        detail: "the card is already running",
+      }),
+    }),
+  );
+  await page.goto(`/card/${CARD_ID}`);
+  await page.getByRole("button", { name: "New run" }).click();
+  const dialog = page.getByRole("dialog", { name: "New run" });
+  await dialog.getByRole("button", { name: "Submit" }).click();
+  await expect(dialog.locator(".form-error")).toContainText("the card is already running");
+});
