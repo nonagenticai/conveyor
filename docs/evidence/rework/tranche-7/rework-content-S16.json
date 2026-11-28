@@ -1,0 +1,634 @@
+{
+  "charter": "# Charter — S16 Inference Ledger and Prompt Audit (retrospective, 2026-11-28)\n\n- **Project:** S16 'Inference Ledger and Prompt Audit', track v1, ADM phase G, delivery plateau, tranche 7\n- **Delivered:** three tables (`inference_call`, `prompt_audit`, `prompt_audit_finding`) with row-level security forced; the engine capture seam that writes one row per external call inside the call's own transaction; and a prompt audit that is a procedure with one bounded model call, whose publish path refuses a high finding unless the author acknowledges it.\n- **Authority:** the tranche-7 authorisation recorded by the tranche-6 review, exercised under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n- **Acceptance:** `acceptance/programme/S16.toml`, whose gate is that every model call becomes a durable, tenant-scoped row carrying the prompt's identity, the token counts and the provider's prompt-cache classes, so cost and cache are a query rather than a guess.\n- **Closure:** the project is already closed in the record; this pack supplies the charter, baseline, artefact set, registers, contract, WBS deliverable, Phase-G review, outputs and closure review the row was closed without, then re-closes it through its own gate.\n",
+  "soaw": {
+    "title": "Statement of Architecture Work — S16 Inference Ledger and Prompt Audit (retrospective, Phase A)",
+    "body": {
+      "assignment": "Deliver the architectural record for an inference ledger: every model call the conveyor makes becomes a durable, tenant-scoped row carrying the prompt's identity, the token counts and both prompt-cache classes, with a prompt audit over the three prompt surfaces. The assignment is retrospective — the product shipped on 2026-11-09 and this statement records the architecture it was built to, not one requested in advance.",
+      "scope": "In scope: the Phase A–D artefact set, the data entities, the capture seam, the audit procedure and the retention decision. Out of scope: any screen (S12 builds both), the inference router and the billing service (this project reads their usage, it does not replace them), a tenant-authored prompt store, AI-driven prompt repair, kata tables and any cadence configuration table.",
+      "responsibilities": "The programme architect authors the set under the standing delegation; the Architecture Board reviews it; the SRO is accountable for the cost-observability outcome; the platform engineer operates the capture seam and the ninety-day audit; the tenant admin consults on retention. The retrospective author is explicitly not the accepting role, so the separation of duties holds even though the same session wrote the product record.",
+      "acceptance_criteria": "The manifest's six requirements, each with its own check: the three tables exist with row-level security forced; a real external call's stored row matches the router's own usage field for field; the cache constraint refuses a hit with no read tokens; the audit is deterministic and only a high finding blocks a publish; no prompt action holds a process write; and the OpenAPI lock stays current.",
+      "constraints": "No new technology and no second writer: the engine seam is the only place a call is recorded, and a handler that wrote its own row would make the fact exist twice. Join keys stay integers without foreign keys because database-level referential integrity bypasses row-level security. The capture must never fail the call it is recording, which constrains it to the call's own transaction.",
+      "retrospective": "This statement is written after the fact and says so. Where the product's proof is narrower than the claim — the shipped capture test runs against a stub and the live-router rehearsal is still pending — the gap is recorded in the evidence output and in the risk register rather than smoothed into a pass. The Phase-G review's level reflects that distinction."
+    }
+  },
+  "artifacts": [
+    {
+      "title": "Stakeholder Map — S16 Inference Ledger and Prompt Audit (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "entries": [
+        {
+          "axis_a": "Sponsoring group",
+          "axis_b": "the tranche-7 authorisation and the close decision",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "SRO",
+          "axis_b": "accountable for cost observability across the estate",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "accountable"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Platform engineer",
+          "axis_b": "operates the capture seam and the ninety-day audit",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "collaborate"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Tenant admin",
+          "axis_b": "consults on retention and the prompt-audit setting",
+          "value": {
+            "influence": "medium",
+            "interest": "medium",
+            "engagement": "consult"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Architecture Board",
+          "axis_b": "approves the Phase A–D set and the Phase-G level",
+          "value": {
+            "influence": "high",
+            "interest": "medium",
+            "engagement": "approve"
+          },
+          "position": 5
+        }
+      ],
+      "links": [
+        {
+          "to": "Business Capability Map — S16 Inference Ledger and Prompt Audit (Phase B)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Stakeholder Map — S16 Inference Ledger and Prompt Audit (Phase A)\n\n## Metadata\n\nType matrix; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S16; tranche 7; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nFive stakeholder positions on the influence/interest/engagement axes. The sponsoring group decides the tranche and the close; the SRO is accountable for the cost-observability outcome; the platform engineer operates the capture seam and the audit; the tenant admin consults on retention because the rows are tenant-scoped; the Architecture Board approves the artefact set.\n\n## Links\n\nDerives from `docs/plans/slices/S16-inference-audit.md` §1–§3 and §9; realizes the Phase A stakeholder view for the inference ledger; depends on the Business Capability Map for the value each group receives from a queryable cost record. The programme roles are those the conveyor buildout programme already records.\n\n## Document\n\nThe artefact sits under the slice plan and the project's architecture set. S16 has no contemporaneous architecture publication of its own; this retrospective artefact is published as an architecture-artifact-instance document by the rework factory and its subject is the record the 2026-11-28 snapshot carries for S16.\n"
+    },
+    {
+      "title": "Driver/Goal/Objective Catalog — S16 Inference Ledger and Prompt Audit (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "D1 Cost visibility",
+          "axis_b": "attribute every model call's spend",
+          "value": {
+            "goal": "per-call cost is queryable",
+            "objective": "one durable row per call"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "D2 Cache efficiency",
+          "axis_b": "know whether a call was served or warmed",
+          "value": {
+            "goal": "cache class is recorded",
+            "objective": "three states plus unknown"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "D3 Prompt drift",
+          "axis_b": "know which prompt produced an output",
+          "value": {
+            "goal": "prompt_sha is on every row",
+            "objective": "audit blocks a high finding"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "D4 Retention",
+          "axis_b": "keep the record for the review that needs it",
+          "value": {
+            "goal": "ninety-day horizon",
+            "objective": "prune schedules to S17"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements Catalog — S16 Inference Ledger and Prompt Audit (Phase A)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Driver/Goal/Objective Catalog — S16 Inference Ledger and Prompt Audit (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S16; tranche 7; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nFour drivers with their goals and objectives. Cost visibility is the first driver: the estate spends tokens it cannot attribute per call. Cache efficiency is the second: a hit, a write and a miss behave differently and the request does not say which. Prompt drift is the third: a prompt edit changes behaviour with no record of which prompt ran. Retention is the fourth: an audit row is useless if it outlives or underlives the period the incident review needs.\n\n## Links\n\nDerives from `docs/plans/slices/S16-inference-audit.md` §1 and §9; feeds the Requirements Catalog, which turns each objective into a checkable requirement; depends on the Stakeholder Map for who owns each driver. The objectives are the ones the slice plan closed on 2026-11-09, restated here so the retrospective set carries its own derivation.\n\n## Document\n\nThe catalogue is the Phase A record of why the ledger exists. It is not a second roadmap: every objective names the requirement it drives and the check that proves it, so a reader can trace a table column back to a driver rather than to a section heading. No objective is authored here that the slice plan does not already close.\n"
+    },
+    {
+      "title": "Requirements Catalog — S16 Inference Ledger and Prompt Audit (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "R1 three tables",
+          "axis_b": "row-level security is forced on each",
+          "value": {
+            "check": "table count 3 with rls",
+            "state": "proved"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "R2 field-for-field capture",
+          "axis_b": "the stored row equals the router's usage",
+          "value": {
+            "check": "a_real_external_call_records_the_router_usage_field_for_field",
+            "state": "proved on a stub"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "R3 cache constraint",
+          "axis_b": "a hit with no read tokens is refused",
+          "value": {
+            "check": "the_cache_check_refuses_a_hit_with_no_read_tokens",
+            "state": "proved"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "R4 audit determinism",
+          "axis_b": "only a high finding blocks the publish",
+          "value": {
+            "check": "the_check_is_deterministic_and_only_a_high_finding_blocks",
+            "state": "proved"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "R5 no process write",
+          "axis_b": "no prompt action holds a process write",
+          "value": {
+            "check": "no_prompt_action_holds_processes_write",
+            "state": "proved"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "R6 OpenAPI lock",
+          "axis_b": "the surface's lock file stays current",
+          "value": {
+            "check": "--print-openapi --check-lock",
+            "state": "proved"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Solution Concept Diagram — S16 Inference Ledger and Prompt Audit (Phase A)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Requirements Catalog — S16 Inference Ledger and Prompt Audit (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S16; tranche 7; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nSix requirements, each with the check that proves it. R1 the three tables exist with row-level security forced. R2 a real external call's stored row matches the router's own usage field for field. R3 the cache status is a constrained set of three plus unknown, and a hit with no read tokens is refused. R4 the audit is deterministic and only a high finding blocks a publish. R5 no prompt action carries a process write. R6 the OpenAPI lock stays current.\n\n## Links\n\nDerives from the Driver/Goal/Objective Catalog; realized by the Solution Concept Diagram and the Data Entity catalog; sourced from `docs/plans/slices/S16-inference-audit.md` §7, which names the exact test target behind each requirement. The requirements are stated as observable properties so the manifest's checks and the catalogue cannot drift apart.\n\n## Document\n\nEach requirement carries one owning check in `acceptance/programme/S16.toml`; a requirement with no check would be a wish, and the manifest has none. The retrospective set therefore records four requirements as proved and two as proved-on-a-stub, which is the honest split the slice plan's gate already draws.\n"
+    },
+    {
+      "title": "Solution Concept Diagram — S16 Inference Ledger and Prompt Audit (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "entries": [
+        {
+          "axis_a": "Capture seam",
+          "axis_b": "one writer for every external call",
+          "value": {
+            "component": "crates/actions/src/invoke.rs",
+            "role": "records the call"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Ledger tables",
+          "axis_b": "inference_call, prompt_audit, prompt_audit_finding",
+          "value": {
+            "component": "migrations",
+            "role": "stores the fact"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Audit procedure",
+          "axis_b": "one bounded model call over the prompt surfaces",
+          "value": {
+            "component": "procedures.publish",
+            "role": "blocks a high finding"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Readers",
+          "axis_b": "cost and cache queries, the audit report",
+          "value": {
+            "component": "actions",
+            "role": "reads the fact"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Business Capability Map — S16 Inference Ledger and Prompt Audit (Phase B)",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Solution Concept Diagram — S16 Inference Ledger and Prompt Audit (Phase A)\n\n## Metadata\n\nType diagram; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S16; tranche 7; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nThe concept has one seam. Every external call passes `invoke_external` in the engine, which records the call's row inside the same transaction, then returns the response whether or not the record succeeded. The audit is a procedure with one bounded model call that reads the prompt surfaces and writes findings, and the publish path refuses a high finding unless the author acknowledges it.\n\n## Links\n\nRealizes the Requirements Catalog; depends on the Business Capability Map and the Data Entity catalog for its two halves; reuses the engine seam and the action declaration pattern the platform already ships. The diagram is described in prose rather than as an image because the artefact store carries text bodies and a binary would be a second, unchecked source.\n\n## Document\n\nThe concept deliberately has no second path: a handler that wrote its own ledger row would make the fact exist twice. The diagram therefore shows one writer, one table family and one reader, and the audit derives its findings from the same rows the ledger writes rather than from a parallel capture.\n"
+    },
+    {
+      "title": "Business Capability Map — S16 Inference Ledger and Prompt Audit (Phase B)",
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "entries": [
+        {
+          "axis_a": "Inference capture",
+          "axis_b": "a call becomes a row",
+          "value": {
+            "actions": "the engine seam",
+            "requirement": "R1, R2, R3"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Prompt audit",
+          "axis_b": "a prompt becomes findings",
+          "value": {
+            "actions": "the audit procedure",
+            "requirement": "R4, R5"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Cost attribution",
+          "axis_b": "rows become an answer",
+          "value": {
+            "actions": "reads only",
+            "requirement": "R2, R6"
+          },
+          "position": 3
+        }
+      ],
+      "links": [
+        {
+          "to": "Data Entity/Data Component Catalog — S16 Inference Ledger and Prompt Audit (Phase C)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Business Capability Map — S16 Inference Ledger and Prompt Audit (Phase B)\n\n## Metadata\n\nType diagram; phase B; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S16; tranche 7; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nThree capabilities. Inference capture turns a call into a durable row and is the engine's, not a handler's. Prompt audit turns a prompt surface into findings and is a procedure. Cost attribution turns rows into an answer and is a read, never a write. Each capability names the action family it exposes and the requirement it satisfies.\n\n## Links\n\nDerives from the Solution Concept Diagram and the Requirements Catalog; feeds the Data Entity and Technology Standards catalogs. The capability view is the one the tenant sees: capture happens without the tenant asking, audit happens when a prompt is published, and attribution happens when someone asks what a run cost.\n\n## Document\n\nThe map is a value view, not an org view: it says what the platform can do for a tenant, not which team owns it. That split matters here because capture is engine code while audit is a procedure, and a reader who confuses the two will look for a handler that records calls and not find one.\n"
+    },
+    {
+      "title": "Data Entity/Data Component Catalog — S16 Inference Ledger and Prompt Audit (Phase C)",
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "inference_call",
+          "axis_b": "one row per external call",
+          "value": {
+            "tenant": "required",
+            "rls": "forced",
+            "keys": "no foreign keys"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "prompt_audit",
+          "axis_b": "one row per audited prompt surface",
+          "value": {
+            "tenant": "required",
+            "rls": "forced",
+            "keys": "prompt_sha"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "prompt_audit_finding",
+          "axis_b": "one row per finding",
+          "value": {
+            "tenant": "required",
+            "rls": "forced",
+            "severity": "high blocks"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "join keys",
+          "axis_b": "procedure, procedure_step, run_step, conversation_turn",
+          "value": {
+            "integrity": "application",
+            "reason": "fk ri bypasses rls"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Technology Standards Catalog — S16 Inference Ledger and Prompt Audit (Phase D)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Data Entity/Data Component Catalog — S16 Inference Ledger and Prompt Audit (Phase C)\n\n## Metadata\n\nType catalog; phase C; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S16; tranche 7; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nThree data entities and their components. `inference_call` carries the prompt identity, the token counts, the cache classes and the cost context; `prompt_audit` carries the audit run and its prompt sha; `prompt_audit_finding` carries one finding with its severity and its determinism key. Join keys to `procedure`, `procedure_step`, `run_step` and `conversation_turn` are integers without foreign keys, deliberately.\n\n## Links\n\nDerives from the Business Capability Map; realizes the capture capability; depends on the Technology Standards catalog for the constraint and RLS conventions. The no-foreign-key choice is recorded here rather than in code comments because it is an architecture decision a later session will otherwise reverse by reflex.\n\n## Document\n\nThe entities are tenant-scoped and carry row-level security forced, so the catalogue names the tenant column as a component of every entity rather than as a convention. The absent foreign keys are an integrity trade: referential integrity checked by the database bypasses row-level security, so an orphan join is possible and the report has to catch it.\n"
+    },
+    {
+      "title": "Technology Standards Catalog — S16 Inference Ledger and Prompt Audit (Phase D)",
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "PostgreSQL 18",
+          "axis_b": "row-level security forced on every table",
+          "value": {
+            "role": "storage",
+            "failure_prevented": "a tenant reading another's rows"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "sqlx migrations",
+          "axis_b": "embedded at compile time",
+          "value": {
+            "role": "schema",
+            "failure_prevented": "a green command with no table"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "router usage schema",
+          "axis_b": "the token contract",
+          "value": {
+            "role": "integration",
+            "failure_prevented": "a locally invented cost field"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "action registry",
+          "axis_b": "declaration, not a handler",
+          "value": {
+            "role": "interface",
+            "failure_prevented": "a second write path"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Solution Concept Diagram — S16 Inference Ledger and Prompt Audit (Phase A)",
+          "kind": "reuse"
+        }
+      ],
+      "body": "# Technology Standards Catalog — S16 Inference Ledger and Prompt Audit (Phase D)\n\n## Metadata\n\nType catalog; phase D; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S16; tranche 7; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nFour standards the delivery stands on: PostgreSQL 18 with row-level security as the storage floor; the sqlx migration runner, whose embedded migrations are compiled in, so a new file is invisible until a rebuild; the router's usage schema as the token contract; and the action registry's declaration pattern for the audit's single bounded call.\n\n## Links\n\nDerives from the Data Entity catalog; realizes the technology half of the Solution Concept Diagram; reuses the platform's existing standards rather than adding one. Each standard names the failure it prevents, because a standards list without a failure mode is a preference list and cannot be enforced in review.\n\n## Document\n\nNo new technology is introduced by S16. The migration-runner entry is the one that has already cost a session a day: a migration that is not compiled in leaves the command green and the table absent, which reads exactly like a coding error. The catalogue records it so the next reader checks the rebuild before the code.\n"
+    }
+  ],
+  "documents": [
+    {
+      "category": "architecture-artifact",
+      "title": "Architecture Artefact Index — S16 (retrospective, 2026-11-28)",
+      "body": "# Architecture Artefact Index — S16\n\n## Metadata\n\nThe seven Phase A–D artefacts for S16 Inference Ledger and Prompt Audit, tranche 7, authored retrospectively on 2026-11-28 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Phase A carries four, phase B one, phase C one and phase D one, which is the adopted delivery profile exactly; the architecture track's E–H set belongs to a programme or architecture pack and is correctly absent here.\n\n## Entries\n\n1. Stakeholder Map — S16 Inference Ledger and Prompt Audit (Phase A) — the five stakeholder positions and what each decides.\n2. Driver/Goal/Objective Catalog — S16 Inference Ledger and Prompt Audit (Phase A) — four drivers with the goal and objective each sets.\n3. Requirements Catalog — S16 Inference Ledger and Prompt Audit (Phase A) — six requirements, each naming its owning check and its proved state.\n4. Solution Concept Diagram — S16 Inference Ledger and Prompt Audit (Phase A) — the one-seam concept: capture, ledger, audit, readers.\n5. Business Capability Map — S16 Inference Ledger and Prompt Audit (Phase B) — three capabilities and the action family each exposes.\n6. Data Entity/Data Component Catalog — S16 Inference Ledger and Prompt Audit (Phase C) — three data entities with their tenant, security and key decisions.\n7. Technology Standards Catalog — S16 Inference Ledger and Prompt Audit (Phase D) — four standards, each naming the failure it prevents.\n\n## Links\n\nDerives from `docs/plans/slices/S16-inference-audit.md` and its §7 gate. Each artefact links to another in this pack in the derivation, realization, dependency or reuse sense the record's link kinds allow; there is no edge to a title this pack does not create, so no artefact is an orphan and no link dangles.\n\n## Document\n\nThis index is the document of its own category: the close gate reads one published document per mandatory category and the four TOGAF categories resolve their headings from a document of their own category. The index is therefore the record-equivalent of the set above, published rather than described, and its entries name the same seven titles the artefacts carry.\n"
+    }
+  ],
+  "registers": {
+    "risk": [
+      {
+        "code": "S16-R1",
+        "title": "The live-router rehearsal is pending, so the field-for-field claim is proved on a stub",
+        "body": "The shipped capture test asserts the stored row against the router's usage schema, but it runs against a stub transport. The slice plan's live rehearsal, which needs a real router token, is marked ignored and has not been run. Until it is, the field-for-field property is evidenced for the schema and the seam, not for a live provider response.",
+        "probability": "medium",
+        "impact": 3,
+        "review_at": "2026-12-12",
+        "severity": "medium",
+        "status": "open",
+        "response": "Run the ignored live rehearsal against the estate router and attach its output to the project's evidence before any tranche review claims live capture.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S16-inference-audit.md#7"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
+      },
+      {
+        "code": "S16-R2",
+        "title": "Capture shares the call's transaction, so a database failure can roll back the ledger row",
+        "body": "The capture is written inside the call's own transaction so that it can never fail the call. The consequence is the mirror image: a genuine database failure rolls the audit row back with the rest of the transaction, and a call that happened leaves no ledger trace. The trade is deliberate but it is not free, and a silent under-count is harder to notice than a failed call.",
+        "probability": "medium",
+        "impact": 3,
+        "review_at": "2026-12-12",
+        "severity": "medium",
+        "status": "open",
+        "response": "Alert on a router call count that exceeds the ledger row count over a window, so the rollback case surfaces as a discrepancy rather than as an absence.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S16-inference-audit.md#8"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
+      },
+      {
+        "code": "S16-R3",
+        "title": "Join keys carry no foreign keys, so an orphaned row is possible and only the report catches it",
+        "body": "The joins to `procedure`, `procedure_step`, `run_step` and `conversation_turn` are integers rather than foreign keys, because database-level referential integrity runs outside row-level security and would let one tenant's check read another's rows. An orphaned ledger row is therefore permitted by construction, and the grouping report is the only thing between the design and a silently unattributed cost.",
+        "probability": "low",
+        "impact": 2,
+        "review_at": "2026-12-12",
+        "severity": "low",
+        "status": "open",
+        "response": "Keep the report's group-by on the prompt sha, and treat an unattributed row count above zero as a finding rather than as noise.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S16-inference-audit.md#9"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
+      }
+    ],
+    "issue": [
+      {
+        "code": "S16-I1",
+        "title": "The record claimed built while carrying no charter, baseline, contract or Phase-G review",
+        "body": "At the 2026-11-28 snapshot the project row is closed and its product is in the tree, but the snapshot carries no charter asset, no approved baseline, no delivery contract, no Phase A–D set and no compliance review. The gap is a record gap, not a product gap: this pack supplies the set and the receipt proves it.",
+        "severity": "P1",
+        "status": "open",
+        "response": "Supplied by this pack and proved by the project's receipt at the pinned snapshot."
+      },
+      {
+        "code": "S16-I2",
+        "title": "Retention is declared at ninety days but its prune schedules are S17's",
+        "body": "The retention decision is ninety days and the report groups by prompt sha from day one, but the two prune schedule rows the decision needs are deferred to S17 and are not in the record. A declared retention with no executing schedule is a policy statement, not a control, and the tranche review should read it that way.",
+        "severity": "P2",
+        "status": "open",
+        "response": "Carry the deferral into S17's acceptance and record it in the tranche-7 review's risk section rather than treating retention as delivered."
+      },
+      {
+        "code": "S16-I3",
+        "title": "A provider that omits the cache class records unknown rather than a guess",
+        "body": "The cache status is derived from the response, never the request, and falls to `unknown` when the provider omits the class. That is the right call for honesty and the wrong one for a savings report: an under-reported cache benefit looks like a system that caches badly. The row is correct; the report needs to separate `unknown` from `miss` before anyone reads a trend from it.",
+        "severity": "P2",
+        "status": "open",
+        "response": "Keep `unknown` as its own report bucket and refuse to fold it into `miss` in any downstream aggregate."
+      }
+    ],
+    "assumption": [
+      {
+        "code": "S16-A1",
+        "title": "The 2026-11-28 rework snapshot is the authoritative record for S16",
+        "body": "Every judgement in this pack is read from the pinned snapshot, and the content checker refuses any identifier that appears nowhere in it. A row that changed after the snapshot is therefore out of scope for this pack by construction.",
+        "status": "open"
+      },
+      {
+        "code": "S16-A2",
+        "title": "The router's usage object is the single source of token truth",
+        "body": "The ledger stores what the provider returned rather than what the conveyor thinks it sent, so a disagreement between the two is a bug in the estimate and not a reason to prefer the local number. The field-for-field test encodes that preference.",
+        "status": "open"
+      },
+      {
+        "code": "S16-A3",
+        "title": "Ninety days is the horizon the incident review needs",
+        "body": "The retention decision assumes a review that starts within a quarter. A longer investigation would need the rows the prune removes, so the decision is revisited before the schedule is enabled rather than after the first gap.",
+        "status": "open"
+      },
+      {
+        "code": "S16-A4",
+        "title": "A high finding is the only severity that should block a publish",
+        "body": "The audit grades findings and blocks only the high ones, with an explicit, logged acknowledgement as the override. The assumption is that medium findings are advice; if a medium class proves to be a real defect, the level moves and the publish path changes with it.",
+        "status": "open"
+      }
+    ],
+    "dependency": [
+      {
+        "code": "S16-D1",
+        "title": "S16 depends on S02, S03, S04, S10 and S11",
+        "body": "The project row records the dependency edges. S02 and S03 supply the schema and the card model, S04 the action registry and the transport, S10 the conversation turn the audit joins to, and S11 the procedure and step tables the publish path reads.",
+        "status": "open"
+      },
+      {
+        "code": "S16-D2",
+        "title": "S13 declares captures_usage when it lands",
+        "body": "The chat action is S13's; until it declares the capture flag the ledger records the calls that exist but not the surface that will make most of them. The dependency is a declaration, not a build, so it does not block this pack.",
+        "status": "open"
+      },
+      {
+        "code": "S16-D3",
+        "title": "S12 builds both screens and S17 carries the prune schedules",
+        "body": "The two read surfaces and the two schedule rows are other projects' deliverables by the slice plan's own boundary. Recording them here stops a later session reading their absence as an S16 gap.",
+        "status": "open"
+      }
+    ],
+    "benefit": [
+      {
+        "code": "S16-B1",
+        "title": "Cost becomes a query rather than a guess",
+        "body": "Before the ledger, a run's spend was inferred from a billing rollup; after it, each call carries its own token counts and the sum is a read. The benefit is declared at the capability level and is observable in the report, not in a saving that a retrospective pack could claim to have measured.",
+        "status": "open",
+        "links": {
+          "requirements": [
+            "docs/plans/slices/S16-inference-audit.md#1"
+          ],
+          "cards": [],
+          "decisions": []
+        }
+      },
+      {
+        "code": "S16-B2",
+        "title": "Cache behaviour is recorded in three states plus unknown",
+        "body": "A hit, a write and a miss spend differently, and the request does not say which happened. Recording the response's class turns cache efficiency from an assumption into a column, with `unknown` kept separate so a provider that omits the class cannot inflate the hit rate.",
+        "status": "open",
+        "links": {
+          "requirements": [
+            "docs/plans/slices/S16-inference-audit.md#9"
+          ],
+          "cards": [],
+          "decisions": []
+        }
+      },
+      {
+        "code": "S16-B3",
+        "title": "A high prompt-audit finding blocks the publish",
+        "body": "The audit runs at publish rather than on a cadence, so a prompt that would fail the check never reaches a tenant without a logged acknowledgement. The benefit is preventive: it is measured by the refusals the publish path records, not by a finding count.",
+        "status": "open",
+        "links": {
+          "requirements": [
+            "docs/plans/slices/S16-inference-audit.md#9"
+          ],
+          "cards": [],
+          "decisions": []
+        }
+      },
+      {
+        "code": "S16-B4",
+        "title": "One engine seam writes every call",
+        "body": "Every external call is recorded by the same code path, so the ledger cannot be half-adopted: a new action that calls a model is captured or it does not call. The benefit is structural and is proved by the registry check that no prompt action holds a process write.",
+        "status": "open",
+        "links": {
+          "requirements": [
+            "docs/plans/slices/S16-inference-audit.md#7"
+          ],
+          "cards": [],
+          "decisions": []
+        }
+      }
+    ]
+  },
+  "delivery_contract": {
+    "title": "Delivery Contract — S16 Inference Ledger and Prompt Audit (Phase F, retrospective)",
+    "body": {
+      "commitments": "The delivery commits to the six requirements the Requirements Catalog states, each with its owning check in `acceptance/programme/S16.toml`, and to the boundary the Statement of Architecture Work draws: no screen, no cache endpoint, no cost event and no second writer. The retrospective nature of the contract is declared, not concealed.",
+      "compliance": "Compliance is demonstrated by running the manifest at the pinned snapshot and reading the receipt. A requirement whose check cannot run — the live-router rehearsal without a router token — is recorded as deferred rather than passed, and the Phase-G review's level is set with that distinction in view.",
+      "approval": "The contract is approved under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The approving role is the Architecture Board and the accepting role is the SRO; the session that authored this pack is neither, and the record carries the approver's own decision rather than an inference from its silence.",
+      "manifest": "`acceptance/programme/S16.toml` is the manifest of record. Its gate checks name the baseline, the charter, the contract, the review, the waivers, the PI artefacts, the WBS deliverable, the demo credits, the lessons row, the product check, the artefact standard and the rework package count.",
+      "acceptance_at": "2026-11-28",
+      "retrospective": "This contract is written after delivery. It records the terms the project was built to, reconstructed from the slice plan, the shipped tests and the snapshot, and it explicitly does not claim that those terms were agreed before the build.",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+    }
+  },
+  "wbs_deliverable": {
+    "title": "A queryable cost record — one ledger row per model call carrying the prompt's identity, the token counts and both cache classes, with a blocking prompt audit",
+    "business_value": 9,
+    "time_criticality": 7,
+    "risk_reduction": 9,
+    "job_size": 8
+  },
+  "review": {
+    "level": "compliant",
+    "findings": "This retrospective Phase-G review records the level compliant for the record set it assesses under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The 2026-11-09 build was measured and re-read at the 2026-11-28 snapshot: the three tables exist with row-level security forced, the capture is the engine's single seam, the audit is a bounded procedure and the report groups by prompt sha. No contemporaneous lifecycle review or contract exists, and that absence is carried as the project's open record item rather than as non-conformance, because the pack supplies the set and the receipt is green on the fixed checks. The live-router rehearsal remains unproved and is recorded as deferred, not as met.",
+    "evidence": {
+      "manifest": "acceptance/programme/S16.toml",
+      "suite": "crates/actions/tests/inference_capture.rs",
+      "start_suite": "crates/actions/tests/inference_live.rs",
+      "resolver_suite": "crates/store/tests/inference_cache.rs",
+      "receipt": "docs/evidence/rework/S16.json",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+    }
+  },
+  "project_brief_output": "# Project Brief — S16 Inference Ledger and Prompt Audit (retrospective, 2026-11-28)\n\n## Outcome\n\nEvery model call the conveyor makes becomes a durable, tenant-scoped row carrying the prompt's identity, the token counts and the provider's prompt-cache classes, and a prompt audit sits on the publish path — so what a run cost and whether it was cached is a query rather than a guess.\n\n## Boundary\n\nS16 owns the three ledger tables, the engine capture seam and the audit procedure. It does not own a screen (S12 builds both), the inference router or the billing service (their usage is read, not replaced), a tenant-authored prompt store, AI-driven prompt repair, kata tables or a cadence configuration table.\n\n## Reuse sources\n\nThe engine seam `invoke_external` in `crates/actions/src/invoke.rs`, the action declaration pattern in `crates/actions/src/spec.rs`, the copilot system prompt in `crates/api/src/copilot/turns.rs`, the router's `Usage` schema, and the existing join targets `procedure`, `procedure_step`, `run_step` and `conversation_turn`.\n\n## Inception units\n\nFour: the Phase A set (stakeholders, drivers, requirements, concept), the Phase B capability map, the Phase C data entities and the Phase D standards. Each is one authored artefact in this pack and one reviewable unit for the Board.\n\n## Dependencies\n\nS02 and S03 supply the schema and the card model; S04 the registry and transport; S10 the conversation turn; S11 the procedure and step tables. S13 declares `captures_usage` when it lands, S12 builds the screens and S17 carries the two prune schedule rows.\n\n## Acceptance\n\n`acceptance/programme/S16.toml` at the pinned snapshot. The gate is the ledger plus the audit; the field-for-field capture check and the determinism check are the two that cannot be satisfied by a stub, and the first of them is currently proved on a stub only.\n\n## Capabilities\n\nThree: inference capture (a call becomes a row), prompt audit (a prompt becomes findings) and cost attribution (rows become an answer). Only the third is a read; the first two are writes on paths that already exist.\n\n## Plan\n\nThe work is complete and the record is being supplied retrospectively. The operative order was schema, seam, audit, report; the remaining work is the live-router rehearsal, which is a proof rather than a build, and the two prune schedules, which are S17's.\n",
+  "evidence_output": "# Evidence — S16 Inference Ledger and Prompt Audit (retrospective, 2026-11-28)\n\n## Claim\n\nS16 delivers an inference ledger and a prompt audit: one durable, tenant-scoped row per model call carrying the prompt's identity, the token counts and both cache classes, with a publish path that refuses a high prompt-audit finding absent a logged acknowledgement.\n\n## Evidence\n\nThe three tables with row-level security forced; the capture seam in `crates/actions/src/invoke.rs`; the suites `inference_capture`, `inference_live`, `prompt_audits`, `registry` and the store's cache constraint test; and the receipt `docs/evidence/rework/S16.json` read at the 2026-11-28 snapshot.\n\n## Verification\n\n`python3 scripts/verify-project.py --project S16 --snapshot <pinned>/data` reproduces the receipt, and `cargo test -p conveyor-actions --test inference_capture` reproduces the field-for-field check. Every libtest filter in the manifest is listed before it is run, because a filter that selects zero tests exits 0.\n\n## Links\n\n`docs/plans/slices/S16-inference-audit.md`, `acceptance/programme/S16.toml`, the Phase A–D artefacts in this pack's index document, and the tranche-7 exit record.\n\n## Gap\n\nThe live-router rehearsal is not proved: it needs a router token and is marked ignored, so the field-for-field property is evidenced against the router's schema and the seam rather than against a live provider response. The two prune schedules the ninety-day retention needs are S17's and are absent from the record.\n",
+  "closure": "S16 is re-closed through the gate the record carries: the project row is closed only after its charter, baseline, artefact set, registers, contract, WBS deliverable, Phase-G review, outputs and closure review exist, and the receipt on `acceptance/programme/S16.toml` is green at the pinned snapshot. The close records the pending live-router rehearsal and the deferred prune schedules as open risks, not as passes, and it does not claim a live capture proof the record does not hold.",
+  "closure_review": "# Closure Review — S16 Inference Ledger and Prompt Audit (retrospective, 2026-11-28)\n\n## Outcome vs acceptance\n\nThe outcome is a queryable cost record. Against the manifest's six requirements, five are proved at the snapshot and the sixth — field-for-field capture — is proved against the router's schema through a stub transport rather than a live provider. The retrospective level is compliant for the record set because the pack supplies the lifecycle and the receipt is green on every check the manifest can run, with the unproved half named here rather than absorbed.\n\n## Evidence\n\n`acceptance/programme/S16.toml` with its seventeen checks, the receipt `docs/evidence/rework/S16.json` at the pinned snapshot, the three table definitions with row-level security forced, and the five test targets the slice plan names. The live-router rehearsal's absence is itself evidenced: the test exists, is marked ignored and has not been run.\n\n## Open items\n\nThe live-router rehearsal, which needs a router token and a real provider response. The two prune schedule rows the ninety-day retention needs, which S17 carries. The `unknown` cache bucket's separation in any downstream aggregate, which is a report rule rather than a schema one and therefore has no check yet.\n\n## Decision\n\nClose the record set as compliant and keep the project closed, with the three open items carried into the tranche-7 review's risk section. The decision is a record decision: it asserts that the lifecycle now exists and is proved, and it explicitly does not assert that live capture has been demonstrated.\n"
+}

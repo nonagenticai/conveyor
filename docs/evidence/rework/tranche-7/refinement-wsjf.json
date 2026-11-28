@@ -1,0 +1,41 @@
+{
+  "schema": "conveyor-pi-refinement-wsjf/v1",
+  "tranche": 7,
+  "tranche_id": "01a1e9e1-0fab-7068-99f2-a233045b1276",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "period": "tranche-7",
+  "recorded_at": "2026-11-28",
+  "members": {
+    "S16": {
+      "business_value": 9,
+      "time_criticality": 7,
+      "risk_reduction": 9,
+      "job_size": 8
+    },
+    "S06c": {
+      "business_value": 8,
+      "time_criticality": 6,
+      "risk_reduction": 6,
+      "job_size": 8
+    },
+    "S15": {
+      "business_value": 10,
+      "time_criticality": 8,
+      "risk_reduction": 7,
+      "job_size": 13
+    }
+  },
+  "reordered": [
+    {
+      "item": "S16 first, then S06c, then S15",
+      "from": "the seed's membership order (S06c, S15, S16)",
+      "to": "S16, S06c, S15",
+      "why": "S16's product is fully in-tree and its receipt is the cheapest of the three to make green; S15's slice lane #9 (PR #949) is still open, so placing it last avoids a re-authoring cycle rather than creating one."
+    }
+  ],
+  "reestimate": {
+    "S16": "8 open packages (0 P0, 8 P1): charter, baseline, contract, review, seven artefacts, closure set",
+    "S06c": "8 open packages (0 P0, 8 P1): the same closure set against a second closed member",
+    "S15": "13 open packages: the same set plus the unpublished declared output and the active-member checks"
+  }
+}
