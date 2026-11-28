@@ -1,8 +1,8 @@
 # Tranche-12 readiness gate — measured 2026-11-28
 
-snapshot: `/tmp/snap-12` — 17 data files, 985 published outputs, taken from
-`issue/961-tranche-12` at `c9e45bd814c84103a0671a68bec2c2e79e2d2209`. The manifest's
-`generated_at` is `2026-11-28T16:03:37.920353Z`; it is **not** the run clock — the product derives
+snapshot: `/tmp/snap-12` — 17 data files, 987 published outputs, taken from
+`issue/961-tranche-12` at `16c4c7cd3f6166a66c87b8f0eb1ae7f57202889b`. The manifest's
+`generated_at` is `2026-11-28T16:10:15.857640Z`; it is **not** the run clock — the product derives
 it from the newest `updated_at` among the `documents` artefacts
 (`crates/pack/src/snapshot.rs::snapshot_generated_at`), so it pins the artefact set, not the
 instant. The run was made after the pack, the readiness inputs and the manifest were committed.

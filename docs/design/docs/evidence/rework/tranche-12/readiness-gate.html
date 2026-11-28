@@ -24,7 +24,7 @@
       >
     </header>
     <main class="doc-body"><h1 id="tranche-12-readiness-gate--measured-2026-11-28">Tranche-12 readiness gate — measured 2026-11-28</h1>
-<p>snapshot: <code>/tmp/snap-12</code> — 17 data files, 985 published outputs, taken from <code>issue/961-tranche-12</code> at <code>c9e45bd814c84103a0671a68bec2c2e79e2d2209</code>. The manifest's <code>generated_at</code> is <code>2026-11-28T16:03:37.920353Z</code>; it is <strong>not</strong> the run clock — the product derives it from the newest <code>updated_at</code> among the <code>documents</code> artefacts (<code>crates/pack/src/snapshot.rs::snapshot_generated_at</code>), so it pins the artefact set, not the instant. The run was made after the pack, the readiness inputs and the manifest were committed.</p>
+<p>snapshot: <code>/tmp/snap-12</code> — 17 data files, 987 published outputs, taken from <code>issue/961-tranche-12</code> at <code>16c4c7cd3f6166a66c87b8f0eb1ae7f57202889b</code>. The manifest's <code>generated_at</code> is <code>2026-11-28T16:10:15.857640Z</code>; it is <strong>not</strong> the run clock — the product derives it from the newest <code>updated_at</code> among the <code>documents</code> artefacts (<code>crates/pack/src/snapshot.rs::snapshot_generated_at</code>), so it pins the artefact set, not the instant. The run was made after the pack, the readiness inputs and the manifest were committed.</p>
 <h2 id="content-pack">Content pack</h2>
 <pre><code>rework-content-check: T15 content is consistent with the facts
 exit=0</code></pre>
@@ -44,17 +44,17 @@ exit=0</code></pre>
 <h2 id="record-readiness-replay-record-schema-110">Record readiness (replay record, schema 110)</h2>
 <ul>
 <li>Four <code>programme_cadence</code> rows at <code>period='tranche-12'</code>: <code>pi</code> <code>01a222e1-ece8-74d3-aa15-b2dd57f9be5f</code>, <code>refinement</code> <code>01a222e1-edb2-797f-9d93-80964422b34f</code>, <code>demo</code> <code>01a222e1-ee63-742d-a9ad-95624a5f87ea</code>, <code>retro</code> <code>01a222e1-ef0d-7bf9-8480-a0f4a64133ee</code>.</li>
-<li>The <code>pi</code> row (version 2) carries <code>meta.pi_plan</code> (scope T15, capacity, WIP limits, objectives O1–O3, the refinement cadence link and T15's three delivered dependency edges) and <code>meta.documents</code>: <code>pi-plan</code> <code>01a222e2-4939-767c-9536-4ca371526284</code>, <code>pi-objectives</code> <code>01a222e2-2b3e-72a8-b886-45d213dc0768</code> — both published, <strong>P0-scoped</strong> (<code>01a1dcb8-d24b-76de-b901-56fd56e001bc</code>) and <code>unit</code> <code>tranche-12</code>, read back from <code>documents.get</code> and carried by the snapshot's <code>outputs.js</code>.</li>
-<li>The <code>refinement</code> row (version 2) carries <code>meta.refinement.wsjf_inputs</code> — T15 8/5/8/8 — matching the pack's WBS integers and the <code>--wsjf</code> the checker ran with.</li>
+<li>The <code>pi</code> row (version 3) carries <code>meta.pi_plan</code> (scope T15, capacity, WIP limits, objectives O1–O3, the refinement cadence link and T15's three delivered dependency edges) and <code>meta.documents</code>: <code>pi-plan</code> <code>01a222e2-4939-767c-9536-4ca371526284</code>, <code>pi-objectives</code> <code>01a222e2-2b3e-72a8-b886-45d213dc0768</code> — both published, <strong>P0-scoped</strong> (<code>01a1dcb8-d24b-76de-b901-56fd56e001bc</code>) and <code>unit</code> <code>tranche-12</code>, read back from <code>documents.get</code> and carried by the snapshot's <code>outputs.js</code>.</li>
+<li>The <code>refinement</code> row (version 3) carries <code>meta.refinement.wsjf_inputs</code> — T15 8/5/8/8 — matching the pack's WBS integers and the <code>--wsjf</code> the checker ran with.</li>
 <li>The PI-plan gate is <code>approved</code> (approval <code>01a222e2-a316-723c-afae-0fdde7df187a</code>) as a <code>rule</code> decision under the standing delegation <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code>; the <code>pi</code> row's own state stays <code>awaiting_approval</code>, as tranches 8 and 9 do.</li>
 <li>The tranche lesson <code>01a222e2-d4e6-76fe-a524-32355e0e920d</code> is linked to the retro cadence with <code>finding_key k1</code> and two anchors (<code>acceptance/programme/T15.toml</code> and <code>docs/plans/T15/closure-review.md</code>); the statement records the measured manifest trap.</li>
 <li>Ten readiness acts are journaled (<code>docs/evidence/record/journal.jsonl</code>, 524 entries, <code>promote-record.py --check</code> green), with their inputs under <code>docs/evidence/record/inputs/tr12/</code>.</li>
-<li>The two PI documents were composed with the title "Pi Plan"/"Pi Objectives" and corrected in place by <code>documents.update</code> (same ids, version 2) to "PI plan"/"PI objectives"; the inputs and the journal carry the corrected title. The body and the unit were unchanged.</li>
+<li>The two PI documents were composed with the title "Pi Plan"/"Pi Objectives" and corrected in place by <code>documents.update</code> (same ids, version 2) to the house title, then their bodies were corrected (version 3) to the baseline's 3-package count; the inputs, the mirrors and the journal carry the final title and body. The unit was unchanged.</li>
 </ul>
 <p>The snapshot assertion in the issue's P1.1 passes:</p>
 <pre><code>python3 -c &#39;… msp.json readiness assertion …&#39;
 tranche-12 readiness: ok</code></pre>
-<h2 id="the-10-open-packages-and-the-route-that-clears-each">The 10 open packages and the route that clears each</h2>
+<h2 id="the-open-packages-and-the-route-that-clears-each">The open packages and the route that clears each</h2>
 <table>
 <thead>
 <tr>
@@ -70,11 +70,12 @@ tranche-12 readiness: ok</code></pre>
 <td>T15</td>
 <td>1</td>
 <td>2</td>
-<td>7</td>
-<td><code>project_in_unauthorised_tranche</code> by authorisation only (#755); <code>contract_missing</code> and <code>mandatory_artefacts</code> by the pack; the seven P2s by the pack's charter, baselines, registers, WBS, artefacts, contract, Phase-G review and closure</td>
+<td>0</td>
+<td><code>project_in_unauthorised_tranche</code> by authorisation only (#755); <code>contract_missing</code> by the delivery contract; <code>mandatory_artefacts</code> by the seven A–D artefacts, the SoAW, the charter and both declared output bodies</td>
 </tr>
 </tbody>
 </table>
+<p>The register at the baseline (<code>generated_at</code> <code>2026-11-28T12:46:29Z</code>, <code>git_sha</code> <code>4f771d53</code>) carries these 3 open packages. The 2026-11-25 receipt named 10: its seven P2 standard packages (change-control, project-baseline, project-registers, project-wbs, architecture-artifact, compliance-review, phase-g) are no longer open at this baseline, and the pack still authors their subjects.</p>
 <p>The P0 is not a pack's to discharge: only the programme owner's gate decision authorises the tranche, and the package clears when the audit next reports on an authorised tranche. The dry-run refusal below is construction's boundary, not a readiness failure.</p>
 <h2 id="batch-gate--the-expected-authorisation-precondition">Batch gate — the expected authorisation precondition</h2>
 <pre><code>$ python3 scripts/rework-batch.py --tranche 12 --snapshot /tmp/snap-12/data \
