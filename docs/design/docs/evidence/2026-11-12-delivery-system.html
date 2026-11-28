@@ -209,6 +209,57 @@
 <li>1 open PR: #36 (<code>lane/spec-v2</code>), with a closing reference.</li>
 </ul>
 <p>Commands: <code>gh issue list --state open --label unit --json number,labels</code>, <code>git ls-remote --heads origin</code>, <code>gh pr list --state open --json number,headRefName,body</code>.</p>
+<h2 id="re-measurement--2026-11-28-after-the-526-rework-landed">Re-measurement — 2026-11-28 (after the #526 rework landed)</h2>
+<p><strong>Reading:</strong> 2026-11-28T14:05:02Z–14:05:18Z, <code>main@f2d0bb608</code>. The record above is kept as written; this section is what changed since, and every number carries its command.</p>
+<h3 id="queue">Queue</h3>
+<ul>
+<li><code>gh issue list --label unit --state open --json labels</code> → <strong>21 open unit issues</strong>: 13 <code>status:claimed</code>, 4 <code>status:blocked</code>, 2 <code>status:needs-human</code>, 2 <code>status:ready</code>.</li>
+<li><code>gh issue list --label unit --state open --json number,labels</code> + <code>git ls-remote --heads origin 'issue/*'</code> + <code>gh pr list --state open --json number,headRefName</code> → <strong>2 label mismatches</strong>:</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Label</th>
+<th>Life</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>#9</td>
+<td><code>status:needs-human</code></td>
+<td>branch <code>issue/9-s15-strata-readback</code></td>
+<td>a live session paused for an owner decision; the branch is its claim</td>
+</tr>
+<tr>
+<td>#916</td>
+<td><code>status:claimed</code></td>
+<td>no branch, no PR</td>
+<td>a claim with nothing pushed; the board's 48 h rule reaps it</td>
+</tr>
+</tbody>
+</table>
+<p>Both belong to their owning sessions; this unit records them and edits neither.</p>
+<h3 id="branch-cleanup">Branch cleanup</h3>
+<ul>
+<li><code>git branch -r --merged origin/main | grep -E 'origin/(lane|slice)/'</code> → empty. Zero pushed <code>lane/*</code>/<code>slice/*</code> tips are ancestors of <code>origin/main</code>, so there is nothing to delete.</li>
+<li><code>git worktree list</code> (same reading) → the only checked-out <code>lane/*</code>/<code>slice/*</code> branches are <code>lane/gemba-walk-docs</code>, <code>slice/526-artefacts</code> and <code>slice/526-board</code>; all are unmerged live claims, and the protocol never deletes a live claim.</li>
+</ul>
+<h3 id="split-map-1">Split map</h3>
+<ul>
+<li><code>gh issue view 6|8|12|13 --json state</code> → #6 closed, #8 closed, #13 closed, #12 open (claimed).</li>
+<li>Each parent body carries the written "Split record (owner decision, 2026-11-11)": #6 keeps P1–P2 with siblings #26/#27/#28; #8 keeps P2–P6 with #29; #12 keeps P1–P5 with its live receipt #30; #13 keeps P1–P5 with the Tier-3 auditor #31. <code>docs/plans/03-DELIVERY.md:34-38</code> records the set.</li>
+</ul>
+<h3 id="adoption-and-p7">Adoption and P7</h3>
+<ul>
+<li><code>gh issue view 24 --json state</code> → CLOSED; <code>git ls-remote --heads origin refs/heads/lane/spec-v2</code> → no head, so the pre-public PR #36's branch is gone.</li>
+<li><code>git cat-file -e origin/main:docs/evidence/2026-11-12-delivery-system.md</code> → 0; this file exists (created by unit #26 after the 2026-11-12 record above was written).</li>
+</ul>
+<h3 id="s06d">S06d</h3>
+<ul>
+<li><code>git show origin/main:docs/plans/slices/S06d-connector-standard.md | head -3</code> → <code>status: built</code>; the queue carries no S06d remainder.</li>
+</ul>
 </main>
     <footer class="doc-footer">
       <span>Rendered from <code>docs/evidence/2026-11-12-delivery-system.md</code> at build time.</span>
