@@ -67,3 +67,26 @@ reachable only through a run's `allowed_actions` (CONTRACT §17).
 - `capabilities.get` `{ready, blocking[]}` and the `capability_agents` caps refusal wait on the S15
   owner's step-5 handlers (not built; it keeps step 5).
 - The catalogue → capability data move is unproven on a pre-existing DB (fresh-DB harness only).
+
+## Live action-path proof — 2026-11-28
+
+The S15 gate's claim — a capability bound to a published pack returns a hit carrying `pack` and
+`layer` — is now proven through the product path against the running compose `strata`, not a stub.
+`crates/actions/tests/strata_live_action.rs` (ignored by default) starts its own Postgres, publishes
+a pack as the platform owner (`0197a0c0-0000-7000-8000-0000000000a1`) through strata's owner routes
+(store → document with `provenance` → `POST /api/platform/packs` → publish), seeds the tenant's
+`strata_rag.token`, binds the pack with `capabilities.bind_knowledge`, and invokes `knowledge.query`.
+
+```sh
+CONVEYOR_STRATA_RAG_URL=http://127.0.0.1:8092 ~/.claude/scripts/cargo-guard.py test \
+  -p conveyor-actions --test strata_live_action -- --ignored --nocapture
+```
+
+Measured: **1 passed / 0 failed / 5 filtered out** (2.83 s). The returned pack is the run's own
+freshly published key — the key is unique per run:
+
+- `packs = ["s15-live-action-01a2227e794a769fa7cc34187ab6324a@1"]`
+- `hits[0].pack = "s15-live-action-01a2227e794a769fa7cc34187ab6324a@1"`
+- `hits[0].layer = "platform"`
+- the seeded capability code was `analysis`; `hits[0].scores.rerank = 0.94606936` (post-penalty,
+  and the hit made the `top_k` cut).
