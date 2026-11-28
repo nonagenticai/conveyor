@@ -2,7 +2,7 @@
   "schema": 1,
   "baseline": {
     "date": "2026-11-27",
-    "git_sha": "01544010f9ef4b86fb2d17aa8543e093588c0190",
+    "git_sha": "10e6531582ac698f304aec99b81ec0157caff9b8",
     "prior": {
       "routes": 52,
       "actions": 597,
@@ -10,16 +10,16 @@
     }
   },
   "counts": {
-    "routes": 52,
-    "actions": 598,
-    "attrs": 572,
+    "routes": 56,
+    "actions": 602,
+    "attrs": 576,
     "manual": 26
   },
   "provenance": {
-    "app_sha256": "28c7ead23b1071e8ce35fb3289afd2408429d6d4f0a814db4293e7436a27ace9",
-    "actions_sha256": "129429ca11b7ec8b504fe6e0927f3ea8654bc88b3675aac929c50fae94a6db4c",
-    "actions_json_sha256": "9c40fd32fe0ad2506ef9b4408204d3c11b8b3a45cac1c831723b2331442fa83b",
-    "scope_map_entries": 74
+    "app_sha256": "a07dd4a2e72e08d7d8d8b8ab398f536da8292856cec097596b75883c9120dbeb",
+    "actions_sha256": "d2a7653a5957a7904af800a81a2b22d437536649e3d3d04d52a75f0b5194afe3",
+    "actions_json_sha256": "ce0edd3d462f45afc35c2e8bf506640a3f36d3addb7424898ae100754a3b90dc",
+    "scope_map_entries": 76
   },
   "routes": [
     {
@@ -52,7 +52,7 @@
     {
       "pattern": "/architecture",
       "walk": "/architecture",
-      "view": "ArchitectureScreen",
+      "view": "SystemArchitectureScreen",
       "room": "governance",
       "owner": "S2",
       "spec": "e2e/procedures-governance/architecture.spec.ts",
@@ -151,7 +151,7 @@
     {
       "pattern": "/design/adm",
       "walk": "/design/adm",
-      "view": "AdmGate",
+      "view": "ArchitectureScreen",
       "room": "governance",
       "owner": "S2",
       "spec": "e2e/procedures-governance/adm.spec.ts",
@@ -257,6 +257,15 @@
       "status": "absent"
     },
     {
+      "pattern": "/feedback",
+      "walk": "/feedback",
+      "view": "FeedbackScreen",
+      "room": "utilities",
+      "owner": "S3",
+      "spec": "e2e/measure-operations-utilities/feedback.spec.ts",
+      "status": "absent"
+    },
+    {
       "pattern": "/improve",
       "walk": "/improve",
       "view": "Improve",
@@ -277,10 +286,37 @@
     {
       "pattern": "/knowledge",
       "walk": "/knowledge",
-      "view": "KnowledgeGate",
+      "view": "KnowledgeScreen",
       "room": "knowledge",
       "owner": "S3",
       "spec": "e2e/measure-operations-utilities/knowledge.spec.ts",
+      "status": "absent"
+    },
+    {
+      "pattern": "/knowledge/memory",
+      "walk": "/knowledge/memory",
+      "view": "MemoryScreen",
+      "room": "knowledge",
+      "owner": "S3",
+      "spec": "e2e/measure-operations-utilities/memory.spec.ts",
+      "status": "absent"
+    },
+    {
+      "pattern": "/knowledge/sources",
+      "walk": "/knowledge/sources",
+      "view": "SourcesScreen",
+      "room": "knowledge",
+      "owner": "S3",
+      "spec": "e2e/measure-operations-utilities/sources.spec.ts",
+      "status": "absent"
+    },
+    {
+      "pattern": "/measure",
+      "walk": "/measure",
+      "view": "MeasureScreen",
+      "room": "measure",
+      "owner": "S3",
+      "spec": "e2e/measure-operations-utilities/measure.spec.ts",
       "status": "absent"
     },
     {
@@ -3795,6 +3831,36 @@
       "timeout_ms": 30000,
       "scopes": [
         "events:read"
+      ],
+      "metadata_complete": true,
+      "status": "absent"
+    },
+    {
+      "name": "feedback.create",
+      "source": "attr",
+      "kind": "internal",
+      "effect": "write",
+      "confirm": "none",
+      "tenancy": "tenant",
+      "idempotent": true,
+      "timeout_ms": 30000,
+      "scopes": [
+        "feedback:write"
+      ],
+      "metadata_complete": true,
+      "status": "absent"
+    },
+    {
+      "name": "feedback.list",
+      "source": "attr",
+      "kind": "internal",
+      "effect": "read",
+      "confirm": "none",
+      "tenancy": "tenant",
+      "idempotent": true,
+      "timeout_ms": 30000,
+      "scopes": [
+        "feedback:read"
       ],
       "metadata_complete": true,
       "status": "absent"
@@ -7377,6 +7443,21 @@
       "status": "absent"
     },
     {
+      "name": "proofs.attest",
+      "source": "attr",
+      "kind": "internal",
+      "effect": "read",
+      "confirm": "none",
+      "tenancy": "tenant",
+      "idempotent": true,
+      "timeout_ms": 30000,
+      "scopes": [
+        "approvals:read"
+      ],
+      "metadata_complete": true,
+      "status": "absent"
+    },
+    {
       "name": "proofs.get",
       "source": "attr",
       "kind": "internal",
@@ -7417,6 +7498,21 @@
       "timeout_ms": 30000,
       "scopes": [
         "approvals:write"
+      ],
+      "metadata_complete": true,
+      "status": "absent"
+    },
+    {
+      "name": "proofs.render",
+      "source": "attr",
+      "kind": "internal",
+      "effect": "read",
+      "confirm": "none",
+      "tenancy": "tenant",
+      "idempotent": true,
+      "timeout_ms": 30000,
+      "scopes": [
+        "approvals:read"
       ],
       "metadata_complete": true,
       "status": "absent"

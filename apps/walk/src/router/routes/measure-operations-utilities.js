@@ -12,6 +12,13 @@ export default [
     load: () => import("../../destinations/approvals.js"),
   },
   {
+    walk: "/feedback",
+    app: "/feedback",
+    room: "utilities",
+    spec: "e2e/measure-operations-utilities/feedback.spec.ts",
+    load: () => import("../../destinations/feedback.js"),
+  },
+  {
     walk: "/evals",
     app: "/evals",
     room: "measure",
@@ -66,6 +73,27 @@ export default [
     room: "knowledge",
     spec: "e2e/measure-operations-utilities/knowledge.spec.ts",
     load: () => import("../../destinations/knowledge.js"),
+  },
+  {
+    walk: "/knowledge/memory",
+    app: "/knowledge/memory",
+    room: "knowledge",
+    spec: "e2e/measure-operations-utilities/memory.spec.ts",
+    load: () => import("../../destinations/memory.js"),
+  },
+  {
+    walk: "/knowledge/sources",
+    app: "/knowledge/sources",
+    room: "knowledge",
+    spec: "e2e/measure-operations-utilities/sources.spec.ts",
+    load: () => import("../../destinations/sources.js"),
+  },
+  {
+    walk: "/measure",
+    app: "/measure",
+    room: "measure",
+    spec: "e2e/measure-operations-utilities/measure.spec.ts",
+    load: () => import("../../destinations/measure.js"),
   },
   {
     walk: "/measure/prompt-audit",

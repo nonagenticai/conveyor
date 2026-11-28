@@ -1932,8 +1932,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/GEMBA-WALK.html",
       "source": "docs/plans/GEMBA-WALK.md",
       "section": "Plans",
-      "sha256": "fdc1bab6077df74c9df088ed049cc049177435c1418cccfcc124e84e98e24f10",
-      "bytes": 30770,
+      "sha256": "362fa3d61d80a436770a11c02b82f3d15539d7c348a6f05b2de51c2193ecf00b",
+      "bytes": 31172,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/GEMBA-WALK.md"
     },
     {
