@@ -121,7 +121,7 @@ export async function render(ctx) {
     status.textContent = "Loading capabilities…";
     clear(capabilityProblem);
     try {
-      const result = await ctx.api.invoke("capabilities.list", { page: { limit: 100 } });
+      const result = await ctx.api.invoke("capabilities.list", { limit: 100 });
       const items = rows(result.output);
       const previous = selectedCapabilityId;
       clear(capabilitySelect);
@@ -169,7 +169,7 @@ export async function render(ctx) {
         table(
           "Intake catalogue",
           ["Title", "Kind", "Status"],
-          items.map((asset) => [text(asset, "title", "name"), text(asset, "kind"), text(asset, "status")]),
+          items.map((asset) => [text(asset, "key", "id"), text(asset, "kind"), text(asset, "status")]),
           "sources-assets",
         ),
       );
@@ -186,7 +186,7 @@ export async function render(ctx) {
       status.textContent = "Name a knowledge query.";
       return;
     }
-    if (ctx.hasAction("capabilities.list") && selectedCapabilityId === "") {
+    if (selectedCapabilityId === "") {
       status.textContent = "Choose a capability; knowledge.query needs one.";
       return;
     }
