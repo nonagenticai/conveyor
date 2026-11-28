@@ -28,7 +28,7 @@
    "acceptance": "Empty evidence returns 422 gate_evidence_missing; a waiver is accepted only when approval_policy declares it, is stored on the approval, and increments the override metric read by the governance audit.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/spine_gates.rs::an_evidence_less_gate_is_refused",
     "evidence": "cargo test -p conveyor-actions --test spine_gates: 11 passed; also a_gate_with_evidence_opens, an_explicit_evidence_waiver_is_recorded"
    }
@@ -62,7 +62,7 @@
    "acceptance": "Accepting with evidence [] returns 422 wbs_acceptance_evidence_missing unless an approved approval row cites run/artefact evidence for each criterion.",
    "owner_project": "T1",
    "resolved_by": {
-    "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/plan_spine.rs::accepting_a_wbs_node_without_evidence_is_refused",
     "evidence": "cargo test -p conveyor-actions --test plan_spine: 14 passed"
    }
@@ -86,7 +86,7 @@
    "acceptance": "Inserting kind='change' with an impact lacking any of scope/schedule/cost/risk returns 422 change_impact_missing, enforced in the store and the DB constraint.",
    "owner_project": "T1",
    "resolved_by": {
-    "commit": "19231dec8f91835839f21ec92f1f75fcbbc61c85",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/spine_gates.rs",
     "evidence": "spine_gates 17/17. `a_change_with_no_impact_analysis_is_refused`: a change created with `meta.impact` `{}` is refused 422 change_impact_missing and writes no row, a raw INSERT bypassing the store is refused by the 0065 CHECK, and the same change with a `scope` delta is created 201; `a_change_impact_cannot_be_stripped_by_an_update`: an update replacing `meta` with `impact: {}` is refused 422 and neither meta nor version moves. `validate_change` requires a JSON object with at least one non-null scope/schedule/cost/risk key; `changes.request` now takes that typed block instead of an integer."
    }
@@ -120,7 +120,7 @@
    "acceptance": "After an approved baseline, WBS mutations return 409 rebaseline_requires_change unless an approved kind='change' references that baseline with an impact block.",
    "owner_project": "T1",
    "resolved_by": {
-    "commit": "16e095fd025366774419fd0b34481e192909b4d0",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/plan_spine.rs",
     "evidence": "plan_spine 19/19: after an approved baseline, wbs.create/update/delete return 409 rebaseline_requires_change without an approved kind='change' citing that baseline with an impact block; a project with no baseline is unchanged."
    }
@@ -149,7 +149,7 @@
    "acceptance": "work_package nodes require card_id and run.card_id is NOT NULL (or the store refuses cardless runs), proven by an insert without the link being refused.",
    "owner_project": "T1",
    "resolved_by": {
-    "commit": "b75651645a65ff6c24775291d3c187485ae81473",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/plan_spine.rs::a_work_package_without_a_card_is_refused; crates/actions/tests/plan_spine.rs::a_work_package_names_its_card_and_run; crates/store/tests/run_binding.rs::a_job_run_without_a_card_is_refused_before_the_insert",
     "evidence": "cargo test -p conveyor-actions --test plan_spine: 23 passed; --test spine_gates: 22; --test spine_msp: 10; --test togaf_close_gate: 4; --test programme_close: 21; -p conveyor-store --test run_binding: 3. wbs.create/pm.plan require the card on a work-package node (422 card_required), the node persists it, and the DB CHECK enforces both the work-package card and the job-run card."
    }
@@ -173,7 +173,7 @@
    "acceptance": "portfolio.in_flight returns projects and programmes in the configured in-flight set (an active programme with zero projects appears) and writes no portfolio row.",
    "owner_project": "T1",
    "resolved_by": {
-    "commit": "16e095fd025366774419fd0b34481e192909b4d0",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/plan_spine.rs",
     "evidence": "plan_spine 19/19: portfolio.in_flight returns a programmes array alongside the unchanged project items; an active programme with zero projects appears and a closed one does not; the action writes no row."
    }
@@ -207,7 +207,7 @@
    "acceptance": "A binding without a budget refuses run start (409/422 naming the missing budget); with a declared budget call N+1 returns 429 budget_exceeded before dispatch and the provider-call counter is unchanged.",
    "owner_project": "T11",
    "resolved_by": {
-    "commit": "8f1e57706a3c1efea6092a3f7b7edebb0facc594",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/tool_budget.rs",
     "evidence": "cargo test -p conveyor-actions --test tool_budget: 14 passed (2026-11-21). The router defaults to Enforce; an unbudgeted capturing call is 429 tool_budget_exceeded before dispatch; an internal-agent binding with no ceiling refuses runs.create 422 budget_missing; a priced call records its derived cost on tool_call."
    }
@@ -236,7 +236,7 @@
    "acceptance": "The usage report derives tool spend at read time and includes it at tenant and run levels; a priced tool_call appears in both totals in tests.",
    "owner_project": "T11",
    "resolved_by": {
-    "commit": "dbbeae4c80daf6af3da3348f8a7d7d32b19ba00c",
+    "commit": "fa0ba44ac",
     "test": "crates/store/tests/inference_.rs::tool_spend_is_derived_at_read_time_at_the_tenant_and_run_levels",
     "evidence": "Tool spend is a read-time CTE over tool_call in usage_rows_tx / usage_by_card_tx / usage_rows_for_bucket_tx; UsageRow gains tool_calls and tool_cost_usd at tenant and run levels; metrics.usage, run_drilldown and conveyor_cost share one TOOL_CALL_PRICE expression. Tests: the priced call appears in the day/project/run buckets and the tenant+run totals; an unpriced call contributes zero; a tool call never moves the inference-only total (inference_ 9/9, metrics 11/11). No stored cost column."
    }
@@ -265,7 +265,7 @@
    "acceptance": "The report returns each required level from the ledgers; a test rolls one call up to the job_binding primary department and its programme.",
    "owner_project": "T11",
    "resolved_by": {
-    "commit": "1e0a27922441fcbb66cbd715712169e33defc3bb",
+    "commit": "fa0ba44ac",
     "test": "crates/store/tests/inference_.rs",
     "evidence": "inference_ 6/6: UsageGroup now carries department, programme, job, run and step (11 dimensions); usage_rows_tx joins run->binding->primary department, run->project->programme, the binding, the run and the step with unattributed fallbacks, and the_extended_dimensions_group_by_programme_job_and_run proves the rows."
    }
@@ -294,7 +294,7 @@
    "acceptance": "The report returns an explicit other/unattributed bucket; a caller_kind='other' call is excluded from project totals and counted separately.",
    "owner_project": "T11",
    "resolved_by": {
-    "commit": "e1fbd15bfc547c99848adc32966c82552baf7dea",
+    "commit": "fa0ba44ac",
     "test": "crates/store/tests/inference_.rs",
     "evidence": "cargo test -p conveyor-store --test inference_ --test metrics_: 5 + 1 passed. An inference_call with caller_kind='other' and a run id appears under 'unattributed' in both the inference usage aggregate and metrics.usage; the project bucket no longer absorbs it."
    }
@@ -302,7 +302,7 @@
   {
    "id": "v1-p75-5",
    "resolved_by": {
-    "commit": "2a295c05f9c39157b513f955db1be6b1a106b37d",
+    "commit": "fa0ba44ac",
     "test": "apps/billing-shim/tests/rollup.rs::the_rollup_is_translated_and_reshaped; crates/actions/tests/metrics.rs::reconciliation_is_exact_or_opens_an_incident; crates/actions/tests/metrics.rs::a_malformed_billing_rollup_is_refused_not_read_as_zero",
     "evidence": "cargo-guard test -p conveyor-billing-shim: 7 passed; -p conveyor-actions --test metrics --test external_inventory: 14 passed; parity 7/7 (commit 054cc5f7, rebased here as 2a295c05). The declared billing.rollup action reads the Rust shim, the shim translates billing-service's six-dimension roll-up, and a differing total opens the incident"
    },
@@ -331,7 +331,7 @@
   {
    "id": "v1-p75-6",
    "resolved_by": {
-    "commit": "fbf2405fbd913947ad0fee96060eb6a3785cfcb4",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/tool_destinations.rs::billing_summary_is_the_ledger_figure; crates/actions/tests/metrics.rs::an_unpriced_period_refuses_an_exact_reconciliation",
     "evidence": "cargo-guard test -p conveyor-actions --test metrics --test tool_destinations: 20 passed on ce0ef5e7 (rebased here as fbf2405f, same content); the summary counts the unpriced call and reconcile refuses 422 unpriced_calls"
    },
@@ -386,7 +386,7 @@
    "acceptance": "phases_advance returns 409 missing_mandatory when the phase set is absent/empty/malformed; profile keys and values must validate against artifact_type keys and the four contract kinds; a profile_key that is not board-adopted is refused; add a test closing phase A with an empty profile and expect 409.",
    "owner_project": "T9",
    "resolved_by": {
-    "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/togaf_profile_gates.rs::an_absent_or_partial_profile_set_does_not_satisfy_the_gate",
     "evidence": "also a_draft_profile_cannot_govern_the_gate; togaf_profile_gates green"
    }
@@ -420,7 +420,7 @@
    "acceptance": "phases_advance(g) returns 409 unless a review exists on a live delivery contract for the project and, when level is non_conformant, an active unexpired waiver exists; the design gate action performs the same checks without the track exemption; tests cover programme track.",
    "owner_project": "T9",
    "resolved_by": {
-    "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/togaf_phase_g.rs::the_design_gate_requires_the_phase_g_review",
     "evidence": "also crates/actions/tests/togaf_close_gate.rs::a_programme_track_project_is_not_exempt_from_phase_g"
    }
@@ -454,7 +454,7 @@
    "acceptance": "Tailoring an adopted profile either returns 409 or resets status to draft requiring re-adoption; adopt_profile_tx requires an approved architecture_board approval whose meta identifies this profile; FK or EXISTS check added, with tests.",
    "owner_project": "T9",
    "resolved_by": {
-    "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/togaf_profile_gates.rs::an_adopted_profile_cannot_be_rewritten",
     "evidence": "also adoption_requires_an_approved_decision_about_this_profile"
    }
@@ -503,7 +503,7 @@
    "acceptance": "decide_board_tx returns 409 unless body status is active, except a subject_kind board self-approval; board approval refuses empty charter/commissioning_authority/members; contract approval resolves body_id from approval meta and requires active status; tests added.",
    "owner_project": "T9",
    "resolved_by": {
-    "commit": "ca05c8a429385f23f16d0259eb1632751b454a2f",
+    "commit": "fa0ba44ac",
     "test": "crates/store/tests/architecture_board.rs",
     "evidence": "decide_board_tx refuses a non-active body except a board self-decision, refuses an empty charter/commissioning_authority/members, and resolves the contract body from approval meta; architecture_board 3 passed/0 failed."
    }
@@ -537,7 +537,7 @@
    "acceptance": "artifacts_create requires non-null project_id and artifact_type_id (422 otherwise); link_artifacts_tx refuses when from/to differ in tenant or project, implemented as a JOIN in the INSERT/SELECT and covered by cross-tenant and cross-project tests.",
    "owner_project": "T9",
    "resolved_by": {
-    "commit": "c6f14b5967090f034aa85f4fedffc22b1b72f064",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/togaf_artifact_requirements.rs::an_artefact_without_a_project_is_refused",
     "evidence": "artifacts_create refuses 422 before any write when project_id or artifact_type_id is absent (crates/actions/src/architecture.rs); link_artifacts_tx is an INSERT..SELECT that joins both ends on tenant+project, so a cross-project or cross-tenant edge writes nothing and a legacy cross-project row is refused on replay. Suites at this commit: togaf_artifact_requirements 5/5, architecture_artifacts 8/8, architecture_board 7/7."
    }
@@ -576,7 +576,7 @@
    "acceptance": "H advance returns 409 unless exactly one review row with an outcome exists for the project and that review belongs to a live delivery contract; a second outcome row is refused by constraint; tests cover zero, two and G-attached outcomes.",
    "owner_project": "T9",
    "resolved_by": {
-    "commit": "c6f14b5967090f034aa85f4fedffc22b1b72f064",
+    "commit": "fa0ba44ac",
     "test": "crates/store/tests/architecture_board.rs::a_second_phase_h_outcome_is_refused_by_its_index",
     "evidence": "Phase H advance requires exactly one outcome-bearing compliance review for the project whose contract is live AND kind=delivery_contract (advance_phase_tx); 0107_architecture_integrity.sql adds the partial unique index architecture_compliance_review_one_outcome. Suites: architecture_board 7/7, togaf_h_change 6/6."
    }
@@ -615,7 +615,7 @@
    "acceptance": "A start gate refuses any tranche whose authorisation_review_id is NULL; evidence must cite existing baseline, benefit-status and risk-register row ids; seeded authorised/closed tranches carry a review row or are refused.",
    "owner_project": "T10",
    "resolved_by": {
-    "commit": "5ec72628d89e11c6d90c73be09ece2f9db28c546",
+    "commit": "fa0ba44ac",
     "test": "crates/store/tests/tranche_review.rs",
     "evidence": "cargo-guard test -p conveyor-store --test tranche_review: 13 passed, 0 failed, EXIT=0. The predecessor continue review authorises the start; an authorised state with no review and a pause review are refused; unknown, unapproved and foreign-programme ids are refused; the seed inserts every tranche planned."
    }
@@ -639,7 +639,7 @@
    "acceptance": "Completeness rejects empty/whitespace/non-measurement baselines and targets; realized requires a transition with baseline and post measurement values plus evidence, not timestamps alone.",
    "owner_project": "T10",
    "resolved_by": {
-    "commit": "472f23fc343f538b4505e5dea2be27be140341b1",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/benefit_lifecycle.rs::a_realized_status_needs_evidence_behind_the_readings",
     "evidence": "benefits.measure requires a numeric actual_value plus a non-blank, non-placeholder unit (422 benefit_measurement_invalid); migration 0077 adds the CHECK. benefits.update to realized requires the latest baseline and a post reading after enactment, each measured and evidenced (benefit_baseline_missing / benefit_post_measurement_missing / benefit_measurement_evidence_missing); timestamps alone refuse. benefit_lifecycle 17/17, benefit_evaluation 7/7, store benefit_transition 5/5."
    }
@@ -673,7 +673,7 @@
    "acceptance": "Roles are seeded as job_keys; benefit_owner_job_id must resolve to the BCM job; the seed uses insert_benefit_tx or supplies a real job id.",
    "owner_project": "T10",
    "resolved_by": {
-    "commit": "81a8b0ed2759947ef8baff4e31a88b6672fd8b1e",
+    "commit": "fa0ba44ac",
     "test": "crates/store/tests/seed_programme_definition.rs",
     "evidence": "The seed creates the programme_governance industry and sro/bcm/sponsoring_group/board jobs; every benefit owner_job_id and benefit_owner_job_id resolves to the bcm job; seed tests 5 and 4 passed/0 failed; check-programme-definition 6 benefits/49 projects OK."
    }
@@ -706,7 +706,7 @@
    "failure_scenario": "A tranche with baseline_ref NULL is reviewed continue and authorises the next tranche; alternatively it cites an unapproved management baseline. The management/governance/boundary trio is never recorded against the work it governs.",
    "acceptance": "A tranche cannot be authorised without cited baselines of the required kinds, each approved_by set; review evidence resolves to those ids.",
    "resolved_by": {
-    "commit": "45fa3eef7cea35f4352ce3d4b1b6f17aebf1ff14",
+    "commit": "fa0ba44ac",
     "test": "crates/store/tests/tranche_review.rs::a_tranche_baseline_must_be_approved_and_in_its_programme",
     "evidence": "cargo-guard.py test -p conveyor-store --test tranche_review: 14 passed"
    },
@@ -741,7 +741,7 @@
    "acceptance": "Every close requires an approved closure asset and gate; programme close requires an approved, published realisation plan naming measured post-closure ownership (a job), not free text.",
    "owner_project": "T10",
    "resolved_by": {
-    "commit": "c6f14b5967090f034aa85f4fedffc22b1b72f064",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/programme_close.rs::programmes_update_runs_the_closure_gate_before_closing",
     "evidence": "update_programme_tx runs the closure gate on a status='closed' transition (assert_programme_can_close_tx: an approved closure asset AND an approved/published realisation plan whose post_closure_owner parses as a job row id — free text is refused). Suites: programme_close 26/26, benefit_transition 6/6."
    }
@@ -765,7 +765,7 @@
    "acceptance": "Closure refuses unless approved scope, schedule and cost baselines exist, at least one accepted WBS deliverable exists, and the register kinds required by the project's standard are populated.",
    "owner_project": "T10",
    "resolved_by": {
-    "commit": "c6f14b5967090f034aa85f4fedffc22b1b72f064",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/programme_close.rs::close_refuses_without_a_schedule_baseline",
     "evidence": "assert_project_can_close now requires approved schedule and cost baselines besides scope, at least one accepted WBS deliverable, and non-empty risk/issue/assumption/dependency registers; each has its own refusal test (schedule, cost, deliverable, register kind). Suite: programme_close 26/26."
    }
@@ -799,7 +799,7 @@
    "acceptance": "coach.remedy dispatches the derived remedy through real actions (process_runs.start for retry, cards.move, repull trigger, block) and stores the resulting run/effect id; a test asserts the run or card actually changed.",
    "owner_project": "T4",
    "resolved_by": {
-    "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/coach.rs::an_injected_failure_plus_coach_remedy_changes_the_run_state",
     "evidence": "cargo test -p conveyor-actions --test coach: 20 passed; also a_remedy_whose_effect_fails_is_not_marked_remedied"
    }
@@ -833,7 +833,7 @@
    "acceptance": "A systemic finding opens a kata with named instrument and success threshold under the kata tenant; a kata candidate opens a development project or config-change path; measurement and a dual-control adoption approval block production until granted; tests exercise the full chain.",
    "owner_project": "T4",
    "resolved_by": {
-    "commit": "2fe0d30c329fb0cff252f7ff14972e274e9b7799",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/coach.rs::a_systemic_class_opens_one_measured_kata",
     "evidence": "The coach policy declares a kata pin (instrument_kind/id/version, held-out split + sha256, pre-registered prediction, base_ref) and the coach opens the kata rows through the kata capability with the interruption signature (coach.rs::a_systemic_class_opens_one_measured_kata asserts the kata row, its signature and instrument version, no documentation run). A policy without a complete pin escalates through a coach.kata gate and opens no kata (::a_systemic_class_without_a_pinned_instrument_escalates). Measurement and dual-control adoption the path hands to are proved in crates/actions/tests/kata_measure.rs::a_procedure_change_is_measured_on_the_held_out_split, crates/actions/tests/kata_adopt.rs::the_kata_cannot_approve_its_own_adoption. cargo test -p conveyor-actions --test coach: 22 passed."
    }
@@ -841,7 +841,7 @@
   {
    "id": "v1-p6-3",
    "resolved_by": {
-    "commit": "a463f0eacd00069b595af86673c348a2a69edbc6",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/metrics.rs::rework_rate_is_a_read_time_ratio_over_runs_and_approvals",
     "evidence": "metrics.flow exposes rework_count, total_count and rework_rate derived at read time over run and approval rows: a run is rework when run.attempt > 1 or an approval on its card is rejected; the ratio is rework_count / total_count and null at 0/0. The test proves 2/5 = 0.4, then 3/6 = 0.5 after a new attempt, an unscoped tenant read, and a zero-denominator project reporting null. `cargo test -p conveyor-actions --test metrics`: 12 passed."
    },
@@ -891,7 +891,7 @@
    "acceptance": "Every failed-run interruption either creates exactly one coach card or escalates/folds under the (card_id, signature) rule; a distinct signature is never suppressed by a card-level count or an unrelated live run.",
    "owner_project": "T4",
    "resolved_by": {
-    "commit": "8842195ff9adb21be6ef2ee9088e8b7eab4db533",
+    "commit": "fa0ba44ac",
     "test": "crates/api/tests/computed_set.rs::a_distinct_signature_is_never_suppressed_by_a_card_level_count",
     "evidence": "The per-card breadth cap and the live-run skip are removed from err.card and coach.interrupt; a fourth DISTINCT signature opens exactly one coach card (the test drives three distinct interruptions then a fourth and asserts the card, the run and four recorded interruptions), and the repeat signature still escalates (crates/actions/tests/coach.rs::a_repeat_signature_escalates_instead_of_a_second_card). Suites: coach 21 passed, computed_set 11 passed."
    }
@@ -930,7 +930,7 @@
    "acceptance": "Each §6.2 input kind (WIP breach, stale lease, gate timeout, board event) invokes coach.interrupt through a tested producer carrying its own signature.",
    "owner_project": "T4",
    "resolved_by": {
-    "commit": "fc020437f8046cf974ee45bb3db59d5f52324bc3",
+    "commit": "fa0ba44ac",
     "test": "apps/server/tests/approval_expire.rs::a_card_scoped_gate_timeout_opens_one_interruption",
     "evidence": "Both remaining producers are proven end to end at the worker. A card-scoped gate that expires unanswered opens exactly one interruption (trigger_kind=gate_timeout, failed_run_id NULL, signature gate_timeout|approval:<id>) with one coach card and one coach run, while a project-scoped gate opens none; a claim whose lease expires opens exactly one stale_lease interruption (signature stale_lease|card:<id>), clears assignee/expiry/token, and a second sweep adds none (apps/server/tests/lease_sweep.rs::a_stale_lease_opens_one_interruption). Each test fails with its producer loop removed — 'one expired card gate, one interruption: []' and 'one cleared lease, one interruption: []' (left 0, right 1) — and passes with it. The caller bypass is closed too: cards.move refuses internal_coach from any non-engine authority with 422 engine_only_input and the member is absent from the served schema (crates/actions/tests/coach.rs::a_public_move_cannot_hide_itself_from_the_coach). Suites: coach 27, approval_expire 2, lease_sweep 1 passed; clippy -D warnings."
    }
@@ -954,7 +954,7 @@
    "acceptance": "Card type coach is refused on the public create path, or coach cards must be created atomically with an interruption referencing them; a test proves an orphan is impossible.",
    "owner_project": "T4",
    "resolved_by": {
-    "commit": "8842195ff9adb21be6ef2ee9088e8b7eab4db533",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/coach.rs::a_coach_card_cannot_be_created_through_the_public_path",
     "evidence": "cards.create refuses the coach card type unless the internal, serde-skipped flag set only by coach.interrupt is present; the public path (dev:alice) gets 422 coach_card_internal and the board holds zero coach cards, while coach.interrupt still creates its card with the interruption in the same transaction."
    }
@@ -978,7 +978,7 @@
    "acceptance": "Materialisation stops at awaiting_approval; a named human approval is required before cards count as planned and the tick cannot bypass it.",
    "owner_project": "T10",
    "resolved_by": {
-    "commit": "8f1e57706a3c1efea6092a3f7b7edebb0facc594",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/pi_plan_approval.rs",
     "evidence": "cargo test -p conveyor-actions --test pi_plan_approval: 8 passed. A pending or rejected plan materialises nothing; an approved plan materialises exactly once inside the WIP slots; a service principal's decision cannot approve a plan."
    }
@@ -1012,7 +1012,7 @@
    "acceptance": "The five states are CHECKed and disallowed transitions are refused with 409 and covered by tests.",
    "owner_project": "T10",
    "resolved_by": {
-    "commit": "d7b7338346b672b3ea0013ee02e1aaf3f69be68c",
+    "commit": "fa0ba44ac",
     "test": "crates/store/tests/programme_cadence.rs",
     "evidence": "programme_cadence 5/5: migration 0064 CHECKs the state to the six values the code writes; cadence_move is consulted by the edit path, the approval gate and the materialiser, and an illegal jump is 409 cadence_illegal_transition. The CHECK was verified against a throwaway postgres:18."
    }
@@ -1046,7 +1046,7 @@
    "acceptance": "programme.shared_config exists with inheritance/lock semantics, resolved on read, and tests prove a locked value cannot be overridden per project.",
    "owner_project": "T10",
    "resolved_by": {
-    "commit": "a54d1f43b624539adcef18efdf716991715ace07",
+    "commit": "fa0ba44ac",
     "test": "crates/store/tests/programme_shared_config.rs::a_locked_programme_config_cannot_be_overridden_per_project",
     "evidence": "programme_shared_config 3 passed on the merged lane: migration 0068 adds the column and its shape CHECK; programmes.create/update/get/list carry shared_config; resolve_shared_config makes a locked programme key win over a project override; a flat object reads as values with no locks; a round trip through the programme row preserves the config. The migration-set test expects 68 and --check-lock passes after the lock was regenerated."
    }
@@ -1070,7 +1070,7 @@
    "acceptance": "The tick handles refinement, revalidates/re-scores the four inputs and flags stale backlog rows with evidence.",
    "owner_project": "T10",
    "resolved_by": {
-    "commit": "61fca7739498d6e2e2f18e40a1b2b29c080295bd",
+    "commit": "fa0ba44ac",
     "test": "crates/store/tests/refinement.rs::refinement_flags_unscored_and_aged_rows",
     "evidence": "refinement 2 passed at the merged lane: the cadence tick now consumes kind='refinement' (cadence.rs includes 'demo', 'retro', 'refinement'); refine_backlog_tx walks every open deliverable of the cadence's programme, revalidates the four typed WSJF inputs, flags a row that cannot score (negative value or zero job size), a row whose value inputs are all zero, and a row unmoved for stale_after_days (default 30) on meta.refinement with its reason, and clears the flag when a row scores again. The computed score is never stored."
    }
@@ -1094,7 +1094,7 @@
    "acceptance": "Backlog selection spans every project whose programme_id matches the cadence programme, with a two-project test.",
    "owner_project": "T10",
    "resolved_by": {
-    "commit": "c6f14b5967090f034aa85f4fedffc22b1b72f064",
+    "commit": "fa0ba44ac",
     "test": "crates/store/tests/programme_cadence.rs::the_backlog_spans_the_programme",
     "evidence": "The PI backlog query joins project on the cadence's programme_id instead of pinning the board's project, so a two-project programme drafts from both; still WSJF-ordered and card-free. Suite: programme_cadence 6/6."
    }
@@ -1118,7 +1118,7 @@
    "acceptance": "Lesson insert refuses empty evidence and a systemic retro finding emits a typed kata candidate with review state.",
    "owner_project": "T10",
    "resolved_by": {
-    "commit": "c6f14b5967090f034aa85f4fedffc22b1b72f064",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/demo_credit.rs::a_systemic_finding_opens_one_kata_candidate",
     "evidence": "propose_lesson_tx refuses an empty evidence array; a systemic retro finding carrying a job binding and a pre-registered prediction emits exactly one typed kata candidate (open_retro_candidate_tx, idempotent per signature) in the close transaction. Suites: demo_credit 13/13, retro 4/4."
    }
@@ -1142,7 +1142,7 @@
    "acceptance": "Portfolio exposes backlog+WSJF, cadence (PI/demo/retro), capacity and per-project metering panels fed by their real actions/rows, with fixtures only behind ?design=1.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "6b4ccc2ddd88ea80c00148ee496717990fe52c70",
+    "commit": "fa0ba44ac",
     "test": "docs/design/scripts/check-v2.cjs",
     "evidence": "The Portfolio destination now composes a WSJF backlog panel (ranked WBS rows), a cadence panel, a real capacity panel (WIP limits vs live cards) and a per-project metering panel from run rows, on both the console and public paths, with honest empty states and no fixture money. check-v2 281 checks; check-console: 0 unhandled page errors."
    }
@@ -1166,7 +1166,7 @@
    "acceptance": "Plan exposes a change-control tab showing change requests and decisions, with the create/approve path wired; the exclusion sentence is removed.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "d59ba796501103811e3aeff1292024407a0cda5a",
+    "commit": "fa0ba44ac",
     "test": "docs/design/scripts/check-v2.cjs",
     "evidence": "The plan destination now carries a Change control tab over the programme register's change rows (the fixture renders only in the design study); the 'T10 stays out of this surface' copy is replaced. check-v2: 281 checks, 0 errors."
    }
@@ -1195,7 +1195,7 @@
    "acceptance": "CONSOLE_PAGES includes 'programme' and dispatches it to the programme definition renderer; the link navigates in the console.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "d59ba796501103811e3aeff1292024407a0cda5a",
+    "commit": "fa0ba44ac",
     "test": "docs/design/scripts/check-console.cjs",
     "evidence": "studio.js's CONSOLE_PAGES now includes 'programme', so the sidebar and both Programme definition links resolve instead of staying on the previous page. check-console: 4 servers, 0 unhandled page errors, 412/401 paths rendered."
    }
@@ -1219,7 +1219,7 @@
    "acceptance": "A Dossier tab lists the programme's projects with tranche, state, baseline and evidence read from the programme/project store.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "4d68301aa5bb95d0028852ad5c884bbe7e33d9ea",
+    "commit": "fa0ba44ac",
     "test": "docs/design/scripts/check-v2.cjs",
     "evidence": "The programme definition gains a Dossier tab over real project rows: status, tranche joined from meta.tranche, project-filtered baseline (or 'not in this read'), and real document/evidence counts; the public path reads live.programme.projects. check-v2 281 checks; check-console 0 unhandled page errors."
    }
@@ -1243,7 +1243,7 @@
    "acceptance": "Live Metering renders tokens, derived cost, tool spend and budget utilisation and drills from tenant to run/step/tool call from the ledger rows.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "59df4b78ba5bfa2a9bdcec5d5f7473bc006058ef",
+    "commit": "fa0ba44ac",
     "test": "crates/store/tests/snapshot_measure.rs",
     "evidence": "The snapshot measure totals now carry cost_usd (D52 read-time price), tool_cost_usd and unpriced_calls; the Metering screen renders Cost / Tool spend / Unpriced calls. snapshot_measure 6/6 asserts one priced and one unpriced tool call at exact figures; check-v2 281 checks."
    }
@@ -1267,7 +1267,7 @@
    "acceptance": "The tab renders stakeholder profiles (name, role, influence, interest, disbenefits) from fixtures in study mode and from the store otherwise.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "d59ba796501103811e3aeff1292024407a0cda5a",
+    "commit": "fa0ba44ac",
     "test": "docs/design/scripts/check-v2.cjs",
     "evidence": "The Stakeholders tab renders live stakeholder profiles when present and a three-row study fixture otherwise, replacing the empty placeholder. check-v2: 281 checks, 0 errors."
    }
@@ -1330,7 +1330,7 @@
    "acceptance": "Pass one clock into both paths; test CLI bytes equal site_view bytes.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+    "commit": "fa0ba44ac",
     "test": "apps/server/tests/snapshot_deterministic.rs::the_live_view_and_the_cli_write_the_same_bytes",
     "evidence": "snapshot_deterministic: 4 passed; snapshot_generated_at is the one clock"
    }
@@ -1364,7 +1364,7 @@
    "acceptance": "Manifest every published data/output file and assert the directory set equals manifest.files.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "aa735094f7c2d0640ef63842fc35c33baa2d060e",
+    "commit": "fa0ba44ac",
     "test": "crates/pack/src/snapshot.rs",
     "evidence": "The manifest-only finalise rehashes the finished data dir (conformance, standards record, build-docs outputs) after the last generator; the shipped manifest went from 12 to 18 files and check-data.cjs (30 checks) now fails on any unlisted data/ file. pack 16/16 including manifest_only_rehashes_the_finished_pack."
    }
@@ -1388,7 +1388,7 @@
    "acceptance": "Confine writes to tmp and --delete the data sync; test the pack is untouched when the audit fails.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "aa735094f7c2d0640ef63842fc35c33baa2d060e",
+    "commit": "fa0ba44ac",
     "test": "docs/design/scripts/publish-data.sh",
     "evidence": "The data rsync now uses --delete, so a stale data file cannot survive a publish; the finalise runs after build-docs and before the copy, so the copied pack is the one hashed. publish_audit.sh green; snapshot tests 6/6."
    }
@@ -1417,7 +1417,7 @@
    "acceptance": "Resolve the registry per target tenant and record its provenance; reject a mismatch.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "27abea0202f09c621355591066eb567d6f2e4474",
+    "commit": "fa0ba44ac",
     "test": "crates/pack/tests/issue_registry.rs::issue_registry_must_name_this_tenant_and_is_hashed",
     "evidence": "The producer (be8076f5) writes issue-registry/v1 with provenance {tenant, source} and the committed registry carries it; the snapshot's read_issues refuses a missing provenance (IssuesProvenanceMissing) and a foreign tenant (IssuesTenantMismatch naming both) and stamps the accepted registry's issues array with its sha256; apps/server/src/publish.rs surfaces both through its permanent JobFailure mapping. `cargo test -p conveyor-pack --test issue_registry`: 1 passed."
    }
@@ -1451,7 +1451,7 @@
    "acceptance": "Redact and programme-filter rows before render_outputs and CSV; seeded-secret test covers HTML and CSV.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+    "commit": "fa0ba44ac",
     "test": "crates/pack/src/outputs.rs::tests::a_secret_in_an_output_never_reaches_the_page_or_the_index",
     "evidence": "cargo test -p conveyor-pack: 15 passed; conveyor-server snapshot_outputs: 6 passed (pages_csv_and_manifest_share_the_json_redaction_and_programme_filter)"
    }
@@ -1480,7 +1480,7 @@
    "acceptance": "Derive the window from cards/runs when project_activity is absent (as v2.js consoleActivity does), or publish the row; add a fixture proving one bar.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "de0fefe9f7b5abf39140d92a53a4ae1b5b8df43f",
+    "commit": "fa0ba44ac",
     "test": "docs/design/scripts/check-console.cjs",
     "evidence": "node docs/design/scripts/check-console.cjs green twice; assertions at lines 3865-3888; each mutation-checked"
    }
@@ -1514,7 +1514,7 @@
    "acceptance": "Bind spend to published fields or show tenant totals as explicitly unattributed; add priced, unpriced and zero fixtures.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "de0fefe9f7b5abf39140d92a53a4ae1b5b8df43f",
+    "commit": "fa0ba44ac",
     "test": "docs/design/scripts/check-console.cjs",
     "evidence": "node docs/design/scripts/check-console.cjs green twice; assertions at lines 3891-3908; each mutation-checked"
    }
@@ -1548,7 +1548,7 @@
    "acceptance": "Apply the active/paused plus board-or-card predicate; a fixture proves a closed standalone project is absent.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "de0fefe9f7b5abf39140d92a53a4ae1b5b8df43f",
+    "commit": "fa0ba44ac",
     "test": "docs/design/scripts/check-console.cjs",
     "evidence": "node docs/design/scripts/check-console.cjs green twice; assertions at lines 3910-3914; each mutation-checked"
    }
@@ -1577,7 +1577,7 @@
    "acceptance": "Render all profiles or print 'showing 8 of N'; add a fixture with more than eight benefits.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "de0fefe9f7b5abf39140d92a53a4ae1b5b8df43f",
+    "commit": "fa0ba44ac",
     "test": "docs/design/scripts/check-console.cjs",
     "evidence": "node docs/design/scripts/check-console.cjs green twice; assertions at lines 3916-3918; each mutation-checked"
    }
@@ -1611,7 +1611,7 @@
    "acceptance": "Cap or paginate lanes and the archived column with a 'show N more' control; add a fixture with more than 50 cards in one lane.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "de0fefe9f7b5abf39140d92a53a4ae1b5b8df43f",
+    "commit": "fa0ba44ac",
     "test": "docs/design/scripts/check-console.cjs",
     "evidence": "node docs/design/scripts/check-console.cjs green twice; assertions at lines 3920-3941; each mutation-checked"
    }
@@ -1645,7 +1645,7 @@
    "acceptance": "Publishing over a department whose required kind has no resolvable value returns 409 release_not_ready with the kind and department named; two sibling departments declaring one kind at different values return 422 department_conflict; the release snapshot records the resolved layer values and their sources, and a successful publish is reproducible byte-for-byte.",
    "owner_project": "T0",
    "resolved_by": {
-    "commit": "8f1e57706a3c1efea6092a3f7b7edebb0facc594",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/release_layers.rs",
     "evidence": "cargo test -p conveyor-actions --test release_layers: green in the 8f1e5770 wave. A release missing a knowledge layer refuses release_not_ready and conflicting department layers refuse department_conflict."
    }
@@ -1674,7 +1674,7 @@
    "acceptance": "Only a gated approval action can move a change row to approved; registers.update refuses a caller-supplied status of approved (422/409 change_requires_approval). take_baseline_guarded requires an approval row with a decider distinct from the requester, not a status string, and a negative test proves the direct update is refused.",
    "owner_project": "T1",
    "resolved_by": {
-    "commit": "19231dec8f91835839f21ec92f1f75fcbbc61c85",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/spine_gates.rs",
     "evidence": "spine_gates 17/17. `a_change_status_cannot_be_written_approved`: `registers.update` with `status: approved` on a change is refused 422 approval_gate_only and the row stays `open` at the same version; `a_self_declared_approved_change_cannot_advance_a_baseline` and `an_approved_change_gate_advances_the_baseline` show the baseline guard reads the approved `change` gate (`approved_change_for_baseline_tx`), never the register status, and the decision writer refuses the requester as decider."
    }
@@ -1703,7 +1703,7 @@
    "acceptance": "An activation/curation action moves draft→active with a version and gate; job_releases.publish on a draft or retired job returns 409 job_not_live; publish on an active job succeeds; a test proves draft publication is refused.",
    "owner_project": "T0",
    "resolved_by": {
-    "commit": "c472dff946874ab98dc9dedf975b3b6a1755f946",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/job_activation.rs::a_draft_job_cannot_be_published; crates/actions/tests/job_activation.rs::an_approved_activation_flips_draft_to_active_then_publish_succeeds",
     "evidence": "cargo test -p conveyor-actions --test job_activation: 7 passed; --test release_layers: 6 passed; --test sop_ingestion: 13 passed. A job is born draft, activation opens a job_activation gate and the requester cannot decide it; only an active job publishes a release or is pinned by a binding (409 job_not_live)."
    }
@@ -1732,7 +1732,7 @@
    "acceptance": "A run that executes conveyor job work requires job_binding_id; an insert with no binding on the job path is refused before the INSERT (409/422 binding_required). Runs that are not job runs are explicitly typed and excluded from the job executor path. A test asserts no job run row can exist with NULL job_binding_id.",
    "owner_project": "T0",
    "resolved_by": {
-    "commit": "fd44c64b6aa10ae538702ae3c055d501caa0c433",
+    "commit": "fa0ba44ac",
     "test": "crates/store/tests/run_binding.rs::a_job_run_without_a_binding_is_refused_before_the_insert; crates/actions/tests/card_binding.rs::a_run_on_an_unbound_card_is_refused",
     "evidence": "cargo test -p conveyor-store --test run_binding: 3 passed; --test transitions: 4; --test s11_process: 14; -p conveyor-actions --test card_binding: 8; --test executor_runtime: 8; --test parity_http_mcp: 7. run.kind is typed, the DB CHECK refuses a job row with no binding, the store refuses pre-INSERT (422 binding_required), and a child inherits its parent's kind."
    }
@@ -1800,7 +1800,7 @@
    "acceptance": "The invoke gate rejects an `ops.*` destructive call unless the approval has `required_decisions >= 2` with two distinct approvers and a recorded dry-run for the same action and target precedes the real call; tests cover a single-decision approval and a no-dry-run call being refused.",
    "owner_project": "T7",
    "resolved_by": {
-    "commit": "ca155fada6f28e72e2afc8e8516d81f0ac67c6f5",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/destructive_gate.rs",
     "evidence": "The invoke gate now refuses an ops destructive call whose approval has fewer than two decisions (dual_control_required) or fewer than two distinct approvers (dual_control_not_met), and refuses a real call with no recorded dry run of the same action and input (dry_run_required). The dry run is an ok action_invocation row matched by the engine's canonical request hash; ops.mitigate proves its inner verb. destructive_gate.rs::an_ops_destructive_call_needs_dual_control_and_a_dry_run covers the single-decision refusal, the no-dry-run refusal and the recorded-dry-run pass; ops_write.rs::the_write_reads_back records the dry run and then runs the real write. 30 tests pass across destructive_gate, ops and ops_write at ca155fada."
    }
@@ -1834,7 +1834,7 @@
    "acceptance": "Role authority resolves from tenant rows (meta-role x action, narrowed by the binding); a delivery binding calling `coach.remedy` or `projects.baseline` is refused unless the tenant granted it; `required_decisions` and approver kind come from a tenant gate-policy row and `pm.route_gate` cannot lower them; tests cover a tenant override and the unconfigured default.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "b9648dcc72006764aa5c0fadc25dbc1e9058d0ab",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/job_authority.rs::an_unconfigured_delivery_binding_cannot_call_coach_remedy; crates/actions/tests/gate_policy.rs::approvals_request_cannot_lower_the_change_gate_floor",
     "evidence": "cargo test -p conveyor-actions --test job_authority: 4 passed; --test gate_policy: 3 passed; -p conveyor-store job_authority: 8 passed; registry 15; parity 7; tool_budget 14; --check-lock exit 0. The U5 audit found the floor only clamped in pm.route_gate; b9648dcc closes approvals.request too, with the audit's scenario as a regression test."
    }
@@ -1868,7 +1868,7 @@
    "acceptance": "ladder.record refuses rung='human' unless the actor is a person and the cited approval has an accepted approval_decision bound to this decision; ladder.apply_draft requires an accepted decision of a dedicated draft-application gate kind (and/or the document's prompt_sha256/inference_call_id) and refuses a generic or pending approval; tests prove a pending approval and an unrelated accepted laya decision both cannot gate a draft.",
    "owner_project": "T2",
    "resolved_by": {
-    "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/ladder_human_gate.rs::a_service_principal_cannot_record_a_human_decision",
     "evidence": "also only_a_human_draft_apply_decision_can_gate_a_draft; crates/actions/tests/decision_ladder.rs 7 passed"
    }
@@ -1902,7 +1902,7 @@
    "acceptance": "The L1 path performs the laya request itself (or records a verified laya call id) and derives answer, confidence, probabilities and measured latency from the response; a laya-rung decision without that provenance is refused; a test posts a confidence directly and proves it cannot produce rung='laya'.",
    "owner_project": "T2",
    "resolved_by": {
-    "commit": "864e71c45ce4b95f33dd9d9551901d826db17966",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/decision_ladder.rs::a_confidence_posted_directly_cannot_produce_a_laya_decision",
     "evidence": "Suites green at merged head b68307bf: decision_ladder 16 (a_confidence_posted_directly_cannot_produce_a_laya_decision, a_laya_decision_derives_its_fields_latency_and_provenance_from_the_response, a_forged_laya_key_is_refused, a_tampered_laya_request_does_not_verify), ladder_human_gate 10, judge 11, registry 12 (529 actions), parity_http_mcp 7, s07_schema 3, prune 17, and the four ladder::laya unit tests. Migration 0069 adds the laya provenance; v1-w1c-4 stays open (decision_option shape, next ladder card)."
    }
@@ -1936,7 +1936,7 @@
    "acceptance": "option sets are authored/versioned rows resolved by policy+question, the evaluate action references the set (and a real version), and the answer must equal one of that set's keys or the action returns 422; tests cover an answer outside the set and a caller trying to pass its own option list.",
    "owner_project": "T2",
    "resolved_by": {
-    "commit": "78cdf4ebbaabbdafbc547fbfd4cdb68c526acf7a",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/decision_ladder.rs::a_caller_cannot_supply_its_own_options",
     "evidence": "Option sets are authored and versioned rows (`decision_option_set`/`decision_option_entry`, tenant sets shadowing the library set, refinements pinning `base_hash`), the evaluate action resolves the set by policy+question and pins its real version, and an answer outside the set is refused 422 `answer_not_in_set` with no laya row written. decision_ladder 22/22 at merged head 7b4b9a0: a_tenant_option_set_shadows_the_library_set, a_hidden_option_is_absent_from_the_wire, a_decision_pins_the_option_set_version_it_read, a_caller_cannot_supply_its_own_options, a_refinement_whose_base_changed_is_refused."
    }
@@ -1970,7 +1970,7 @@
    "acceptance": "A gate_unavailable path exists on the ladder that records the outage and applies fail_policy (closed => refused, open => the policy action), with a test for an unreachable laya on both a closed and an open policy; open with annotate must record the note, closed must record the refusal.",
    "owner_project": "T2",
    "resolved_by": {
-    "commit": "bfbfa65a2cea55bc2e3e6e2528bbfca6dce59705",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/decision_ladder.rs::a_closed_laya_outage_records_a_refused_unavailable_decision; crates/actions/tests/decision_ladder.rs::an_open_laya_outage_records_its_action_and_annotate_note",
     "evidence": "cargo test -p conveyor-actions --test decision_ladder: 25 passed. A laya outage returns 503 gate_unavailable and records one unavailable decision after the handler rollback, applying fail_policy: closed records the refusal, open records the policy action and the annotate note."
    }
@@ -1978,7 +1978,7 @@
   {
    "id": "v1-w1c-6",
    "resolved_by": {
-    "commit": "b8eb6e4c9aec6eb23c0b044b59cdafcddb374162",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/knowledge_binding.rs::a_pack_bound_capability_returns_a_hit_carrying_pack_and_layer; crates/actions/tests/metrics.rs::flow_recomputes_and_knowledge_rates_are_null_without_rows",
     "evidence": "cargo-guard test -p conveyor-actions --test metrics: 14 passed; --test knowledge_binding: 4 passed; -p conveyor-store --test s07_schema: 3 passed at e41d7cf6. Migration 0104 writes one retrieval row per query; metrics.flow reports knowledge_pack_hit_rate and knowledge_lesson_promotion_rate from real rows, null without a denominator"
    },
@@ -2038,7 +2038,7 @@
    "acceptance": "A phase with no explicit profile entry falls back to the standard's mandatory artifact_type set for that phase/plateau (or the profile is refused as un-tailored at adoption); advancing B with no approved Business Service/Function is refused by architecture_artifact_missing.",
    "owner_project": "T9",
    "resolved_by": {
-    "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/togaf_profile_gates.rs::an_absent_or_partial_profile_set_does_not_satisfy_the_gate",
     "evidence": "also a_draft_profile_cannot_govern_the_gate; mandatory_sets_tx joins artifact_type.mandatory"
    }
@@ -2067,7 +2067,7 @@
    "acceptance": "Adoption refuses unless the id names an approval row with gate='architecture_board', status='approved', subject_kind='adm_profile' and subject_id = this profile id; the migration carries the FK and a NOT NULL board_decision_id for status='adopted'.",
    "owner_project": "T9",
    "resolved_by": {
-    "commit": "c6f14b5967090f034aa85f4fedffc22b1b72f064",
+    "commit": "fa0ba44ac",
     "test": "crates/store/tests/architecture_board.rs::an_adopted_profile_needs_an_existing_board_decision",
     "evidence": "The action-level check already required an approved architecture_board decision about the profile; 0107_architecture_integrity.sql now carries it at the table: adm_profile_board_decision_fk references approval(id) and adm_profile_adopted_needs_decision refuses status='adopted' with no decision. Verified viable against the single live adopted profile before adding. Suite: architecture_board 7/7."
    }
@@ -2091,7 +2091,7 @@
    "acceptance": "A superseded contract must belong to the same project (and kind/phase) as the new one, else 409; a failed check writes neither the retirement nor the new row.",
    "owner_project": "T9",
    "resolved_by": {
-    "commit": "c6f14b5967090f034aa85f4fedffc22b1b72f064",
+    "commit": "fa0ba44ac",
     "test": "crates/store/tests/architecture_board.rs::a_supersede_across_projects_is_refused_and_writes_neither_row",
     "evidence": "request_contract_tx now reads the superseded contract's project before any write and refuses a mismatch (409) so neither the retirement nor the replacement is written; the same-project revision path is unchanged. Suite: architecture_board 7/7."
    }
@@ -2125,7 +2125,7 @@
    "acceptance": "phase_progress counts only status='approved' artefacts and status='live' contracts (matching advance_phase_tx), so a phase reported `evidenced` is one the gate would also close.",
    "owner_project": "T9",
    "resolved_by": {
-    "commit": "c6f14b5967090f034aa85f4fedffc22b1b72f064",
+    "commit": "fa0ba44ac",
     "test": "crates/store/tests/snapshot_measure.rs::only_approved_artefacts_and_live_contracts_evidence_a_phase",
     "evidence": "phase_progress counts only status='approved' artefacts and status='live' contracts (matching advance_phase_tx); project listing still reads every contract. Suite: snapshot_measure 7/7."
    }
@@ -2159,7 +2159,7 @@
    "acceptance": "For a project whose programme_id is set, a missing tranche row returns 409 tranche_not_authorised (only programme_id NULL may pass); an integration test creates a programme with zero tranches and asserts project start is refused.",
    "owner_project": "T10",
    "resolved_by": {
-    "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/spine_gates.rs::a_project_outside_its_programme_tranche_plan_cannot_start",
     "evidence": "also a_programme_without_a_tranche_plan_keeps_its_legacy_allowance"
    }
@@ -2193,7 +2193,7 @@
    "acceptance": "benefits.create and benefits.update refuse 400 benefit_profile_incomplete unless capabilities is a non-empty array and operational_area is non-blank after trim, in addition to the four measurement fields.",
    "owner_project": "T10",
    "resolved_by": {
-    "commit": "5cc321144ff68470aa24ab9bf05b65bf0b9124b5",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/benefit_lifecycle.rs",
     "evidence": "cargo test -p conveyor-actions --test benefit_lifecycle: 13 passed, including a_benefit_without_capabilities_or_an_area_is_refused and a_placeholder_baseline_is_refused (422 benefit_profile_incomplete naming both gaps). spine_msp 10, plan_spine 14 and the parity sample are green with the two fields present."
    }
@@ -2227,7 +2227,7 @@
    "acceptance": "benefits.link resolves output_ref to an existing wbs_node id in the same programme (refusing a non-uuid or a node from another programme), or the dependency-slip path returns an error when an edge names no node instead of silently returning an empty list.",
    "owner_project": "T10",
    "resolved_by": {
-    "commit": "7a38afacb49313738fd939218b27857d1cde419e",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/plan_spine.rs",
     "evidence": "plan_spine 17/17 and spine_msp 10/10: a benefit link with a non-UUID output_ref or a node from another programme is 422 benefit_output_unresolved before any row; a node in the benefit's programme is stored as the canonical id; the dependency-slip path now refuses an edge that names no node."
    }
@@ -2261,7 +2261,7 @@
    "acceptance": "A demo cadence refuses to credit/accept a completed deliverable without a typed evidence reference exhibited at that demo, and a retro action writes lessons plus kata candidates linked to the retro cadence row; tests cover the refused credit and the written lessons.",
    "owner_project": "T10",
    "resolved_by": {
-    "commit": "e9aac5637f9a4003c81e30d484fe8565d4cfb221",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/demo_credit.rs::a_retro_close_writes_the_lesson_and_a_systemic_candidate",
     "evidence": "demo_credit 12 passed / 0 failed and demo_gate 1 passed on the merged lane. Typed evidence is required: a blank, null or empty-object reference is demo_evidence_untyped; an accepted deliverable must carry its evidence. close_retro_tx writes the lesson from the finding's statement and evidence; a systemic finding carries lesson.meta.kata_candidate = {signature,title,rationale,target_ref,prediction:null} and no kata is opened (an unmeasurable kata is never fabricated); cadences.update cannot close a retro — retros.close is the only path."
    }
@@ -2295,7 +2295,7 @@
    "acceptance": "The baseline guard resolves approval through the approval table (gate='change', status='approved', meta.change_id matches), not the row status; register create/update refuse status='approved' for change rows (approval is only a gate effect). A test that self-declares approved and re-baselines must be rejected.",
    "owner_project": "T3",
    "resolved_by": {
-    "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/spine_gates.rs::a_self_declared_approved_change_cannot_advance_a_baseline",
     "evidence": "also a_register_cannot_be_born_approved, an_approved_change_gate_advances_the_baseline"
    }
@@ -2324,7 +2324,7 @@
    "acceptance": "Trace ends include run, step, artefact and evidence (tenant-resolved), and a bounded governance view action returns requirement → cards → runs → steps/artefacts/evidence for a requirement or run; tests build the chain and read it back.",
    "owner_project": "S07",
    "resolved_by": {
-    "commit": "5968c53d4b08774cc504bd5075c9b2bd3eb86bd8",
+    "commit": "fa0ba44ac",
     "test": "crates/store/tests/s07_store.rs::the_trace_view_walks_requirement_to_run_step_artefact_and_evidence",
     "evidence": "cargo test -p conveyor-store --test s07_store: 6 passed (the view walks requirement -> cards -> run -> step -> artefact -> evidence and refuses an unknown root); conveyor-actions parity_http_mcp: 7 passed over 620 actions; conveyor-api s07_requests: 16 passed"
    }
@@ -2353,7 +2353,7 @@
    "acceptance": "Creation of a work package/card for an architecture-governed project refuses with 409 unless it carries a trace link to an approved requirement or architecture asset, writing the edge in the same transaction; a test asserts the orphan is refused and the linked creation succeeds.",
    "owner_project": "S07",
    "resolved_by": {
-    "commit": "c6f14b5967090f034aa85f4fedffc22b1b72f064",
+    "commit": "fa0ba44ac",
     "test": "crates/api/tests/s07_requests.rs::an_orphan_card_in_a_governed_project_is_refused_and_writes_nothing",
     "evidence": "cards.create on a board whose project type is 'architecture' refuses 409 card_trace_link_required unless it carries a trace link to an APPROVED governed requirement/ADR (card_trace_link_unapproved otherwise), and writes the edge in the card's transaction. System records (coach cards, ops/reconciliation incidents) are exempt through non-serialisable internal flags, not through anything a public caller can set. Suites: s07_requests 15/15."
    }
@@ -2382,7 +2382,7 @@
    "acceptance": "andon.release returns 403 unless ctx.actor_kind == \"user\"; a test asserts a machine principal holding andon:write is refused while a user succeeds, and the andon.released event carries the principal kind.",
    "owner_project": "T7",
    "resolved_by": {
-    "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/andon_release.rs::a_machine_cannot_release_the_andon_cord_but_a_person_can",
     "evidence": "andon_release: 4 passed"
    }
@@ -2421,7 +2421,7 @@
    "acceptance": "An incident may record mitigation as 'no action required' with a reason (no cluster write, no mitigated write recorded) and may then be postmortemed and resolved; a test asserts a zero-write incident reaches resolved with a postmortem and, when systemic, exactly one kata candidate.",
    "owner_project": "T7",
    "resolved_by": {
-    "commit": "ca155fada6f28e72e2afc8e8516d81f0ac67c6f5",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/ops.rs",
     "evidence": "An incident may record a no-action mitigation with a reason (ops.mitigate with no_action_required: true and a non-empty reason), then be postmortemed and resolved. ops.rs::a_zero_write_incident_resolves_with_a_postmortem_and_one_kata opens and triages an incident, records the no-action mitigation (zero cluster writes: the stub sees no PATCH), writes a systemic postmortem (exactly one kata candidate) and resolves the incident; 11 tests pass in ops.rs at ca155fada."
    }
@@ -2460,7 +2460,7 @@
    "acceptance": "Each §10.5 destination has a live route and Sidebar entry (Organisation, Procedures, Authoring, Portfolio, Programme, Plan, Improve, Operations), each landing on a real screen; or an owner-approved scope cut records the deferral in SPEC_V2 §10.5.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+    "commit": "fa0ba44ac",
     "test": "apps/web/e2e/programme.spec.ts",
     "evidence": "apps/web/src/app.rs carries routes and sidebar entries for Organisation, Authoring, Portfolio, Programme, Plan, Improve and Operations, and the e2e specs for organisation/programme/improve exist; the destination coverage resolves them."
    }
@@ -2499,7 +2499,7 @@
    "acceptance": "authoring.intake|draft|review|publish and authoring.assets are registered ActionSpecs with handlers, appear in served-spec.lock.json and the MCP manifest, and a registry test asserts the five names; or SPEC_V2 §10.4 is amended by owner decision naming the replacement family.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "8b4cae479391bf2d374bdf5ef4213e83dd265eef",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/authoring.rs",
     "evidence": "The five declared actions are registered ActionSpecs with handlers: authoring.intake, authoring.draft, authoring.review, authoring.publish and the authoring.assets read (registry 12/12 at 517 actions, 504 internal / 13 external; the served-spec lock carries all five operations and --check-lock is exit 0). The engine is migration 0066 (authoring_intake, authoring_asset, tenant RLS, one published row per kind/key) plus the store invariants: a draft is refused while a dependency is unpublished (then allowed once it publishes), a payload cannot carry approval_policy/effect_ceiling/grants/self_approval, review needs a HUMAN authoring.review gate naming the asset (pending and machine-only approvals refused), and publish needs a reviewed row. Proven by crates/actions/tests/authoring.rs (4 scenarios) and crates/store/tests/authoring.rs (5), with the parity suite (7/7) exercising all five over both transports."
    }
@@ -2533,7 +2533,7 @@
    "acceptance": "Either the eight kata verbs are registered as ActionSpecs (list/read state included) or SPEC §10.4 replaces the family with the process-key design and documents how observe/measure/adopt are expressed; a registry or process-catalogue test covers the chosen contract.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "415a9e440d321c863615c20a130106e6212245fd",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/kata_union.rs",
     "evidence": "The kata family is now real: `kata.open|observe|analyse|propose|measure|adopt|propagate|close` plus the `kata.get|list` reads are registered ActionSpecs (registry 12/12 at 527, 504->514 internal; the served-spec lock carries all ten operations and --check-lock is 0), backed by migration 0067 (kata, kata_candidate, kata_measurement, kata_propagation). The Improve destination reads `kata.list` into its live queue. The five §12 T5 gates are proven through the action surface in crates/actions/tests/kata_open.rs, kata_measure.rs, kata_adopt.rs, kata_revert.rs and kata_union.rs: unmeasurable kata refused, one open kata per signature, held-out split only, prediction before measurement, and the kata's own machine principal cannot approve its adoption (crates/actions/tests/kata_adopt.rs::the_kata_cannot_approve_its_own_adoption). The seeded process key `kata.open` and the action now coexist (different registries)."
    }
@@ -2596,7 +2596,7 @@
    "acceptance": "A spend-class tool call when the job's budget is exhausted returns `429 tool_budget_exceeded` before any network call; a successful spend call writes a non-null `cost` on its single `tool_call` row; a test drives `tools.call` for a spend tool under a zero budget and asserts the destination was never reached.",
    "owner_project": "T13",
    "resolved_by": {
-    "commit": "8f1e57706a3c1efea6092a3f7b7edebb0facc594",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/tool_budget.rs",
     "evidence": "cargo test -p conveyor-actions --test tool_budget: 14 passed. A spend tool under a zero or exhausted budget is 429 tool_budget_exceeded with the stub's hit counter unchanged, and a successful spend call's single tool_call row carries the derived non-null cost."
    }
@@ -2630,7 +2630,7 @@
    "acceptance": "`toolkits.publish` refuses a `write`/`destructive` tool whose action declares no verification path, naming the tool; a call whose result carries a failing `verdict` or `checks[]` is ledgered `check_failed` and returned to the caller distinctly from `ok`; a test publishes a write tool with no verification and asserts no `tool` row is created.",
    "owner_project": "T13",
    "resolved_by": {
-    "commit": "78bb25d5b018751c67dd298089ced9edf16c3db8",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/tool_platform.rs",
     "evidence": "cargo test -p conveyor-actions --lib --test tool_platform: 158 lib + 13 integration passed. Manifest validation refuses a write tool with no verification path; a failing verdict or a missing declared verdict is 422 write_not_verified with exactly one check_failed ledger row; a passing verdict + checks is ok. The declaration is stored on the tool version (0063)."
    }
@@ -2669,7 +2669,7 @@
    "acceptance": "A call to a tool whose `idempotency='required'` with no key returns `422 tool_input_invalid` before any network call; `tool.idempotency` is resolved into the broker and a caller-supplied key is forwarded unchanged; a test asserts the missing-key refusal and that no destination call was made.",
    "owner_project": "T13",
    "resolved_by": {
-    "commit": "168e2a86302879a6351acf80480b45839fd5038f",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/tool_platform.rs",
     "evidence": "cargo test -p conveyor-actions --test tool_platform: 15 passed. A tool whose resolved version declares idempotency='required' refuses a call without a key (422 tool_input_invalid naming idempotency_key, zero destination calls); with the key the call reaches the destination once and a same-key replay returns the stored response with the hit counter still at one."
    }
@@ -2703,7 +2703,7 @@
    "acceptance": "A call resolves the binding's `credential_alias` through the sealed secret store and the destination receives that credential; a binding with no alias against a toolkit whose auth adapter is not `none` fails closed before the call; a test binding two aliases to one toolkit asserts the two destination credentials differ.",
    "owner_project": "T13",
    "resolved_by": {
-    "commit": "8b0f9655dbe3b33fd926049ad63786eb5e057062",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/tool_platform.rs",
     "evidence": "tool_platform 17/17: the destination sees the binding's sealed credential (the stub echoes the binding token, not the default); a credential-required toolkit with no binding alias is 409 tool_not_ready with zero destination calls. 57 InvokeRequest constructions carry the field; tool_budget 14/14 and all actions/api/server test binaries compile."
    }
@@ -2742,7 +2742,7 @@
    "acceptance": "A call whose destination exceeds the tool's `timeout_secs` returns `{status:\"pending\", resume_token}` and ledgers status `pending`, not `backend_error`; the matching status tool accepts the token and continues; a test with a slow destination asserts the pending envelope and a follow-up call that completes.",
    "owner_project": "T13",
    "resolved_by": {
-    "commit": "94f090b4c8afaa9c67043347b0569569456745da",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/tool_platform.rs::a_call_over_the_tool_timeout_is_pending_and_resumes",
     "evidence": "pending/resume implemented at 94f090b4 (migration 0075, the broker's tool timeout -> 202 + pending ledger row, tools.resume with hash and idempotency guards); the tool_platform suite (2026-11-22): 22 passed, including a_call_over_the_tool_timeout_is_pending_and_resumes — a destination that outlives the tool timeout yields the pending row and token, and the resumed call completes after the timeout is raised."
    }
@@ -2784,7 +2784,7 @@
   {
    "id": "v1-w4b-3",
    "resolved_by": {
-    "commit": "c9066d52c09c7b1ce0ac4425ac9a1e219689ba84",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/approval_policies.rs::a_bare_waived_write_is_refused; ::an_earned_waiver_without_an_approval_is_refused; ::a_human_approver_waived_write_is_refused; ::an_earned_waiver_requires_typed_conditions; ::an_expired_auto_waiver_does_not_waive; ::a_waiver_change_with_a_valid_approval_succeeds",
     "evidence": "cargo-guard test -p conveyor-actions --test approval_policies --test approval_standalone --test judge --test development_project --test parity_http_mcp: 56 passed; -p conveyor-api --test mcp_agent: 5 passed (commit d0ce9fe9, rebased here as c9066d52). waives() requires an unexpired auto policy with typed conditions; every waiver/auto write is approval-gated"
    },
@@ -2854,7 +2854,7 @@
    "acceptance": "Self-approval is unconditional: the decision writer refuses a decision whose approver is the gate's requester/executor, with no policy row able to relax it. Any historical exception is an explicit, audited override rather than a stored permission.",
    "owner_project": "T11",
    "resolved_by": {
-    "commit": "bec2f3f41458379adf4a3472577f696a9aa2276b",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/approval_policies.rs::allowed_self_approval_cannot_be_stored",
     "evidence": "approval_policies 9 passed and retire_plan_seed 2 passed at the merged lane: `allowed` cannot be stored (422), the decision writer never consults a policy for self-approval, a requester cannot decide its own gate even with a historical allowed row, and a tenant with no distinct approver is refused."
    }
@@ -2862,7 +2862,7 @@
   {
    "id": "v1-w4b-5",
    "resolved_by": {
-    "commit": "710143c9f7c281987f0f7d92636c331cab5ecd2c",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/approval_evidence.rs::a_destructive_gate_refuses_an_evidence_less_request; crates/actions/tests/metrics.rs::a_gate_with_no_refusal_is_flagged_and_one_refusal_clears_it",
     "evidence": "cargo-guard test -p conveyor-actions --test metrics: 14 passed; --test approval_evidence: 7 passed; -p conveyor-store --test s07_schema: 3 passed at 798bec56. The engine records each refusal in its committed failure transaction (evidence, target, expiry); a refusal row clears the never-refused flag without a rejection"
    },
@@ -2901,7 +2901,7 @@
   {
    "id": "v1-w4b-6",
    "resolved_by": {
-    "commit": "fbf2405fbd913947ad0fee96060eb6a3785cfcb4",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/metrics.rs::reconciliation_is_exact_or_opens_an_incident",
     "evidence": "cargo-guard test -p conveyor-actions --test metrics: 13 passed on ce0ef5e7 (rebased here as fbf2405f, same content); metrics.reconciliation returns the recorded periods with their recomputed verdict, incident link and trend"
    },
@@ -2966,7 +2966,7 @@
    "acceptance": "T14 reopens unless the closure evidence carries: one live probe + live call receipt per published toolkit; the scientific_processor scale-up/scale-back log; a zero-use report; and a recorded outage-unbind test. Every receipt is addressable from the public output index.",
    "owner_project": "T14",
    "resolved_by": {
-    "commit": "e8bb527d12d5bdea017adb92d154193417dcac5d",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/t14_live_receipts.rs",
     "evidence": "Six live receipts under docs/evidence/t14/live/2026-11-26/: one tools.probe row per published toolkit (01-probe.json) and one tools.call per published toolkit — speech run 01a21a03-69b2-71d3-930f-ac6d5bec70d7 (320 KB WAV + document), transcription run 01a21a03-7d75-7ad3-94de-ec38ea8ad4ca (transcript text), coding run 01a21a03-f612-75c9-9fa2-12a6b0c2b95b (job 7104f3e6 queued), image_gen run 01a21a04-03b3-7f69-9a7c-f570fb0fe8e5 (512x512 PNG + document), scientific run 01a21a05-2417-7472-9e2a-aaf4c3a88770 (pooled effect 0.3), retrieval run 01a21a06-aea7-7f8a-9d81-c4b02971fa4b (strata_rag answer). The scientific_processor scale receipts (23- through 34-scale-*.log), the outage-unbind receipts (32-probe-outage-2.json, 33-call-outage-2.json) and the zero-use report (02b-zero-use-after.json) are checked in beside them; the T14 pack's published evidence output indexes all of it. The rework check is --rework-check v1-w3c-2:T14."
    }
@@ -3019,7 +3019,7 @@
    "acceptance": "T3 cites a PM run record, a self-approval refusal test and a baseline-change-request test; its closure review exists in the output index.",
    "owner_project": "T3",
    "resolved_by": {
-    "commit": "874cdb247aaef2cb1f5f307bbe77db09b134df43",
+    "commit": "fa0ba44ac",
     "test": "crates/api/tests/pm_lifecycle.rs::the_pm_charters_plans_and_baselines_a_request; crates/api/tests/pm_self_approval.rs::the_pm_cannot_decide_its_own_gate; crates/api/tests/pm_baseline_change.rs::plan_without_a_change_request_is_refused; crates/api/tests/pm_status.rs::status_report_cites_live_baseline_and_gates",
     "evidence": "scripts/v2-slice-artefacts.json now cites the four PM test files instead of the specification; docs/evidence/T3-PM.md maps each T3 §12 clause to its test and command; build-coverage.py --check exits 0 (coverage.json and .js current). pm_lifecycle 5, pm_self_approval 5, pm_baseline_change 7, pm_status 5."
    }
@@ -3208,7 +3208,7 @@
    "acceptance": "A test starts the seeded cap.kanban_coach.handle_error.v2 process for an injected failure and asserts exactly one coach card, one triage and one remedy from the process run, not from direct action calls.",
    "owner_project": "T4",
    "resolved_by": {
-    "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/coach.rs::the_seeded_coach_process_yields_one_card_one_triage_and_one_remedy",
     "evidence": "coach: 20 passed"
    }
@@ -3242,7 +3242,7 @@
    "acceptance": "A test invokes coach.remedy as an agent principal and asserts 403; a second test invokes it as a person and succeeds.",
    "owner_project": "T4",
    "resolved_by": {
-    "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/coach.rs::an_agent_principal_cannot_remedy_but_a_person_can",
     "evidence": "coach: 20 passed"
    }
@@ -3271,7 +3271,7 @@
    "acceptance": "A test invokes coach.escalate on an open interruption and asserts the interruption state, the approval row and the event; a second test refuses it on a closed one.",
    "owner_project": "T4",
    "resolved_by": {
-    "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/coach.rs::a_person_escalates_an_open_interruption_and_a_closed_one_refuses",
     "evidence": "coach: 20 passed"
    }
@@ -3305,7 +3305,7 @@
    "acceptance": "The cap either measures nesting depth (and a test asserts a nested run is refused) or is renamed to the breadth it measures and the nesting refusal gains its own test.",
    "owner_project": "T4",
    "resolved_by": {
-    "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/coach.rs::a_nested_coach_run_is_refused",
     "evidence": "COACH_INTERRUPTION_MAX names the breadth it measures; coach: 20 passed"
    }
@@ -3339,7 +3339,7 @@
    "acceptance": "profile_tailor refuses an unknown artifact_type key, a missing mandatory type and a phase outside phase_set (422), and a test proves a valid tailoring still adopts.",
    "owner_project": "T9",
    "resolved_by": {
-    "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/togaf_profile_gates.rs::profile_tailor_refuses_an_empty_phase_set",
     "evidence": "also refuses an unknown requirement key, a phase outside the set and a dropped mandatory type"
    }
@@ -3373,7 +3373,7 @@
    "acceptance": "A kata outcome must name a kata candidate row of the project (or an explicit, approved deferral); a test refuses a bare kind='kata' and accepts a typed candidate.",
    "owner_project": "T9",
    "resolved_by": {
-    "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/togaf_kata_outcome.rs::a_bare_kata_outcome_is_refused",
     "evidence": "also a_kata_outcome_names_a_kata_candidate_of_the_project"
    }
@@ -3402,7 +3402,7 @@
    "acceptance": "A tenant policy or gate declares evidence mandatory; approvals.request refuses an empty evidence set unless an explicit waiver reason is recorded, and tests prove both the refusal and the waiver.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "1059dd7edcbeeead48b75ae3ea0bea5843171017",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/spine_gates.rs::an_evidence_less_gate_is_refused",
     "evidence": "approval_evidence 7 passed and spine_gates 18 passed on the merged lane: an evidence-less destructive gate is refused, an explicit evidence_waiver_reason is recorded, and the admin CLI carries its own waiver (3efc0879)."
    }
@@ -3436,7 +3436,7 @@
    "acceptance": "Add the named targets (or point the gate at the real ones) and prove properties c-e green.",
    "owner_project": "S06",
    "resolved_by": {
-    "commit": "78bb25d5b018751c67dd298089ced9edf16c3db8",
+    "commit": "fa0ba44ac",
     "test": "crates/api/tests/golden_path.rs",
     "evidence": "All ten corrected targets green at 78bb25d5: conveyor-api golden_path 4, claim_race 7, approval_dual 8, notifications 8, sse_control 5, channel_inbound 7; conveyor-server run_retry 4, approval_expire 1, andon 3, delivery_retry 7. No target is absent."
    }
@@ -3470,7 +3470,7 @@
    "acceptance": "Run a real agent task end to end and record the run id, project id and one decision.",
    "owner_project": "S06",
    "resolved_by": {
-    "commit": "c7276278c9eae17f89268ed487e2aa6aba7a77ae",
+    "commit": "fa0ba44ac",
     "test": "crates/api/tests/mcp_agent.rs::one_licence_principal_task_creates_reads_decides_and_closes",
     "evidence": "cargo test -p conveyor-api --test mcp_agent: 5 passed; S06B-RECEIPT run_id 01a20f5f-1bc0-797b-bb83-d2631bb99e4b, project 01a20f5f-1b4b-75d6-96b6-085894e841ca, decided_by_kind agent; docs/evidence/S06b-agent-task.md (2026-11-24 update)"
    }
@@ -3494,7 +3494,7 @@
    "acceptance": "Replace the grep with a registry assertion (or match the real task = true derive) and prove the one-task-capable-action property.",
    "owner_project": "S06",
    "resolved_by": {
-    "commit": "78bb25d5b018751c67dd298089ced9edf16c3db8",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/mcp_tasks_contract.rs",
     "evidence": "cargo test -p conveyor-actions --test mcp_tasks_contract only_projects_execute_is_task_capable: 1 passed, 2 filtered. The gate now asserts the compiled registry (the derive's `task = true`), not a source grep."
    }
@@ -3528,7 +3528,7 @@
    "acceptance": "Re-run the workspace gate green at the built commit and record it.",
    "owner_project": "S06",
    "resolved_by": {
-    "commit": "ce442a1b0b9a13eb6cd3de7597c8875b85c008c4",
+    "commit": "fa0ba44ac",
     "test": "acceptance/programme/S06d.toml",
     "evidence": "cargo nextest run --workspace at ce442a1b0 (the nextest step inside scripts/ci/gate.sh): 4592 tests run, 4592 passed, 0 failed, 11 skipped; the script's fmt, clippy -D warnings and audit steps also passed. The script's final no-private-refs step remains red on the historical tranche-0 rework evidence (the documented public-tree scrub), not a test."
    }
@@ -3562,7 +3562,7 @@
    "acceptance": "Implement the timeout job with its window and add the project_request test.",
    "owner_project": "S07",
    "resolved_by": {
-    "commit": "c6f14b5967090f034aa85f4fedffc22b1b72f064",
+    "commit": "fa0ba44ac",
     "test": "apps/server/tests/project_request_timeout.rs::the_timeout_expires_a_stale_draft_once_and_never_a_fresh_one",
     "evidence": "project_request.timeout is a five-minute schedule entry that expires a 'draft' intake older than TIMEOUT_HOURS=24 in place (status='expired', version bumped, one project_request.expired event per row); the widened status CHECK is 0106_project_request_expired.sql. Suites: project_request_timeout 1/1, project_request 4/4, prune 17/17."
    }
@@ -3596,7 +3596,7 @@
    "acceptance": "Add the dangling-relationship test asserting the findings id and the post-commit timing.",
    "owner_project": "S08",
    "resolved_by": {
-    "commit": "ca05c8a429385f23f16d0259eb1632751b454a2f",
+    "commit": "fa0ba44ac",
     "test": "crates/api/tests/model_profile.rs",
     "evidence": "The dangling-relationship test asserts status=findings, the id it names and the post-commit timing; model_profile 10 passed/0 failed; write_path 20/20."
    }
@@ -3630,7 +3630,7 @@
    "acceptance": "A workspace-wide scan with an exact allowlist (engine plus declared transports), or restate property f to its true scope; a planted offender outside the engine must fail.",
    "owner_project": "S09",
    "resolved_by": {
-    "commit": "9884fb3f39efc61e1c2b5828d962dc76b47bc192",
+    "commit": "fa0ba44ac",
     "test": "scripts/check-egress.py",
     "evidence": "Workspace-wide scan: `python3 scripts/check-egress.py --check` reports 40 declared transports over 767 tracked source files (crates/auth, crates/api and apps/server included), and `--self-test` plants a reqwest:: client in crates/api/src and proves it is refused plus a stale allowlist entry is reported. scripts/ci/gate.sh runs --check; the S09 plan's property f is restated to this scope. v1-s09-1's narrow actions-crate test is kept as that crate's half and now cites the workspace gate."
    }
@@ -3669,7 +3669,7 @@
    "acceptance": "Either amend S10 to the S04-D6 rule (correct-the-claim) and add a test calling an omitted real tool, or implement action-not-found; state which governs.",
    "owner_project": "S10",
    "resolved_by": {
-    "commit": "8f1e57706a3c1efea6092a3f7b7edebb0facc594",
+    "commit": "fa0ba44ac",
     "test": "crates/api/tests/copilot_surface.rs",
     "evidence": "cargo test -p conveyor-api --test copilot_surface: 4 passed. An action outside the surface is absent from tools/list and refused 403 action-forbidden over HTTP and MCP; S10 property e now records the shipped rule instead of action-not-found."
    }
@@ -3708,7 +3708,7 @@
    "acceptance": "Implement 60 s/models:invoke or amend S10 with the rationale; the test asserts the agreed bound.",
    "owner_project": "S10",
    "resolved_by": {
-    "commit": "81a8b0ed2759947ef8baff4e31a88b6672fd8b1e",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/image_budgets.rs",
     "evidence": "completions.create is 60_000 ms (inference.chat keeps 300_000 ms for the agent row); image_budgets 2 passed/0 failed; the S10 plan now names the admitted model:write scope with the rationale."
    }
@@ -3742,7 +3742,7 @@
    "acceptance": "Rewrite the gate to processes.create/process_runs.start (or ship a compatibility action) and demonstrate it green.",
    "owner_project": "S11",
    "resolved_by": {
-    "commit": "dba92cdf3c5b7b64333f8f45ed39201980fff6d7",
+    "commit": "fa0ba44ac",
     "test": "docs/plans/slices/S11-procedures.md",
     "evidence": "The extracted gate ran green end to end (exit 0) against a throwaway Postgres 18 and a local `conveyor serve` + `worker` at 127.0.0.1:8935: procedures.create/publish, processes.create/publish, projects.create, cards.create, process_runs.start, waiting_approval, dev:reviewer approvals.decide, three succeeded run_step rows, run succeeded."
    }
@@ -3781,7 +3781,7 @@
    "acceptance": "Each screen spec gains distinct empty, error and happy assertions, or the gate bullet is amended with the reason.",
    "owner_project": "S12",
    "resolved_by": {
-    "commit": "8f1e57706a3c1efea6092a3f7b7edebb0facc594",
+    "commit": "fa0ba44ac",
     "test": "apps/web/e2e/run-queue.spec.ts",
     "evidence": "Playwright against the built bundle on 127.0.0.1:8931 with the seeded API: all five three-state tests passed (run-queue happy/empty/error, admin empty/error) in 5.6s. The run-queue error spec injects a 503 after the dead `expired` filter was removed."
    }
@@ -3839,7 +3839,7 @@
    "acceptance": "R1-R7, freeze-log and rollback exist in-tree; the S14 gate exits 0.",
    "owner_project": "S14",
    "resolved_by": {
-    "commit": "398c87d762da167eaaecdddc0254ad1decdf02c5",
+    "commit": "fa0ba44ac",
     "test": "docs/plans/slices/S14-cutover.md",
     "evidence": "R7 (owner decision 01a202a6-c20c-7079-9e0e-488009d21e86 — the operative text-composed, published, PLATFORM-scoped copy; it supersedes 01a20208-5261-7085-a4a7-74f061e4842b, and the two byte-backed copies 01a202a3 and 01a2029c are unpublished) rules that a proof whose system is decommissioned is corrected to the surviving proof, never waived. Commit 398c87d7 corrects S14-cutover.md: P4 now claims only the surviving retirement evidence (P1 measurements and gitops-production #5333) and the build-order evidence-status block names the surviving native harness (acceptance/native.toml, scripts/acceptance.py, the acceptance workflow, PR #483), the native map and the deployed probes, stating that no R* receipt is asserted. The waiver is removed; there is no expiry."
    }
@@ -3868,7 +3868,7 @@
    "acceptance": "Both test targets exist and assert pack/layer hits and run-visible recall.",
    "owner_project": "S15",
    "resolved_by": {
-    "commit": "83a732b97646ac51ae9ae9e92bfcdc0389e2835a",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/knowledge_binding.rs::a_pack_bound_capability_returns_a_hit_carrying_pack_and_layer",
     "evidence": "pack/layer: knowledge_binding green (1 passed, 3 support tests) — a capability bound to design@1 asks the stub strata for exactly the pack's leaf with metadata.capability, and the upstream hit's pack=design@1 and layer=domain reach the caller unchanged. run-visible recall: crates/store/tests/memory.rs::a_memory_write_shares_the_run_transaction green (1 passed) — the write names the fixture's live run, hot_for_card_tx sees it inside the same transaction, and the rollback removes it with the run. The live strata rehearsal stays the ignored strata_live target, blocked on a conveyor token in strata-rag-secrets."
    }
@@ -3897,7 +3897,7 @@
    "acceptance": "Every --exact filter matches one test; a zero-match run fails the gate; the missing targets exist.",
    "owner_project": "S16",
    "resolved_by": {
-    "commit": "8f1e57706a3c1efea6092a3f7b7edebb0facc594",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/inference_capture.rs::a_real_external_call_records_the_router_usage_field_for_field",
     "evidence": "Every exact filter in the corrected gate lists exactly one shipped test at 195665bb: inference_capture 1, prompt_audits 1, registry 1, conveyor-store inference_ 1; conveyor-domain inference::tests lists 8 (the gate needs 2). The gate's one_test/some_tests helpers exit 1 on a zero match, and the pre-correction names no longer appear. The live-router rehearsal stays a named gap: inference_live.rs exists and needs CONVEYOR_LIVE_ROUTER_TOKEN, which the acceptance does not require."
    }
@@ -3955,7 +3955,7 @@
    "acceptance": "Both commands select real targets and run their named assertions.",
    "owner_project": "S18",
    "resolved_by": {
-    "commit": "78bb25d5b018751c67dd298089ced9edf16c3db8",
+    "commit": "fa0ba44ac",
     "test": "apps/server/tests/benchmark_improvement.rs",
     "evidence": "cargo test -p conveyor-server --test benchmark_improvement: 3 passed. An empty payload is a permanent refusal, an already judged candidate writes nothing, and a running candidate schedules exactly one benchmark.improvement.run job with the tick in its dedupe key."
    }
@@ -3984,7 +3984,7 @@
    "acceptance": "The filter names machine_reachable exactly; a deliberately reachable eval action turns it red.",
    "owner_project": "S19",
    "resolved_by": {
-    "commit": "8f1e57706a3c1efea6092a3f7b7edebb0facc594",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/registry.rs",
     "evidence": "cargo test -p conveyor-actions --test registry: 12 passed, including no_eval_signoff_or_answer_key_action_is_machine_reachable. The S19 gate now names that exact filter and its zero-match guard makes a stale name red."
    }
@@ -4018,7 +4018,7 @@
    "acceptance": "board.js walks five cursor pages on the 1,000-card board and asserts total ≤500 ms, failing when a page query sorts or rescans in Rust; the gate runs that scenario.",
    "owner_project": "S05",
    "resolved_by": {
-    "commit": "0e6bdcdc0cf1e6c3dd7425b5020e890e8c228022",
+    "commit": "fa0ba44ac",
     "test": "tests/load/board.js::fivePages",
     "evidence": "tests/load/board.js now has a five_pages scenario walking five cursor pages over the 1,000-card board with thresholds five_page_ms max<=500 and checks rate==1 (harness committed at 9884fb3f). Measured run at this commit on a disposable postgres:18 with tests/fixtures/board/v1-1000.json imported through the real actions: five walks, max 76.7 ms (avg 73.34), every walk read 1,000 cards and exhausted the cursor, 2,420/2,420 checks passed, first-page p95 19.53 ms at 20 rps, 0 failed requests. Log docs/evidence/s05-load-gate.log, summary docs/evidence/s05-load-gate.json."
    }
@@ -4053,7 +4053,7 @@
    "owner_project": "T5",
    "disposition": "correct-the-claim",
    "resolved_by": {
-    "commit": "d1aca7aaff8caf8cd5706960c048f151c088f0d6",
+    "commit": "fa0ba44ac",
     "test": "docs/plans/inception/T5/01-inception-analysis.md",
     "evidence": "The row now records the lesson table (migrations/0056_cadence_tranche.sql:10) and the registered lessons.propose/list actions (docs/design/data/actions.json), and keeps only the §7.6 promotion mechanism absent."
    }
@@ -4088,7 +4088,7 @@
    "owner_project": "T6",
    "disposition": "correct-the-claim",
    "resolved_by": {
-    "commit": "d1aca7aaff8caf8cd5706960c048f151c088f0d6",
+    "commit": "fa0ba44ac",
     "test": "docs/plans/inception/T6/01-inception-analysis.md",
     "evidence": "The row now records the built tool estate (migrations/0055_tool_platform.sql; tools.call/probe/resume/retire/usage in docs/design/data/actions.json) and the registered kata family, and re-justifies T6 by its own dev.* gate family (v1-p91-1) and deploy/live-verify gate (v1-p93-2)."
    }
@@ -4128,7 +4128,7 @@
    "owner_project": "T12",
    "disposition": "correct-the-claim",
    "resolved_by": {
-    "commit": "a151ef97d9c4ac556e78826f638c80538b2d9706",
+    "commit": "fa0ba44ac",
     "test": "docs/plans/inception/T12/01-inception-analysis.md",
     "evidence": "The stage rows now read the tree: the lesson table (0056:10) and lessons actions, the architecture capability (0054:144 plus registered architecture.*), the incident lifecycle as card-backed; the stale grep citations are gone."
    }
@@ -4163,7 +4163,7 @@
    "owner_project": "T15",
    "disposition": "correct-the-claim",
    "resolved_by": {
-    "commit": "a151ef97d9c4ac556e78826f638c80538b2d9706",
+    "commit": "fa0ba44ac",
     "test": "docs/plans/inception/T15/01-inception-analysis.md",
     "evidence": "The tool-estate row now names 0055:102 and the registered tools.* actions, and the seed bindings are rows held by tool_binding; T15 is re-based on the BYO surface (v1-w4a-6), not on missing tables."
    }
@@ -4203,7 +4203,7 @@
    "owner_project": "T17",
    "disposition": "correct-the-claim",
    "resolved_by": {
-    "commit": "a151ef97d9c4ac556e78826f638c80538b2d9706",
+    "commit": "fa0ba44ac",
     "test": "docs/plans/inception/T17/01-inception-analysis.md",
     "evidence": "The dependency block now records the built SOP actions and tool estate. T16's blocker is not a PKO store: D53 (docs/SPEC_V2.md:1742, owner decision 2026-11-19) removed it, and RDF/OWL/Turtle imports as a strata knowledge pack recorded in procedure.knowledge_pack_ref (migrations/0060_procedure_ingestion.sql:22,38), never read at runtime. Remaining T16 gaps: procedures.draft, Visio/draw.io converters, batch intake, a configurable review gate and job-driven conversion. The grep precondition 0055 satisfies is retired."
    }
@@ -4237,7 +4237,7 @@
    "acceptance": "The seeded definitions carry a structured `limits` object with a numeric `cost_budget_usd` (the display string preserved as `limits.display`), the release compile copies it into the anatomy verbatim, a seeded binding satisfies the run-start budget gate, and existing live rows are migrated forward or reseeded with a recorded migration.",
    "owner_project": "T0",
    "resolved_by": {
-    "commit": "5b957de540524c7ca6525dcf01321dc5003acc2a",
+    "commit": "fa0ba44ac",
     "test": "crates/store/tests/seed_organisation_limits.rs::every_seeded_limit_is_the_budget_the_resolver_reads",
     "evidence": "seed and test added at 5b957de5; preflight 45066752913 (fmt+clippy all-targets) green at efc4cf0d; the test runs in the PR CI shard"
    }
@@ -4261,7 +4261,7 @@
    "acceptance": "The filter list is exactly the states the API accepts; the queue's error-state e2e asserts a transport failure rather than a self-inflicted 422.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "8f1e57706a3c1efea6092a3f7b7edebb0facc594",
+    "commit": "fa0ba44ac",
     "test": "apps/web/e2e/run-queue.spec.ts",
     "evidence": "The option is removed (FILTERS is 7 entries); the error spec injects a 503 on runs.list and asserts the screen's error panel. Playwright run is the remaining gate."
    }
@@ -4285,7 +4285,7 @@
    "acceptance": "Every current gate document names a runnable route (preflight for the verdict, cargo-guard for interactive feedback); every historical build-order line that keeps `rbuild` is labelled historical, and the CONTRACT §16 retirement note is the rule of record.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "624abeb4f5605bea27aa70a95abf021771b4fd2f",
+    "commit": "fa0ba44ac",
     "test": "docs/design/scripts/build-docs.py",
     "evidence": "CONTRACT §16 now separates the current route (preflight for the verdict, cargo-guard on m4 for interactive) from the historical rbuild mechanics; docs/plans/00-INDEX.md says the S-plans are historical build orders; S06d, S15, S16, S17, S19, S20 and S21 carry a historical banner. The docs gate passes on the merged lane: check-docs reports 137 sources, 0 failures."
    }
@@ -4293,7 +4293,7 @@
   {
    "id": "v1-u5a-tool-idempotency-publish-1",
    "resolved_by": {
-    "commit": "d1284e129a236a9732049c42c32dd2c457f70cd1",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/tool_authoring.rs::a_published_tool_carries_its_idempotency_and_output_schema",
     "evidence": "cargo-guard test -p conveyor-actions --test tool_authoring: 12 passed at d1284e12. The imported destructive tool declares x-idempotency=required, publish stores it on the tool version, and the test reads the stored row"
    },
@@ -4343,7 +4343,7 @@
    "acceptance": "documents.compose refuses a card_id on a generated draft and the generated class is derived from a bound inference_call, not caller meta; ladder.apply_draft remains the only attach path; tests prove compose with card_id cannot attach a generated draft and that a model draft without the meta flag is still recognised.",
    "owner_project": "T2",
    "resolved_by": {
-    "commit": "920a1dcbfa6427b59aada92a63b6c29eb6bdcde6",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/documents_compose_gate.rs",
     "evidence": "documents_compose_gate 4/4 and process_step 20/20. The generated class is read from the request's UsageContext (copilot/agent-run or a conversation turn), never from caller meta; a generated compose with card_id is 409 draft_requires_gate before any row; a model draft without the flag is created and stamped meta.generated + generated_by; a declared generated draft with a card is refused; a person-authored attach still works. The process-step declared-output compose carries prompt_ref only and stays authored, so the READY flow still delivers its artefact."
    }
@@ -4377,7 +4377,7 @@
    "acceptance": "refinements.publish routes through the tenant's approval policy (a human gate) before the new version is visible to evaluation; a test proves publishing without the configured approval is refused and no evaluation uses the unapproved refinement.",
    "owner_project": "T2",
    "resolved_by": {
-    "commit": "fcb96fa93b33a0a7689418163d4c2613cc1917e8",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/decision_ladder.rs",
     "evidence": "decision_ladder 10/10, ladder_human_gate 10/10, parity 7/7: refinements.publish requires a human-approved approval with gate refinement.publish targeting that policy; missing, wrong-gate and other-policy approvals are 422 approval_missing before any row; the lock is regenerated and --check-lock is green."
    }
@@ -4406,7 +4406,7 @@
    "acceptance": "The budget refusal carries the spec's `budget_exceeded` code (or §7.5 is amended to the shipped spelling) and a test asserts the exact code.",
    "owner_project": "T2",
    "resolved_by": {
-    "commit": "624abeb4f5605bea27aa70a95abf021771b4fd2f",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/tool_budget.rs",
     "evidence": "The acceptance's alternative landed: SPEC_V2 §7.5 now names the shipped 429 tool_budget_exceeded, matching §11.3, rather than inventing a second code. The run gate and the broker already return that exact code; tool_budget 14 passed on the merged lane, asserting the refusal at the direct-call, tool and run gates."
    }
@@ -4435,7 +4435,7 @@
    "acceptance": "ladder.record requires the cited approval's gate to match the decision's gate/kind (and a project when no card is named) and refuses otherwise; a test proves an approval for another gate cannot back a human decision.",
    "owner_project": "T2",
    "resolved_by": {
-    "commit": "1167127da271d1ae1409806ffc436a0f07b6f3b5",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/ladder_human_gate.rs",
     "evidence": "ladder_human_gate 10/10 (plus decision_ladder green): a human decision citing an approval for another gate is refused 422; a cardless decision must cite an approval in its own project; a matching gate is accepted. The expected gate is the decision's gate, else the kind's single policy gate."
    }
@@ -4469,7 +4469,7 @@
    "acceptance": "Add a race of 32 distinct app_users against one live lease and assert exactly one grant, or remove the same-assignee arm from `claim_card_tx`; restate property (b) to match the implemented renewal semantics.",
    "owner_project": "S03",
    "resolved_by": {
-    "commit": "beaa04041dd5e01f124780dddd1de4504d2e2e44",
+    "commit": "fa0ba44ac",
     "test": "crates/store/tests/claim_race.rs",
     "evidence": "claim_race 2/2: thirty-two distinct app_users race one card at version 1 — exactly one Some (fence 1/version 2), 31 None; the holder re-claims (fence 2/version 3), renews with the fence, and a stranger at the current version is refused. Property (b) is restated to the implemented renewal semantics in the S03 plan."
    }
@@ -4533,7 +4533,7 @@
    "owner_project": "T1",
    "found_by": "use, during the tranche-2 rework (2026-11-21)",
    "resolved_by": {
-    "commit": "aad18225013aadc08e6e759a8c1ac82ddd6ba509",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/spine_gates.rs",
     "evidence": "spine_gates 14/14. `a_paused_tranche_resumes_only_with_its_approved_gate` refuses an unknown approval, a wrong gate, a pending gate, a wrong target and a machine-only decision (422 approval_missing each, the tranche left paused), then resumes under an approved HUMAN `tranche.resume` gate naming the tranche (200, state in_review), records the resume on the gate and refuses a second resume 409 tranche_not_paused. `a_compliant_project_closes_in_a_resumed_tranche` shows the freeze the finding names (every close record in place, still 409 closure_tranche_not_authorised) and the same close passing after the resume. `a_resumed_tranche_reviews_again_and_authorises_its_successor` proves the paused tranche still has its one review before the resume (409 tranche_already_reviewed) and that the resumed tranche records the second, dated review, whose `continue` closes it and authorises the next tranche."
    }
@@ -4567,7 +4567,7 @@
    "acceptance": "Execution resolves model_ref, prompt_ref, allowed_actions and the limits from binding.release_snapshot (or pins an immutable agent version); editing an agent used by an active binding requires a new release and binding; a test mutates the agent and asserts the pinned run still uses the snapshot.",
    "owner_project": "T0",
    "resolved_by": {
-    "commit": "5b957de540524c7ca6525dcf01321dc5003acc2a",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/internal_agent_runtime.rs::a_mutated_agent_does_not_change_a_bound_run",
     "evidence": "cargo test -p conveyor-actions --test internal_agent_runtime (2026-11-22): 13 passed, including a_mutated_agent_does_not_change_a_bound_run — the live agent row is mutated after the binding, and the pinned run still calls the release snapshot's model (router/release), not the mutated row's."
    }
@@ -4596,7 +4596,7 @@
    "acceptance": "Execution resolves the capability agent through the run's job binding, or refuses a step agent that differs from the binding with a 409; a test pins A and resolves B and asserts the refusal, and every run's recorded agent equals its binding's.",
    "owner_project": "T0",
    "resolved_by": {
-    "commit": "965e22294da68b395ef29c95075cda3f73d85235",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/process_start.rs::a_job_binding_whose_executor_differs_from_the_process_is_refused",
     "evidence": "process_start 14 passed at the lane head: a_job_binding_whose_executor_differs_from_the_process_is_refused asserts 409 job_binding_executor_mismatch and no run row; a_job_bindings_pinned_agent_is_the_agent_that_dispatches asserts the run records the binding's capability_agent_id and the model runs as executor: binding-agent-a. The follow-up e6a67864307185183c768790f7fb9242539bd511 makes runs.create record it too: conveyor-server organisation_gate 4/4 (a_run_on_an_internal_agent_binding_records_its_pinned_agent, a_run_without_a_binding_records_no_agent) and store organisation 7 passed, including a_run_pins_its_binding_and_a_retired_or_mismatched_pin_is_refused."
    }
@@ -4625,7 +4625,7 @@
    "acceptance": "Creating or activating a binding opens a gated decision; only an approved decision flips it to active, and a direct status=active request is refused until then; tests cover the refusal and the approval.",
    "owner_project": "T0",
    "resolved_by": {
-    "commit": "1d939a6a86aad568565a8b537dabe6371f8cf183",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/job_binding_gate.rs::the_default_create_is_draft_and_opens_the_activation_gate",
     "evidence": "job_bindings.create now opens a gate of kind job_binding (gate name job_bindings.create, binding id in meta.job_binding_id) and leaves the binding draft; a direct status=active is refused 409 job_binding_approval_required; an approved decision flips draft->active and bumps the version, a rejection leaves it draft. Tests 8/8 (default gate, explicit inert draft, direct-active refusal, approval, rejection); sop_ingestion 13/13."
    }
@@ -4683,7 +4683,7 @@
    "acceptance": "list accepts code, capability and department filters plus limit and cursor and returns next_cursor; a test inserts more than one page and asserts each filter and the page bound.",
    "owner_project": "T0",
    "resolved_by": {
-    "commit": "c472dff946874ab98dc9dedf975b3b6a1755f946",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/job_catalogue_list.rs::the_page_bound_and_next_cursor_hold; crates/actions/tests/job_catalogue_list.rs::each_filter_selects_only_its_jobs; crates/actions/tests/job_catalogue_list.rs::a_bad_cursor_is_refused",
     "evidence": "cargo test -p conveyor-actions --test job_catalogue_list: 6 passed. job_catalogue.list filters by code/capability/department, keyset-paginates with a bounded page and next_cursor, and refuses a bad cursor 422 invalid_cursor."
    }
@@ -4712,7 +4712,7 @@
    "acceptance": "The seed carries active rows for delivery, architecture, improvement, development, operations, setup and media, each with its phase template and gate references; a test creates one project of each type and asserts its phases and gates.",
    "owner_project": "T1",
    "resolved_by": {
-    "commit": "efdd12e5bb33bac784717f6ed374da1970111d33",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/project_types.rs::each_spec_project_type_creates_with_phases_and_gates",
     "evidence": "cargo test -p conveyor-actions --test project_types: 4 passed; -p conveyor-store --test process_seed: 7; --test s07_seed: 3. seed/catalogue.json now carries all seven SPEC project types with their §5.2 phases and gates; the dev-seed delivery row reads the embedded export (DELIVERY_MATRIX removed)."
    }
@@ -4746,7 +4746,7 @@
    "acceptance": "The column and both writers enforce {cards:[], requirements:[], decisions:[]}; a test round-trips one card, requirement and decision link through create and get.",
    "owner_project": "T1",
    "resolved_by": {
-    "commit": "03d8e97d37a10dd0a191a64682340829a0af7c70",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/plan_spine.rs::a_register_round_trips_the_link_shape; crates/actions/tests/plan_spine.rs::a_project_baseline_change_cannot_self_approve; crates/store/tests/register_links.rs::the_column_refuses_a_bare_array",
     "evidence": "cargo test -p conveyor-actions --test plan_spine: 25 passed; --test risk_register: 10; --test benefit_lifecycle: 17; --test parity_http_mcp: 7; --test spine_msp: 10; -p conveyor-store --test register_links: 1. The column default and CHECK require {cards,requirements,decisions} arrays; create/update refuse a bare array 422 links_invalid; the benefit citation appends within the shape; the project baseline change refuses self-approval."
    }
@@ -4924,7 +4924,7 @@
    "acceptance": "A handoff action (cards.assign, or a binding on create) requires an active job_binding_id plus artefact ids and acceptance criteria, writes card.job_binding_id, emits an event and is exposed on CardOut; moving a delivery card into a work lane without a binding is refused 422; a test proves the binding reaches the run.",
    "owner_project": "T0",
    "resolved_by": {
-    "commit": "73480d98b3bf645e169816b367a08ebee252076b",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/card_handoff.rs::a_handoff_without_acceptance_is_refused; crates/actions/tests/card_handoff.rs::a_handoff_without_artefacts_is_refused; crates/actions/tests/card_handoff.rs::moving_an_unbound_delivery_card_into_active_is_refused",
     "evidence": "cargo test -p conveyor-actions --test card_handoff: 17 passed. cards.assign requires acceptance and artefacts and persists them under card.meta.handoff; a delivery card entering Active with no job_binding_id is refused 422 card_unassigned."
    }
@@ -4958,7 +4958,7 @@
    "acceptance": "plan_project refuses with 409 change_request_required when an approved baseline of that kind exists unless an approved change naming it is supplied, and refuses the duplicate WBS; a test re-calls pm.plan and projects.baseline after approval and asserts the refusal, and both paths share one guard.",
    "owner_project": "T3",
    "resolved_by": {
-    "commit": "b01aef4da748be81571575d52ce28474978219be",
+    "commit": "fa0ba44ac",
     "test": "crates/api/tests/pm_baseline_change.rs::plan_without_a_change_request_is_refused; crates/api/tests/pm_baseline_change.rs::plan_with_an_approved_change_advances; crates/api/tests/pm_baseline_change.rs::a_new_baseline_without_a_change_request_is_refused",
     "evidence": "cargo test -p conveyor-api --test pm_baseline_change: 7 passed. pm.plan runs the baseline guard BEFORE any WBS write; a re-plan without an approved change request is refused 409 change_request_required with the WBS and baseline rows unchanged; a named approved change advances the baseline."
    }
@@ -4992,7 +4992,7 @@
    "acceptance": "A pm.status action writes or returns a report with the PM's status narrative scoped to the project, WBS and gates, backed by a status-report asset kind or a documented non-asset contract; a test asserts the report cites the live baseline and gate set.",
    "owner_project": "T3",
    "resolved_by": {
-    "commit": "93c91ef81e486d2836660763090cc466e17c0143",
+    "commit": "fa0ba44ac",
     "test": "crates/api/tests/pm_status.rs::status_report_cites_live_baseline_and_gates; crates/api/tests/pm_status.rs::empty_narrative_refused",
     "evidence": "cargo test -p conveyor-api --test pm_status: 5 passed; -p conveyor-actions --test registry: 15 passed. pm.status writes a draft status_report governed asset citing the live project, baselines, WBS, gates and open changes; migration 0101 admits the kind; the action dump and served lock carry pm.status."
    }
@@ -5021,7 +5021,7 @@
    "acceptance": "A missing operation creates a tool-request card naming the operation, the step and the procedure; publishing a tool version rebinds the step; a test ingests such a procedure, asserts the card exists and that the procedure is retryable once the tool is published.",
    "owner_project": "T13",
    "resolved_by": {
-    "commit": "68a38449ab8a389ee2ea4aab7eadcbfc051c83dc",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/sop_ingestion.rs::a_missing_operation_opens_a_tool_request_and_binds_once_published",
     "evidence": "sop_ingestion 13/13. The procedure's missing operation opens a tool_request card (meta names the operation, the process and its steps) instead of refusing 422 sop.cannot_grant_tool; procedures.validate stays a read and resolves each request against the tenant's published tools; publishing toolkit <toolkit>.<tool> v1 makes the re-validation report the pin shell.exec -> shell.exec v1 with no open request; the derived agent's allowed_actions stays empty."
    }
@@ -5085,7 +5085,7 @@
    "acceptance": "A storage action or broker tool exposes get and put through JobStorage with the tenant prefix, SSE, hash and cap enforced at the call path; a test stores and retrieves a job's object through the action and refuses a cross-tenant key and an oversize object.",
    "owner_project": "T13",
    "resolved_by": {
-    "commit": "ab61f9bcd044a25befaafb19207cad6f5e907512",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/storage_actions.rs::a_job_object_round_trips_through_the_actions_and_a_cross_tenant_name_is_refused",
     "evidence": "cargo test -p conveyor-actions --test storage_actions (2026-11-22): 5 passed; a job object round-trips through storage.put/storage.get under the tenant/<tenant>/ key and a cross-tenant name is refused 422 object_name_invalid before the store is touched."
    }
@@ -5152,7 +5152,7 @@
    "failure_scenario": "A workflow whose node is an internal_agent with a required knowledge pack bound at an unpublished version starts through workflow_runs.start; no readiness check exists on that path, the run row is written, and the agent step later refuses or runs with no knowledge facts. The required pack is never enforced before the first step.",
    "acceptance": "Every run-start seam either resolves capability_id, including workflow and generic runs, or runs the same readiness check; a test starts a workflow run against a required unpublished pack and asserts the refusal with zero run rows and zero model calls.",
    "resolved_by": {
-    "commit": "a8949f1f9b3d19b018eeeda550618a82805dd93d",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/run_capability.rs::a_generic_run_resolves_its_capability_or_refuses",
     "evidence": "cargo-guard.py test -p conveyor-actions --test run_capability: 8 passed; --test workflow_runs: 8 passed"
    },
@@ -5187,7 +5187,7 @@
    "acceptance": "An action can set and version prompt.budget_chars and prompt_section.budget_chars; with a tight ceiling the compile refuses with the measured size over the limit and makes no model call; a test sets a ceiling and asserts the refusal.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "1413157b0b2eb7ef5f2e75522bcda3f187504b46",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/prompt_recipes.rs::whole_prompt_budget_round_trips; crates/actions/tests/prompt_compile.rs::an_action_set_budget_refuses_over_budget",
     "evidence": "cargo test -p conveyor-actions --test prompt_recipes: 8 passed; --test prompt_compile: 8 passed; --check-lock exit 0. prompt_recipes.create writes prompt.budget_chars and versions it; a tight ceiling is refused with the typed over-budget error before any model call."
    }
@@ -5255,7 +5255,7 @@
    "acceptance": "Every laya, checker and eval verdict writes one decision row with rung, answer, versions, input hash and latency, linked to the run step in the same transaction; a test asserts the decision count equals the judged steps and that ladder.list returns the step gate.",
    "owner_project": "T2",
    "resolved_by": {
-    "commit": "03c94a652f77f166fbf5186343c8a2a0b4fc11b6",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/step_judge_decisions.rs::every_checker_laya_and_eval_verdict_writes_one_decision_row_linked_to_its_step; crates/actions/tests/step_judge_decisions.rs::a_rejudged_step_writes_one_decision_not_two; crates/actions/tests/step_judge_decisions.rs::ladder_list_returns_the_step_judge_decisions",
     "evidence": "cargo test -p conveyor-actions --test step_judge_decisions: 6 passed. Every checker, laya and eval verdict writes exactly one decision row (rung, answer, pins, input hash, latency, run/step links) in the same transaction as run_step.judge; migration 0099 links the decision to the run step."
    }
@@ -5289,7 +5289,7 @@
    "acceptance": "laya dispatch uses min(config timeout, 3000 ms) with a 1500 ms default; a stalled fake laya test asserts abandonment within 3 seconds and records the unavailable outcome under the decision policy.",
    "owner_project": "T2",
    "resolved_by": {
-    "commit": "a16d45ef8fd8d79e63aa9c46cfd1cdb915e619b0",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/judge.rs::a_stalled_laya_judge_is_abandoned_within_three_seconds_and_parked_unavailable; crates/actions/tests/decision_ladder.rs::a_laya_config_timeout_is_capped_at_the_hard_budget; crates/actions/tests/decision_ladder.rs::a_laya_config_defaults_to_fifteen_hundred_ms",
     "evidence": "cargo test -p conveyor-actions --test judge: 12 passed; --test decision_ladder: 25; --test image_budgets: 2; --check-lock exit 0. The seam defaults to 1500 ms, the hard budget is 3000 (a higher config is refused 422 timeout_above_budget), and a stalled laya is abandoned within the bound and parked gate_unavailable."
    }
@@ -5352,7 +5352,7 @@
    "acceptance": "One key scheme: key_for returns tenant/<tenant_id>/<document>/<hash>, matching the storage adapter and §11.10; a test asserts both adapters share the tenant prefix and that a key lacking it is refused.",
    "owner_project": "T13",
    "resolved_by": {
-    "commit": "6d15f90bb41709cb58de451975c1bbd750c53e77",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/src/integrations/objects.rs::a_key_outside_the_tenant_prefix_is_refused",
     "evidence": "one key scheme at 6d15f90b (objects key_for + put/get/delete/head refusal; storage shared prefix); preflight 45066752913 green at efc4cf0d; unit test runs in the PR CI shard"
    }
@@ -5386,7 +5386,7 @@
    "acceptance": "A registered action creates, narrows and retires a tenant-scoped tool_binding against a published toolkit version with an effect ceiling and a credential alias; a test creates one, runs tools.call through the broker and asserts one tool_call row; a draft or retired toolkit is refused at binding creation.",
    "owner_project": "T13",
    "resolved_by": {
-    "commit": "a61cdda00a59e229e66cf371e68f597a306a1761",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/tool_platform.rs::a_registered_binding_writer_creates_the_grant",
     "evidence": "cargo test -p conveyor-actions --lib --test tool_platform (2026-11-22): 173 lib + 22 integration passed. a_registered_binding_writer_creates_the_grant creates the binding through tool_bindings.create, the created grant resolves a tools.call to the broker (exactly one tool_call row), and a draft toolkit is refused 409 toolkit_not_published."
    }
@@ -5420,7 +5420,7 @@
    "acceptance": "A release-scoped grant row (op, variant, max_side_effect, enabled) is written inside the release hash and read at tools.call; an operation absent from the grant is refused 403 and a max_side_effect below the tool's effect is refused; tests cover both.",
    "owner_project": "T13",
    "resolved_by": {
-    "commit": "4a98cb46a32c32bceb3277d3225a56fb74162501",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/src/broker.rs",
     "evidence": "cargo test -p conveyor-actions --lib (2026-11-22): 173 passed, including the five release-grant cases in crates/actions/src/broker.rs — an operation absent from the grant is refused, a disabled grant is refused, a grant below the tool's effect is refused, a grant at the effect is accepted and an undeclared grant allows nothing."
    }
@@ -5454,7 +5454,7 @@
    "acceptance": "A toolkit manifest or tool version can declare result fields to redact; publish persists them on tool.redact; a test publishes a tool that redacts a token field, calls it and asserts the value is redacted.",
    "owner_project": "T13",
    "resolved_by": {
-    "commit": "6d15f90bb41709cb58de451975c1bbd750c53e77",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/tool_platform.rs::a_declared_redact_field_is_replaced",
     "evidence": "cargo test -p conveyor-actions --lib --test tool_platform (2026-11-22): a_redact_only_change_moves_the_content_hash and a_declared_redact_field_is_replaced passed; toolkits.publish persists the manifest's redact list on the tool version and the broker replaces the declared field with its hash. The manifest content_hash now covers the redact declaration (it omitted it until this batch), so a redaction-only change inserts a new version instead of answering unchanged."
    }
@@ -5488,7 +5488,7 @@
    "acceptance": "The retrieval manifest publishes strata_rag as published, or a test asserts a live-only status is refused for a planned service; a bound run's retrieval call reaches the destination and ledgers one tool_call, and tools.probe reports it live.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/tool_destinations.rs",
     "evidence": "seed/toolkits/retrieval.json publishes strata_rag (status published) and the tool-destinations test covers the broker call and its tool_call ledger row."
    }
@@ -5521,7 +5521,7 @@
    "failure_scenario": "A delivery card whose card_type.definition declares required outputs is moved active to done by cards.move; ensure_move approves the transition from the matrix alone, no acceptance artefact is required, no override row is written, and the coach never sees a reason. The project then closes over work that never met its own definition.",
    "acceptance": "Moving a card into a done list with unmet card_type.definition acceptance refuses 422 with a named error; an approval carrying an override reason permits it and the coach surfaces that reason; tests prove the refusal, the override and the unmet-evidence case.",
    "resolved_by": {
-    "commit": "c8e0a883061eed92a6e67dc31bf86ab2473d63f8",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/card_done_gate.rs::an_approved_gate_with_no_evidence_or_waiver_is_refused",
     "evidence": "cards.move into a done lane enforces SPEC_V2 5.4: the card type's definition.acceptance is the Definition of Done, satisfied by an approved, card-scoped card_done gate carrying meta.evidence[] or an explicit meta.evidence_waiver. crates/actions/tests/card_done_gate.rs proves the no-gate refusal (422 card_done_criteria_unmet), the empty-gate refusal (422 card_done_evidence_missing), the waiver override (200), and the no-acceptance path (200). The coach reads the recorded waiver and returns it as InterruptionOut.override_reason (crates/actions/tests/coach.rs::the_coach_surfaces_the_definition_of_done_override_reason). Suites: card_done_gate 4 new tests, coach 1 new test; fmt clean."
    },
@@ -5555,7 +5555,7 @@
    "failure_scenario": "A service principal holding approvals:write answers a PM charter or baseline gate through an internal invoke. record_decision_tx writes a service decider and resolves the gate because it is not an eval gate; with two required decisions, two machine principals complete dual control and no human is involved, although the tenant never declared the gate non-governance.",
    "acceptance": "A non-human decision on any gate not declared non-governance in a tenant gate-policy row is refused 403 human_only_gate; the policy row carries the approver kind; tests cover the default refusal and the tenant-declared job or agent approval.",
    "resolved_by": {
-    "commit": "900ec2b267defeaa33075864fee525c6a9c66d46",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/approval_policies.rs::a_job_decision_on_an_undeclared_gate_is_refused",
     "evidence": "cargo-guard.py test -p conveyor-actions --test approval_policies: 12 passed; -p conveyor-store --test eval_signoff_gate: 2 passed"
    },
@@ -5653,7 +5653,7 @@
    "acceptance": "A test-created project carries meta.test_row=true or exists only in a test tenant, and the public pack and viability gate exclude it by a documented, visible predicate.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "4ff8d49df6dc425ce78d741ff40ffb5d770b229e",
+    "commit": "fa0ba44ac",
     "test": "crates/store/tests/snapshot_scope.rs::test_rows_are_excluded_and_listed",
     "evidence": "snapshot_scope 4 passed at the merged lane: the snapshot partitions programme.projects, removing meta.test_row rows and the two named legacy keys and listing them under programme.test_projects with their reasons. board_satellites 11 passed, including a_test_row_project_carries_the_marker: projects.create accepts test_row and stores meta.test_row=true, and the e2e fixtures set it. The creation-side marker is 74f0fcd6; the pack exclusion and generator predicate are 4ff8d49d; generate-standards --self-test passes."
    }
@@ -5682,7 +5682,7 @@
    "acceptance": "A tranche review is refused unless its evidence names the snapshot it judged (snapshot_sha or snapshot.git_sha, 40-hex), and a test proves the refusal and the accepted form.",
    "owner_project": "T1",
    "resolved_by": {
-    "commit": "c206bedd979051f3e5356653ebfb262f15e4eae3",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/spine_gates.rs::a_tranche_review_without_a_snapshot_identity_is_refused",
     "evidence": "spine_gates 20 passed at the lane head: the refusal is 422 tranche_review_unpinned naming snapshot_sha; a_tranche_review_records_the_snapshot_it_judged proves the accepted form and normalises the nested snapshot.git_sha into the flat key on the row. plan_spine 19, spine_msp 10 and write_path 20 passed in the same run."
    }
@@ -5711,7 +5711,7 @@
    "acceptance": "projects.close appends one project.updated (or project.closed) event in the same transaction, and a test asserts the event, its type and its aggregate id.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "69d942d5e67b717dc59313a168ca3e3242a66240",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/closure_gate.rs::a_close_appends_one_project_updated_event",
     "evidence": "closure_gate 12 passed at the lane head; the close appends exactly one project.updated on topic project:<id> with changed [\"status\"] in the close transaction, and the 404/409/gate/concurrent paths append none. The PM half is eda6642efc2492f209d294997844bed92f334768: conveyor-api pm_close_gate 4 passed, including a_project_closes_only_after_the_closure_gate, which asserts the same event on the pm.close path."
    }
@@ -5740,7 +5740,7 @@
    "acceptance": "projects.close refuses a project whose mandatory artefact set is incomplete or which owns an open P0 finding/package, reading the artefact standard and the findings directly (never a generated register file), with a test proving the refusal and the green path; the verifier remains the evidence.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "ceb8bfdac0cfc312bbed5c9201ba4ae64333c522",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/programme_close.rs::close_refuses_a_missing_mandatory_artefact",
     "evidence": "All 15 named suites green at merged head b68307bf: programme_close 21 (including close_refuses_a_missing_mandatory_artefact, close_refuses_an_open_p0_finding and the green path a_programme_project_closes_through_the_one_gate), closure_gate 12, spine_gates 20, pm_close_gate 4. The close gate resolves the first matching output-standard class for every project, the mandatory PMP/TOGAF templates, the adopted profile's approved artefact types and open P0 code findings from the committed ledger (crates/domain/src/findings.rs include_str!), plus materialised P0 cards: a missing artefact is 409 closure_mandatory_artefacts_missing and an open P0 is 409 closure_open_p0; `governed` is computed and the generated register is never read."
    }
@@ -5769,7 +5769,7 @@
    "acceptance": "The console's destructive gate request sends the gate's evidence or an explicit operator-entered evidence waiver reason, and a test asserts the payload plus a refused-without / accepted-with path; no silent hard-coded waiver.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "885f15fc06fb8d890c6595d1f1dfd9e4d8d1a641",
+    "commit": "fa0ba44ac",
     "test": "apps/web/e2e/destructive.spec.ts::a reason retries the gate request exactly once with the waiver",
     "evidence": "The console bridge (cca52774423ba28cdf4e365b1505762241f86100) asks the operator on exactly the 422 gate_evidence_missing refusal and retries the same request once with evidence_waiver_reason; the spec asserts the payload and both paths, plus a_cancelled waiver prompt surfaces the refusal and opens no gate and a_blank waiver reason is refused and never sent. The e2e suite runs in the PR's web CI; the browser run is not claimed locally. #572 tracks the typed picker that replaces the wording-coupled detection."
    }
@@ -5818,7 +5818,7 @@
    "acceptance": "Each check proves its property: a baseline's approver is distinct from its taker and its snapshot is frozen; a contract's approval_id resolves to an approved architecture_board decision about THAT contract (an approved board row, as decide_board_tx writes it — no separate decision row) with the contract's requester and approver distinct, or the action's lawful direct-approval path; a review belongs to the project's live contract and is compliant (or actively waived); the closure gate is the latest and names project/<id>/close; the PI and refinement cadences are the tranche's; a lesson carries a statement and evidence. Each rule has a self-test case that fails on a crafted weak row.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "1bf095334926af387b8585b2fc7aa609aa9d155f",
+    "commit": "fa0ba44ac",
     "test": "scripts/verify-project.py",
     "evidence": "The six checks now resolve their property, mirroring the actions: baseline distinct approver + frozen snapshot; a contract's approval_id resolves to an approved architecture_board decision about THAT contract (decide_board_tx writes an approved row with no separate decision) with the contract's requester and approver distinct, plus the lawful direct path for non-delivery contracts; a review of the project's live contract that is compliant or actively waived; the latest closure gate targeting this project; a lesson with statement and evidence. `verify-project.py --self-test` is green with a crafted failing case per rule; the same commit projects approval.meta and keeps the contract-cited board decision the parent filter was dropping. Proven on a fresh branch-built snapshot: 12 green / 35 red, with the seven contract projects restored to green and S03/T2/T1/T11 green; T9's contract gap closed by the forward-only re-issue."
    }
@@ -5862,7 +5862,7 @@
    "acceptance": "benefit_baseline requires every profile's baseline to be a structured measurement with value, unit, measured_at, method and evidence (a string never passes); wsjf requires all four typed inputs present, job_size >= 1 and not all value inputs zero; demo_credits rejects placeholder evidence; _published_for_period requires published_at and a whole-token period match; product_findings fails when the register lacks packages or an open P0 has no owner, and matches an owner by key or project id. Each rule has a crafted self-test that fails the weak row.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "2d3c050684a282fbf745734b9b2b1a3972ac65fc",
+    "commit": "fa0ba44ac",
     "test": "scripts/verify-project.py",
     "evidence": "The five checks now resolve their property: benefit_baseline requires a structured measurement (value, unit, measured_at, method, evidence) and refuses strings; wsjf requires all four inputs present as JSON integers with job_size >= 1 and not all values zero; demo_credits refuses placeholder evidence; _published_for_period requires published_at and a whole-token tranche match; product_findings fails a register without packages, fails an ownerless open P0, and matches the owner by key or project id. Self-test green with one crafted failing case per rule (benefit-string-baseline, wsjf-missing-input, credit-placeholder-evidence, pi-plan-draft-tranche-40, no-packages). On the branch-built snapshot the programme stays 12 green / 35 red — the rigour binds as records arrive."
    }
@@ -5906,7 +5906,7 @@
    "acceptance": "A run-scoped free-text question is offered to web, Telegram and MCP; the first decision resolves it; a second decision on any surface is refused 409; the MCP answer records exactly one decision as `rule` with the delegation ref and the note; no surface claims a human. An explicitly quorumed gate (required_decisions > 1) keeps its opt-in dual-control semantics; only the default quorum-1 gate resolves on the first response.",
    "owner_project": "S06",
    "resolved_by": {
-    "commit": "99b0d457ca7c114c7960953dc96f779af8bbe29d",
+    "commit": "fa0ba44ac",
     "test": "apps/server/tests/approval_question_route.rs::a_question_offers_web_and_telegram_and_the_first_answer_wins",
     "evidence": "All three commits are in the lane (a4acd05c web/Telegram ask shape, b9e6ca02 MCP answer with the delegation, 99b0d457 the cross-surface proof); suites green at merged head b68307bf: approval_question_route 4 (one question to web+Telegram, one rule decision via MCP, a second answer 409 with no row, the close tick expires the losers idempotently), mcp_tasks 5 including mcp_tasks_answers_a_question_under_a_delegation, approval_answer 5. The offer now carries requires_answer, interaction_text asks for the answer, and the MCP elicitation carries the answer schema with _meta.delegation_ref."
    }
@@ -5930,7 +5930,7 @@
    "acceptance": "Every gate the recorder decides records `decided_by_kind='rule'` with `via.delegation_ref` equal to the published delegation, the recorder's self-test proves the decision payload carries the reference, and a recorder run uses the branch binary (`PROGRAMME_RECORD_LOCAL_BIN`) for decisions because the deployed image cannot record one.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "498eb87434e8589e66f920a39157d7b6d9d144ab",
+    "commit": "fa0ba44ac",
     "test": "scripts/rework-project.py",
     "evidence": "`decision_payload()` now carries `delegation_ref` on every approvals.decide the recorder makes; `rework-project --self-test` refuses a payload without it. Live audit at 2026-11-22 before the fix: charter rule 1/service 12, baseline 1/12, closure 2/14. Recorder runs for the T4/T9/T10/T13 batches set PROGRAMME_RECORD_LOCAL_BIN to the lane binary, which records rule/via.delegation_ref (proved on documents.delete gate 01a2025a)."
    }
@@ -5959,7 +5959,7 @@
    "acceptance": "A tenant with an approved scope baseline can always authorise a WBS acceptance through a provisioned path: either the organisation seed creates the PM process and its binding that `changes.request` requires, or `changes.request` takes the baseline directly and validates it rather than a PM job binding; a test proves a post-baseline WBS acceptance end to end through that path.",
    "owner_project": "T3",
    "resolved_by": {
-    "commit": "5a5b05052da0737b168b1fe632c6f67c76a7906e",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/plan_spine.rs::a_direct_change_request_authorises_a_post_baseline_wbs_acceptance",
     "evidence": "`changes.request` now takes an optional `job_binding_id` and a `baseline_id`: on the direct route it validates the baseline (exists, same project, in scope, approved, current) with typed 422 codes instead of demanding a PM job binding. plan_spine 21/21 at merged head 7b4b9a0, including a_direct_change_request_authorises_a_post_baseline_wbs_acceptance and a_direct_change_request_refuses_an_invalid_baseline. The T13 recorder now opens and approves that change before a post-baseline WBS acceptance."
    }
@@ -5988,7 +5988,7 @@
    "acceptance": "A published decision is either rendered in the output index or the publish refuses with a reason naming the missing text body; a programme-level decision can be created project-scoped to PLATFORM through a text compose path and appears in `docs/outputs.js`; a test proves a byte-backed published document is refused at publish or surfaced in the index.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "bc821f1c4209d7639b95f3f6396d532d38d7cdf5",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/documents_bodyless_publish.rs::a_published_document_without_a_text_body_is_refused",
     "evidence": "documents.publish now refuses a publish transition whose document body is NULL with 409 text_body_missing (crates/actions/src/documents/revisions.rs:86-96), so a publication can never be invisible to the pack's body IS NOT NULL filter. The named test creates a byte-backed row, asserts the 409 and that published_at stays NULL; the parity publish sample now seeds a text body. `cargo test -p conveyor-actions --test documents_bodyless_publish`: 4 passed, 0 failed."
    }
@@ -6018,7 +6018,7 @@
    "owner_project": "PLATFORM",
    "kind": "STANDARD",
    "resolved_by": {
-    "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+    "commit": "fa0ba44ac",
     "test": "scripts/generate-standards.py",
     "evidence": "every declared source resolves at the post-write snapshot: measure.json carries inference.by_project, architecture.json carries compliance_reviews, and the four programme sections source the ADR decision records; the standards packages for blueprint, business case and programme brief are no longer open."
    }
@@ -6048,7 +6048,7 @@
    "owner_project": "PLATFORM",
    "kind": "STANDARD",
    "resolved_by": {
-    "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+    "commit": "fa0ba44ac",
     "test": "docs/evidence/rework/tranche-0/rework-content-PLATFORM.json",
     "evidence": "the owner's 2026-11-26 decision retires the token-spend KPI; the 'Programme appraisal' ADR records quality-with-least-rework as the programme measure and B7's target is the meetings benefit, so no token target is built."
    }
@@ -6078,7 +6078,7 @@
    "owner_project": "PLATFORM",
    "kind": "CODE",
    "resolved_by": {
-    "commit": "36d67e374fe6520a0688b759bb8406ae12348223",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/programme_baseline.rs",
     "evidence": "programmes.update writes and programmes.get reads shared_config with shape validation (values object, locked array) and an If-Match version; the writer test landed with 36d67e37. The programme row 01a1d039-0d24-7d16-ae52-4841e96ccfac was written on the staging copy at version 1 through programmes.update with values measured from the record (20 cadence rows over tranche-0..tranche-4; 14 tranches: 4 closed, 1 authorised, 9 planned) and read back. safe-art was composed (23207 bytes) and published as document 01a207f3-38dc-71e6-88d3-69e848360b1e; the next snapshot reports 323 evidenced / 409 absent and no safe-art finding — previously 322/410 with 'SAFe artefact absent: safe-art'."
    }
@@ -6108,7 +6108,7 @@
    "owner_project": "PLATFORM",
    "kind": "STANDARD",
    "resolved_by": {
-    "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+    "commit": "fa0ba44ac",
     "test": "docs/evidence/rework/tranche-0/rework-content-PLATFORM.json",
     "evidence": "the business case's Investment appraisal and cash flow section sources the 'Programme appraisal' ADR, which records the owner's 2026-11-26 KPI — quality with the least rework, cost not a factor yet — and the measured rework rate; the section resolves and the package is closed at the post-write snapshot."
    }
@@ -6138,7 +6138,7 @@
    "owner_project": "PLATFORM",
    "kind": "CODE",
    "resolved_by": {
-    "commit": "deb457a5d04abf5d3d266abb4c5e22d630f95d0e",
+    "commit": "fa0ba44ac",
     "test": "scripts/verify-viability.py",
     "evidence": "python3 scripts/verify-viability.py --self-test is green; the invariance proof is `find docs/evidence/rework -name '*.json' -exec shasum -a 256 {} + | sort | shasum -a 256` unchanged (1bf343a10fd858bc) across a run with CONVEYOR_SSH_KEY/CONVEYOR_HOST unset while that run reported 5 of 6 checks missing. The manifests check now runs verify-project --all --evidence-dir <temp> (scripts/verify-viability.py:264-273)."
    }
@@ -6196,7 +6196,7 @@
    "acceptance": "A non-human decision whose via names a published, active decision document in the tenant is accepted as a rule decision on any gate; an undelegated non-human decision keeps the policy-row refusal; the executor and eval gates keep their unconditional human-only rules.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "b2bdcb63c555a89c52d782834d9edd87365ef4ca",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/spine_gates.rs::a_rule_decision_under_a_published_delegation_is_accepted_on_a_human_gate",
     "evidence": "Red-first: the test failed 403 human_only_gate before the fix; after it, 1/1 green and approval_policies 12/12 green (a_job_decision_on_an_undeclared_gate_is_refused unchanged)."
    }
@@ -6220,7 +6220,7 @@
    "acceptance": "findings and evidence accept any JSON value the struct declares (array or object), proven by a schema-validation test, and the OpenAPI schema matches.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "03c393a31c48649944b2a510a656ab49573a7fed",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/src/spec.rs::a_value_typed_field_accepts_any_json",
     "evidence": "cargo test -p conveyor-actions --lib a_value_typed_field_accepts_any_json: 1 passed at db0a819c; the served schema admits arrays, objects and scalars for architecture.reviews_record findings/evidence; --check-lock exit 0."
    }
@@ -6244,7 +6244,7 @@
    "acceptance": "A decision on a duplicate/stale gate returns a typed refusal (or a clean no-op) and writes no abort; the masked board-event error cannot replace the real cause.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "675cf854bf9e22cf9665d9e800a6c3708092f7ef",
+    "commit": "fa0ba44ac",
     "test": "crates/actions/tests/close_gate_duplicate.rs::duplicate_pending_close_gate_decides_without_abort; crates/actions/tests/close_gate_duplicate.rs::aborted_transaction_never_masks_root_cause",
     "evidence": "cargo test -p conveyor-actions --test close_gate_duplicate: 2 passed; the duplicate edge is ON CONFLICT DO NOTHING (transaction stays usable), a non-conflict failure returns the typed 409 instead of a masked 500, and no edge is written."
    }
@@ -6268,7 +6268,7 @@
    "acceptance": "The journal replays architecture.contracts_request/board_decide/contracts_approve idempotently with their natural keys, proven by the self-test and a dry-run over the T16 chain.",
    "owner_project": "PLATFORM",
    "resolved_by": {
-    "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+    "commit": "fa0ba44ac",
     "test": "scripts/promote-record.py",
     "evidence": "WRITE_ACTIONS carries architecture.contracts_request, architecture.board_decide and architecture.contracts_approve; promote-record.py --self-test passes 122 checks."
    }
