@@ -336,52 +336,35 @@ async fn an_in_flight_claim_is_reclaimable_once_its_own_ttl_passes() {
     let tenant = a_tenant(&db).await;
     let scope = "inference.chat";
     let hash = idempotency::request_hash(&json!({"model": "local-llm"}));
+    // Long enough that the assertion below cannot lose a race with the database: the point is the
+    // TTL's BOUND, not its millisecond precision. A 20 ms window failed on CI once (#909) because
+    // the second transaction's round trip outlasted it.
+    let live = chrono::Duration::milliseconds(750);
 
     let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
     assert!(
-        idempotency::begin(
-            &mut tx,
-            tenant,
-            scope,
-            "k",
-            &hash,
-            chrono::Duration::milliseconds(20)
-        )
-        .await
-        .expect("begin")
+        idempotency::begin(&mut tx, tenant, scope, "k", &hash, live)
+            .await
+            .expect("begin")
     );
     tx.commit().await.expect("commit");
 
     let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
     assert!(
-        !idempotency::begin(
-            &mut tx,
-            tenant,
-            scope,
-            "k",
-            &hash,
-            chrono::Duration::milliseconds(20)
-        )
-        .await
-        .expect("a live claim still refuses a replay"),
+        !idempotency::begin(&mut tx, tenant, scope, "k", &hash, live)
+            .await
+            .expect("a live claim still refuses a replay"),
         "a claim inside its own window still blocks"
     );
     tx.rollback().await.expect("rollback");
 
-    tokio::time::sleep(std::time::Duration::from_millis(80)).await;
+    tokio::time::sleep(std::time::Duration::from_millis(2_000)).await;
 
     let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
     assert!(
-        idempotency::begin(
-            &mut tx,
-            tenant,
-            scope,
-            "k",
-            &hash,
-            chrono::Duration::milliseconds(20)
-        )
-        .await
-        .expect("reclaim the dead holder's claim"),
+        idempotency::begin(&mut tx, tenant, scope, "k", &hash, live)
+            .await
+            .expect("reclaim the dead holder's claim"),
         "once the call's own deadline has passed, the claim is reclaimable — a killed holder must \
          not refuse retries for the 24-hour replay TTL"
     );
