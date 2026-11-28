@@ -31,3 +31,38 @@ test("the skip link and the room sheet are a keyboard path with focus return", a
   await expect(dialog).toHaveCount(0);
   expect(await room.evaluate((node) => node === document.activeElement)).toBe(true);
 });
+
+// #914. The Palette button's tooltip advertises Ctrl/Cmd+K; this proves the advertised path exists
+// and that the shortcut never steals a keystroke from a field.
+test("the advertised Ctrl/Cmd+K opens the Palette, and a field keeps its keystrokes", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(page.locator("#world-canvas")).toHaveAttribute(
+    "data-engine",
+    /ecs|fallback/,
+    { timeout: 20_000 },
+  );
+
+  // The shortcut is deliberately ignored while a field has focus, and `focusFirst` may have put
+  // focus on a control inside the entrance. Blur first so this asserts the body-level path.
+  await page.evaluate(() => {
+    const active = document.activeElement;
+    if (active instanceof HTMLElement) active.blur();
+  });
+  const shortcut = process.platform === "darwin" ? "Meta+k" : "Control+k";
+  await page.keyboard.press(shortcut);
+  const dialog = page.getByRole("dialog", { name: "Palette" });
+  await expect(dialog).toBeVisible();
+
+  const search = dialog.getByRole("searchbox", { name: "Search" });
+  await expect(search).toBeFocused();
+  await page.keyboard.press("k");
+  await expect(search).toHaveValue("k");
+  // The shortcut is ignored while a field has focus, so the second press cannot stack a palette.
+  await page.keyboard.press(shortcut);
+  await expect(page.getByRole("dialog", { name: "Palette" })).toHaveCount(1);
+
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+});
