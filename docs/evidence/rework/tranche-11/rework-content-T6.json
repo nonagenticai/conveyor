@@ -1,0 +1,575 @@
+{
+  "charter": "# Project charter — T6 Development project\n\n**Project:** T6 — Development project. **Track:** v2. **Tranche:** 11. **Sponsor:** the sponsoring group.\n**Accountable:** the SRO. **Owner:** the programme architect.\n\n**Outcome.** A delivery is one governed project row: every step from lane to live verify is recorded, a red CI run refuses the merge gate, the implementer cannot decide the gates that judge it, a deploy without a tested rollback is refused, and an exercised rollback records both digests and the schema generation.\n\n**Scope.** The development-project aggregate and its transitions; the gate refusals; the rollback record; the tenant auto-merge policy. Out: the CI system, the deploy applier's implementation, T5's kata loop and P0's programme definition.\n\n**Authority.** The sponsoring group decides the close; the SRO is accountable for the capability; the Architecture Board reviews Phase-G compliance; the release manager proves a deployed digest.\n\n**Gates.** Charter approved; scope baseline with one WBS deliverable; seven A–D artefacts bound; five registers; delivery contract approved; Phase-G review recorded; closure review published; acceptance receipt green at the pinned snapshot.\n",
+  "soaw": {
+    "title": "Statement of Architecture Work — T6 Development project (retrospective, 2026-11-28)",
+    "body": {
+      "assignment": "The sponsoring group assigns T6 the governance of the conveyor's own development: every delivery is a project row, every step is recorded, every gate is decided by a seat distinct from the builder, and every deploy is reversible. The architect answers to the SRO and the Architecture Board.",
+      "scope": "In scope: the development-project aggregate, its transitions, the gate refusals, the rollback record and the tenant auto-merge policy. Out of scope: the CI system, the deploy applier's implementation, the kata loop that reads the record (T5), and the programme definition (P0).",
+      "responsibilities": "The programme architect owns this statement and the Phase-G review; the implementer runs lanes and decides no gate that judges it; the release manager proves a deployed digest; the SRO is accountable for the capability; the sponsoring group decides the close.",
+      "acceptance_criteria": "The six scenarios pass: the step record, the red-CI refusal, the distinct-approver refusals, the rollback refusal and record, the auto-merge default, and the coverage agreement. The live rollback record is the end-to-end evidence for the deploy columns.",
+      "constraints": "No second CI and no second approval store; the compile verdict is the hosted preflight; a deploy without a tested rollback is refused; the implementer never approves a gate that judges its own delivery.",
+      "retrospective": "Authored retrospectively at tranche 11 from the delivered project, its migration, its test file and the 2026-11-27 live rollback. It claims the capability the tests prove and names the applier gap the exercise did not cover."
+    }
+  },
+  "artifacts": [
+    {
+      "title": "Stakeholder Map — T6 Development project (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "entries": [
+        {
+          "axis_a": "Sponsoring group",
+          "axis_b": "authorises the tranche and the close",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "SRO",
+          "axis_b": "accountable for the governed delivery chain",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "accountable"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Programme architect",
+          "axis_b": "owns the contract and the Phase-G review",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Release manager",
+          "axis_b": "proves the deployed digest and the live verification",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Implementer",
+          "axis_b": "runs the lane; decides no gate that judges it",
+          "value": {
+            "influence": "low",
+            "interest": "high",
+            "engagement": "inform"
+          },
+          "position": 5
+        }
+      ],
+      "links": [
+        {
+          "to": "Driver/Goal/Objective Catalog — T6 Development project (Phase A)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Stakeholder Map — T6 Development project (Phase A)\n\n## Metadata\n\nType: stakeholder matrix. Version 1, retrospective at tranche 11 (2026-11-28). Owner: the programme architect; reviewer: the Architecture Board. Phase A, PSA plateau, project T6.\n\n## Entries\n\nFive seats: the sponsoring group decides the close, the SRO is accountable for the governed chain, the programme architect owns the contract and the review, the release manager proves the deployed digest, and the implementer runs the lane without deciding any gate that judges it.\n\n## Links\n\nDerives the Driver/Goal/Objective Catalog: the implementer's exclusion from the gates is the driver that shapes the whole requirement set, and the catalogue records it as an objective rather than a convention.\n\n## Document\n\nThe map records the separation of duties the project exists to prove: the builder hands its work to a gate it does not decide. It is the Phase A artefact the delivery contract's commitments resolve against.\n"
+    },
+    {
+      "title": "Driver/Goal/Objective Catalog — T6 Development project (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "D36 development project",
+          "axis_b": "one governed row carries lane, CI, review, merge, deploy and live verify",
+          "value": {
+            "goal": "one record",
+            "objective": "every step recorded on the project row"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Gate independence",
+          "axis_b": "the implementer cannot decide the gates that judge it",
+          "value": {
+            "goal": "separation",
+            "objective": "distinct approver on every gate"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Rollback",
+          "axis_b": "a deploy without a tested rollback is refused",
+          "value": {
+            "goal": "reversibility",
+            "objective": "both digests and the schema generation recorded"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Auto-merge",
+          "axis_b": "off by default; the tenant policy row decides",
+          "value": {
+            "goal": "no silent merge",
+            "objective": "an explicit armed state"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements Catalog — T6 Development project (Phase A)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Driver/Goal/Objective Catalog — T6 Development project (Phase A)\n\n## Metadata\n\nType: driver/goal/objective catalogue. Version 1, retrospective at tranche 11 (2026-11-28). Owner: the programme architect; reviewer: the Architecture Board. Phase A, PSA plateau, project T6.\n\n## Entries\n\nFour drivers: one governed record per delivery, gate independence for the implementer, a tested rollback on every deploy, and auto-merge off unless the tenant policy arms it. Each maps to a requirement and a named test.\n\n## Links\n\nRealises the Requirements Catalog: every requirement row names the driver it serves, and the catalogue's objectives are the acceptance the requirement rows are checked against in `development_project.rs`.\n\n## Document\n\nThe catalogue records why the development project is a governance capability rather than a CI convenience. A green build is not the claim; the claim is that every step is recorded and that the builder cannot decide the gates that judge it.\n"
+    },
+    {
+      "title": "Requirements Catalog — T6 Development project (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "R1 step record",
+          "axis_b": "lane, PR, CI, review, merge, deploy and live verify on one row",
+          "value": {
+            "disposition": "delivered",
+            "evidence": "development_project.rs and migration 0068"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "R2 red CI refuses merge",
+          "axis_b": "a red run refuses the merge gate",
+          "value": {
+            "disposition": "delivered",
+            "evidence": "development_project.rs::a_red_ci_run_refuses_the_merge_gate"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "R3 distinct approver",
+          "axis_b": "the implementer cannot decide its own gates",
+          "value": {
+            "disposition": "delivered",
+            "evidence": "two refusal tests in development_project.rs"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "R4 tested rollback",
+          "axis_b": "a deploy without a tested rollback is refused; an exercised rollback records both digests",
+          "value": {
+            "disposition": "delivered",
+            "evidence": "three rollback tests and the 2026-11-27 live rollback"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "R5 auto-merge",
+          "axis_b": "defaults off and reads the tenant policy row",
+          "value": {
+            "disposition": "delivered",
+            "evidence": "development_project.rs::auto_merge_defaults_off"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "R6 live verification",
+          "axis_b": "the deployed digest answers the acceptance probe",
+          "value": {
+            "disposition": "delivered",
+            "evidence": "the 2026-11-27 rollback record's health checks"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Business Capability Map — T6 Development project (Phase B)",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Requirements Catalog — T6 Development project (Phase A)\n\n## Metadata\n\nType: requirements catalogue. Version 1, retrospective at tranche 11 (2026-11-28). Owner: the programme architect; reviewer: the Architecture Board. Phase A, PSA plateau, project T6.\n\n## Entries\n\nSix requirements: the step record on one row, a red CI refusing the merge gate, a distinct approver for every gate, a tested and recorded rollback, auto-merge off by default, and a live verification against the deployed digest. Each names its test or its evidence.\n\n## Links\n\nDerives the Business Capability Map: the requirements cluster into one capability — governed self-development — and the map records what the capability lets the programme do that a bespoke deploy script could not.\n\n## Document\n\nThe catalogue is the trace from the SPEC_V2 T6 gate sentence to the tests. The two rollback tests prove the refuse-and-record behaviour; the live rollback on 2026-11-27 proved the behaviour against a database at a later migration than the binary.\n"
+    },
+    {
+      "title": "Solution Concept Diagram — T6 Development project (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "entries": [
+        {
+          "axis_a": "Lane",
+          "axis_b": "the implementer's branch and worktree",
+          "value": {
+            "path": "issue branch -> pull request"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "CI",
+          "axis_b": "preflight and the full suite decide the run",
+          "value": {
+            "path": "preflight -> ci-public -> merge queue"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Gate",
+          "axis_b": "the project row records every step and its approver",
+          "value": {
+            "path": "development_project row + approvals"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Deploy",
+          "axis_b": "an applied digest, a tested rollback and a live probe",
+          "value": {
+            "path": "image digest -> namespace -> health"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Stakeholder Map — T6 Development project (Phase A)",
+          "kind": "reuse"
+        }
+      ],
+      "body": "# Solution Concept Diagram — T6 Development project (Phase A)\n\n## Metadata\n\nType: solution concept. Version 1, retrospective at tranche 11 (2026-11-28). Owner: the programme architect; reviewer: the Architecture Board. Phase A, PSA plateau, project T6.\n\n## Entries\n\nOne chain: the implementer's lane produces a pull request, the repository's CI decides the run, the project row records each step with its approver, and the deploy applies a digest with a tested rollback and a live probe. No step is skipped and no gate is decided by the builder.\n\n## Links\n\nReuses the Stakeholder Map: the implementer's exclusion is what the chain's approver columns encode, and the release manager's seat is the one that reads the live probe.\n\n## Document\n\nThe concept is a governance chain, not a pipeline diagram. Its output is a record a reviewer can read: who approved the merge, which run refused it, which digest deployed, and what the rollback would restore.\n"
+    },
+    {
+      "title": "Business Capability Map — T6 Development project (Phase B)",
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "entries": [
+        {
+          "axis_a": "Governed self-development",
+          "axis_b": "the conveyor changes itself under its own gates",
+          "value": {
+            "level": "delivered",
+            "evidence": "development_project.rs and the live rollback"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Auditable delivery",
+          "axis_b": "every step and approver is a row, not a memory",
+          "value": {
+            "level": "delivered",
+            "evidence": "the project row and its approval links"
+          },
+          "position": 2
+        }
+      ],
+      "links": [
+        {
+          "to": "Data Entity/Data Component Catalog — T6 Development project (Phase C)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Business Capability Map — T6 Development project (Phase B)\n\n## Metadata\n\nType: capability map. Version 1, retrospective at tranche 11 (2026-11-28). Owner: the programme architect; reviewer: the Architecture Board. Phase B, HLD plateau, project T6.\n\n## Entries\n\nTwo capabilities: governed self-development (the conveyor changing itself with rollback) and auditable delivery (every step and approver recorded). The second is what makes the first safe to grant.\n\n## Links\n\nDepends on the Data Entity Catalog: the capability is only real because the rows exist and are queryable — the project row, the approvals, the deploy record and the rollback digests.\n\n## Document\n\nThe map records the boundary between a capability and a wish. A team that can deploy is not the claim; a team whose deploys are recorded, gated by a distinct approver and reversible is the capability this project delivered.\n"
+    },
+    {
+      "title": "Data Entity/Data Component Catalog — T6 Development project (Phase C)",
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "development_project",
+          "axis_b": "one row per delivery: lane, PR, CI, review, merge, deploy, verify",
+          "value": {
+            "owner": "conveyor",
+            "migration": "0068_development_project.sql"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "approval",
+          "axis_b": "the gate decisions, with a distinct approver",
+          "value": {
+            "owner": "conveyor",
+            "migration": "the approval primitive"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "run",
+          "axis_b": "the CI and deploy attempts attached to the project",
+          "value": {
+            "owner": "conveyor",
+            "migration": "the seed"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "rollback record",
+          "axis_b": "both digests and the schema generation",
+          "value": {
+            "owner": "conveyor",
+            "migration": "0068_development_project.sql"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Technology Standards Catalog — T6 Development project (Phase D)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Data Entity/Data Component Catalog — T6 Development project (Phase C)\n\n## Metadata\n\nType: data entity catalogue. Version 1, retrospective at tranche 11 (2026-11-28). Owner: the programme architect; reviewer: the Architecture Board. Phase C, HLD plateau, project T6.\n\n## Entries\n\nFour entities: the development project row, the approval rows that name each gate's approver, the runs attached to the project, and the rollback record carrying both digests and the schema generation. Migration 0068 creates the project and rollback tables.\n\n## Links\n\nDepends on the Technology Standards Catalog: the rows live in the one Postgres primary, are reached through PgBouncer, and the schema is migrated by the pipeline's migrate role — the standards the project's own deploy chain must obey.\n\n## Document\n\nThe catalogue records why the project cannot be proved from CI logs: a green run is one input, and the capability's claim is that the row plus its approvals plus the deploy record agree. That is what a reviewer reads at closure.\n"
+    },
+    {
+      "title": "Technology Standards Catalog — T6 Development project (Phase D)",
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "Language and runtime",
+          "axis_b": "Rust workspace; the conveyor service image",
+          "value": {
+            "standard": "the repository's Rust archetype"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "CI",
+          "axis_b": "GitHub-hosted preflight and the repository suite; no local compile gate",
+          "value": {
+            "standard": "the repository's workflow set"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Database",
+          "axis_b": "Postgres 18 behind PgBouncer; migrations by the migrate role",
+          "value": {
+            "standard": "one database, one migrate role"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Merge",
+          "axis_b": "the merge queue; auto-merge off unless the tenant policy arms it",
+          "value": {
+            "standard": "the repository's merge-queue policy"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Business Capability Map — T6 Development project (Phase B)",
+          "kind": "reuse"
+        }
+      ],
+      "body": "# Technology Standards Catalog — T6 Development project (Phase D)\n\n## Metadata\n\nType: technology standards catalogue. Version 1, retrospective at tranche 11 (2026-11-28). Owner: the programme architect; reviewer: the Architecture Board. Phase D, HLD plateau, project T6.\n\n## Entries\n\nThe chain runs on the repository's Rust workspace and its GitHub-hosted CI, the merge queue, Postgres 18 behind PgBouncer with a separate migrate role, and the image deploy path with a tested rollback.\n\n## Links\n\nReuses the Business Capability Map: the standards exist so the governed capability is provable on the estate's own instruments rather than a bespoke script that could bypass them.\n\n## Document\n\nThe catalogue fixes the two rules the capability depends on: the compile verdict comes from the hosted preflight, never a local build, and no deploy path may skip the rollback record. A future change that breaks either breaks the project's claim.\n"
+    }
+  ],
+  "documents": [
+    {
+      "category": "architecture-artifact",
+      "title": "Architecture Artefact Index — T6 Development project (retrospective, 2026-11-28)",
+      "body": "# Architecture Artefact Index — T6 Development project (retrospective, 2026-11-28)\n\n## Metadata\n\nSeven A–D artefacts are bound to T6 in the standard's order: stakeholder map, driver/goal/objective catalogue, requirements catalogue, solution concept, business capability map, data entity catalogue and technology standards catalogue. Owner: the programme architect; reviewer: the Architecture Board; phase G retrospective.\n\n## Entries\n\n- Stakeholder Map — Phase A, matrix: five seats, including the implementer's exclusion.\n- Driver/Goal/Objective Catalog — Phase A, catalogue: D36 and the three governance drivers.\n- Requirements Catalog — Phase A, catalogue: six requirements with their tests.\n- Solution Concept Diagram — Phase A, diagram: lane, CI, gate row, deploy and probe.\n- Business Capability Map — Phase B, diagram: governed self-development and auditable delivery.\n- Data Entity/Data Component Catalog — Phase C, catalogue: the project, approval, run and rollback rows.\n- Technology Standards Catalog — Phase D, catalogue: Rust, hosted CI, Postgres, merge queue.\n\n## Links\n\n- Plan: `docs/SPEC_V2.md` §12 T6; `docs/plans/T6/closure-review.md`; `docs/plans/T6/evidence.md`.\n- Evidence: `crates/actions/tests/development_project.rs`, migration `0068_development_project.sql`.\n\n## Document\n\nThe index is the published entry point to T6's typed artefacts. Every artefact carries its own document, so a reader can follow a row from the index to the artefact and back without a second catalogue.\n"
+    },
+    {
+      "category": "user-stories",
+      "title": "User stories — T6 Development project (retrospective, 2026-11-28)",
+      "body": "# User stories — T6 Development project (retrospective, 2026-11-28)\n\n## Personas\n\nThe implementer, who runs a lane and must not decide the gates that judge it; the reviewer, who reads the project row rather than a chat summary; the release manager, who proves a deployed digest; and the sponsoring group, which decides the close on the record.\n\n## Stories\n\n- As the implementer, I want every step of my delivery recorded on one row, so that the review reads the record and not my description of it.\n- As the reviewer, I want a red CI run to refuse the merge, so that a green claim cannot overrule the instrument.\n- As the release manager, I want a deploy without a tested rollback refused, so that every deploy I approve is reversible.\n- As the sponsoring group, I want the gates decided by an approver distinct from the builder, so that the close is a governance act.\n\n## Scenarios\n\n- Given a delivery in flight, when each step completes, then the project row carries lane, PR, CI, review, merge, deploy and live verify.\n- Given a red CI run, when the merge gate is requested, then it refuses and the refusal is recorded.\n- Given a deploy without a rollback, when it is attempted, then it is refused; given an exercised rollback, then both digests and the schema generation are recorded.\n- Given an approval gate, when the implementer attempts to decide it, then the store refuses.\n\n## Verify\n\n- `cargo test -p conveyor-actions --test development_project` — the six named scenarios.\n- `python3 scripts/verify-project.py --project T6` — the receipt.\n- The 2026-11-27 live rollback record — the behaviour against a later migration.\n"
+    },
+    {
+      "category": "acceptance-criteria",
+      "title": "Acceptance criteria — T6 Development project (retrospective, 2026-11-28)",
+      "body": "# Acceptance criteria — T6 Development project (retrospective, 2026-11-28)\n\n## Scenarios\n\n- AC1: a development project records every step from lane to live verify on one row.\n- AC2: a red CI run refuses the merge gate.\n- AC3: the implementer cannot decide the gates that judge it, and a project cannot change its own gates.\n- AC4: a deploy without a tested rollback is refused; an exercised rollback records both digests and the schema generation.\n- AC5: auto-merge defaults off and reads the tenant policy row.\n- AC6: the project row, coverage and programme agree at the close.\n\n## Verify commands\n\n- `cargo test -p conveyor-actions --test development_project` — AC1 to AC5.\n- The store test `the_database_refuses_a_lesson_with_one_independent_ref` is T8's, not this project's.\n- `python3 scripts/build-coverage.py --check` — AC6's coverage agreement at the merge head.\n\n## Results\n\nAll six pass. AC1–AC5 are the named tests in `crates/actions/tests/development_project.rs`; AC4 is additionally evidenced by the 2026-11-27 live rollback, which ran a binary embedding migrations through 0080 against a database at 0081 and recorded both digests with a health check at each step.\n\n## Status\n\nAccepted. The project closes through its gate in tranche 11; the closure review records `Close`, and the live rollback's applier gap (the behaviour was exercised through the deployment repository, not conveyor's own applier) is recorded as another unit's scope.\n"
+    },
+    {
+      "category": "definition-of-ready",
+      "title": "Definition of ready — T6 Development project (retrospective, 2026-11-28)",
+      "body": "# Definition of ready — T6 Development project (retrospective, 2026-11-28)\n\n## Independent\n\nThe project lands in this repository without another project's files: migration 0068, the actions and their tests are its own. Its dependencies are typed in the project row (T5, T13, P0) and delivered in earlier tranches, so no file overlap remains.\n\n## Negotiable\n\nThe outcome is fixed — a governed chain with recorded steps and independent gates. The shape of each action, the test names and the store's refusal messages were settled at delivery against the schema, not in the brief.\n\n## Valuable\n\nThe unit removes a named gap: a deployment that is not recorded, gated or reversible is a bespoke process. The delivered capability is the one way the conveyor changes itself with rollback, which is what B3 Self-development measures.\n\n## Estimable\n\nThe baseline, the files and the acceptance are named: `migrations/0068_development_project.sql`, `crates/actions/tests/development_project.rs`, the merge commits `00094194` and `a8c22f8e`, and the 2026-11-27 live rollback record.\n\n## Small\n\nOne project, one migration, one test file, one delivery unit (#80). The follow-on applier work belongs to another unit and is recorded in the closure review's open items, not smuggled into this one.\n\n## Testable\n\nEvery scenario carries a test or a command: six named tests in `development_project.rs`, the coverage check, and the live rollback record for the deploy behaviour.\n\n## Dependencies\n\nT5 (kata) and T13 (tool platform) in the project row, plus the P0 programme definition. T5 and T13 delivered in trans 10 and 3; the close is not blocked on them.\n"
+    },
+    {
+      "category": "definition-of-done",
+      "title": "Definition of done — T6 Development project (retrospective, 2026-11-28)",
+      "body": "# Definition of done — T6 Development project (retrospective, 2026-11-28)\n\n## Acceptance criteria\n\nAll six criteria are evidenced at their merge heads: AC1–AC5 by the named tests, AC4 additionally by the 2026-11-27 live rollback, and AC6 by the coverage check at `7d5ef094`. A criterion without a named test is not done, whatever the prose says.\n\n## Evidence at completion\n\nThe evidence is `crates/actions/tests/development_project.rs`, migration `0068_development_project.sql`, the merges `00094194130b2e652a2c62fe1f0c11ccfa3e3fdb` (PR #658) and `a8c22f8e3401d66f2e2f00d579ee00d73b7775b3` (PR #672), and `docs/evidence/2026-11-27-rollback-migration-boundary.md`.\n\n## Repo gate\n\nThe compile and lint verdict is the repository's GitHub-hosted preflight; the targeted suite runs through the sanctioned route. No local cargo build is a gate, and the closure does not claim one.\n\n## Merge and closure\n\nThe delivery merged and the project closes in tranche 11 through its closure gate: the closure review is published with its four sections, the manifest states `closed`, and the receipt is green at the pinned snapshot. The applier gap is recorded as other scope.\n"
+    },
+    {
+      "category": "inception-analysis",
+      "title": "Inception Analysis — T6 Development project (retrospective, 2026-11-28)",
+      "body": "# Inception Analysis — T6 Development project (retrospective, 2026-11-28)\n\n## Current state\n\nBefore T6 the programme's own changes were delivered by whatever process the session happened to use: a branch, a hand-run test, a merge, and a deploy whose rollback was a hope. No row carried the steps, and the builder decided its own gates.\n\n## Reuse sources\n\nThe project reuses the conveyor's own primitives: the project row, the approval primitive, the run ledger and the image deploy path. It adds one migration (0068) and one test file; it invents no second deploy system.\n\n## Build vs reuse\n\nBuild: the typed step record, the gate refusals and the rollback record on the project row. Reuse: the approval primitive, the existing run ledger and the merge queue. Do not build: a second CI, a second approval store, or a deploy tool that bypasses the repository's path.\n\n## Risks\n\nThe main risk is a gate that exists in code but is bypassed in practice, so every refusal is a test rather than a policy sentence. The second is a rollback that is recorded but never exercised; the 2026-11-27 live rollback closes that gap for one boundary and names the applier gap that remains.\n"
+    },
+    {
+      "category": "architecture-analysis",
+      "title": "Architecture Analysis — T6 Development project (retrospective, 2026-11-28)",
+      "body": "# Architecture Analysis — T6 Development project (retrospective, 2026-11-28)\n\n## Current state\n\nThe analysis started from one question: what must be true for the conveyor to change itself safely? The answer had four parts — a record of every step, a CI verdict that refuses the merge, an approver distinct from the builder, and a rollback that is refused without a test and recorded when exercised.\n\n## Options considered\n\n- A checklist and a human promise: refused, because it cannot refuse a merge.\n- A second CI system for the conveyor's own repo: refused, because it duplicates the estate's gate and splits the record.\n- A typed project row plus the existing primitives: chosen, because it makes every step queryable and every gate decidable by a distinct seat.\n\n## Risks\n\nA row that is written after the fact is a narrative, so each transition is an action with an approval. A rollback record that is never exercised is a claim, so the project required a live exercise; the 2026-11-27 record is that exercise, and it names the applier gap it did not cover.\n\n## Dependency map\n\nT5 supplies the kata loop that will read the record; T13 supplies the governed tool platform the deploy path uses; P0 supplies the programme definition and the gates. The edges are typed in the project row and were delivered before this close.\n"
+    },
+    {
+      "category": "architecture-design",
+      "title": "Architecture Design — T6 Development project (retrospective, 2026-11-28)",
+      "body": "# Architecture Design — T6 Development project (retrospective, 2026-11-28)\n\n## Context and boundary\n\nT6 is the conveyor's development-project capability. Inside: the project row, its step transitions, the gate refusals, the rollback record and the auto-merge policy. Outside: the CI system itself, the deploy applier's own implementation, and any project management process the tenant has not bound.\n\n## Aggregates, tables and actions\n\nOne aggregate, `development_project`, with transitions for lane, PR, CI, review, merge, deploy and live verify; the approval primitive decides each gate; migration 0068 adds the table and the rollback record's columns. The actions refuse a red CI merge, an implementer's own gate decision, a self-changed gate, and a deploy without a tested rollback.\n\n## Decisions\n\nFour decisions: the project row is the single record; gates are approvals with a distinct approver; auto-merge is off unless the tenant policy arms it; a rollback records both digests and the schema generation. Each is a test, not a policy sentence.\n\n## Acceptance\n\nThe acceptance is the six scenarios in `development_project.rs` plus the coverage agreement at the merge head. The live rollback of 2026-11-27 is the end-to-end evidence for the deploy and rollback columns.\n\n## Architecture artefacts\n\nThe seven A–D artefacts record the seats, the drivers, the requirements, the concept, the capability, the rows and the standards. The design's links are the artefact chain, and the published index is their entry point.\n"
+    },
+    {
+      "category": "statement-of-architecture-work",
+      "title": "Statement of Architecture Work — T6 Development project (retrospective, 2026-11-28)",
+      "body": "# Statement of Architecture Work — T6 Development project (retrospective, 2026-11-28)\n\n## Assignment\n\nThe sponsoring group assigns T6 the governance of the conveyor's own development: every delivery is a project row, every step is recorded, every gate is decided by a seat distinct from the builder, and every deploy is reversible. The architect answers to the SRO and the Architecture Board.\n\n## Scope\n\nIn scope: the development-project aggregate, its transitions, the gate refusals, the rollback record and the tenant auto-merge policy. Out of scope: the CI system, the deploy applier's implementation, the kata loop that reads the record (T5), and the programme definition (P0).\n\n## Responsibilities\n\nThe programme architect owns this statement and the Phase-G review; the implementer runs lanes and decides no gate that judges it; the release manager proves a deployed digest; the SRO is accountable for the capability. The sponsoring group decides the close.\n\n## Acceptance criteria\n\nThe six scenarios pass: the step record, the red-CI refusal, the distinct-approver refusals, the rollback refusal and record, the auto-merge default, and the coverage agreement. The live rollback record is the end-to-end evidence for the deploy columns.\n\n## Contract\n\nThis statement is the architecture contract the Phase-G review reads. It binds the project to the estate's CI, approval and deploy primitives and forbids the two shortcuts the analysis refused: a second CI and a second approval store.\n"
+    }
+  ],
+  "registers": {
+    "risk": [
+      {
+        "code": "T6-R1",
+        "title": "A gate could exist in code and still be bypassed by a hand merge",
+        "body": "The refusals are enforced in the action layer and the store. A hand merge outside the queue, or a direct database write, bypasses them; the record would then claim a gate that never ran.",
+        "probability": "low",
+        "impact": 4,
+        "review_at": "2026-12-19",
+        "severity": "high",
+        "status": "open",
+        "response": "The merge queue and branch protection are the enforcement; the receipt records the gate, and a bypass is an incident rather than a permitted route.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "crates/actions/tests/development_project.rs"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
+      },
+      {
+        "code": "T6-R2",
+        "title": "The rollback behaviour is proved for one migration boundary only",
+        "body": "The 2026-11-27 live rollback exercised a binary embedding migrations through 0080 against a database at 0081. A different boundary — a destructive or non-additive migration — has the refusal test but no live exercise.",
+        "probability": "medium",
+        "impact": 3,
+        "review_at": "2026-12-19",
+        "severity": "medium",
+        "status": "open",
+        "response": "The refusal test covers the non-additive case; a second live exercise is recorded as a candidate for the applier unit the closure review names.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/evidence/2026-11-27-rollback-migration-boundary.md"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the release manager (conveyor-e2e)"
+        }
+      }
+    ],
+    "issue": [
+      {
+        "code": "T6-I1",
+        "title": "The deploy applier gap: the live rollback ran through the deployment repository, not conveyor's applier",
+        "body": "The capability's deploy and rollback columns are proved, but the exercise used the GitOps path rather than conveyor's own applier. The applier's implementation remains another unit's scope.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/evidence/2026-11-27-rollback-migration-boundary.md"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the release manager (conveyor-e2e)"
+        }
+      }
+    ],
+    "assumption": [
+      {
+        "code": "T6-A1",
+        "title": "The tenant auto-merge policy row is authoritative",
+        "body": "Auto-merge off is the default, and the project reads the tenant policy row rather than a repository setting. The assumption is that no tenant-level change silently arms it; the test reads the row on every decision.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "crates/actions/tests/development_project.rs"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
+      }
+    ],
+    "dependency": [
+      {
+        "code": "T6-D1",
+        "title": "T6 depends on T5, T13 and P0",
+        "body": "The project row records the edges: T5 supplies the kata loop that reads the record, T13 the governed tool platform the deploy path uses, and P0 the programme definition and its gates. Each delivered in an earlier tranche.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "seed/programme-definition.json"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
+      }
+    ],
+    "benefit": [
+      {
+        "code": "T6-B1",
+        "title": "B3 Self-development: the conveyor changes itself with rollback",
+        "body": "Before T6 a change was delivered by an ad-hoc process; after it, a delivery is a governed row with a recorded CI verdict, an independent approver and a tested rollback. B3's target — one self-development run reaches live verification on evidence, and a second is repeatable — is measured by this record.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "seed/programme-definition.json"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the SRO (conveyor-e2e)"
+        }
+      }
+    ]
+  },
+  "delivery_contract": {
+    "title": "Delivery Contract — T6 Development project (retrospective, 2026-11-28)",
+    "body": {
+      "commitments": "The delivery commits to the six requirements the Requirements Catalog states — the one-row step record, the red-CI merge refusal, a distinct approver for every gate, a tested and recorded rollback, auto-merge off by default, and a live verification — and to the boundary the Statement of Architecture Work draws: no second CI, no second approval store.",
+      "compliance": "Compliance is measured by `crates/actions/tests/development_project.rs` for the refusals and the record, by the coverage check for the programmatic agreement, and by the 2026-11-27 live rollback for the deploy and rollback columns. The Phase-G review records the level and names the applier gap as other scope.",
+      "approval": "The contract is approved by the programme architect as the delegated architecture authority under the standing rule decision; the closure decision is taken by the distinct approver the factory's gate requires, and the closure review records it.",
+      "manifest": "acceptance/programme/T6.toml",
+      "acceptance_at": "The acceptance is the six-scenario suite at the delivered merge, the coverage agreement at 7d5ef094, and this rework's receipt at the pinned snapshot; the closure gate then reads the published documents and the green receipt.",
+      "retrospective": "Authored at tranche 11. The live rollback was exercised through the deployment repository rather than conveyor's own applier; that gap is recorded here and in the closure review rather than being claimed as delivered.",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+    }
+  },
+  "wbs_deliverable": {
+    "title": "The governed development chain is delivered and re-closed through its gate — one row records every step, the refusals are tests, and the rollback is exercised",
+    "business_value": 9,
+    "time_criticality": 6,
+    "risk_reduction": 8,
+    "job_size": 8
+  },
+  "review": {
+    "level": "compliant",
+    "findings": "The delivery is compliant with its contract: all six acceptance criteria are named by tests, the rollback refusal and record are proved by three scenarios and by the 2026-11-27 live exercise, and the coverage agrees at the merge head. One gap is recorded as other scope: the live exercise ran through the deployment repository, not conveyor's own applier.",
+    "evidence": {
+      "manifest": "acceptance/programme/T6.toml",
+      "suite": "crates/actions/tests/development_project.rs",
+      "start_suite": "migrations/0068_development_project.sql",
+      "resolver_suite": "docs/evidence/2026-11-27-rollback-migration-boundary.md",
+      "receipt": "docs/evidence/rework/T6.json",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+    }
+  },
+  "closure": "T6 is re-closed through the gate the record carries: the project row closes only after its charter, scope baseline, seven A–D artefacts, five registers, delivery contract, WBS deliverable, Phase-G review, both declared outputs and the retrospective closure review exist, and the receipt on `acceptance/programme/T6.toml` is green at the pinned snapshot. The close records the applier gap as other scope and claims no deployment proof the live rollback did not exercise.",
+  "closure_review": "# Closure Review — T6 Development project (retrospective, 2026-11-28)\n\n## Outcome vs acceptance\n\n| Acceptance criterion | Evidence | Result |\n|---|---|---|\n| A development project records every step from lane to live verify | `crates/actions/tests/development_project.rs::a_development_project_records_every_step_from_lane_to_live_verify`; migration `0068_development_project.sql` | pass |\n| A red CI run refuses the merge gate | `development_project.rs::a_red_ci_run_refuses_the_merge_gate` | pass |\n| The implementer cannot decide the gates that judge it | `development_project.rs::the_implementer_cannot_decide_its_own_merge_gate`, `::a_development_project_cannot_change_the_gates_that_judge_it` | pass |\n| A deploy without a tested rollback is refused; an exercised rollback records both digests and the schema generation | `development_project.rs::a_deploy_without_a_tested_rollback_is_refused`, `::an_exercised_rollback_records_both_digests_and_the_schema_generation`, `::an_application_rollback_across_a_non_additive_migration_is_refused` | pass |\n| Auto-merge defaults off and reads the tenant policy row | `development_project.rs::auto_merge_defaults_off_and_reads_the_tenant_policy_row` | pass |\n| The project row, coverage and programme agree | #80 closed; PRs #658 (`00094194`) and #672 (`a8c22f8e`); `build-coverage.py --check` green at `7d5ef094` | pass |\n\n## Evidence\n\n- Delivery merges `00094194130b2e652a2c62fe1f0c11ccfa3e3fdb` (PR #658) and `a8c22f8e3401d66f2e2f00d579ee00d73b7775b3` (PR #672).\n- Schema: `migrations/0068_development_project.sql`.\n- Behaviour: the six named scenarios in `crates/actions/tests/development_project.rs`.\n- Live rollback: `docs/evidence/2026-11-27-rollback-migration-boundary.md` — a binary embedding migrations through 0080 against a database at 0081, both digests and `/health` 200 at each step.\n\n## Open items\n\n- The live rollback was exercised through the deployment repository and the GitOps reconcile path, not through conveyor's own deploy applier; the applier gap stands and is another unit's scope.\n- The rollback proof covers one migration boundary; a destructive boundary has the refusal test but no live exercise.\n- The tranche-11 authorisation is not claimed here; it is the programme chain's act.\n\n## Decision\n\nClose. Acceptance is met on the evidence above; the applier gap and the boundary note are recorded as other scope, and this review does not manufacture a tranche authorisation.\n",
+  "project_brief_output": "# T6 — Development project\n\n**Track:** v2 · **Tranche:** 11 · **Measured status:** closed · **Issues:** #80 (closed)\n**Gate:** a real feature lands lane → PR → CI → review → merge → deploy → live verify; the project cannot change its own gates; rollback tested.\n\n## Outcome\n\nA delivery is one governed project row: every step is recorded, a red CI run refuses the merge, the implementer cannot decide the gates that judge it, and a deploy without a tested rollback is refused.\n\n## Boundary\n\nIn: the development-project aggregate, its transitions, the gate refusals, the rollback record, the tenant auto-merge policy. Out: the CI system, the deploy applier's implementation, T5's kata loop and P0's definition.\n\n## Reuse sources\n\nThe project row, the approval primitive, the run ledger and the image deploy path. One migration (0068) and one test file; no second CI and no second approval store.\n\n## Inception units\n\nThe analysis and architecture documents are published on this project; the seven A–D artefacts are bound in the standard's order and indexed by the published architecture-artifact document.\n\n## Dependencies\n\nT5 (kata), T13 (tool platform) and P0 (programme definition), typed in the project row and delivered in earlier tranches.\n\n## Acceptance\n\nThe six scenarios in `development_project.rs` pass, the coverage agrees at `7d5ef094`, and the 2026-11-27 live rollback evidences the deploy and rollback columns.\n\n## Capabilities\n\nGoverned self-development and auditable delivery: the conveyor changes itself under gates a distinct approver decides, and every step is a row.\n\n## Plan\n\nDelivered by #80 (PRs #658, #672); the closure review is `docs/plans/T6/closure-review.md`. The applier gap and the single-boundary rollback proof are recorded as other scope, and the project closes in tranche 11 through its gate.\n",
+  "evidence_output": "# Evidence — T6 Development project\n\n## Claim\n\nT6 delivered the conveyor's governed development capability: every step of a delivery is recorded on one project row, a red CI run refuses the merge, the implementer cannot decide the gates that judge it, and a deploy without a tested rollback is refused.\n\n## Evidence\n\n- `crates/actions/tests/development_project.rs` — the six named scenarios.\n- `migrations/0068_development_project.sql` — the project and rollback schema.\n- Merges `00094194` (PR #658) and `a8c22f8e` (PR #672); issue #80 closed.\n- `docs/evidence/2026-11-27-rollback-migration-boundary.md` — the live rollback with both digests and health checks.\n\n## Verification\n\nRun `cargo test -p conveyor-actions --test development_project` at a checked-out main; the CI equivalent is the merged PRs' preflight and ci-public runs. The coverage agreement is `python3 scripts/build-coverage.py --check` at `7d5ef094`.\n\n## Links\n\n- Closure review: `docs/plans/T6/closure-review.md` — the decision and its outcome table.\n- Evidence document: `docs/plans/T6/evidence.md` — the claim, the tests and the stated gap.\n- Unit: #80 — the delivery issue, closed by the two merges.\n- Plan: `docs/SPEC_V2.md` §12 T6 — the gate sentence this evidence answers.\n\n## Gap\n\nThe live rollback ran through the deployment repository, not conveyor's own deploy applier; the applier gap is another unit's scope. The rollback proof covers one migration boundary; a destructive boundary has the refusal test but no live exercise.\n"
+}

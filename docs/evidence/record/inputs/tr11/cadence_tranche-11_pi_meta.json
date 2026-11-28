@@ -1,0 +1,116 @@
+{
+  "id": "01a222e7-0eb9-7386-8e46-4b8f39fb8302",
+  "meta": {
+    "tranche_id": "01a1e9e1-33f4-70a7-8af4-658f1c583e99",
+    "tranche_number": 11,
+    "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+    "pi_plan": {
+      "scope": [
+        "S14",
+        "T6",
+        "T8"
+      ],
+      "period": "tranche-11",
+      "capacity": {
+        "projects": [
+          "S14",
+          "T6",
+          "T8"
+        ],
+        "read_agents_max": 6,
+        "build_concurrency": 1,
+        "live_record_writer": 1
+      },
+      "evidence": [
+        "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+        "01a1e9e1-33f4-70a7-8af4-658f1c583e99",
+        "docs/evidence/rework/tranche-11/refinement-wsjf.json",
+        "docs/evidence/rework-register.json"
+      ],
+      "wip_limit": {
+        "open_batches": 2,
+        "open_cards_per_writer": 1
+      },
+      "objectives": [
+        {
+          "id": "O1",
+          "committed": true,
+          "business_value": 8,
+          "statement": "S14 is accepted on its surviving evidence and stays active because #29 remains open."
+        },
+        {
+          "id": "O2",
+          "committed": true,
+          "business_value": 9,
+          "statement": "T6 is re-closed through its closure gate with its authored set and a compliant Phase-G review."
+        },
+        {
+          "id": "O3",
+          "committed": true,
+          "business_value": 8,
+          "statement": "T8 is re-closed through its closure gate with its authored set and a compliant Phase-G review."
+        },
+        {
+          "id": "O4",
+          "committed": false,
+          "business_value": 7,
+          "statement": "The two tranche-11 SAFe gaps clear and the exit gate hands three fresh receipts to #755."
+        }
+      ],
+      "refinement": {
+        "cadence_id": "01a222e7-1b99-7069-90d9-c34763ac508b"
+      },
+      "dependencies": [
+        {
+          "from": "S14",
+          "to": "S00",
+          "note": "S14 declares depends_on S00, delivered in tranche 0"
+        },
+        {
+          "from": "S14",
+          "to": "S06b",
+          "note": "S14 declares depends_on S06b, delivered in tranche 6"
+        },
+        {
+          "from": "S14",
+          "to": "S12",
+          "note": "S14 declares depends_on S12, delivered in tranche 10"
+        },
+        {
+          "from": "S14",
+          "to": "S13",
+          "note": "S14 declares depends_on S13, delivered in tranche 8 (#952)"
+        },
+        {
+          "from": "T6",
+          "to": "T5",
+          "note": "T6 declares depends_on T5, delivered in tranche 10"
+        },
+        {
+          "from": "T6",
+          "to": "T13",
+          "note": "T6 declares depends_on T13, delivered in tranche 3"
+        },
+        {
+          "from": "T6",
+          "to": "P0",
+          "note": "T6 declares depends_on the programme definition"
+        },
+        {
+          "from": "T8",
+          "to": "T5",
+          "note": "T8 declares depends_on T5, delivered in tranche 10"
+        },
+        {
+          "from": "T8",
+          "to": "P0",
+          "note": "T8 declares depends_on the programme definition"
+        }
+      ]
+    },
+    "documents": {
+      "pi-plan": "01a222e7-31e3-738a-a4a6-854970f4bff2",
+      "pi-objectives": "01a222e7-42de-739b-9381-6f5743287704"
+    }
+  }
+}

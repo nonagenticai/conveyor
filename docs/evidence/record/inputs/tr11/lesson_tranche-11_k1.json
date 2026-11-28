@@ -1,0 +1,16 @@
+{
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "cadence_id": "01a222e7-1cff-79d4-92b4-9f979eb4dd4b",
+  "finding_key": "k1",
+  "statement": "A tranche whose members sit beyond the standard's scope.through_tranche reads as almost empty in the package list while its register rows carry the v4 gap: tranche 11 has two tranche-scope packages and zero per member, yet the register's missing list carries 16, 13 and 15 of the 17 declared categories for S14, T6 and T8. The package count is scope-filtered; a tranche preparation must read each project's missing list, or it will author nothing and still believe it measured the tranche.",
+  "evidence": [
+    {
+      "kind": "path",
+      "value": "docs/evidence/rework-register.json"
+    },
+    {
+      "kind": "path",
+      "value": "seed/output-standard.json"
+    }
+  ]
+}

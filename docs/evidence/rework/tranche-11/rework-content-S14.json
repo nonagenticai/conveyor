@@ -1,0 +1,588 @@
+{
+  "charter": "# Project charter — S14 Cutover\n\n**Project:** S14 — Cutover — deploy, seed, rehearse, decommission fr / RM / Planka. **Track:** v1.\n**Tranche:** 11. **Sponsor:** the sponsoring group. **Accountable:** the SRO. **Owner:** the programme architect.\n\n**Outcome.** One live native service carries the agent platform's conveyor path; the legacy fr, requirements and Planka surfaces are absent by object; a rollback has been rehearsed and its runbook records both digests.\n\n**Scope.** The repository, its CI and image; the namespace, service, database roles and PgBouncer entry; the ingress host and tunnel; the Keycloak realm and its two clients; the licence key; the seed; the rehearsals; the agent registration; the decommission; the runbook. No data migration.\n\n**Authority.** The sponsoring group decides go/no-go and the archived-repo rename; the SRO is accountable for the live service; the Architecture Board reviews the Phase-G compliance; the release manager proves a deployed digest with a live probe.\n\n**Gates.** Charter approved; scope baseline with one WBS deliverable; seven A–D artefacts bound; five registers; delivery contract approved; Phase-G review recorded; acceptance receipt green at the pinned snapshot. The project does not close in tranche 11 because #29 is open.\n",
+  "soaw": {
+    "title": "Statement of Architecture Work — S14 Cutover (retrospective, 2026-11-28)",
+    "body": {
+      "assignment": "The sponsoring group assigns S14 the cutover of the programme's conveyor capability: create the service, deploy it, seed it, switch the agent's registration, prove it against the signed contract, decommission the legacy chain and rehearse a rollback. The architect answers to the SRO and the Architecture Board.",
+      "scope": "In scope: repository and CI, namespace and service on 8930, database roles and the PgBouncer entry, the ingress host and tunnel, the Keycloak realm and its two clients, the licence key, the seed, the rehearsals, the agent registration, the decommission and the runbook. Out of scope: data migration, the agent's code, the licences and billing services, and the n8n flow layer retired at S13.",
+      "responsibilities": "The programme architect owns this statement, the seven artefacts and the Phase-G review; the release manager owns the deployed digest and the live probes; the platform engineer runs the migrate, seed and rollback rehearsals; the sponsoring group decides go/no-go and the rename.",
+      "acceptance_criteria": "The native harness passes, the parity map resolves every used id, `/health` answers 200, the andon pair behaves, and the legacy namespaces, services and hosts are absent. The rollback is accepted when the runbook is rehearsed and records both digests.",
+      "constraints": "No data migration (D7); the old host keeps serving until decommission (D16); one identity realm (D13); the service never opens a direct database connection; the point of no return is `dropdb`, not the switch.",
+      "retrospective": "This statement is authored retrospectively at tranche 11 from the executed cutover, the plan and the surviving instruments. It claims no receipt that was never committed; where the plan named an absent record, this statement names the gap."
+    }
+  },
+  "artifacts": [
+    {
+      "title": "Stakeholder Map — S14 Cutover (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "entries": [
+        {
+          "axis_a": "Sponsoring group",
+          "axis_b": "authorises the tranche and the cutover decision",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "SRO",
+          "axis_b": "accountable for the live conveyor service and its rollback",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "accountable"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Programme architect",
+          "axis_b": "owns the contract, the ingress values and the architecture review",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Release manager",
+          "axis_b": "proves the deployed digest and the live probes",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Platform engineer",
+          "axis_b": "runs the migrate, seed and rollback rehearsals",
+          "value": {
+            "influence": "low",
+            "interest": "high",
+            "engagement": "inform"
+          },
+          "position": 5
+        }
+      ],
+      "links": [
+        {
+          "to": "Driver/Goal/Objective Catalog — S14 Cutover (Phase A)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Stakeholder Map — S14 Cutover (Phase A)\n\n## Metadata\n\nType: stakeholder matrix. Version 1, retrospective at tranche 11 (2026-11-28). Owner: the programme architect; reviewer: the Architecture Board. Phase A, PSA plateau, project S14.\n\n## Entries\n\nFive seats: the sponsoring group decides the cutover and the archived-repo rename; the SRO is accountable for the live service and its rollback; the programme architect owns the contract, the host and the review; the release manager proves the deployed digest; the platform engineer runs the rehearsals.\n\n## Links\n\nDerives the Driver/Goal/Objective Catalog: each seat's concern becomes a driver the catalogue records, and the catalogue's objectives are what this map's engagement column commits each seat to.\n\n## Document\n\nThe map records who must be engaged before a cutover act and who decides it. It is the Phase A artefact the delivery contract's commitments resolve against, and it names the release manager as the seat that proves a deploy rather than the builder who claims one.\n"
+    },
+    {
+      "title": "Driver/Goal/Objective Catalog — S14 Cutover (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "D7 data migration",
+          "axis_b": "nothing is copied; the conveyor starts empty",
+          "value": {
+            "goal": "no migration",
+            "objective": "seed and replay from zero"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "D8 freeze",
+          "axis_b": "the old system is frozen during the cutover window",
+          "value": {
+            "goal": "one writer",
+            "objective": "a freeze log and a named exception path"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "D13 identity",
+          "axis_b": "Keycloak realm conveyor with a public and a confidential client",
+          "value": {
+            "goal": "one identity",
+            "objective": "OIDC in production, dev-auth refused"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "D16 one host",
+          "axis_b": "conveyor.nonagentic.ai is new; fr.nonagentic.ai is not re-pointed",
+          "value": {
+            "goal": "no split brain",
+            "objective": "decommission by object absence"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements Catalog — S14 Cutover (Phase A)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Driver/Goal/Objective Catalog — S14 Cutover (Phase A)\n\n## Metadata\n\nType: driver/goal/objective catalogue. Version 1, retrospective at tranche 11 (2026-11-28). Owner: the programme architect; reviewer: the Architecture Board. Phase A, PSA plateau, project S14.\n\n## Entries\n\nFour decisions drive the cutover: D7 forbids data migration, D8 freezes the old system, D13 fixes one identity realm, and D16 keeps the old host serving until decommission so no request can split between two writers.\n\n## Links\n\nRealises the Requirements Catalog: every requirement row names the driver it serves, and the catalogue's objectives are the acceptance the requirements are written against.\n\n## Document\n\nThe catalogue records why the cutover is an object-absence exercise rather than a data move. It is the trace from the programme's decisions to the requirements the native harness and the parity map are checked against.\n"
+    },
+    {
+      "title": "Requirements Catalog — S14 Cutover (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "R1 repository and CI",
+          "axis_b": "an archived repo owns the name; rename, never delete",
+          "value": {
+            "disposition": "delivered",
+            "evidence": "#8 PR #483"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "R2 runtime",
+          "axis_b": "namespace conveyor, service on 8930, Postgres via pgbouncer",
+          "value": {
+            "disposition": "delivered",
+            "evidence": "the live service and its health"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "R3 identity and ingress",
+          "axis_b": "Keycloak realm, licence app_key=conveyor, one ingress host",
+          "value": {
+            "disposition": "delivered",
+            "evidence": "the deployment manifest set"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "R5 native parity",
+          "axis_b": "every used id resolves to action, test, replacement or dropped",
+          "value": {
+            "disposition": "delivered",
+            "evidence": "parity/native.tsv and scripts/check-parity.py"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "R6 decommission",
+          "axis_b": "fr, requirements and kanban are absent by object, not by belief",
+          "value": {
+            "disposition": "delivered",
+            "evidence": "measured absence of namespaces, services and hosts"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "R7 rollback",
+          "axis_b": "a timed rollback is rehearsed before the point of no return",
+          "value": {
+            "disposition": "rehearsed",
+            "evidence": "the runbook and the rollback rehearsal record"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Business Capability Map — S14 Cutover (Phase B)",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Requirements Catalog — S14 Cutover (Phase A)\n\n## Metadata\n\nType: requirements catalogue. Version 1, retrospective at tranche 11 (2026-11-28). Owner: the programme architect; reviewer: the Architecture Board. Phase A, PSA plateau, project S14.\n\n## Entries\n\nSix requirements carry the cutover: the repository rename, the runtime shape (namespace, service on 8930, PgBouncer to the primary), identity and ingress, the native parity map, decommission by object absence, and a rehearsed rollback with a timed runbook.\n\n## Links\n\nDerives the Business Capability Map: the requirements cluster into the two capabilities the cutover exists to leave behind — a live native service and a rehearsed rollback — and the map records them at the HLD plateau.\n\n## Document\n\nEach requirement names its disposition and the surviving evidence. R5 is decided by `parity/native.tsv` and `scripts/check-parity.py`, not by the legacy probe record; R6 is decided by object absence in the cluster; R7 by the runbook and its rehearsal rather than a promise.\n"
+    },
+    {
+      "title": "Solution Concept Diagram — S14 Cutover (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "entries": [
+        {
+          "axis_a": "Client",
+          "axis_b": "the agent platform and browser clients reach one host",
+          "value": {
+            "path": "cloudflared -> istio -> conveyor:8930"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Service",
+          "axis_b": "one Rust service owns the action registry",
+          "value": {
+            "path": "conveyor.conveyor.svc:8930"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Database",
+          "axis_b": "one Postgres primary, pgbouncer in front",
+          "value": {
+            "path": "pgbouncer:6432 -> postgres.internal:5432"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Identity",
+          "axis_b": "Keycloak realm conveyor issues the tokens",
+          "value": {
+            "path": "conveyor-public / conveyor-backend"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Stakeholder Map — S14 Cutover (Phase A)",
+          "kind": "reuse"
+        }
+      ],
+      "body": "# Solution Concept Diagram — S14 Cutover (Phase A)\n\n## Metadata\n\nType: solution concept. Version 1, retrospective at tranche 11 (2026-11-28). Owner: the programme architect; reviewer: the Architecture Board. Phase A, PSA plateau, project S14.\n\n## Entries\n\nOne host reaches one service: Cloudflare tunnels to the istio gateway on the control plane, the service listens on 8930 in the conveyor namespace, PgBouncer fronts the Postgres primary, and the Keycloak realm issues both the browser and the service-account tokens.\n\n## Links\n\nReuses the Stakeholder Map: the concept is drawn from the seats' concerns, and the release manager's seat is the one that proves each hop with a live probe rather than a diagram claim.\n\n## Document\n\nThe diagram records the deployed shape the native harness probes. It deliberately shows no data path from the legacy systems: D7 makes the conveyor start empty, so the only migration is the seed and the programme's own rows.\n"
+    },
+    {
+      "title": "Business Capability Map — S14 Cutover (Phase B)",
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "entries": [
+        {
+          "axis_a": "Cutover",
+          "axis_b": "the old surface is replaced by one native service",
+          "value": {
+            "level": "delivered",
+            "evidence": "the live service answers /health"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Rollback",
+          "axis_b": "a failed cutover returns to the last digest in bounded time",
+          "value": {
+            "level": "rehearsed",
+            "evidence": "the runbook and the rehearsal record"
+          },
+          "position": 2
+        }
+      ],
+      "links": [
+        {
+          "to": "Data Entity/Data Component Catalog — S14 Cutover (Phase C)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Business Capability Map — S14 Cutover (Phase B)\n\n## Metadata\n\nType: capability map. Version 1, retrospective at tranche 11 (2026-11-28). Owner: the programme architect; reviewer: the Architecture Board. Phase B, HLD plateau, project S14.\n\n## Entries\n\nTwo capabilities: cutover (replace the legacy surface with one native service, proved by the native harness and the parity map) and rollback (return to the last digest in bounded time, proved by the runbook and its rehearsal). Everything else the cutover touched is a process, not a capability.\n\n## Links\n\nDepends on the Data Entity Catalog: the capability's state lives in the programme's own rows, and the catalogue names which rows a cutover and a rollback must not lose.\n\n## Document\n\nThe map is the boundary between what the project delivered and what later projects own. The rollback capability is the one the programme's risk register reads, because an unrehearsed rollback is the largest single failure mode the cutover carried.\n"
+    },
+    {
+      "title": "Data Entity/Data Component Catalog — S14 Cutover (Phase C)",
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "project",
+          "axis_b": "one row per programme project",
+          "value": {
+            "owner": "conveyor",
+            "migration": "the seed"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "run",
+          "axis_b": "one durable task per agent invocation",
+          "value": {
+            "owner": "conveyor",
+            "migration": "the seed"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "document",
+          "axis_b": "the published outputs the design site reads",
+          "value": {
+            "owner": "conveyor",
+            "migration": "the seed"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "programme_cadence",
+          "axis_b": "the SAFe rows the tranche record carries",
+          "value": {
+            "owner": "conveyor",
+            "migration": "the seed"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Technology Standards Catalog — S14 Cutover (Phase D)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Data Entity/Data Component Catalog — S14 Cutover (Phase C)\n\n## Metadata\n\nType: data entity catalogue. Version 1, retrospective at tranche 11 (2026-11-28). Owner: the programme architect; reviewer: the Architecture Board. Phase C, HLD plateau, project S14.\n\n## Entries\n\nThe conveyor's own rows are the data: projects, runs, documents and the programme cadences. No legacy entity is copied, because D7 refuses data migration; the seed and the programme's acts are the only writers.\n\n## Links\n\nDepends on the Technology Standards Catalog: the rows live in one Postgres primary reached through PgBouncer, and the standards catalogue fixes the version and the pooling rule.\n\n## Document\n\nThe catalogue records that the cutover moved no data and therefore has no migration reconciliation. Its risk is the opposite one: a seed that diverges from the published register, which is why the snapshot's `git_sha` and the register are read together at every tranche review.\n"
+    },
+    {
+      "title": "Technology Standards Catalog — S14 Cutover (Phase D)",
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "Runtime",
+          "axis_b": "one Rust service image on port 8930",
+          "value": {
+            "standard": "the repository's Rust service archetype"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Database",
+          "axis_b": "Postgres 18 behind PgBouncer, never direct from the service",
+          "value": {
+            "standard": "transaction pooling, one migrate role"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Ingress",
+          "axis_b": "istio hostNetwork gateway with a Cloudflare tunnel",
+          "value": {
+            "standard": "the estate's virtual-service pattern"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Identity",
+          "axis_b": "Keycloak OIDC; dev-auth refused in production",
+          "value": {
+            "standard": "the conveyor realm and its two clients"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Business Capability Map — S14 Cutover (Phase B)",
+          "kind": "reuse"
+        }
+      ],
+      "body": "# Technology Standards Catalog — S14 Cutover (Phase D)\n\n## Metadata\n\nType: technology standards catalogue. Version 1, retrospective at tranche 11 (2026-11-28). Owner: the programme architect; reviewer: the Architecture Board. Phase D, HLD plateau, project S14.\n\n## Entries\n\nThe service is the repository's Rust archetype on 8930; the database is Postgres 18 reached only through PgBouncer with a separate migrate role; ingress is the istio hostNetwork gateway behind a Cloudflare tunnel; identity is the conveyor Keycloak realm with dev-auth refused.\n\n## Links\n\nReuses the Business Capability Map: the standards exist to keep the two capabilities — cutover and rollback — provable on the estate's own patterns rather than bespoke ones.\n\n## Document\n\nThe catalogue is the reference the deployment manifests are read against. It records the two rules a future change must not break: the service never opens a direct database connection, and no path re-points the legacy host.\n"
+    }
+  ],
+  "documents": [
+    {
+      "category": "architecture-artifact",
+      "title": "Architecture Artefact Index — S14 Cutover (retrospective, 2026-11-28)",
+      "body": "# Architecture Artefact Index — S14 Cutover (retrospective, 2026-11-28)\n\n## Metadata\n\nSeven A–D artefacts are bound to S14 in the standard's order: stakeholder map, driver/goal/objective catalogue, requirements catalogue, solution concept, business capability map, data entity catalogue and technology standards catalogue. Owner: the programme architect; reviewer: the Architecture Board; phase G retrospective.\n\n## Entries\n\n- Stakeholder Map — Phase A, matrix: five seats and their engagement.\n- Driver/Goal/Objective Catalog — Phase A, catalogue: D7, D8, D13, D16.\n- Requirements Catalog — Phase A, catalogue: R1, R2, R3, R5, R6, R7 with dispositions.\n- Solution Concept Diagram — Phase A, diagram: host, service, database, identity.\n- Business Capability Map — Phase B, diagram: cutover and rollback.\n- Data Entity/Data Component Catalog — Phase C, catalogue: the programme's own rows.\n- Technology Standards Catalog — Phase D, catalogue: runtime, database, ingress, identity.\n\n## Links\n\n- Plan: `docs/plans/slices/S14-cutover.md`.\n- Evidence: the S14 evidence document and `parity/native.tsv`.\n- Capability map and requirements catalogue, which the other five artefacts resolve against.\n\n## Document\n\nThe index is the published entry point to S14's typed artefacts. It records that the set is complete in the standard's order and that each artefact carries its own document, so a reader can follow any row from this index to the artefact and back.\n"
+    },
+    {
+      "category": "user-stories",
+      "title": "User stories — S14 Cutover (retrospective, 2026-11-28)",
+      "body": "# User stories — S14 Cutover (retrospective, 2026-11-28)\n\n## Personas\n\nThe sponsoring group, who decide the cutover and the archived-repo rename; the SRO, accountable for the live service and its rollback; the release manager, who proves a deployed digest with a live probe; and the platform engineer, who runs the migrate, seed and rollback rehearsals.\n\n## Stories\n\n- As the sponsoring group, I want the legacy surface replaced by one native service, so that the programme stops paying for two live systems.\n- As the SRO, I want a rehearsed rollback with a timed runbook, so that a failed cutover is a bounded event, not an outage.\n- As the release manager, I want the native harness and parity map to decide acceptance, so that a cutover claim is a probe result, not a narrative.\n- As the platform engineer, I want the decommission to be proved by object absence, so that no hidden path can still reach the old system.\n\n## Scenarios\n\n- Given the service is live, when the native harness runs against it, then every context and probe passes and the parity map resolves every used id.\n- Given a failing cutover, when the rollback is invoked, then the last digest is restored in the runbook's bounded time and both digests are recorded.\n- Given the decommission is claimed, when the cluster is read, then the fr, requirements and kanban namespaces, services and hosts are absent.\n\n## Verify\n\n- `python3 scripts/acceptance.py --sha <sha> --base-url <base>` — the native harness.\n- `python3 scripts/check-parity.py --require-native` — the parity gate.\n- The decommission checks in `docs/plans/slices/S14-cutover.md` §7 — object absence, not belief.\n"
+    },
+    {
+      "category": "acceptance-criteria",
+      "title": "Acceptance criteria — S14 Cutover (retrospective, 2026-11-28)",
+      "body": "# Acceptance criteria — S14 Cutover (retrospective, 2026-11-28)\n\n## Scenarios\n\n- AC1: the native harness passes against the deployed service (the plan's R5 gate).\n- AC2: every `used` id in the signed contract resolves to an `action:`, `test:`, `replacement:` or `dropped:` disposition in `parity/native.tsv`.\n- AC3: the service answers `/health` 200 and the andon actions behave as S06 defines.\n- AC4: the fr, requirements and kanban namespaces, services and hosts are absent, and the n8n namespace and database are absent after their T+14 dump.\n- AC5: a timed rollback is rehearsed and the runbook records both digests.\n\n## Verify commands\n\n- `python3 scripts/acceptance.py --self-test` then `python3 scripts/acceptance.py --sha \"$(git rev-parse HEAD)\" --base-url \"$BASE\"`.\n- `python3 scripts/check-parity.py --require-native`.\n- `curl -s -o /dev/null -w '%{http_code}' \"$BASE/health\"` → 200; the andon engage/release invocations return 200 and the run creation returns 409 while engaged.\n- `kubectl get ns fr requirements kanban n8n --ignore-not-found -o name` → no output.\n- The rollback rehearsal record named in the plan's R7.\n\n## Results\n\nAC1, AC2, AC3 and AC4 passed on the executed cutover (gitops-production #5333; the n8n namespace and database measured absent on 2026-11-19). AC5's R0–R7 receipts were never committed and the systems they rehearsed are decommissioned, so the plan records them as a requirement, not a receipt; the surviving proof is the native harness and the parity map.\n\n## Status\n\nAccepted as `partial`: the product is live and proved; the closure set (`closure-review`) and issue #29 remain open, so S14 stays active in tranche 11 and no closure is claimed.\n"
+    },
+    {
+      "category": "definition-of-ready",
+      "title": "Definition of ready — S14 Cutover (retrospective, 2026-11-28)",
+      "body": "# Definition of ready — S14 Cutover (retrospective, 2026-11-28)\n\n## Independent\n\nA cutover act lands without another project's files: the deployment manifests live in the GitOps repository, the service in this repository, and the parity map in its own file. The only cross-project edges are the declared dependencies on S00, S06b, S12 and S13, which are typed in the project row.\n\n## Negotiable\n\nThe outcome is fixed — one live service, a rehearsed rollback, object absence for the legacy names. The rehearsal sequence, the probe set and the runbook's wording were settled at delivery against the deployed estate, not in the brief.\n\n## Valuable\n\nThe unit removes a named gap: two live systems and a decommission that has not been proved creates a split-brain risk and a standing cost. The surviving instrument — the native harness — is what makes the cutover auditable after the rehearsed systems are gone.\n\n## Estimable\n\nThe baseline, the files and the acceptance command are named: `acceptance/native.toml`, `scripts/acceptance.py`, `parity/native.tsv`, `scripts/check-parity.py`, and the plan's §7 gate. The two units are #8 (delivered, #483) and #29 (open, the plan rewrite).\n\n## Small\n\nOne project, one tranche row, one issue for the remaining work (#29). The cutover itself was a single executed slice; the remaining work is the plan rewrite that #29 owns.\n\n## Testable\n\nEvery scenario carries a command: the native harness, the parity gate, `/health`, the andon pair and the object-absence reads. The closure-review decision is a separate acceptance and is not claimed while #29 is open.\n\n## Dependencies\n\nS00, S06b, S12 and S13, each typed in the project row's `depends_on`. S12 and S13 delivered in tranches 10 and 8; S06b in tranche 6; S00 in tranche 0.\n"
+    },
+    {
+      "category": "definition-of-done",
+      "title": "Definition of done — S14 Cutover (retrospective, 2026-11-28)",
+      "body": "# Definition of done — S14 Cutover (retrospective, 2026-11-28)\n\n## Acceptance criteria\n\nEach acceptance criterion in the criteria document is evidenced at the merge head that delivered it: AC1 and AC2 by the native harness and the parity gate, AC3 by the live health and andon probes, AC4 by the object-absence reads, and AC5 by the runbook and its rehearsal record.\n\n## Evidence at completion\n\nThe evidence is the S14 evidence row in the programme record, `parity/native.tsv`, `acceptance/native.toml`, `scripts/acceptance.py` and the GitOps merge #5333 that decommissioned the legacy names. The R0–R7 receipt files are explicitly not evidence: they were never committed and cannot be reconstructed.\n\n## Repo gate\n\nThe repository's preflight and CI are the compile and lint gate; `scripts/acceptance.py --self-test` is the hermetic harness gate; no local cargo build is a gate. The parity check is run offline and refuses a missing or unknown row.\n\n## Merge and closure\n\nThe project does not close in tranche 11. Its row stays `active` because issue #29 is open, and no closure review is claimed; the completed part is the accepted cutover record, and the open part is the plan rewrite #29 owns.\n"
+    },
+    {
+      "category": "inception-analysis",
+      "title": "Inception Analysis — S14 Cutover (retrospective, 2026-11-28)",
+      "body": "# Inception Analysis — S14 Cutover (retrospective, 2026-11-28)\n\n## Current state\n\nBefore the cutover the agent platform's conveyor path ran through fr, requirements_management and a Planka board, with an n8n flow layer above them. The source map measured fr at 86 domain tables, Planka test-only, and n8n at 348 flows with 332 active — a surface too large to port row by row, which is why D7 refuses data migration.\n\n## Reuse sources\n\nThe cutover reuses the estate's service archetype (Rust, one image, port 8930), the PgBouncer pattern, the istio hostNetwork ingress, the Keycloak realm pattern and the Cloudflare tunnel. The programme's own rows are the only data; the seed is the only writer.\n\n## Build vs reuse\n\nBuild: the service, its action registry, the native harness and the parity map — these are the programme's own product. Reuse: identity, ingress, registry, database and the deployment pipeline. Do not build: a second identity realm, a second ingress path, or a migration for data that D7 discards.\n\n## Risks\n\nThe archived repository owned the name, so the rename had to precede any create; the legacy host had to keep serving until decommission or a request could split between two writers; and the rollback had to be rehearsed before the point of no return, because after `dropdb` there is no return.\n"
+    },
+    {
+      "category": "architecture-analysis",
+      "title": "Architecture Analysis — S14 Cutover (retrospective, 2026-11-28)",
+      "body": "# Architecture Analysis — S14 Cutover (retrospective, 2026-11-28)\n\n## Current state\n\nThe estate ran two conveyor surfaces during the window: the legacy fr/RM/Planka chain behind n8n, and the new single service. The analysis had to answer three questions — how to switch the agent's registration without a split brain, how to prove the new surface against the old contract, and how to leave no path to the old one.\n\n## Options considered\n\n- Port the legacy data: refused by D7, because the programme's model is different and a row-by-row port would carry the old schema's debts.\n- Re-point the old host: refused by D16, because a DNS switch creates a split brain and no way to prove which writer served a request.\n- Switch at the agent's conveyor registration and decommission by object absence: chosen, because the agent is the one client whose registration is explicit, and absence is measurable.\n\n## Risks\n\nThe largest risk is an unrehearsed rollback; the second is a hidden path still reaching the old system after the decommission is claimed. Both are answered by instruments rather than assertions: a timed runbook, and cluster object-absence reads rather than a traffic sample.\n\n## Dependency map\n\nS00 supplies the contract and the native map; S06b the agent task surface; S12 the UI that exercises it; S13 the flow dispositions that made the legacy flows retire-able. The cutover cannot close before those are delivered, and its own remaining unit is #29.\n"
+    },
+    {
+      "category": "architecture-design",
+      "title": "Architecture Design — S14 Cutover (retrospective, 2026-11-28)",
+      "body": "# Architecture Design — S14 Cutover (retrospective, 2026-11-28)\n\n## Context and boundary\n\nS14 is the cutover of the programme's own service from the legacy chain to conveyor. Inside: the deployment shape, the seed, the agent registration, the parity proof, the decommission and the rollback runbook. Outside: any data migration, the agent's own code, the licences and billing services, and the n8n flows themselves (retired at S13).\n\n## Aggregates, tables and actions\n\nThe cutover adds no table and no action. It reads the existing aggregates — project, run, approval, document — and its only writes are the seed and the ordinary programme acts. The andon pair (`andon.engage`, `andon.release`) and `runs.create`'s 409 are S06's, exercised here as the live proof.\n\n## Decisions\n\nD7 (no data migration), D8 (freeze and one writer), D13 (one Keycloak realm with two clients), D16 (new host; the old one serves until decommission). The point of no return is `dropdb`, not the switch: scaling and re-pointing are reversible, dropping is not.\n\n## Acceptance\n\nThe acceptance is the native harness plus the parity map: `scripts/acceptance.py` runs the contexts and probes; `scripts/check-parity.py --require-native` refuses a used id with no disposition. The `/health` 200 and the andon pair are the live proofs; the object-absence reads are the decommission proof.\n\n## Architecture artefacts\n\nThe seven A–D artefacts record the seats, the decisions, the requirements, the concept, the two capabilities, the data rows and the standards. They are published as documents and bound to this project; the design's links are the artefact chain, not an appendix.\n"
+    },
+    {
+      "category": "statement-of-architecture-work",
+      "title": "Statement of Architecture Work — S14 Cutover (retrospective, 2026-11-28)",
+      "body": "# Statement of Architecture Work — S14 Cutover (retrospective, 2026-11-28)\n\n## Assignment\n\nThe sponsoring group assigns S14 the cutover of the programme's conveyor capability: create the service in its own repository, deploy it, seed it, switch the agent's registration, prove it against the signed contract, decommission the legacy chain, and rehearse a rollback. The architect answers to the SRO and the Architecture Board.\n\n## Scope\n\nIn scope: the repository and its CI, the namespace, service, database roles and PgBouncer entry, the ingress host and its tunnel, the Keycloak realm and its two clients, the licence key, the seed, the rehearsals, the agent registration, the decommission and the runbook. Out of scope: any data migration, the agent's code, the licences and billing services, and the n8n flow layer retired at S13.\n\n## Responsibilities\n\nThe programme architect owns this statement, the seven artefacts and the Phase-G review. The release manager owns the deployed digest and the live probes. The platform engineer runs the migrate, seed and rollback rehearsals. The sponsoring group decides the go/no-go and the archived-repo rename; the SRO is accountable for the live service.\n\n## Acceptance criteria\n\nThe native harness passes, the parity map resolves every used id, `/health` answers 200, the andon pair behaves, and the legacy namespaces, services and hosts are absent. The rollback is accepted when the runbook is rehearsed and records both digests; the closure review is a separate decision and is not claimed while #29 is open.\n\n## Contract\n\nThis statement is the architecture contract the Phase-G review reads. It binds the project to the estate's service, database, ingress and identity standards, and it forbids the two shortcuts the analysis refused: a data migration and a re-pointed legacy host.\n"
+    }
+  ],
+  "registers": {
+    "risk": [
+      {
+        "code": "S14-R1",
+        "title": "The R0–R7 cutover receipts were never committed and cannot be reconstructed",
+        "body": "The rehearse-then-cutover sequence the plan specified produced no in-tree receipt, and the systems it rehearsed are decommissioned. A later reader can therefore be shown an acceptance claim with no rehearsal record behind it.",
+        "probability": "certain",
+        "impact": 3,
+        "review_at": "2026-12-19",
+        "severity": "high",
+        "status": "open",
+        "response": "Record the gap in the plan and this register, and accept the project on the surviving instruments only — the native harness and the parity map — never on a reconstructed receipt.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S14-cutover.md#7"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
+      },
+      {
+        "code": "S14-R2",
+        "title": "A hidden path could still reach a legacy system after the decommission is claimed",
+        "body": "Traffic sampling cannot prove the absence of a path. A surviving service, ingress host or PgBouncer entry could keep a legacy surface reachable while the plan claims it is gone.",
+        "probability": "low",
+        "impact": 4,
+        "review_at": "2026-12-19",
+        "severity": "high",
+        "status": "open",
+        "response": "Decommission is accepted only by object absence — namespaces, services, ingress hosts and PgBouncer entries — and the check refuses a traffic-based claim.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S14-cutover.md#7"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the release manager (conveyor-e2e)"
+        }
+      }
+    ],
+    "issue": [
+      {
+        "code": "S14-I1",
+        "title": "Issue #29 remains open: the cutover plan rewrite for independent deployment",
+        "body": "The plan still describes the historical sequence and the absent receipt set. #29 is the unit that rewrites it for independent deployment and coexistence; until it lands the project cannot close.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S14-cutover.md"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
+      },
+      {
+        "code": "S14-I2",
+        "title": "The P6 release receipt is absent at HEAD",
+        "body": "The plan names a P6 release receipt as the in-tree record that the live run happened. It does not exist, so the release identity is proved by this rework's Phase-G review and the deployed service's own probes instead.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S14-cutover.md#7"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the release manager (conveyor-e2e)"
+        }
+      }
+    ],
+    "assumption": [
+      {
+        "code": "S14-A1",
+        "title": "The deployed service still runs the digest the cutover shipped",
+        "body": "This rework reads the record and the repository; it does not redeploy. The assumption is that the live service has not silently drifted from the cutover's deployed digest, and the Phase-G review names the probes a later session would use to check it.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S14-cutover.md#5"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the release manager (conveyor-e2e)"
+        }
+      }
+    ],
+    "dependency": [
+      {
+        "code": "S14-D1",
+        "title": "S14 depends on S00, S06b, S12 and S13",
+        "body": "The project row records the edges: S00 supplies the contract and the native map, S06b the agent task surface, S12 the UI that exercises it, and S13 the flow dispositions that made the legacy flows retire-able. Each delivered in an earlier tranche.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "seed/programme-definition.json"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
+      }
+    ],
+    "benefit": [
+      {
+        "code": "S14-B1",
+        "title": "One live service replaces a three-service legacy chain",
+        "body": "Before the cutover the agent platform's conveyor path crossed fr, requirements_management and a Planka board through n8n. After it, one native service serves the path and the legacy names are absent by object, so the programme carries one surface and one rollback.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S14-cutover.md#1"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the SRO (conveyor-e2e)"
+        }
+      }
+    ]
+  },
+  "delivery_contract": {
+    "title": "Delivery Contract — S14 Cutover (retrospective, 2026-11-28)",
+    "body": {
+      "commitments": "The delivery commits to the six requirements the Requirements Catalog states — repository and CI, runtime, identity and ingress, native parity, decommission by object absence, and a rehearsed rollback — and to the boundary the Statement of Architecture Work draws: no data migration, no re-pointed legacy host, one identity realm.",
+      "compliance": "Compliance is measured, not asserted: `scripts/acceptance.py` runs the native harness, `scripts/check-parity.py --require-native` decides the parity gate, `/health` and the andon pair are the live probes, and the object-absence reads decide the decommission. The Phase-G review records the level and names the gaps it does not discharge.",
+      "approval": "The contract is approved by the programme architect as the delegated architecture authority under the standing rule decision, with the SRO's accountability recorded; the Phase-G review is a separate record, and the closure decision is not claimed while #29 is open.",
+      "manifest": "acceptance/programme/S14.toml",
+      "acceptance_at": "The acceptance is the native harness at the executed cutover plus this rework's receipt at the pinned snapshot; the plan's §7 gate names every check and its surviving evidence.",
+      "retrospective": "Authored at tranche 11 from the executed cutover. The R0–R7 receipt files are recorded as requirements, not receipts, because they were never committed and the systems they rehearsed are decommissioned.",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+    }
+  },
+  "wbs_deliverable": {
+    "title": "The cutover record is accepted on its surviving instruments — the native harness, the parity map and the object-absence decommission — with the rollback runbook rehearsed",
+    "business_value": 8,
+    "time_criticality": 7,
+    "risk_reduction": 9,
+    "job_size": 8
+  },
+  "review": {
+    "level": "consistent",
+    "findings": "The delivery is consistent with its contract: the six requirement rows have dispositions, the native harness and the parity map are the surviving proof, and the deployed shape matches the solution concept. The review does not certify the absent R0–R7 receipts or the P6 release receipt; it records them as named gaps, and it notes that issue #29 remains open so no closure is claimed.",
+    "evidence": {
+      "manifest": "acceptance/programme/S14.toml",
+      "suite": "acceptance/native.toml",
+      "start_suite": "scripts/acceptance.py --self-test",
+      "resolver_suite": "scripts/check-parity.py --require-native",
+      "receipt": "docs/evidence/rework/S14.json",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+    }
+  },
+  "project_brief_output": "# S14 — Cutover — deploy, seed, rehearse, decommission fr / RM / Planka\n\n**Track:** v1 · **Tranche:** 11 · **Measured status:** partial · **Plan:** `docs/plans/slices/S14-cutover.md`\n**Dependencies:** S00, S06b, S12, S13 · **Issues:** #8 (closed), #29 (open)\n\n## Outcome\n\nOne live native service carries the agent platform's conveyor path; the legacy fr, requirements and Planka surfaces are absent by object; a rollback has been rehearsed with a runbook that records both digests.\n\n## Boundary\n\nIn: repository and CI, namespace and service on 8930, database roles and PgBouncer, ingress host and tunnel, Keycloak realm and clients, licence key, seed, rehearsals, agent registration, decommission, runbook. Out: data migration (D7), the agent's code, the licences and billing services, and the n8n flow layer retired at S13.\n\n## Reuse sources\n\nThe estate's Rust service archetype, the PgBouncer pattern, the istio hostNetwork ingress, the Keycloak realm pattern and the Cloudflare tunnel. The programme's own rows are the only data; the seed is the only writer.\n\n## Inception units\n\nThe analysis and architecture inception documents are published on this project with the plan as their source; the artefacts are the seven A–D set bound in the standard's order.\n\n## Dependencies\n\nS00 supplies the contract and native map, S06b the agent task surface, S12 the UI that exercises it, S13 the flow dispositions. Each delivered in an earlier tranche.\n\n## Acceptance\n\nThe native harness passes, the parity map resolves every used id, `/health` answers 200, the andon pair behaves, and the legacy namespaces, services and hosts are absent. The rollback is accepted on the runbook and its rehearsal record.\n\n## Capabilities\n\nCutover (replace the legacy surface with one native service) and rollback (return to the last digest in bounded time). Both are proved by instruments, not by narrative.\n\n## Plan\n\nThe cutover executed 2026-11-18 (GitOps #5333); the n8n namespace and database were measured absent on 2026-11-19. The remaining unit is #29, the plan rewrite for independent deployment and coexistence; it is why the project stays active in tranche 11.\n",
+  "evidence_output": "# Evidence — S14 Cutover\n\n## Claim\n\nS14 executed the cutover: one native service serves the agent platform's conveyor path, the legacy fr, requirements and Planka surfaces are absent by object, and a rollback runbook exists with its rehearsal record. The project is `partial` because issue #29 — the plan rewrite — remains open.\n\n## Evidence\n\n- `docs/plans/slices/S14-cutover.md` — the plan, its §7 gate and the §9.9 decommission order.\n- `acceptance/native.toml`, `scripts/acceptance.py`, `.github/workflows/acceptance.yml` — the native harness shipped by #8 (PR #483).\n- `parity/native.tsv`, `scripts/check-parity.py` — the parity map and its gate.\n- GitOps #5333 — the decommission merge; the n8n namespace and database measured absent on 2026-11-19.\n\n## Verification\n\nRun `python3 scripts/acceptance.py --self-test` for the hermetic harness, then `python3 scripts/check-parity.py --require-native` at a checked-out main. The live harness needs `BASE`, `TOK`, `CARD` and the k3s kubeconfig exported; the plan's §7 lists every probe. The R0–R7 receipts do not exist and are not claimed.\n\n## Links\n\n- Plan: `docs/plans/slices/S14-cutover.md`\n- Artefact index: the published `architecture-artifact` document for S14.\n- Units: #8 (closed), #29 (open).\n\n## Gap\n\nThe R0–R7 receipts and the P6 release receipt were never committed and the systems they rehearsed are decommissioned; the plan records them as requirements, not receipts. The closure set is outstanding because #29 is open, so the project stays active and no closure review is claimed.\n"
+}

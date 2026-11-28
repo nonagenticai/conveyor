@@ -1,0 +1,46 @@
+{
+  "schema": "conveyor-pi-refinement-wsjf/v1",
+  "tranche": 11,
+  "tranche_id": "01a1e9e1-33f4-70a7-8af4-658f1c583e99",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "period": "tranche-11",
+  "recorded_at": "2026-11-28",
+  "members": {
+    "S14": {
+      "business_value": 8,
+      "time_criticality": 7,
+      "risk_reduction": 9,
+      "job_size": 8
+    },
+    "T6": {
+      "business_value": 9,
+      "time_criticality": 6,
+      "risk_reduction": 8,
+      "job_size": 8
+    },
+    "T8": {
+      "business_value": 8,
+      "time_criticality": 5,
+      "risk_reduction": 7,
+      "job_size": 5
+    }
+  },
+  "order": [
+    "T8",
+    "S14",
+    "T6"
+  ],
+  "reordered": [
+    {
+      "item": "T8 first, then S14, then T6",
+      "from": "the seed's membership order (S14, T6, T8)",
+      "to": "T8, S14, T6",
+      "why": "T8 is the smallest job and its two-independent-refs rule is what the programme's later lessons run on; S14 carries the largest risk reduction because an unrehearsed rollback is the programme's largest single failure mode; T6 is the largest job and depends on T5 and T13, both already delivered."
+    }
+  ],
+  "reestimate": {
+    "S14": "0 open packages of its own at the 2026-11-28 snapshot; 16 of the 17 declared v4 categories missing (only evidence is published)",
+    "T6": "0 open packages of its own at the 2026-11-28 snapshot; 13 of the 17 declared v4 categories missing (project-brief, evidence, inception-analysis, architecture-design and closure-review are published)",
+    "T8": "0 open packages of its own at the 2026-11-28 snapshot; 15 of the 17 declared v4 categories missing (project-brief, evidence and closure-review are published)"
+  }
+}

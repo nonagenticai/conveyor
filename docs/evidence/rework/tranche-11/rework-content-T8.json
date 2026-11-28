@@ -1,0 +1,536 @@
+{
+  "charter": "# Project charter — T8 Organisational memory\n\n**Project:** T8 — Organisational memory. **Track:** v2. **Tranche:** 11. **Sponsor:** the sponsoring group.\n**Accountable:** the SRO. **Owner:** the programme architect.\n\n**Outcome.** A lesson proposed from a run cannot become doctrine until it carries two independent evidence references and a person's review; a lesson with one reference is refused; a bad run records a lesson that is not doctrine.\n\n**Scope.** The lesson lifecycle, the independence rule and the promotion gate. Out: incident references (T7), the promotion-rate metric (#84), retro authoring (#82), the live organisation loop (T12), any second memory copy.\n\n**Authority.** The sponsoring group decides the close; the SRO is accountable for the memory; the Architecture Board reviews Phase-G compliance; the reviewer is the person whose act promotes a source draft.\n\n**Gates.** Charter approved; scope baseline with one WBS deliverable; seven A–D artefacts bound; five registers; delivery contract approved; Phase-G review recorded; closure review published; acceptance receipt green at the pinned snapshot.\n",
+  "soaw": {
+    "title": "Statement of Architecture Work — T8 Organisational memory (retrospective, 2026-11-28)",
+    "body": {
+      "assignment": "The sponsoring group assigns T8 the programme's organisational memory: a lesson is proposed from a run, refused when its evidence is not independent, and promoted only by a person's review. The architect answers to the SRO and the Architecture Board.",
+      "scope": "In scope: the lesson lifecycle, the two-independent-references rule, the promotion gate and the refusal behaviour. Out of scope: incident references (T7), the promotion-rate metric (#84), retro authoring (#82), the live organisation loop (T12), and any second memory copy.",
+      "responsibilities": "The programme architect owns this statement and the Phase-G review; the lesson author proposes and never promotes its own proposal; the reviewer decides the promotion; the SRO is accountable for the memory; the sponsoring group decides the close.",
+      "acceptance_criteria": "The four criteria pass: the one-reference refusal in the action and the database, promotion with two independent references and a review, a bad run's non-doctrine lesson, and the delivery on main with its gate named.",
+      "constraints": "No second memory store; no machine promotion without a person's review; the independence rule is a database constraint as well as an action refusal; incident references wait for T7's table.",
+      "retrospective": "Authored retrospectively at tranche 11 from the delivered lifecycle, its migration and its tests. It claims what the tests prove and records the incident-reference limitation as another project's scope."
+    }
+  },
+  "artifacts": [
+    {
+      "title": "Stakeholder Map — T8 Organisational memory (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "entries": [
+        {
+          "axis_a": "Sponsoring group",
+          "axis_b": "authorises the tranche and the close",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "SRO",
+          "axis_b": "accountable for the organisational memory",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "accountable"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Programme architect",
+          "axis_b": "owns the contract and the Phase-G review",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Lesson author",
+          "axis_b": "proposes a lesson from a run; promotes nothing alone",
+          "value": {
+            "influence": "low",
+            "interest": "high",
+            "engagement": "inform"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Reviewer",
+          "axis_b": "the person whose review promotes or rejects a source draft",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 5
+        }
+      ],
+      "links": [
+        {
+          "to": "Driver/Goal/Objective Catalog — T8 Organisational memory (Phase A)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Stakeholder Map — T8 Organisational memory (Phase A)\n\n## Metadata\n\nType: stakeholder matrix. Version 1, retrospective at tranche 11 (2026-11-28). Owner: the programme architect; reviewer: the Architecture Board. Phase A, PSA plateau, project T8.\n\n## Entries\n\nFive seats: the sponsoring group decides the close, the SRO is accountable for the memory, the programme architect owns the contract and review, the lesson author proposes from a run without promoting, and the reviewer is the person whose act promotes or rejects a source draft.\n\n## Links\n\nDerives the Driver/Goal/Objective Catalog: the reviewer's seat is the driver that shapes the lifecycle — two independent evidence refs plus a person's review — and the catalogue records it as an objective, not a convenience.\n\n## Document\n\nThe map records why the memory cannot be a machine-written log: a lesson becomes doctrine only through a person's review, and that seat is named here so the lifecycle has an owner rather than an implicit assumption.\n"
+    },
+    {
+      "title": "Driver/Goal/Objective Catalog — T8 Organisational memory (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "D36 memory decision",
+          "axis_b": "the project's brief records SPEC_V2 §12 T8 and decision D36",
+          "value": {
+            "goal": "one governed memory",
+            "objective": "lessons live in the conveyor's own rows"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "One-ref refusal",
+          "axis_b": "a lesson with one evidence reference is refused",
+          "value": {
+            "goal": "independence",
+            "objective": "two independent refs before review"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Human review",
+          "axis_b": "a person's review promotes a source draft",
+          "value": {
+            "goal": "doctrine needs a person",
+            "objective": "an approval row per promotion"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Bad run",
+          "axis_b": "a failed run records a lesson that is not doctrine",
+          "value": {
+            "goal": "no doctrine by accident",
+            "objective": "a proposed lesson, never promoted"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements Catalog — T8 Organisational memory (Phase A)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Driver/Goal/Objective Catalog — T8 Organisational memory (Phase A)\n\n## Metadata\n\nType: driver/goal/objective catalogue. Version 1, retrospective at tranche 11 (2026-11-28). Owner: the programme architect; reviewer: the Architecture Board. Phase A, PSA plateau, project T8.\n\n## Entries\n\nFour drivers: one governed memory in the conveyor's own rows, a refusal of one-reference lessons, a human review before promotion, and a bad run that records a lesson without making it doctrine. Each maps to a requirement and a named test.\n\n## Links\n\nRealises the Requirements Catalog: every requirement names its driver, and the catalogue's objectives are the acceptance the requirement rows are checked against in `lessons.rs` and the store test.\n\n## Document\n\nThe catalogue records why organisational memory is a governance capability: the value is not that a lesson is stored, but that only a lesson with independent evidence and a person's review can change how the programme acts.\n"
+    },
+    {
+      "title": "Requirements Catalog — T8 Organisational memory (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "R1 one-ref refusal",
+          "axis_b": "a lesson with one evidence reference is refused",
+          "value": {
+            "disposition": "delivered",
+            "evidence": "lessons.rs and store/tests/lesson.rs"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "R2 promotion",
+          "axis_b": "two independent refs and a human review promote a source draft",
+          "value": {
+            "disposition": "delivered",
+            "evidence": "lessons.rs::two_independent_refs_and_a_human_review_promote_a_source_draft"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "R3 bad run",
+          "axis_b": "a failed run records a lesson that is not doctrine",
+          "value": {
+            "disposition": "delivered",
+            "evidence": "lessons.rs::a_failed_run_records_a_lesson_that_is_not_doctrine"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "R4 delivery",
+          "axis_b": "the delivery is on main and gated",
+          "value": {
+            "disposition": "delivered",
+            "evidence": "PR #664, merge 57d8ef8f; preflight 45393424722"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Business Capability Map — T8 Organisational memory (Phase B)",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Requirements Catalog — T8 Organisational memory (Phase A)\n\n## Metadata\n\nType: requirements catalogue. Version 1, retrospective at tranche 11 (2026-11-28). Owner: the programme architect; reviewer: the Architecture Board. Phase A, PSA plateau, project T8.\n\n## Entries\n\nFour requirements: the one-reference refusal enforced in the action and the database, promotion only with two independent references and a person's review, a bad run's lesson recorded but never doctrine, and the delivery on main with a green gate.\n\n## Links\n\nDerives the Business Capability Map: the requirements cluster into one capability — a governed organisational memory — and the map records what it lets the programme do that a log cannot.\n\n## Document\n\nThe catalogue is the trace from the SPEC_V2 T8 gate sentence to the tests. The store test proves the independence rule at the database, so a caller that skips the action cannot write a one-reference lesson either.\n"
+    },
+    {
+      "title": "Solution Concept Diagram — T8 Organisational memory (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "entries": [
+        {
+          "axis_a": "Run",
+          "axis_b": "a run produces an observation",
+          "value": {
+            "path": "execution -> finding"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Proposal",
+          "axis_b": "a lesson is proposed with evidence refs",
+          "value": {
+            "path": "programme_lessons.propose"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Review",
+          "axis_b": "a person reviews the source draft",
+          "value": {
+            "path": "approval primitive"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Doctrine",
+          "axis_b": "a promoted lesson changes how the programme acts",
+          "value": {
+            "path": "promotion -> the next unit reads it"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Stakeholder Map — T8 Organisational memory (Phase A)",
+          "kind": "reuse"
+        }
+      ],
+      "body": "# Solution Concept Diagram — T8 Organisational memory (Phase A)\n\n## Metadata\n\nType: solution concept. Version 1, retrospective at tranche 11 (2026-11-28). Owner: the programme architect; reviewer: the Architecture Board. Phase A, PSA plateau, project T8.\n\n## Entries\n\nOne path: a run produces an observation, a lesson is proposed with evidence, the independence rule refuses a single reference, a person's review promotes or rejects the source draft, and only a promoted lesson changes how the programme acts.\n\n## Links\n\nReuses the Stakeholder Map: the reviewer's seat is the gate the concept centres on, and the lesson author's seat is deliberately not able to promote its own proposal.\n\n## Document\n\nThe concept is a lifecycle with a human gate, not a database table. Its output is a doctrine row whose provenance is two independent references and an approval, which is what makes the memory auditable after the session that produced it is gone.\n"
+    },
+    {
+      "title": "Business Capability Map — T8 Organisational memory (Phase B)",
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "entries": [
+        {
+          "axis_a": "Organisational memory",
+          "axis_b": "the programme keeps what its runs taught it",
+          "value": {
+            "level": "delivered",
+            "evidence": "the lesson lifecycle and its tests"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Auditable learning",
+          "axis_b": "a promoted lesson carries its refs and its review",
+          "value": {
+            "level": "delivered",
+            "evidence": "the lesson and approval rows"
+          },
+          "position": 2
+        }
+      ],
+      "links": [
+        {
+          "to": "Data Entity/Data Component Catalog — T8 Organisational memory (Phase C)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Business Capability Map — T8 Organisational memory (Phase B)\n\n## Metadata\n\nType: capability map. Version 1, retrospective at tranche 11 (2026-11-28). Owner: the programme architect; reviewer: the Architecture Board. Phase B, HLD plateau, project T8.\n\n## Entries\n\nTwo capabilities: organisational memory (the programme keeps what its runs taught it) and auditable learning (a promoted lesson carries its references and the review that promoted it). The second is what makes the first trustworthy.\n\n## Links\n\nDepends on the Data Entity Catalog: the capability is real only because the lesson and evidence rows exist, and the catalogue records the lifecycle and its constraints.\n\n## Document\n\nThe map records the boundary between a log and a memory. A log records what happened; the memory records what the programme concluded and who agreed, and a later reader can challenge either the evidence or the review.\n"
+    },
+    {
+      "title": "Data Entity/Data Component Catalog — T8 Organisational memory (Phase C)",
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "lesson",
+          "axis_b": "one row per proposed lesson with its lifecycle state",
+          "value": {
+            "owner": "conveyor",
+            "migration": "0069_lesson_lifecycle.sql"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "lesson evidence",
+          "axis_b": "two or more independent references",
+          "value": {
+            "owner": "conveyor",
+            "migration": "0069_lesson_lifecycle.sql"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "approval",
+          "axis_b": "the person's review that promotes a source draft",
+          "value": {
+            "owner": "conveyor",
+            "migration": "the approval primitive"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "run finding",
+          "axis_b": "the observation a lesson is proposed from",
+          "value": {
+            "owner": "conveyor",
+            "migration": "the run ledger"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Technology Standards Catalog — T8 Organisational memory (Phase D)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Data Entity/Data Component Catalog — T8 Organisational memory (Phase C)\n\n## Metadata\n\nType: data entity catalogue. Version 1, retrospective at tranche 11 (2026-11-28). Owner: the programme architect; reviewer: the Architecture Board. Phase C, HLD plateau, project T8.\n\n## Entries\n\nFour entities: the lesson row and its lifecycle, the evidence references that must be independent, the approval row that records the person's review, and the run finding the lesson is proposed from. Migration 0069 creates the lesson and evidence tables and their constraints.\n\n## Links\n\nDepends on the Technology Standards Catalog: the rows live in the one Postgres primary through PgBouncer, and the lifecycle's constraints are enforced in the database as well as the action.\n\n## Document\n\nThe catalogue records why the one-reference refusal is both an action and a database constraint: a caller that bypasses the action must still be refused, and the store test proves it. That is the difference between a rule and a convention.\n"
+    },
+    {
+      "title": "Technology Standards Catalog — T8 Organisational memory (Phase D)",
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "Language and runtime",
+          "axis_b": "Rust workspace; the conveyor service image",
+          "value": {
+            "standard": "the repository's Rust archetype"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Database",
+          "axis_b": "Postgres 18 behind PgBouncer; migrations by the migrate role",
+          "value": {
+            "standard": "one database, one migrate role"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Review",
+          "axis_b": "the approval primitive every gate uses",
+          "value": {
+            "standard": "one approval store"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "CI",
+          "axis_b": "GitHub-hosted preflight; no local compile gate",
+          "value": {
+            "standard": "the repository's workflow set"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Business Capability Map — T8 Organisational memory (Phase B)",
+          "kind": "reuse"
+        }
+      ],
+      "body": "# Technology Standards Catalog — T8 Organisational memory (Phase D)\n\n## Metadata\n\nType: technology standards catalogue. Version 1, retrospective at tranche 11 (2026-11-28). Owner: the programme architect; reviewer: the Architecture Board. Phase D, HLD plateau, project T8.\n\n## Entries\n\nThe lifecycle runs on the repository's Rust workspace, Postgres 18 behind PgBouncer with a separate migrate role, the one approval primitive every gate uses, and the hosted preflight as the compile verdict.\n\n## Links\n\nReuses the Business Capability Map: the standards exist so the memory is provable on the estate's own instruments, not a bespoke approval mechanism that could disagree with the programme's other gates.\n\n## Document\n\nThe catalogue fixes the rule the capability depends on: a promotion is an approval row in the same store as every other gate, so a lesson's review can be audited by the same reader that audits a tranche review.\n"
+    }
+  ],
+  "documents": [
+    {
+      "category": "architecture-artifact",
+      "title": "Architecture Artefact Index — T8 Organisational memory (retrospective, 2026-11-28)",
+      "body": "# Architecture Artefact Index — T8 Organisational memory (retrospective, 2026-11-28)\n\n## Metadata\n\nSeven A–D artefacts are bound to T8 in the standard's order: stakeholder map, driver/goal/objective catalogue, requirements catalogue, solution concept, business capability map, data entity catalogue and technology standards catalogue. Owner: the programme architect; reviewer: the Architecture Board; phase G retrospective.\n\n## Entries\n\n- Stakeholder Map — Phase A, matrix: five seats, including the reviewer's human gate.\n- Driver/Goal/Objective Catalog — Phase A, catalogue: the memory decision and three lifecycle drivers.\n- Requirements Catalog — Phase A, catalogue: four requirements with their tests.\n- Solution Concept Diagram — Phase A, diagram: run, proposal, review, doctrine.\n- Business Capability Map — Phase B, diagram: organisational memory and auditable learning.\n- Data Entity/Data Component Catalog — Phase C, catalogue: lesson, evidence, approval, finding.\n- Technology Standards Catalog — Phase D, catalogue: Rust, Postgres, the approval primitive, CI.\n\n## Links\n\n- Plan: `docs/SPEC_V2.md` §12 T8; `docs/plans/T8/project-brief.md`; `docs/plans/T8/closure-review.md`.\n- Evidence: `crates/actions/tests/lessons.rs`, `crates/store/tests/lesson.rs`, migration `0069_lesson_lifecycle.sql`.\n\n## Document\n\nThe index is the published entry point to T8's typed artefacts. Every artefact carries its own document, so a reader can follow a lifecycle row from this index to the artefact and back without a second catalogue.\n"
+    },
+    {
+      "category": "user-stories",
+      "title": "User stories — T8 Organisational memory (retrospective, 2026-11-28)",
+      "body": "# User stories — T8 Organisational memory (retrospective, 2026-11-28)\n\n## Personas\n\nThe lesson author, who proposes from a run and must not promote alone; the reviewer, whose review promotes or rejects a source draft; the programme manager, who reads promoted lessons as doctrine; and the SRO, accountable for the memory the programme acts on.\n\n## Stories\n\n- As the lesson author, I want to propose a lesson with its evidence, so that what a run taught is not lost with the session.\n- As the reviewer, I want a one-reference lesson refused, so that doctrine is never built on a single observation.\n- As the programme manager, I want a bad run's lesson recorded as proposed and not promoted, so that a failure cannot quietly become policy.\n- As the SRO, I want every promotion to carry its references and its reviewer, so that a later reader can challenge the conclusion.\n\n## Scenarios\n\n- Given a lesson with one evidence reference, when it is proposed, then the action and the store both refuse it.\n- Given two independent references, when a person reviews the source draft, then the lesson is promoted; when the person rejects it, then it is rejected and stays out of doctrine.\n- Given a failed run, when a lesson is recorded, then it is proposed and not promoted.\n- Given the delivery, when the merge head is checked, then the gate that delivered it is green.\n\n## Verify\n\n- `cargo test -p conveyor-actions --test lessons` — the three action scenarios.\n- `cargo test -p conveyor-store --test lesson` — the database's independence refusal.\n- `python3 scripts/verify-project.py --project T8` — the receipt.\n"
+    },
+    {
+      "category": "acceptance-criteria",
+      "title": "Acceptance criteria — T8 Organisational memory (retrospective, 2026-11-28)",
+      "body": "# Acceptance criteria — T8 Organisational memory (retrospective, 2026-11-28)\n\n## Scenarios\n\n- AC1: a lesson with one evidence reference is refused, in the action and in the database.\n- AC2: two independent references and a human review promote a source draft; a rejection keeps it out of doctrine.\n- AC3: a failed run records a lesson that is not doctrine.\n- AC4: the delivery is on main and gated, with the merge and the preflight run named.\n\n## Verify commands\n\n- `cargo test -p conveyor-actions --test lessons` — AC1 to AC3.\n- `cargo test -p conveyor-store --test lesson` — AC1's database constraint.\n- The merge `57d8ef8fe07de413e6a73430584ddd2cf2d59d7f` and preflight run 45393424722 — AC4.\n\n## Results\n\nAll four pass. AC1 is proved twice — by the action's refusal and by the database's constraint — so a caller that skips the action cannot write a one-reference lesson. AC2's promotion and rejection are separate scenarios; AC3 records a failed run's lesson as proposed, never promoted.\n\n## Status\n\nAccepted. The project closes through its gate in tranche 11; the closure review records `Close`, and the incident-reference limitation (a typed 422 until T7's table) is recorded as another project's scope.\n"
+    },
+    {
+      "category": "definition-of-ready",
+      "title": "Definition of ready — T8 Organisational memory (retrospective, 2026-11-28)",
+      "body": "# Definition of ready — T8 Organisational memory (retrospective, 2026-11-28)\n\n## Independent\n\nThe project lands in this repository without another project's files: migration 0069, the lesson actions and their tests are its own. Its dependencies are typed in the project row (T5, P0) and delivered earlier, and the T7 incident-reference limitation is recorded as other scope.\n\n## Negotiable\n\nThe outcome is fixed — a governed lifecycle with a human gate. The lifecycle's states, the refusal messages and the test names were settled at delivery against the schema, not in the brief.\n\n## Valuable\n\nThe unit removes a named gap: without a memory, every run relearns what a previous run already paid to learn. The delivered value is a doctrine row a later reader can challenge on its evidence and its review.\n\n## Estimable\n\nThe baseline, the files and the acceptance are named: `migrations/0069_lesson_lifecycle.sql`, `crates/actions/tests/lessons.rs`, `crates/store/tests/lesson.rs`, the merge `57d8ef8f` and PR #664.\n\n## Small\n\nOne project, one migration, two test files, one delivery unit (#79). Incident-reference lessons are explicitly another project's scope and are not smuggled into this one.\n\n## Testable\n\nEvery scenario carries a test or a command: the three action scenarios, the store's constraint test, and the merge and preflight identifiers for the delivery.\n\n## Dependencies\n\nT5 (kata) supplies measured lessons from the execute → memory → lesson chain; P0 supplies the programme definition. Both delivered in earlier tranches; T7 owns incident references and is not a blocker for this lifecycle.\n"
+    },
+    {
+      "category": "definition-of-done",
+      "title": "Definition of done — T8 Organisational memory (retrospective, 2026-11-28)",
+      "body": "# Definition of done — T8 Organisational memory (retrospective, 2026-11-28)\n\n## Acceptance criteria\n\nAll four criteria are evidenced at their merge head: AC1 by the action and store tests, AC2 by the promotion and rejection scenarios, AC3 by the bad-run scenario, and AC4 by the merged commit and its preflight run. A criterion without a named test is not done.\n\n## Evidence at completion\n\nThe evidence is `crates/actions/tests/lessons.rs`, `crates/store/tests/lesson.rs`, migration `0069_lesson_lifecycle.sql`, the merge `57d8ef8fe07de413e6a73430584ddd2cf2d59d7f` (PR #664, head `9e2b7f57`) and preflight run 45393424722.\n\n## Repo gate\n\nThe compile and lint verdict is the repository's GitHub-hosted preflight; the targeted suites run through the sanctioned route. No local cargo build is a gate, and the closure does not claim one.\n\n## Merge and closure\n\nThe delivery merged and the project closes in tranche 11 through its closure gate: the closure review is published with its four sections, the manifest states `closed`, and the receipt is green at the pinned snapshot. Incident references remain T7's scope.\n"
+    },
+    {
+      "category": "inception-analysis",
+      "title": "Inception Analysis — T8 Organisational memory (retrospective, 2026-11-28)",
+      "body": "# Inception Analysis — T8 Organisational memory (retrospective, 2026-11-28)\n\n## Current state\n\nBefore T8 a programme's learning lived in conversation, retrose prose and the memory of whoever was in the session. Nothing refused a one-observation conclusion, and nothing recorded who had agreed to it, so a bad run could become policy by repetition.\n\n## Reuse sources\n\nThe project reuses the conveyor's own rows and primitives: documents, the approval store and the run ledger. It adds one migration (0069) and two test files. It does not add a second memory store, an embedding index or a machine-learning pipeline.\n\n## Build vs reuse\n\nBuild: the lesson lifecycle, the independence rule and the promotion gate. Reuse: the approval primitive and the run ledger. Do not build: incident references (T7), the promotion-rate metric (#84), retro authoring (#82), or a second memory copy in the agent platform.\n\n## Risks\n\nThe main risk is a rule enforced only in the action layer, so the independence check is also a database constraint and the store test proves it. The second is a memory that records conclusions without provenance; every promoted lesson therefore carries its references and its reviewer.\n"
+    },
+    {
+      "category": "architecture-analysis",
+      "title": "Architecture Analysis — T8 Organisational memory (retrospective, 2026-11-28)",
+      "body": "# Architecture Analysis — T8 Organisational memory (retrospective, 2026-11-28)\n\n## Current state\n\nThe analysis asked what must be true for the programme to keep what its runs taught without turning every observation into doctrine. The answer had three parts: a proposal, an independence rule on its evidence, and a person's review before promotion.\n\n## Options considered\n\n- A shared document that anyone may edit: refused, because it cannot refuse a one-reference conclusion and keeps no provenance.\n- A machine-promoted memory with a confidence score: refused, because no person is accountable and a bad run could be promoted by its own output.\n- A typed lesson with two independent refs and an approval-row promotion: chosen, because it is auditable and it names the person who decided.\n\n## Risks\n\nA rule that exists only in the action can be bypassed by a direct write, so the constraint is in the database too. A lesson without provenance is a rumour, so the evidence references are required at proposal time and the promotion records the reviewer.\n\n## Dependency map\n\nT5 supplies measured lessons from the kata loop; P0 supplies the programme definition; T7 owns incident references and is a typed refusal until it lands; T12 owns the live organisation loop that exercises the memory in production.\n"
+    },
+    {
+      "category": "architecture-design",
+      "title": "Architecture Design — T8 Organisational memory (retrospective, 2026-11-28)",
+      "body": "# Architecture Design — T8 Organisational memory (retrospective, 2026-11-28)\n\n## Context and boundary\n\nT8 is the conveyor's organisational memory. Inside: the lesson row and its lifecycle, the evidence references and their independence rule, the promotion approval, and the refusal behaviour. Outside: incident references (T7), the promotion-rate metric (#84), retro authoring (#82), and any second memory copy in the agent platform.\n\n## Aggregates, tables and actions\n\nOne aggregate, `lesson`, with proposed, reviewed, promoted and rejected states; migration 0069 adds the lesson and evidence tables and the constraint that refuses one independent reference; the promotion is an approval row through the existing primitive, not a new gate mechanism.\n\n## Decisions\n\nFour decisions: a lesson is proposed, never written as doctrine; two independent references are required; a person's review promotes or rejects it; a bad run's lesson is recorded as proposed and never promoted. Each is a test, and the independence rule is also a database constraint.\n\n## Acceptance\n\nThe acceptance is the three action scenarios in `lessons.rs`, the store constraint test in `store/tests/lesson.rs`, and the delivery's merge and preflight identifiers. The closure review records the decision and the T7 limitation.\n\n## Architecture artefacts\n\nThe seven A–D artefacts record the seats, the drivers, the requirements, the lifecycle concept, the capability, the rows and the standards. The published index is their entry point, and the design's links are the artefact chain.\n"
+    },
+    {
+      "category": "statement-of-architecture-work",
+      "title": "Statement of Architecture Work — T8 Organisational memory (retrospective, 2026-11-28)",
+      "body": "# Statement of Architecture Work — T8 Organisational memory (retrospective, 2026-11-28)\n\n## Assignment\n\nThe sponsoring group assigns T8 the programme's organisational memory: a lesson is proposed from a run, refused when its evidence is not independent, and promoted only by a person's review. The architect answers to the SRO and the Architecture Board.\n\n## Scope\n\nIn scope: the lesson lifecycle, the two-independent-references rule, the promotion gate and the refusal behaviour. Out of scope: incident references (T7), the promotion-rate metric (#84), retro authoring (#82), the live organisation loop (T12), and any second memory copy.\n\n## Responsibilities\n\nThe programme architect owns this statement and the Phase-G review; the lesson author proposes and never promotes its own proposal; the reviewer decides the promotion; the SRO is accountable for the memory; the sponsoring group decides the close.\n\n## Acceptance criteria\n\nThe four criteria pass: the one-reference refusal in the action and the database, promotion with two independent references and a review, a bad run's non-doctrine lesson, and the delivery on main with its gate named.\n\n## Contract\n\nThis statement is the architecture contract the Phase-G review reads. It binds the project to the estate's approval and database primitives and forbids the shortcut the analysis refused: a memory promoted by a score rather than by a person.\n"
+    }
+  ],
+  "registers": {
+    "risk": [
+      {
+        "code": "T8-R1",
+        "title": "A lesson could be promoted without its references being truly independent",
+        "body": "The rule counts references, not their independence. Two refs copied from one source satisfy the count while giving no corroboration; the reviewer is the only check on that, and a hasty review could promote it.",
+        "probability": "medium",
+        "impact": 3,
+        "review_at": "2026-12-19",
+        "severity": "medium",
+        "status": "open",
+        "response": "The review's evidence is the record of how the refs were produced; a later reader can challenge it, and the lesson's provenance is visible in the row rather than inferred.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "crates/actions/tests/lessons.rs"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
+      }
+    ],
+    "issue": [
+      {
+        "code": "T8-I1",
+        "title": "Incident-reference lessons are a typed 422 until T7's table exists",
+        "body": "A lesson proposed from an incident cannot cite an incident reference, because the table is T7's scope. The lifecycle is complete without it, but the memory cannot yet record that class of evidence.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/T8/closure-review.md"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
+      }
+    ],
+    "assumption": [
+      {
+        "code": "T8-A1",
+        "title": "The promotion's reviewer is a person, not a service identity",
+        "body": "The approval primitive records whoever decides. The assumption is that a promotion's approver is a human seat; a session acting as its own reviewer would satisfy the row while defeating the gate's purpose.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "crates/actions/tests/lessons.rs"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
+      }
+    ],
+    "dependency": [
+      {
+        "code": "T8-D1",
+        "title": "T8 depends on T5 and P0",
+        "body": "The project row records the edges: T5 supplies measured lessons from the execute → memory → lesson chain, and P0 the programme definition and its gates. Both delivered in earlier tranches; T7's incident references are a limitation, not a blocker.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "seed/programme-definition.json"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
+      }
+    ],
+    "benefit": [
+      {
+        "code": "T8-B1",
+        "title": "The programme keeps what its runs taught it, with provenance",
+        "body": "Before T8, learning was lost with the session and a bad run could become policy by repetition. After it, a lesson carries two independent references and a person's review before it can change how the programme acts, so the memory is both durable and auditable.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/T8/project-brief.md"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the SRO (conveyor-e2e)"
+        }
+      }
+    ]
+  },
+  "delivery_contract": {
+    "title": "Delivery Contract — T8 Organisational memory (retrospective, 2026-11-28)",
+    "body": {
+      "commitments": "The delivery commits to the four requirements the Requirements Catalog states — the one-reference refusal, promotion with two independent references and a person's review, a bad run's non-doctrine lesson, and the gated delivery — and to the boundary the Statement of Architecture Work draws: no second memory store and no machine promotion.",
+      "compliance": "Compliance is measured by `crates/actions/tests/lessons.rs` for the lifecycle, by `crates/store/tests/lesson.rs` for the database's independence constraint, and by the merge and preflight identifiers for the delivery. The Phase-G review records the level and the T7 limitation.",
+      "approval": "The contract is approved by the programme architect as the delegated architecture authority under the standing rule decision; the closure decision is taken by the distinct approver the factory's gate requires, and the closure review records it.",
+      "manifest": "acceptance/programme/T8.toml",
+      "acceptance_at": "The acceptance is the three action scenarios and the store constraint at the delivered merge, and this rework's receipt at the pinned snapshot; the closure gate then reads the published documents and the green receipt.",
+      "retrospective": "Authored at tranche 11. Incident references are a typed refusal until T7's table; that limitation is recorded here and in the closure review rather than being claimed as delivered.",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+    }
+  },
+  "wbs_deliverable": {
+    "title": "The organisational memory is delivered and re-closed through its gate — a lesson needs two independent references and a person's review before it can become doctrine",
+    "business_value": 8,
+    "time_criticality": 5,
+    "risk_reduction": 7,
+    "job_size": 5
+  },
+  "review": {
+    "level": "compliant",
+    "findings": "The delivery is compliant with its contract: the one-reference refusal is enforced both in the action and in the database, promotion requires two independent references and a person's review, and a bad run's lesson is recorded without becoming doctrine. The T7 incident-reference limitation is recorded as another project's scope, not as a gap in this delivery.",
+    "evidence": {
+      "manifest": "acceptance/programme/T8.toml",
+      "suite": "crates/actions/tests/lessons.rs",
+      "start_suite": "migrations/0069_lesson_lifecycle.sql",
+      "resolver_suite": "crates/store/tests/lesson.rs",
+      "receipt": "docs/evidence/rework/T8.json",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+    }
+  },
+  "closure": "T8 is re-closed through the gate the record carries: the project row closes only after its charter, scope baseline, seven A–D artefacts, five registers, delivery contract, WBS deliverable, Phase-G review, both declared outputs and the retrospective closure review exist, and the receipt on `acceptance/programme/T8.toml` is green at the pinned snapshot. The close records the incident-reference limitation as T7's scope and claims no memory surface beyond the conveyor's own rows.",
+  "closure_review": "# Closure Review — T8 Organisational memory (retrospective, 2026-11-28)\n\n## Outcome vs acceptance\n\n| Acceptance criterion | Evidence | Result |\n|---|---|---|\n| A lesson with one evidence reference is refused | `crates/actions/tests/lessons.rs::one_evidence_ref_is_refused`; `crates/store/tests/lesson.rs::the_database_refuses_a_lesson_with_one_independent_ref`; migration `0069_lesson_lifecycle.sql` | pass |\n| Two independent references and a human review promote a source draft | `lessons.rs::two_independent_refs_and_a_human_review_promote_a_source_draft` | pass |\n| A bad run records a lesson that is not doctrine | `lessons.rs::a_failed_run_records_a_lesson_that_is_not_doctrine` | pass |\n| The delivery is on main and gated | issue #79 closed by PR #664, merge `57d8ef8fe07de413e6a73430584ddd2cf2d59d7f` (head `9e2b7f57`); preflight run 45393424722 success | pass |\n\n## Evidence\n\n- Delivery merge `57d8ef8fe07de413e6a73430584ddd2cf2d59d7f`; migration `migrations/0069_lesson_lifecycle.sql`.\n- Behaviour: the named `lessons.rs` and `store/tests/lesson.rs` scenarios.\n- The brief: `docs/plans/T8/project-brief.md`, authored at closure from SPEC_V2 §12 T8 and decision D36.\n\n## Open items\n\n- Incident-reference lessons are a typed 422 until T7's table — T7's scope, not a T8 gap.\n- `strata_rag` publishing and embeddings were never in T8's scope; #84's promotion rate and #82's retro authoring are separate units; the live loop is #88/T12.\n- The tranche-11 authorisation is not claimed here; it is the programme chain's act.\n\n## Decision\n\nClose. Acceptance is met on the evidence above; the listed items are other projects' scope, and this review does not manufacture a tranche authorisation.\n",
+  "project_brief_output": "# T8 — Organisational memory\n\n**Track:** v2 · **Tranche:** 11 · **Measured status:** closed · **Issues:** #79 (closed)\n**Gate:** a lesson with one evidence reference is refused; two independent references and a person's review promote a source draft; a bad run records a lesson that is not doctrine.\n\n## Outcome\n\nA lesson proposed from a run cannot become doctrine until it carries two independent evidence references and a person's review. A lesson with one reference is refused in the action and in the database; a bad run records a lesson that stays proposed.\n\n## Boundary\n\nIn: the lesson lifecycle, the independence rule, the promotion gate and the refusal behaviour. Out: incident references (T7), the promotion-rate metric (#84), retro authoring (#82), the live organisation loop (T12), and any second memory copy.\n\n## Reuse sources\n\nThe conveyor's own rows and primitives: documents, the approval store and the run ledger. One migration (0069) and two test files; no second store and no embedding index.\n\n## Inception units\n\nThe analysis and architecture documents are published on this project; the seven A–D artefacts are bound in the standard's order and indexed by the published architecture-artifact document.\n\n## Dependencies\n\nT5 (kata) supplies measured lessons from the execute → memory → lesson chain; P0 supplies the programme definition. T7 owns incident references and is a typed limitation, not a blocker.\n\n## Acceptance\n\nThe three action scenarios and the store constraint pass; the delivery merge `57d8ef8f` and preflight run 45393424722 are named; the closure review records the decision.\n\n## Capabilities\n\nOrganisational memory and auditable learning: the programme keeps what its runs taught it, and every promoted lesson carries its references and its reviewer.\n\n## Plan\n\nDelivered by #79 (PR #664); the closure review is `docs/plans/T8/closure-review.md`. Incident references remain T7's scope, and the project closes in tranche 11 through its gate.\n",
+  "evidence_output": "# Evidence — T8 Organisational memory\n\n## Claim\n\nT8 delivered the programme's organisational memory: a lesson is proposed from a run, refused when its evidence is not independent, and promoted only by a person's review; a bad run's lesson is recorded and never becomes doctrine.\n\n## Evidence\n\n- `crates/actions/tests/lessons.rs` — the three action scenarios.\n- `crates/store/tests/lesson.rs` — the database's one-independent-reference refusal.\n- `migrations/0069_lesson_lifecycle.sql` — the lifecycle and its constraints.\n- Merge `57d8ef8fe07de413e6a73430584ddd2cf2d59d7f` (PR #664, head `9e2b7f57`); issue #79 closed.\n\n## Verification\n\nRun `cargo test -p conveyor-actions --test lessons` and `cargo test -p conveyor-store --test lesson` at a checked-out main; the CI equivalent is PR #664's preflight run 45393424722.\n\n## Links\n\n- Closure review: `docs/plans/T8/closure-review.md` — the decision and its outcome table.\n- Project brief: `docs/plans/T8/project-brief.md` — the outcome, boundary and acceptance.\n- Unit: #79 — the delivery issue, closed by PR #664.\n- Plan: `docs/SPEC_V2.md` §12 T8 — the gate sentence this evidence answers.\n\n## Gap\n\nIncident-reference lessons are a typed 422 until T7's table exists; `strata_rag` publishing and embeddings were never in T8's scope, and the live organisation loop is T12's.\n"
+}
