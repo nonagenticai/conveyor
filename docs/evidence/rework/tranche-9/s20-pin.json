@@ -1,0 +1,24 @@
+{
+  "schema": "conveyor-tranche-member-pin/v1",
+  "project": "S20",
+  "project_id": "01a1d039-0d31-7d0f-ab1f-16240952e223",
+  "measured_at": "2026-11-28",
+  "before": {
+    "record_status": "closed",
+    "manifest_pin": "active",
+    "check_project": "fails P0: the row is closed, the pin expects active",
+    "closes_project": false,
+    "consequence": "an active pack may not carry closure content, so the closure review the register demands (closed_without_closure_review:S20) could never be published"
+  },
+  "after": {
+    "manifest_pin": "closed",
+    "check_project": "passes: the pin and the row agree",
+    "closes_project": true,
+    "factory_route": "reopen (step 1) -> declare closure_outputs=[closure-review] (step 3) -> publish the closure review (step 8) -> closure gate decided by a distinct approver (step 11)",
+    "content_still_required": "rework-project.py refuses a close without content.closure and content.closure_review (1038, 1277)"
+  },
+  "readbacks": {
+    "pin_assertion": "python3 -c '<S20-project regex>' -> S20-project pin: closed",
+    "closes_project": "importlib-loaded rework-batch.py -> manifest_status('S20')='closed'; closes_project({key:S20, issues:[14]}, {14:CLOSED}, content)=True"
+  }
+}
