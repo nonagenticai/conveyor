@@ -1,0 +1,731 @@
+{
+  "charter": "# Charter \u2014 T5 Kata (retrospective, 2026-11-28)\n\nT5 delivers the kata capability: a procedure change is measured on a held-out instrument, adopted only when it wins, reverted when it regresses, and never approved by the actor that proposed it. The capability is built (migrations 0066_kata.sql and 0067_kata_gate.sql, the `kata.*` action family and its integration suites) and its project row is closed; this charter is the retrospective record the v4 close gate requires, not a claim of new construction.\n\nThe project's authority comes from SPEC_V2 \u00a712's T5 row, and its boundaries are the ones the inception analysis set: the instruments belong to S16\u2013S20, the lesson register to T8, the development project to T6, the andon cord to S06 and the tool platform to T13. The kata reuses the eval, benchmark and approval surfaces and defines none of them. Its acceptance is the six refusal scenarios of the delivered gate plus the three audit findings carried by the code unit; the receipt stays red until those land, and the closure review records that split openly.\n\nThe review is the Architecture Board's, under its published standing delegation; the tranche decision is the programme owner's. This charter claims no tranche authority and re-opens no delivered slice.\n",
+  "soaw": {
+    "title": "Statement of Architecture Work \u2014 T5 Kata (retrospective, Phase A)",
+    "body": {
+      "assignment": "Deliver the architecture record for the kata capability: a procedure change measured on a held-out instrument, adopted only on a win, reverted on a regression, with the adoption decided by a person distinct from the kata's actor. The assignment is retrospective: the product shipped on issue #77 and the merges the closure review cites, and this statement records the architecture that shipped.",
+      "scope": "The kata action family, the two kata migrations, the eval and approval reuse, and the seven A\u2013D artefacts. Out of scope: the instruments, the lesson promotion, the development project, the andon cord and the tool platform. The phase set is A\u2013D on the delivery ADM; the programme row carries adm_phase G and plateau capability.",
+      "responsibilities": "The coach seat opens and measures; the kata owner sets the prediction and the instrument; the adoption approver decides keep or revert; the Architecture Board reviews the architecture record under its standing delegation; the programme owner decides the tranche. No role signs its own gate.",
+      "acceptance_criteria": "The acceptance is A1\u2013A8 of the acceptance document, each by its test, plus the closure review's outcome-vs-acceptance table. A1\u2013A5 are delivered; A6\u2013A8 are the code unit's and are named open. The statement claims no tranche authority: authorisation is the programme's separate act.",
+      "constraints": "No second metric store, no second approval path, no second runtime or service, no direct database path from the kata, and no adoption by a non-human principal. The kata tenant is the systemic kata's home; the coached tenant is never the kata's tenant.",
+      "retrospective": "This SoAW is authored at the 2026-11-28 retrospective snapshot against a closed project row. It describes what the delivered capability is, names the three open findings, and records that the tranche authorisation is the review's act rather than this document's."
+    }
+  },
+  "artifacts": [
+    {
+      "title": "Stakeholder Map \u2014 T5 Kata (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "entries": [
+        {
+          "axis_a": "Programme owner",
+          "axis_b": "owns the tranche decision and the closure gate",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Architecture Board",
+          "axis_b": "approves the architecture contract and the Phase-G level",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Kata owner (coach seat)",
+          "axis_b": "opens, measures and propagates a kata; never approves adoption",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "collaborate"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Adoption approver",
+          "axis_b": "a person, distinct from the kata's actor, who decides keep or revert",
+          "value": {
+            "influence": "high",
+            "interest": "medium",
+            "engagement": "decide"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Instrument owner (S16\u2013S20)",
+          "axis_b": "owns the eval and benchmark instruments a kata measures on",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "collaborate"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Development project (T6)",
+          "axis_b": "receives an adopted code candidate as its own unit",
+          "value": {
+            "influence": "low",
+            "interest": "medium",
+            "engagement": "inform"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Driver/Goal/Objective Catalog \u2014 T5 Kata (Phase A)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Architecture artefact\n\n## Metadata\n\nType: matrix. Title: Stakeholder Map \u2014 T5 Kata (Phase A). Version 1. Owner: the conveyor programme session. Reviewer: the Architecture Board's published standing delegation. Review date 2026-11-28. Phase A of the delivery ADM, plateau capability. The related project is T5, the kata capability; the record row is closed and this artefact set is the retrospective document the close gate reads.\n\n## Entries\n\nThe rows pair each seat with what it decides about a kata: who may open it, who owns its instrument, and who alone may approve an adoption. The adoption approver is a person distinct from the kata's own actor; the map records that separation as the engagement that carries the gate.\n\n## Links\n\nThe driver catalog derives from this map; the requirements catalog narrows each stakeholder's expectation to one measurable requirement.\n\n## Document\n\nThe stakeholder map for the kata capability. Used at Phase A to confirm every seat whose decision the kata row audits; no seat holds two conflicting engagements.\n"
+    },
+    {
+      "title": "Driver/Goal/Objective Catalog \u2014 T5 Kata (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "D1 \u2014 a change is adopted on evidence",
+          "axis_b": "G1 \u2014 measure on a held-out instrument",
+          "value": {
+            "objective": "O1 \u2014 every adoption cites a measurement on the test split"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "D2 \u2014 a regression does not linger",
+          "axis_b": "G2 \u2014 revert on a measured regression",
+          "value": {
+            "objective": "O2 \u2014 a reverted candidate restores the recorded base version"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "D3 \u2014 the improvement cannot grade itself",
+          "axis_b": "G3 \u2014 self-approval refused",
+          "value": {
+            "objective": "O3 \u2014 adoption needs a resolved human approval by a distinct approver"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "D4 \u2014 an unmeasurable guess is not a kata",
+          "axis_b": "G4 \u2014 no instrument, no kata",
+          "value": {
+            "objective": "O4 \u2014 opening without an instrument or prediction is refused"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "D5 \u2014 a drifted contract is caught",
+          "axis_b": "G5 \u2014 a schema drift opens a kata with a contract-test instrument",
+          "value": {
+            "objective": "O5 \u2014 a 422 drift is measured rather than patched"
+          },
+          "position": 5
+        }
+      ],
+      "links": [
+        {
+          "to": "Stakeholder Map \u2014 T5 Kata (Phase A)",
+          "kind": "dependency"
+        },
+        {
+          "to": "Requirements Catalog \u2014 T5 Kata (Phase A)",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Architecture artefact\n\n## Metadata\n\nType: catalog. Title: Driver/Goal/Objective Catalog \u2014 T5 Kata (Phase A). Version 1. Owner: the conveyor programme session. Reviewer: the Architecture Board's published standing delegation. Review date 2026-11-28. Phase A of the delivery ADM, plateau capability. The related project is T5, the kata capability; the record row is closed and this artefact set is the retrospective document the close gate reads.\n\n## Entries\n\nEach row states one driver, the goal that answers it and the objective a receipt can measure. D5 is the rework finding carried by the code unit: a schema drift had no instrument class, so the improvement could only be patched. The catalog makes the missing instrument an objective rather than a silent gap.\n\n## Links\n\nEach goal realizes one requirement in the requirements catalog; the requirements are accepted or failed by the kata test suites.\n\n## Document\n\nThe drivers, goals and objectives the kata capability answers. The catalog is the bridge between the programme's drivers and the kata's measurable objectives; no objective is stated without a measurement the record can read.\n"
+    },
+    {
+      "title": "Requirements Catalog \u2014 T5 Kata (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "R1",
+          "axis_b": "a kata opens only on a replayable flow with a recorded prediction",
+          "value": {
+            "acceptance": "kata_open.rs::a_kata_without_an_instrument_is_not_opened"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "R2",
+          "axis_b": "one open kata per signature",
+          "value": {
+            "acceptance": "kata_open.rs::a_second_kata_for_an_open_signature_is_refused"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "R3",
+          "axis_b": "measurement runs on the held-out split",
+          "value": {
+            "acceptance": "kata_measure.rs::a_procedure_change_is_measured_on_the_held_out_split"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "R4",
+          "axis_b": "a regression reverts; a flat result adopts nothing",
+          "value": {
+            "acceptance": "kata_revert.rs::a_measured_regression_reverts_the_candidate"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "R5",
+          "axis_b": "the kata cannot approve its own adoption",
+          "value": {
+            "acceptance": "kata_adopt.rs::the_kata_cannot_approve_its_own_adoption"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "R6",
+          "axis_b": "a completed run pins the instrument it measured",
+          "value": {
+            "acceptance": "eval_instrument_digest.rs::a_completed_run_pins_the_instrument_it_measured (to create, #962)"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "R7",
+          "axis_b": "a systemic kata lives under tenant kata",
+          "value": {
+            "acceptance": "kata_tenant.rs::a_systemic_kata_opens_in_the_kata_tenant (to create, #962)"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "R8",
+          "axis_b": "a schema drift opens a kata with a contract-test instrument",
+          "value": {
+            "acceptance": "kata_drift.rs::a_schema_drift_opens_a_kata_with_a_contract_instrument (to create, #962)"
+          },
+          "position": 8
+        }
+      ],
+      "links": [
+        {
+          "to": "Driver/Goal/Objective Catalog \u2014 T5 Kata (Phase A)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Solution Concept Diagram \u2014 T5 Kata (Phase A)",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Architecture artefact\n\n## Metadata\n\nType: catalog. Title: Requirements Catalog \u2014 T5 Kata (Phase A). Version 1. Owner: the conveyor programme session. Reviewer: the Architecture Board's published standing delegation. Review date 2026-11-28. Phase A of the delivery ADM, plateau capability. The related project is T5, the kata capability; the record row is closed and this artefact set is the retrospective document the close gate reads.\n\n## Entries\n\nR1\u2013R5 are the delivered acceptance of SPEC_V2 \u00a712's T5 row, each naming the test that exercises it. R6\u2013R8 are the three rework findings the audit registered after delivery: the instrument digest a completed run must pin, the kata tenant that isolates a systemic kata, and the contract-test instrument class a schema drift needs. They are tracked by the code unit and red the receipt until they land; the closure review records them as open rather than claiming them.\n\n## Links\n\nEach requirement realizes the solution concept and is accepted by a named test; no requirement is prose without an instrument.\n\n## Document\n\nThe requirements the kata capability is accepted against. The catalog is the acceptance set the closure review reads, and it separates the delivered gate from the open audit residue.\n"
+    },
+    {
+      "title": "Solution Concept Diagram \u2014 T5 Kata (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "entries": [
+        {
+          "axis_a": "Observe",
+          "axis_b": "the coach reads a replayable flow and states the problem with data",
+          "value": {
+            "step": 1
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Open",
+          "axis_b": "kata.open records the instrument version, the prediction and the signature",
+          "value": {
+            "step": 2
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Candidate",
+          "axis_b": "one candidate change with its base version and target reference",
+          "value": {
+            "step": 3
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Measure",
+          "axis_b": "kata.measure runs on the held-out split and records the noise band",
+          "value": {
+            "step": 4
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Adopt or revert",
+          "axis_b": "a person decides keep or revert; the record restores the base on revert",
+          "value": {
+            "step": 5
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Propagate",
+          "axis_b": "each target carries its own approval; nothing inherits the kata's authority",
+          "value": {
+            "step": 6
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Close",
+          "axis_b": "the outcome, the measurement and the decision are one audited record",
+          "value": {
+            "step": 7
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements Catalog \u2014 T5 Kata (Phase A)",
+          "kind": "dependency"
+        },
+        {
+          "to": "Business Capability Map \u2014 T5 Kata (Phase B)",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Architecture artefact\n\n## Metadata\n\nType: diagram. Title: Solution Concept Diagram \u2014 T5 Kata (Phase A). Version 1. Owner: the conveyor programme session. Reviewer: the Architecture Board's published standing delegation. Review date 2026-11-28. Phase A of the delivery ADM, plateau capability. The related project is T5, the kata capability; the record row is closed and this artefact set is the retrospective document the close gate reads.\n\n## Entries\n\nThe diagram is the seven steps of the loop. It shows the two refusals that define the capability \u2014 no instrument, no kata; no distinct human approver, no adoption \u2014 and the one restore path, a revert that puts the recorded base version back through the target's own publish action.\n\n## Links\n\nThe capability map realizes the loop as the single kata capability; the data catalog names the rows each step reads and writes.\n\n## Document\n\nThe solution concept: the kata loop from observation to a recorded adoption. This is the concept the delivery implemented in the kata action family, and the shape the closure review's outcome rows follow.\n"
+    },
+    {
+      "title": "Business Capability Map \u2014 T5 Kata (Phase B)",
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "entries": [
+        {
+          "axis_a": "Kata lifecycle",
+          "axis_b": "one capability: open, analyse, propose, measure, adopt, propagate, close",
+          "value": {
+            "capability": "kata"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Instrument reuse",
+          "axis_b": "eval and benchmark versions, splits and sign-offs; the kata never defines a metric",
+          "value": {
+            "capability": "eval, benchmark"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Approval reuse",
+          "axis_b": "an approval row and its policy; adoption is a human decision",
+          "value": {
+            "capability": "approval"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Organisational memory",
+          "axis_b": "lessons.propose receives the kata's candidates; promotion is T8's",
+          "value": {
+            "capability": "lessons"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Development handoff",
+          "axis_b": "an adopted code candidate becomes a T6 project, never a silent edit",
+          "value": {
+            "capability": "development project"
+          },
+          "position": 5
+        }
+      ],
+      "links": [
+        {
+          "to": "Solution Concept Diagram \u2014 T5 Kata (Phase A)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Data Entity/Data Component Catalog \u2014 T5 Kata (Phase C)",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Architecture artefact\n\n## Metadata\n\nType: diagram. Title: Business Capability Map \u2014 T5 Kata (Phase B). Version 1. Owner: the conveyor programme session. Reviewer: the Architecture Board's published standing delegation. Review date 2026-11-28. Phase A of the delivery ADM, plateau capability. The related project is T5, the kata capability; the record row is closed and this artefact set is the retrospective document the close gate reads.\n\n## Entries\n\nThe kata is one capability with one owner. It consumes the instruments, the approvals and the lesson register rather than copying them, and its adopted code candidate leaves as a development project. The map exists to show what the kata must not fork: a second metric, a second approval path or a second lesson store.\n\n## Links\n\nThe data component catalog realizes each capability edge as a named row; the technology standards catalog fixes what each edge may run on.\n\n## Document\n\nThe capability map places the kata among the built capabilities. The map is the boundary the inception analysis asserts and the architecture design honours.\n"
+    },
+    {
+      "title": "Data Entity/Data Component Catalog \u2014 T5 Kata (Phase C)",
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "kata",
+          "axis_b": "one row per kata project; signature, instrument_version_id, prediction",
+          "value": {
+            "migration": "0066_kata.sql"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "kata_candidate",
+          "axis_b": "ordinal, target reference, base version; immutable once measured",
+          "value": {
+            "migration": "0066_kata.sql"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "kata_measurement",
+          "axis_b": "instrument version, split, baseline and candidate from the same instrument",
+          "value": {
+            "migration": "0066_kata.sql"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "kata_gate",
+          "axis_b": "the adoption approval and its distinct human approver",
+          "value": {
+            "migration": "0067_kata_gate.sql"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "eval_version / eval_run",
+          "axis_b": "the pinned instrument and the run; the digest is the provenance the code unit adds",
+          "value": {
+            "migration": "0026_s19_eval.sql"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "approval / approval_decision",
+          "axis_b": "the adoption gate and its recorded decision",
+          "value": {
+            "migration": "0050_approval_policies.sql"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "benchmark_run",
+          "axis_b": "the kept or reverted verdict vocabulary the kata reuses",
+          "value": {
+            "migration": "0034_s18_kata_arm.sql"
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Business Capability Map \u2014 T5 Kata (Phase B)",
+          "kind": "dependency"
+        },
+        {
+          "to": "Technology Standards Catalog \u2014 T5 Kata (Phase D)",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Architecture artefact\n\n## Metadata\n\nType: catalog. Title: Data Entity/Data Component Catalog \u2014 T5 Kata (Phase C). Version 1. Owner: the conveyor programme session. Reviewer: the Architecture Board's published standing delegation. Review date 2026-11-28. Phase A of the delivery ADM, plateau capability. The related project is T5, the kata capability; the record row is closed and this artefact set is the retrospective document the close gate reads.\n\n## Entries\n\nThe two kata migrations own the lifecycle rows; the eval, approval and benchmark tables are reused and never copied. R6's digest belongs on the run row: the measurement's provenance is the instrument version as it stood when the run completed, not a value recomputed later.\n\n## Links\n\nEach row realizes one capability edge; the technology catalog names the store and the action surface each row is written through.\n\n## Document\n\nThe data components behind the kata loop. The catalog is the data half of the design; the closure review's evidence section cites the migrations directly.\n"
+    },
+    {
+      "title": "Technology Standards Catalog \u2014 T5 Kata (Phase D)",
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "Language and runtime",
+          "axis_b": "Rust workspace crate and action family; no second service or runtime",
+          "value": {
+            "standard": "workspace crates only"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Store",
+          "axis_b": "PostgreSQL with sqlx; every rule is a constraint or an action",
+          "value": {
+            "standard": "migrations 0066/0067 and the store module"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Action surface",
+          "axis_b": "the kata.* family through the served registry; no direct database path",
+          "value": {
+            "standard": "docs/design/data/actions.json"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Instrument",
+          "axis_b": "eval_version and eval_run; the kata reads and signs, never defines",
+          "value": {
+            "standard": "SPEC_V2 \u00a79.3"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Approvals",
+          "axis_b": "the shared approval row and policy; a human-only decision",
+          "value": {
+            "standard": "migration 0050"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Testing",
+          "axis_b": "integration tests per action family, one file per refusal",
+          "value": {
+            "standard": "crates/actions/tests/kata_*.rs"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Data Entity/Data Component Catalog \u2014 T5 Kata (Phase C)",
+          "kind": "dependency"
+        },
+        {
+          "to": "Solution Concept Diagram \u2014 T5 Kata (Phase A)",
+          "kind": "reuse"
+        }
+      ],
+      "body": "# Architecture artefact\n\n## Metadata\n\nType: catalog. Title: Technology Standards Catalog \u2014 T5 Kata (Phase D). Version 1. Owner: the conveyor programme session. Reviewer: the Architecture Board's published standing delegation. Review date 2026-11-28. Phase A of the delivery ADM, plateau capability. The related project is T5, the kata capability; the record row is closed and this artefact set is the retrospective document the close gate reads.\n\n## Entries\n\nEvery row is an existing standard of the repository: the Rust workspace, PostgreSQL, the action registry, the eval instrument, the shared approval policy and the integration-test shape. The catalog records that the kata added no technology and no service; the three open findings are fixes inside these standards, not new components.\n\n## Links\n\nThe standards constrain the data components and are reused by the solution concept rather than replaced: the kata actions run in the workspace, write through sqlx, read the eval instrument and decide through the shared approval row. The three open findings are fixes inside these standards, not new technology.\n\n## Document\n\nThe technology standards the kata is built on. This is the Phase D statement that the capability fits the estate's technology direction without an exception.\n"
+    }
+  ],
+  "documents": [
+    {
+      "category": "architecture-artifact",
+      "title": "Architecture Artefact Index \u2014 T5 (retrospective, 2026-11-28)",
+      "body": "# Architecture artefact index\n\n## Metadata\n\nSeven A\u2013D artefacts for T5, the kata capability, at the 2026-11-28 retrospective snapshot. Phase A carries four PSA artefacts (a stakeholder matrix, two catalogs and a diagram); Phases B, C and D carry one HLD artefact each. Owner: the conveyor programme session; reviewer: the Architecture Board's standing delegation; the related project is T5 and its record row is closed.\n## Entries\n\nThe artefacts are the Stakeholder Map, the Driver/Goal/Objective Catalog, the Requirements Catalog, the Solution Concept Diagram, the Business Capability Map, the Data Entity/Data Component Catalog and the Technology Standards Catalog. Each entry names its phase, plateau and kind in the pack's `artifacts` array, and each carries authored entries and at least one link to another artefact of this set.\n## Links\n\nThe links form the derivation chain the standard requires: the driver catalog derives from the stakeholder map, the requirements catalog derives from the driver catalog, the solution concept realizes the requirements, the capability map derives from the solution concept, the data catalog realizes the capability map, and the technology catalog is reused by the solution concept. An artefact with no link would be an orphan and is refused before the create.\n## Document\n\nThis index is the pack's document for the architecture-artifact category. It records what the factory creates and how the set relates; the individual artefacts carry the substance. The closure review cites the migrations and tests the set describes, and the three open findings carried by the code unit are named in the Requirements Catalog rather than omitted.\n"
+    },
+    {
+      "category": "user-stories",
+      "title": "User Stories \u2014 T5 Kata (retrospective, 2026-11-28)",
+      "body": "# User stories\n\n## Personas\n\nThe coach seat opens and measures a kata; the kata owner sets the prediction and the instrument; the adoption approver is a person distinct from the kata's actor and alone decides keep or revert; the programme owner reads the closure review; the instrument owner (S16\u2013S20) supplies the eval or benchmark version the measurement runs on.\n## Stories\n\nAs a coach, I want to open a kata only when there is a replayable flow and a recorded prediction, so that an unmeasurable guess never becomes work. As a kata owner, I want a candidate measured on the held-out split, so that the verdict is not fitted to the data it was chosen on. As an adoption approver, I want a keep-or-revert decision recorded against the measured baseline, so that a regression restores the base version. As a programme owner, I want the kata's outcome, measurement and decision in one audited record, so that the closure review reads evidence rather than a claim.\n## Scenarios\n\nOpening without an instrument is refused (`kata_open.rs`). A second kata for an open signature is refused (`kata_open.rs`). The measurement runs on the test split (`kata_measure.rs`). A measured regression reverts the candidate (`kata_revert.rs`). A flat or incomparable result adopts nothing (`kata_revert.rs`). The kata cannot approve its own adoption (`kata_adopt.rs`). A completed run pins the instrument it measured (`eval_instrument_digest.rs`, to create). A systemic kata opens under tenant kata (`kata_tenant.rs`, to create). A schema drift opens a kata with a contract-test instrument (`kata_drift.rs`, to create).\n## Verify\n\nEach scenario names its integration test in `crates/actions/tests/`. The five delivered tests exist at the baseline and are named in the acceptance-criteria document; the three carried by the code unit are marked to create there. A story whose scenario has no test is a gap the acceptance document records, not a completed story.\n"
+    },
+    {
+      "category": "acceptance-criteria",
+      "title": "Acceptance Criteria \u2014 T5 Kata (retrospective, 2026-11-28)",
+      "body": "# Acceptance criteria\n\n## Scenarios\n\nA1: a kata opens only with an instrument and a prediction. A2: one open kata per signature. A3: the measurement runs on the held-out split. A4: a regression reverts and a flat result adopts nothing. A5: the kata cannot approve its own adoption. A6: a completed eval run pins the digest of the instrument it measured. A7: a systemic kata is created under tenant kata with its own policy. A8: a 422 schema drift opens a kata with a contract-test instrument and a typed threshold.\n## Verify commands\n\nA1\u2013A5: `cargo test -p conveyor-actions --test kata_open --test kata_measure --test kata_revert --test kata_adopt`. A6: `cargo test -p conveyor-actions --test eval_instrument_digest` (to create). A7: `cargo test -p conveyor-actions --test kata_tenant` (to create). A8: `cargo test -p conveyor-actions --test kata_drift` (to create). The compile and lint verdict is the repository's preflight, not a local build.\n## Results\n\nA1\u2013A5 pass at the delivered merges recorded in the closure review. A6\u2013A8 are not yet exercised: the tests do not exist, the findings are open P1 packages, and the receipt's `T5-rework` check is red until they land. The closure review records this split explicitly rather than folding the open findings into a pass.\n## Status\n\nDelivered: A1\u2013A5, on the evidence of the kata test suites and migrations 0066/0067. Open: A6\u2013A8, carried by the code unit linked from this tranche. The project's acceptance against SPEC_V2 \u00a712 is met on A1\u2013A5; the programme's rework resolution is not, and the tranche exit waits for it.\n"
+    },
+    {
+      "category": "definition-of-ready",
+      "title": "Definition of Ready \u2014 T5 Kata (retrospective, 2026-11-28)",
+      "body": "# Definition of ready\n\n## Independent\n\nA kata unit lands inside the kata action family and its tests; it does not need another unit's files. The real orderings are typed: the instrument comes from S16\u2013S20 and the development handoff is T6, neither of which this project's units edit.\n## Negotiable\n\nThe outcome is fixed by SPEC_V2 \u00a712's T5 gate and the six refusal scenarios; the implementation of a new instrument class or a digest column is settled at delivery, not in this brief.\n## Valuable\n\nThe outcome removes the named gap the register carries: an improvement that cannot be measured on the instrument it named, and a kata that could run inside the tenant it coaches. It maps to `B3` self-development and `B1` auditable decisions.\n## Estimable\n\nThe baseline is `main@ea03b188a`, the files are named (the kata action family, migrations 0066/0067, the eval run row), and every acceptance command is a test target.\n## Small\n\nOne unit is one issue, one branch and one PR; the three open findings are one code unit because they share the kata and eval surfaces and cannot merge independently of each other.\n## Testable\n\nEvery scenario carries a `@verify` id and a test target; a scenario without a test is marked to create in the acceptance document rather than counted as passing.\n## Dependencies\n\nT5 needs P0, T2, S16, S17, S18, S19 and S20 (meta.depends_on). The kata loop reads their instruments; it redefines none of them. The three open findings depend on no other unit.\n"
+    },
+    {
+      "category": "definition-of-done",
+      "title": "Definition of Done \u2014 T5 Kata (retrospective, 2026-11-28)",
+      "body": "# Definition of done\n\n## Acceptance criteria\n\nOne row per scenario A1\u2013A8, each keyed by its test target. A unit is done only when every row has a result at the merge head; a green suite on a different revision is not the evidence.\n## Evidence at completion\n\nThe command, its result and the merge SHA per row. A1\u2013A5 carry the delivered merges and their suites; A6\u2013A8 carry their tests once the code unit lands. Evidence recorded against a stale SHA is recomputed rather than cited.\n## Repo gate\n\nThe repository's preflight is the compile and lint verdict; the PR's public CI is the final gate. No local compiling build is used as a gate, and no test is skipped to make the gate green.\n## Merge and closure\n\nOne PR closes the unit's issue; the branch is deleted after the merge. A project closes only when its receipt is green at a pinned snapshot; the tranche exit reads that receipt, so an open P0/P1 rework package keeps the close honest and the exit red.\n"
+    },
+    {
+      "category": "architecture-analysis",
+      "title": "Architecture Analysis \u2014 T5 Kata (retrospective, 2026-11-28)",
+      "body": "# Architecture and analysis pack\n\n## Current state\n\nThe kata capability exists: migrations 0066 and 0067 create the kata, candidate, measurement and gate rows; the `kata.*` action family is registered and served; the test suites kata_open, kata_measure, kata_revert, kata_adopt, kata_gets, kata_union and kata_benchmark exercise the loop. The instrument is reused from S19: eval_version pins a drawn split and eval_run carries a variant and a change patch. The approvals surface is the shared row and policy.\n## Options considered\n\nThe alternative to a kata aggregate was a benchmark-only improvement path, which cannot express a held-out adoption decision for an eval instrument; a second metric store was refused because the instrument is S16\u2013S20's. Storing the instrument digest on the run row was chosen over minting a version on every edit because the run must identify what it measured even after the instrument moves.\n## Risks\n\nThe inherited risk is that a measurement names an instrument that has since changed: R6's digest closes it. A systemic kata running inside the coached tenant is a cross-tenant risk: R7 closes it. A schema drift with no instrument is a silent patch risk: R8 closes it. Each risk has a test as its check, not a waiver.\n## Dependency map\n\nT5 depends on P0 (the programme and its tranches), T2 (the decision ladder), S16 (the inference ledger and prompt audit), S17 (the benchmark harness), S18 (the kata improvement loop), S19 (the eval builder) and S20 (the eval hillclimb). The edges are `needs` edges in the project row; none is open construction except S19's remaining lane.\n"
+    },
+    {
+      "category": "architecture-design",
+      "title": "Architecture Design \u2014 T5 Kata (retrospective, 2026-11-28)",
+      "body": "# Architecture design\n\n## Context and boundary\n\nT5 owns the kata capability: open, analyse, propose, measure, adopt, propagate and close. It does not own the instruments (S16\u2013S20), the lesson register (T8), the development project (T6), the andon cord (S06) or the tool platform (T13). The design keeps the kata in one action family and one store, and reuses the approval and instrument rows rather than copying them.\n## Aggregates, tables and actions\n\nThe aggregates are the kata, the candidate, the measurement, the adoption and the propagation. Migrations 0066 and 0067 create the kata rows and the gate; `kata.*` actions write them. The adoption is an `approval` row decided by a human distinct from the kata's actor; the revert restores the recorded base version through the target's own publish action. The three open findings add no aggregate: a digest on eval_run, a tenant on the kata row and a contract-test instrument class.\n## Decisions\n\nThe instrument is never defined by the kata; it is pinned by version. The split is held out at measure time, not judged after the fact. The adoption decision is a person's, recorded with the measurement it cites. A kata opens only for a replayable flow. These decisions are constraints and action refusals, not conventions.\n## Acceptance\n\nA1\u2013A8 of the acceptance document, each by its test. The delivered five pass; the three open ones are the code unit's, and the closure review names them as open rather than folding them into the delivered gate.\n## Architecture artefacts\n\nThe pack carries the seven A\u2013D artefacts: the stakeholder map, the driver and requirements catalogs, the solution concept, the capability map, the data catalog and the technology standards catalog. They are the record's architecture set; the data catalog names the migrations and the requirements catalog names the tests.\n"
+    },
+    {
+      "category": "inception-analysis",
+      "title": "Inception Analysis \u2014 T5 Kata (retrospective, 2026-11-28)",
+      "body": "# Inception analysis\n\n## Current state\n\nAt inception the capability, the flow and the V1 verdict were built; the six-Gets state, the kata rows and the `kata.*` actions were absent. The project row records `needs` edges to P0, T2, S16, S17, S18, S19 and S20. The inception documents (`docs/plans/inception/T5/`) record the current state row by row with `path:symbol` citations; the delivery then built the kata rows and actions those documents designed.\n## Reuse sources\n\nThe comparability rule in the benchmark improvement path, the eval versions and sign-offs, the approval policy and the seeded kata flow. Reuse is the reason the capability is one action family: a second metric, a second approval path or a second lesson store would each be a fork the analysis refuses.\n## Build vs reuse\n\nBuild the kata lifecycle rows and actions; reuse the instrument, the approvals and the verdict vocabulary. Revert is built because no existing action restores a recorded base version through the target's own publish path. Lessons are deferred to the lesson register by design.\n## Risks\n\nThe inception analysis named the missing six-Gets state, the benchmark-shaped measurement and the absent held-out enforcement. Delivery closed the first two and the held-out rule; the three rework findings are the residue of the third: the digest, the tenant and the drift instrument. None is a design change; each is an obligation the record already implied.\n"
+    },
+    {
+      "category": "statement-of-architecture-work",
+      "title": "Statement of Architecture Work \u2014 T5 Kata (retrospective, 2026-11-28)",
+      "body": "# Statement of Architecture Work\n\n## Assignment\n\nDeliver the architecture record for the kata capability: a procedure change measured on a held-out instrument, adopted only on a win, reverted on a regression, with the adoption decided by a person distinct from the kata's actor. The assignment is retrospective: the product shipped on issue #77 and the merges the closure review cites, and this statement records the architecture that shipped.\n## Scope\n\nThe kata action family, the two kata migrations, the eval and approval reuse, and the seven A\u2013D artefacts. Out of scope: the instruments, the lesson promotion, the development project, the andon cord and the tool platform. The phase set is A\u2013D on the delivery ADM; the programme row carries adm_phase G and plateau capability.\n## Responsibilities\n\nThe coach seat opens and measures; the kata owner sets the prediction and the instrument; the adoption approver decides keep or revert; the Architecture Board reviews the architecture record under its standing delegation; the programme owner decides the tranche. No role signs its own gate.\n## Acceptance criteria\n\nThe acceptance is A1\u2013A8 of the acceptance document, each by its test, plus the closure review's outcome-vs-acceptance table. A1\u2013A5 are delivered; A6\u2013A8 are the code unit's and are named open. The statement claims no tranche authority: authorisation is the programme's separate act.\n## Contract\n\nThe delivery contract carries the commitments, the compliance method and the approval. The live contract row is the one the compliance review cites; this statement is its architecture half, and the two are published together so the close gate reads one consistent record.\n"
+    }
+  ],
+  "registers": {
+    "risk": [
+      {
+        "code": "T5-R1",
+        "title": "A measurement names an instrument that has since changed",
+        "body": "A completed run can be read as evidence about a version whose cases, metric or harness have moved. The risk is not that the digest is absent from the sign-off; it is that the run row does not carry it. R6 closes it with a test that edits a cited case and asserts the run still identifies what it measured.",
+        "probability": "medium",
+        "impact": 4,
+        "review_at": "2027-02-28",
+        "response": "store the digest on the run row at completion; edits leave the recorded digest intact",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "R6"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the kata owner (coach seat)"
+        }
+      },
+      {
+        "code": "T5-R2",
+        "title": "A systemic kata runs inside the tenant it coaches",
+        "body": "If the kata row inherits the coached tenant, the improvement can read and write the target's scope and its approvals. R7 closes it: the kata row carries tenant kata with the kata tenant's policy, and adoption needs a resolved approval by a distinct human.",
+        "probability": "medium",
+        "impact": 5,
+        "review_at": "2027-02-28",
+        "response": "create the systemic kata under tenant kata; test the row's tenant",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "R7"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the programme architect"
+        }
+      },
+      {
+        "code": "T5-R3",
+        "title": "A schema drift is patched without an instrument",
+        "body": "A 422 drift can be fixed by hand and leave no measurement, so the same drift recurs. R8 closes it: a contract-test instrument class and a kata whose threshold is the drift refusal plus a green contract test.",
+        "probability": "high",
+        "impact": 3,
+        "review_at": "2027-02-28",
+        "response": "open the kata from the drift signature with the contract-test instrument",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "R8"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the coach seat"
+        }
+      }
+    ],
+    "issue": [
+      {
+        "code": "T5-I1",
+        "title": "The manifest pinned active against a closed row",
+        "body": "The project row is closed while `acceptance/programme/T5.toml` pinned `T5-project` active, so the verifier failed the pin and the close path could not preflight. The pin now states closed, the record's measured status; the fix is recorded in the tranche's pin evidence."
+      },
+      {
+        "code": "T5-I2",
+        "title": "Three P1 code findings are open after delivery",
+        "body": "The audit registered the instrument digest, the kata tenant and the schema-drift instrument as unresolved P1 packages. They are carried by one code unit and red the receipt until they land; the closure review names them open rather than claiming them."
+      },
+      {
+        "code": "T5-I3",
+        "title": "The project's delivery contract was missing",
+        "body": "The register carried `contract_missing:T5`: no live architecture contract for the project. This pack supplies the delivery contract the factory composes and the compliance review cites."
+      }
+    ],
+    "assumption": [
+      {
+        "code": "T5-A1",
+        "title": "The instruments stay S16\u2013S20's",
+        "body": "The kata reads eval and benchmark versions and never defines a metric. The assumption holds because the instrument rows are owned by those projects and the kata actions carry no metric writer."
+      },
+      {
+        "code": "T5-A2",
+        "title": "The record's closed status is authoritative",
+        "body": "The project row is closed and the closure review is the retrospective record of delivery. This pack does not re-open the project; it authors the documents the v4 close gate requires."
+      },
+      {
+        "code": "T5-A3",
+        "title": "The code unit lands before the tranche exit",
+        "body": "The three open findings are P1 and the receipt is red until they land. The tranche exit assumes the code unit is delivered or its claims withdrawn with evidence; nothing in this pack changes that dependency."
+      }
+    ],
+    "dependency": [
+      {
+        "code": "T5-D1",
+        "title": "S19 supplies the eval instrument",
+        "body": "The kata measures on eval versions and runs; S19 owns their creation, splits and metrics. The dependency is a `needs` edge in the project row."
+      },
+      {
+        "code": "T5-D2",
+        "title": "S18 supplies the improvement verdict",
+        "body": "The kept-or-reverted vocabulary and the benchmark comparison are S18's; the kata reuses them rather than writing a second verdict."
+      },
+      {
+        "code": "T5-D3",
+        "title": "The tranche authorisation is #755's",
+        "body": "Tranche 10 is planned; the review that records the tranche-9 decision is the only writer of its authorisation. This pack and the readiness rows do not claim it."
+      }
+    ],
+    "benefit": [
+      {
+        "code": "T5-B1",
+        "title": "A measured improvement is auditable",
+        "body": "Each kata carries its instrument, its prediction and its measurement, so an adoption can be re-read by a person who was not present. This is `B1` auditable decisions in the kata's own terms."
+      },
+      {
+        "code": "T5-B2",
+        "title": "The programme improves itself on evidence",
+        "body": "The kata is `B3` self-development's first instrument: a procedure change measured on a held-out instrument, adopted only on a win. The rework completes the record the benefit is measured from."
+      },
+      {
+        "code": "T5-B3",
+        "title": "A regression is reverted, not remembered",
+        "body": "A measured regression restores the recorded base version and records the reason, so the next unit starts from a known state rather than a warning in a document."
+      }
+    ]
+  },
+  "delivery_contract": {
+    "title": "Delivery Contract \u2014 T5 Kata (retrospective, 2026-11-28)",
+    "body": {
+      "commitments": "T5 delivers the kata loop over the built instrument: one kata row per open signature, a candidate with a recorded base version, a measurement on the held-out split, an adoption decided by a distinct human, a revert that restores the base, and a propagation whose targets each carry their own approval. The capability adds no metric and no second store.",
+      "compliance": "Compliance is judged at the pinned 2026-11-28 snapshot against the record, which marks the project closed, and against SPEC_V2 \u00a712's T5 gate. The delivered five scenarios pass by their tests; the three audit findings carried by the code unit are recorded as open, and the receipt's rework check is red until they land. The Phase-G review is recorded at level compliant for the document set it assesses.",
+      "approval": "The adoption gate inside the capability is decided by a person distinct from the kata's actor. This contract's own approval is the Architecture Board's standing delegation, published and cited by the compliance review; the tranche authorisation is the programme owner's separate act and is not claimed here.",
+      "manifest": "acceptance/programme/T5.toml \u2014 the manifest's project check now pins closed, the record's measured status; the remaining checks read the receipt's verdict rather than a claim.",
+      "acceptance_at": "The 2026-11-28 retrospective snapshot, taken from the replay record at schema 110 after the pack's documents and the manifest pin were committed.",
+      "retrospective": "This contract is authored after delivery. It records the commitments the shipped capability meets, the compliance method the receipt applies, and the open findings the record already carries; it does not re-open the delivered slice."
+    }
+  },
+  "wbs_deliverable": {
+    "title": "The kata loop \u2014 a procedure change measured on a held-out instrument, adopted only on a win, reverted on a regression, with the adoption decided by a distinct human",
+    "business_value": 9,
+    "time_criticality": 6,
+    "risk_reduction": 9,
+    "job_size": 13
+  },
+  "review": {
+    "level": "compliant",
+    "findings": [
+      {
+        "code": "PG-1",
+        "note": "The delivered kata gate is evidenced by the five test suites and migrations 0066/0067; the closure review reproduces the outcome-vs-acceptance table."
+      },
+      {
+        "code": "PG-2",
+        "note": "The manifest pinned active against a closed row; corrected to closed before preflight, with the before/after recorded in the tranche's pin evidence."
+      },
+      {
+        "code": "PG-3",
+        "note": "Three P1 code findings (instrument digest, kata tenant, schema-drift instrument) are open and carried by one code unit; they are named open in the closure review and red the receipt until they land."
+      }
+    ],
+    "evidence": {
+      "manifest": "acceptance/programme/T5.toml",
+      "suite": "crates/actions/tests/kata_{open,measure,revert,adopt,gets,union,benchmark}.rs",
+      "migrations": "migrations/0066_kata.sql, migrations/0067_kata_gate.sql",
+      "merges": "7e617673 (PR #636), f8c82c68 (PR #654)",
+      "closure_review": "docs/plans/T5/closure-review.md"
+    }
+  },
+  "project_brief_output": "# Project brief\n\n## Outcome\n\nA procedure change is measured on a held-out instrument, adopted only when it wins, and reverted when it regresses. The outcome is true of the shipped capability and is re-read by the closure review's outcome table rather than asserted by the charter.\n## Boundary\n\nIn scope: the kata lifecycle over the existing project, card, run, approval and event surfaces. Out of scope: the instruments, the lesson promotion, the development project, the andon cord and the tool platform. No second runtime, service or metric store is introduced.\n## Reuse sources\n\nThe comparability rule of the benchmark improvement path, the eval versions and sign-offs, the approval policy and the seeded kata flow. Each is named in the inception analysis with its path; the delivery reuses them rather than copying them.\n## Inception units\n\nThe published analysis and design pair under `docs/plans/inception/T5/`: `01-inception-analysis.md` and `02-architecture-design.md`, both published on the project before delivery. They define the rows and actions this pack records.\n## Dependencies\n\nT5 needs P0, T2, S16, S17, S18, S19 and S20. The instruments come from the eval and benchmark slices; the decision ladder and the programme spine are the other edges. None is edited by this project's units.\n## Acceptance\n\nSPEC_V2 \u00a712's T5 gate: a procedure change measured on a held-out instrument, a regression reverted, self-approval refused, an unmeasurable kata not opened. The three audit findings are additional obligations carried by the code unit, not a redefinition of the gate.\n## Capabilities\n\nThe `kata` capability owns the outcome; no other capability may fork the kata lifecycle. The capability map records the reuse edges to the instruments, approvals, lessons and development handoff.\n## Plan\n\nThe plan is SPEC_V2 \u00a712's T5 row, delivered on issue #77 and the two merges the closure review cites. The tranche plan places T5 in tranche 10 with S12; the authorisation is the tranche review's act.\n",
+  "evidence_output": "# Evidence\n\n## Claim\n\nThe kata capability delivers a measured, adopt-or-revert improvement loop with a human adoption gate and no second metric store.\n## Evidence\n\nThe kata migrations 0066 and 0067, the `kata.*` action family and the integration suites kata_open, kata_measure, kata_revert, kata_adopt, kata_gets, kata_union and kata_benchmark; the merges 7e617673 (PR #636) and f8c82c68 (PR #654) recorded in the closure review.\n## Verification\n\nRun the five gate suites with `cargo test -p conveyor-actions --test kata_open --test kata_measure --test kata_revert --test kata_adopt` on a checked-out main; the compile verdict is the repository's preflight. The receipt reads the pinned snapshot, not a local run.\n## Links\n\n`docs/plans/T5/closure-review.md`, `docs/plans/T5/evidence.md`, the inception set under `docs/plans/inception/T5/`, SPEC_V2 \u00a712 and the project row's `meta.depends_on` edges.\n## Gap\n\nThe three P1 code findings are open: the instrument digest a completed run must pin, the kata tenant for a systemic kata, and the contract-test instrument class for a schema drift. They are carried by one code unit and the receipt is red until they land; no other gap is claimed by the issue record.\n",
+  "closure": "T5 is closed through the record's one gate: the project row is closed only after its charter, baseline, artefacts, registers, contract, WBS, Phase-G review, declared outputs and closure review exist, and the receipt on `acceptance/programme/T5.toml` is read against the 2026-11-28 retrospective snapshot. The closure records the delivered kata gate on its five test suites and names the three open P1 findings carried by the code unit; it claims no tranche authority, which is the tranche review's separate act.",
+  "closure_review": "# Closure Review \u2014 T5 Kata (retrospective, 2026-11-28)\n\n## Outcome vs acceptance\n\nThe delivered gate is the SPEC_V2 \u00a712 T5 acceptance, and each row names its test: a prediction recorded before measurement (`kata_gets.rs`), the measurement on the held-out split (`kata_measure.rs`), a regression reverted and a flat result adopting nothing (`kata_revert.rs`), self-approval refused (`kata_adopt.rs`), and open/adopt refusals for an instrument-less or duplicate kata (`kata_open.rs`). All five pass on the delivered merges. The three rework findings \u2014 the run's instrument digest, the kata tenant and the schema-drift instrument \u2014 are not part of the delivered gate and remain open, carried by the code unit.\n## Evidence\n\nThe migrations 0066_kata.sql and 0067_kata_gate.sql; the `kata.*` action family and its store and domain modules; the five gate suites plus kata_gets, kata_union and kata_benchmark; the merges 7e617673 (PR #636) and f8c82c68 (PR #654) in the closure review of 2026-11-25; and this pack's nine documents and seven artefacts at the pinned snapshot.\n## Open items\n\nThe three P1 packages `v1-p119-1:T5`, `v1-p93-1:T5` and `v1-w1b-3:T5` are open and carried by one code unit, with test-shaped definitions of done. The receipt's rework check stays red until they land, so the tranche-10 exit waits on that unit. No other delivery item is open.\n## Decision\n\nClose the record: acceptance is met on the delivered gate by its five suites, and the open findings are a tracked P1 residue rather than a re-opening. The tranche authorisation is the programme review's separate act; this review records delivery and claims no authority over it.\n"
+}

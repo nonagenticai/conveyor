@@ -1,0 +1,89 @@
+{
+  "id": "01a222e3-61b5-75f3-b122-75c8af9d859d",
+  "meta": {
+    "tranche_id": "01a1e9e1-28de-7da4-a03d-3147cb34a775",
+    "tranche_number": 10,
+    "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+    "pi_plan": {
+      "scope": [
+        "S12",
+        "T5"
+      ],
+      "period": "tranche-10",
+      "capacity": {
+        "projects": [
+          "S12",
+          "T5"
+        ],
+        "read_agents_max": 6,
+        "build_concurrency": 1,
+        "live_record_writer": 1
+      },
+      "evidence": [
+        "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+        "01a1e9e1-28de-7da4-a03d-3147cb34a775",
+        "docs/evidence/rework/tranche-10/refinement-wsjf.json",
+        "docs/evidence/rework-register.json"
+      ],
+      "wip_limit": {
+        "open_batches": 2,
+        "open_cards_per_writer": 1
+      },
+      "objectives": [
+        {
+          "id": "O1",
+          "committed": true,
+          "statement": "S12 is accepted and closed through its closure gate with a published closure review and named closure outputs.",
+          "business_value": 8
+        },
+        {
+          "id": "O2",
+          "committed": true,
+          "statement": "T5's record is completed and its manifest states the record's measured status; its receipt is green once #962's three CODE packages land.",
+          "business_value": 9
+        },
+        {
+          "id": "O3",
+          "committed": true,
+          "statement": "The tranche's readiness is a record: four cadences, two P0-scoped PI outputs with unit tranche-10, a delegated plan approval and a retro lesson.",
+          "business_value": 8
+        },
+        {
+          "id": "O4",
+          "committed": false,
+          "statement": "The tranche-10 exit gate exits 0 on two fresh receipts and hands a measured tranche to the #755 review.",
+          "business_value": 8
+        }
+      ],
+      "refinement": {
+        "cadence_id": "01a222e3-86d4-7812-9ab1-1f550a3c603c"
+      },
+      "dependencies": [
+        {
+          "to": "S18",
+          "from": "S12",
+          "note": "S12 declares depends_on S18; S18 is tranche 9's member"
+        },
+        {
+          "to": "S18",
+          "from": "T5",
+          "note": "T5 declares depends_on S18; S18 is tranche 9's member"
+        },
+        {
+          "to": "S20",
+          "from": "T5",
+          "note": "T5 declares depends_on S20; S20 is tranche 9's member"
+        },
+        {
+          "to": "S19",
+          "from": "T5",
+          "note": "T5 declares depends_on S19; its remaining lane is #31"
+        }
+      ]
+    },
+    "documents": {
+      "pi-plan": "01a222e3-9670-70fc-8280-50493a8dfbab",
+      "pi-objectives": "01a222e3-c641-7359-95fc-2faea4f9198d"
+    }
+  }
+}

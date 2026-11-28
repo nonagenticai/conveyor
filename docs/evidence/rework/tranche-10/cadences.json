@@ -1,0 +1,192 @@
+{
+  "schema": "conveyor-tranche-cadences/v1",
+  "tranche": 10,
+  "tranche_id": "01a1e9e1-28de-7da4-a03d-3147cb34a775",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "period": "tranche-10",
+  "recorded_at": "2026-11-28",
+  "readback": "copy:55458",
+  "cadences": [
+    {
+      "id": "01a222e3-8768-7b1b-8100-6ce2601faae2",
+      "kind": "demo",
+      "period": "tranche-10",
+      "state": "planned",
+      "version": 1,
+      "meta": {
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "tranche_id": "01a1e9e1-28de-7da4-a03d-3147cb34a775",
+        "tranche_number": 10
+      }
+    },
+    {
+      "id": "01a222e3-61b5-75f3-b122-75c8af9d859d",
+      "kind": "pi",
+      "period": "tranche-10",
+      "state": "awaiting_approval",
+      "version": 3,
+      "meta": {
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "documents": {
+          "pi-objectives": "01a222e3-c641-7359-95fc-2faea4f9198d",
+          "pi-plan": "01a222e3-9670-70fc-8280-50493a8dfbab"
+        },
+        "pi_plan": {
+          "capacity": {
+            "build_concurrency": 1,
+            "live_record_writer": 1,
+            "projects": [
+              "S12",
+              "T5"
+            ],
+            "read_agents_max": 6
+          },
+          "dependencies": [
+            {
+              "from": "S12",
+              "note": "S12 declares depends_on S18; S18 is tranche 9's member",
+              "to": "S18"
+            },
+            {
+              "from": "T5",
+              "note": "T5 declares depends_on S18; S18 is tranche 9's member",
+              "to": "S18"
+            },
+            {
+              "from": "T5",
+              "note": "T5 declares depends_on S20; S20 is tranche 9's member",
+              "to": "S20"
+            },
+            {
+              "from": "T5",
+              "note": "T5 declares depends_on S19; its remaining lane is #31",
+              "to": "S19"
+            }
+          ],
+          "evidence": [
+            "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+            "01a1e9e1-28de-7da4-a03d-3147cb34a775",
+            "docs/evidence/rework/tranche-10/refinement-wsjf.json",
+            "docs/evidence/rework-register.json"
+          ],
+          "objectives": [
+            {
+              "business_value": 8,
+              "committed": true,
+              "id": "O1",
+              "statement": "S12 is accepted and closed through its closure gate with a published closure review and named closure outputs."
+            },
+            {
+              "business_value": 9,
+              "committed": true,
+              "id": "O2",
+              "statement": "T5's record is completed and its manifest states the record's measured status; its receipt is green once #962's three CODE packages land."
+            },
+            {
+              "business_value": 8,
+              "committed": true,
+              "id": "O3",
+              "statement": "The tranche's readiness is a record: four cadences, two P0-scoped PI outputs with unit tranche-10, a delegated plan approval and a retro lesson."
+            },
+            {
+              "business_value": 8,
+              "committed": false,
+              "id": "O4",
+              "statement": "The tranche-10 exit gate exits 0 on two fresh receipts and hands a measured tranche to the #755 review."
+            }
+          ],
+          "period": "tranche-10",
+          "refinement": {
+            "cadence_id": "01a222e3-86d4-7812-9ab1-1f550a3c603c"
+          },
+          "scope": [
+            "S12",
+            "T5"
+          ],
+          "wip_limit": {
+            "open_batches": 2,
+            "open_cards_per_writer": 1
+          }
+        },
+        "tranche_id": "01a1e9e1-28de-7da4-a03d-3147cb34a775",
+        "tranche_number": 10
+      }
+    },
+    {
+      "id": "01a222e3-86d4-7812-9ab1-1f550a3c603c",
+      "kind": "refinement",
+      "period": "tranche-10",
+      "state": "planned",
+      "version": 2,
+      "meta": {
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "refinement": {
+          "period": "tranche-10",
+          "reestimate": {
+            "S12": "5 open packages (1 P0 project_in_unauthorised_tranche, cleared by authorisation only; 4 P1: closed_without_closure_review, closure_outputs_undeclared, unpublished_declared_output, mandatory_artefacts)",
+            "T5": "6 open packages (1 P0 project_in_unauthorised_tranche, cleared by authorisation only; 5 P1: contract_missing, mandatory_artefacts, and the three CODE packages v1-p119-1, v1-p93-1, v1-w1b-3 now carried by #962)",
+            "tranche-10": "2 open packages (2 P1: pi_cadence_missing, backlog_refinement_missing), cleared by this readiness set"
+          },
+          "reordered": [
+            {
+              "from": "the seed's membership order (S12, T5)",
+              "item": "S12 first, then T5",
+              "to": "S12, T5",
+              "why": "S12 is the record-only closure: its fifteen linked issues are all closed, so its pack bears the closure review and the closure outputs and nothing else. T5 carries the tranche's only CODE work (three packages, now #962) and its manifest must state the record's status before its pack can preflight. The factory's roster sorts by project key, which is the same order here."
+            }
+          ],
+          "wsjf_inputs": {
+            "S12": {
+              "business_value": 8,
+              "job_size": 8,
+              "risk_reduction": 6,
+              "time_criticality": 7
+            },
+            "T5": {
+              "business_value": 9,
+              "job_size": 13,
+              "risk_reduction": 9,
+              "time_criticality": 6
+            }
+          }
+        },
+        "tranche_id": "01a1e9e1-28de-7da4-a03d-3147cb34a775",
+        "tranche_number": 10
+      }
+    },
+    {
+      "id": "01a222e3-87fb-72ce-b917-493ac7487a89",
+      "kind": "retro",
+      "period": "tranche-10",
+      "state": "planned",
+      "version": 1,
+      "meta": {
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "tranche_id": "01a1e9e1-28de-7da4-a03d-3147cb34a775",
+        "tranche_number": 10
+      }
+    }
+  ],
+  "documents": {
+    "pi-plan": {
+      "id": "01a222e3-9670-70fc-8280-50493a8dfbab",
+      "category": "pi-plan",
+      "unit": "tranche-10",
+      "publishable": true
+    },
+    "pi-objectives": {
+      "id": "01a222e3-c641-7359-95fc-2faea4f9198d",
+      "category": "pi-objectives",
+      "unit": "tranche-10",
+      "publishable": true
+    }
+  },
+  "plan_approval": {
+    "id": "01a222e4-408d-7d71-9931-913ecdfc054c",
+    "gate": "cadences.approve_plan",
+    "decision": "approve",
+    "status": "approved",
+    "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+  },
+  "note": "The four rows, the two P0-scoped published PI documents and the delegated plan approval, read back from the replay copy after the ten readiness acts. The pi row's state stays awaiting_approval while its gate is approved, as tranche 9's does."
+}

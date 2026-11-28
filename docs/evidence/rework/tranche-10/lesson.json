@@ -1,0 +1,26 @@
+{
+  "schema": "conveyor-lesson/v1",
+  "tranche": 10,
+  "tranche_id": "01a1e9e1-28de-7da4-a03d-3147cb34a775",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "cadence_id": "01a222e3-87fb-72ce-b917-493ac7487a89",
+  "finding_key": "k1",
+  "action": "programme_lessons.propose",
+  "input": "docs/evidence/record/inputs/tr10/lesson_tranche-10_k1.json",
+  "planned_at": "2026-11-28",
+  "why": "acceptance/programme/S12.toml and T5.toml each run the `lessons` check; it requires a lesson with a statement and evidence on the tranche's own retro cadence. Tranche 10 had none, so the check would have been red for both members.",
+  "result": {
+    "id": "01a222e4-bd0d-7bfb-b7de-976b5ee29493",
+    "state": "proposed",
+    "source": "retro",
+    "finding_key": "k1",
+    "cadence_id": "01a222e3-87fb-72ce-b917-493ac7487a89",
+    "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+    "independent_count": 2,
+    "created_at": "2026-11-28T16:02:25.673064Z"
+  },
+  "verified": {
+    "lessons_list": "programme_lessons.list on the replay copy returns the row",
+    "snapshot": "msp.json of the fresh snapshot carries finding_key k1 on the tranche-10 retro cadence with a non-empty evidence list"
+  }
+}

@@ -1,0 +1,713 @@
+{
+  "charter": "# Charter \u2014 S12 UI Build-out (retrospective, 2026-11-28)\n\nS12 delivers the web app over the conveyor's served actions: 22 declared screens, one action client, SSE subscriptions and a Playwright suite that runs the real binary against a seeded database. The project row is closed; this charter is the retrospective record the v4 close gate requires, and it states the gate's measured status rather than claiming it.\n\nThe project's authority is the S12 slice plan (`docs/plans/slices/S12-ui-buildout.md`) and its gate: every spec asserts empty state, error state and happy path \u2014 a spec that only asserts the happy path fails review \u2014 and the coverage table has no orphan. The coverage half is met (the parity contract is signed and its native map present); the state half is not: three specs assert only the happy path, eight miss one state, and the eval-run screen has no dedicated spec. A test-only unit carries the repair, and this project's closure review is authored only after it lands.\n\nThe app owns no table, action or event; every write is an action invocation and every read is a declared projection. The review is the Architecture Board's under its published standing delegation; the tranche decision is the programme owner's. This charter claims neither.\n",
+  "soaw": {
+    "title": "Statement of Architecture Work \u2014 S12 UI Build-out (retrospective, Phase A)",
+    "body": {
+      "assignment": "Deliver the web app for the declared screen set: every screen a route over the served actions, its states honest, and its suite on the real binary. The assignment is retrospective: the app shipped on its slice lanes and this statement records the architecture that shipped, at the 2026-11-28 snapshot.",
+      "scope": "The shell, the 22 declared screens and their screen modules, the action client, the SSE subscriptions and the Playwright suite; and the seven A\u2013D artefacts. Out of scope: the workflow editor (S13), the V2 destinations (T18), the cutover (S14) and the read models themselves (their declaring slices).",
+      "responsibilities": "The UI owner builds the screens and the suite; each declaring slice owns the read model and action a screen renders; the accessibility reviewer runs the one pass after the last screen; the cutover owner reuses the same suite; the programme owner decides the tranche. No role signs its own gate.",
+      "acceptance_criteria": "The acceptance is A1\u2013A5 of the acceptance document, plus the closure review's outcome-vs-acceptance table. A1, A3, A4 and A5 are delivered; A2 is the gate and is carried by #965. The statement claims no tranche authority.",
+      "constraints": "No client database, no runtime API mocks, no fixture in a production screen, no second rendering stack, and no self-approved screen that no slice declared. The dev cookie is dev-only; the deployed run uses the OIDC helper.",
+      "retrospective": "This SoAW is authored at the 2026-11-28 retrospective snapshot against a closed project row. It describes what the delivered app is, names the measured gate gap and the unit that carries it, and records that the tranche authorisation is the review's act."
+    }
+  },
+  "artifacts": [
+    {
+      "title": "Stakeholder Map \u2014 S12 UI Build-out (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "entries": [
+        {
+          "axis_a": "Tenant user",
+          "axis_b": "drives every screen; needs its empty, error and happy state",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "collaborate"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Declaring slice owner (S01\u2013S20)",
+          "axis_b": "owns the read model and the action a screen renders",
+          "value": {
+            "influence": "high",
+            "interest": "medium",
+            "engagement": "collaborate"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Approver and eval pilot",
+          "axis_b": "decides in the cockpit and signs off on the eval screens",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Accessibility reviewer",
+          "axis_b": "the one accessibility pass after the last screen",
+          "value": {
+            "influence": "low",
+            "interest": "medium",
+            "engagement": "inform"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "S14 cutover owner",
+          "axis_b": "switches the host to the new app on the same specs",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "collaborate"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Programme owner",
+          "axis_b": "owns the tranche decision and the closure gate",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Driver/Goal/Objective Catalog \u2014 S12 UI Build-out (Phase A)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Architecture artefact\n\n## Metadata\n\nType: matrix. Title: Stakeholder Map \u2014 S12 UI Build-out (Phase A). Version 1. Owner: the conveyor programme session. Reviewer: the Architecture Board's published standing delegation. Review date 2026-11-28. Phase A of the delivery ADM, plateau delivery. The related project is S12, the UI build-out; the record row is closed and this artefact set is the retrospective document the close gate reads. The map pairs each seat with what it decides about a screen.\n\n## Entries\n\nThe rows name the tenant user who needs an honest empty state, the slice owner who owns the read model a screen renders, the approver and eval pilot whose decisions the screens carry, and the cutover owner who reuses the same suite. The accessibility pass is one review after the last screen, not a per-screen routine.\n\n## Links\n\nThe driver catalog derives from this map; the requirements catalog narrows each seat's expectation to one testable requirement.\n\n## Document\n\nUsed at Phase A to confirm every seat whose decision a screen renders, and to make the cutover owner a reader of the same specs rather than a second UI.\n"
+    },
+    {
+      "title": "Driver/Goal/Objective Catalog \u2014 S12 UI Build-out (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "D1 \u2014 one UI over the served actions",
+          "axis_b": "G1 \u2014 every action resolved from /api/actions before the first click",
+          "value": {
+            "objective": "O1 \u2014 no screen invents an action or a field"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "D2 \u2014 a screen is honest about its states",
+          "axis_b": "G2 \u2014 every spec asserts empty, error and happy",
+          "value": {
+            "objective": "O2 \u2014 a screen that loses a state fails the suite"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "D3 \u2014 the UI is not a second store",
+          "axis_b": "G3 \u2014 writes go through POST /api/actions/{name}/invocations",
+          "value": {
+            "objective": "O3 \u2014 no screen calls the database"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "D4 \u2014 the parity contract is a coverage check",
+          "axis_b": "G4 \u2014 every used fr UI row maps to a screen or is API-only with a reason",
+          "value": {
+            "objective": "O4 \u2014 the coverage table has no orphan"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "D5 \u2014 the suite runs on the real product",
+          "axis_b": "G5 \u2014 the real binary and a seeded database, never a mocked API",
+          "value": {
+            "objective": "O5 \u2014 a green run means the app works"
+          },
+          "position": 5
+        }
+      ],
+      "links": [
+        {
+          "to": "Stakeholder Map \u2014 S12 UI Build-out (Phase A)",
+          "kind": "dependency"
+        },
+        {
+          "to": "Requirements Catalog \u2014 S12 UI Build-out (Phase A)",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Architecture artefact\n\n## Metadata\n\nType: catalog. Title: Driver/Goal/Objective Catalog \u2014 S12 UI Build-out (Phase A). Version 1. Owner: the conveyor programme session. Reviewer: the Architecture Board's published standing delegation. Review date 2026-11-28. Phase A of the delivery ADM, plateau delivery. The related project is S12, the UI build-out; the record row is closed and this artefact set is the retrospective document the close gate reads. The drivers and goals the UI build-out answers.\n\n## Entries\n\nEach row pairs a driver with the goal that answers it and the objective a check can read. D2 is the one the audit measured as partial: three specs assert only the happy path and eight miss a state, so the goal is carried by a test-only unit rather than claimed. The catalog makes that gap an explicit objective, not a footnote.\n\n## Links\n\nEach goal realizes one requirement in the requirements catalog; the requirements are accepted by the e2e suite and the parity check.\n\n## Document\n\nThe catalog is the bridge from the programme's drivers to measurable acceptance; an objective without a check is not listed.\n"
+    },
+    {
+      "title": "Requirements Catalog \u2014 S12 UI Build-out (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "R1",
+          "axis_b": "the 22 declared screens exist as routes with their screen modules",
+          "value": {
+            "acceptance": "apps/web/e2e/<screen>.spec.ts (21 files) plus the S12 plan \u00a75 table"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "R2",
+          "axis_b": "every screen spec asserts empty, error and happy",
+          "value": {
+            "acceptance": "#965 \u2014 3 happy-path-only, 8 missing one state, screen 16 no dedicated spec"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "R3",
+          "axis_b": "writes go through the actions API; no screen reads the database",
+          "value": {
+            "acceptance": "apps/web/src/api.rs; the specs' request assertions"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "R4",
+          "axis_b": "the coverage table has no orphan",
+          "value": {
+            "acceptance": "python3 scripts/check-parity.py --require-native"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "R5",
+          "axis_b": "the suite runs on the real binary and a seeded database",
+          "value": {
+            "acceptance": "apps/web/playwright.config.ts webServer; DEV_AUTH_TOKEN mode"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "R6",
+          "axis_b": "decisions render their decider kind and channel",
+          "value": {
+            "acceptance": "cockpit.spec.ts; ApprovalOut's decided_by_kind and via.channel"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "R7",
+          "axis_b": "the two eval pauses are screens over one approval primitive",
+          "value": {
+            "acceptance": "eval-signoff.spec.ts"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "R8",
+          "axis_b": "the same suite runs deployed through the OIDC helper",
+          "value": {
+            "acceptance": "deployed-smoke.spec.ts; oidc.setup.ts"
+          },
+          "position": 8
+        }
+      ],
+      "links": [
+        {
+          "to": "Driver/Goal/Objective Catalog \u2014 S12 UI Build-out (Phase A)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Solution Concept Diagram \u2014 S12 UI Build-out (Phase A)",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Architecture artefact\n\n## Metadata\n\nType: catalog. Title: Requirements Catalog \u2014 S12 UI Build-out (Phase A). Version 1. Owner: the conveyor programme session. Reviewer: the Architecture Board's published standing delegation. Review date 2026-11-28. Phase A of the delivery ADM, plateau delivery. The related project is S12, the UI build-out; the record row is closed and this artefact set is the retrospective document the close gate reads. The requirements the UI build-out is accepted against.\n\n## Entries\n\nR1, R3, R4, R5 and R6\u2013R8 are delivered and their instruments are named: the 21 screen specs, the api client, the parity check, the real-binary harness and the OIDC helper. R2 is the gate sentence and is partial: the audit measured three happy-path-only specs, eight specs missing a state and no dedicated eval-run spec, so the closure review records it as the open item carried by #965.\n\n## Links\n\nEach requirement realizes the solution concept: R1's rows become screens, R3\u2013R5 are the client, the coverage check and the harness, and R6\u2013R8 are the decision and eval views. R2's instrument is the spec set #965 completes, and no other requirement depends on it.\n\n## Document\n\nThe catalog is the acceptance set the closure review will read when #965 lands. Until then its Results and Status sections record the split honestly: four requirements delivered, the gate's state half open, and the closure deliberately unauthored.\n"
+    },
+    {
+      "title": "Solution Concept Diagram \u2014 S12 UI Build-out (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "entries": [
+        {
+          "axis_a": "Shell and sign-in",
+          "axis_b": "the session, the tenant and the navigation every screen sits in",
+          "value": {
+            "step": 1
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Action client",
+          "axis_b": "one client resolves /api/actions and posts invocations",
+          "value": {
+            "step": 2
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Screen module",
+          "axis_b": "a screen renders one read model and calls one action family",
+          "value": {
+            "step": 3
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "SSE subscription",
+          "axis_b": "board, card, run, approval, model and eval channels update the view",
+          "value": {
+            "step": 4
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Playwright spec",
+          "axis_b": "the real binary, a seeded database, the dev cookie or the OIDC helper",
+          "value": {
+            "step": 5
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Parity coverage",
+          "axis_b": "every used fr UI row maps to a screen or is API-only with its reason",
+          "value": {
+            "step": 6
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements Catalog \u2014 S12 UI Build-out (Phase A)",
+          "kind": "dependency"
+        },
+        {
+          "to": "Business Capability Map \u2014 S12 UI Build-out (Phase B)",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Architecture artefact\n\n## Metadata\n\nType: diagram. Title: Solution Concept Diagram \u2014 S12 UI Build-out (Phase A). Version 1. Owner: the conveyor programme session. Reviewer: the Architecture Board's published standing delegation. Review date 2026-11-28. Phase A of the delivery ADM, plateau delivery. The related project is S12, the UI build-out; the record row is closed and this artefact set is the retrospective document the close gate reads. The solution concept: one web app over the served action registry.\n\n## Entries\n\nThe diagram is six parts: the shell, the single action client, the screen modules, the SSE subscriptions, the Playwright suite and the parity coverage check. It shows the two rules that keep the app from becoming a second store \u2014 every write is an action invocation and every action is resolved from the served registry \u2014 and the one rule that keeps the suite honest, the real binary.\n\n## Links\n\nThe capability map realizes the concept as the screen groups; the data catalog names the read models each screen renders.\n\n## Document\n\nThis is the shape the 21 screen specs drive and the shape #965's assertions extend: each spec exercises one screen module over the action client with the real binary, and the empty and error assertions are added at the same seam the happy path already uses.\n"
+    },
+    {
+      "title": "Business Capability Map \u2014 S12 UI Build-out (Phase B)",
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "entries": [
+        {
+          "axis_a": "Boards and work",
+          "axis_b": "shell/login, board, cockpit, run queue, run detail",
+          "value": {
+            "screens": "1\u20134"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Authoring",
+          "axis_b": "requirements, trace/architecture, processes, process map, search",
+          "value": {
+            "screens": "5\u20138, 22"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Operations and admin",
+          "axis_b": "admin, copilot, inference usage, prompt audit",
+          "value": {
+            "screens": "9\u201312"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Measurement",
+          "axis_b": "benchmarks, improvement, evals, eval run, eval report, eval audit, eval sign-off, eval interop, eval hillclimb",
+          "value": {
+            "screens": "13\u201321"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Solution Concept Diagram \u2014 S12 UI Build-out (Phase A)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Data Entity/Data Component Catalog \u2014 S12 UI Build-out (Phase C)",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Architecture artefact\n\n## Metadata\n\nType: diagram. Title: Business Capability Map \u2014 S12 UI Build-out (Phase B). Version 1. Owner: the conveyor programme session. Reviewer: the Architecture Board's published standing delegation. Review date 2026-11-28. Phase A of the delivery ADM, plateau delivery. The related project is S12, the UI build-out; the record row is closed and this artefact set is the retrospective document the close gate reads. The capability map groups the 22 declared screens.\n\n## Entries\n\nThe map groups the screens into boards and work, authoring, operations and admin, and measurement. Each group names the slice that declared its read models \u2014 S05 for the board, S07 for requirements and search, S11 for processes, S16\u2013S20 for the measurement screens \u2014 so a screen can never invent a model its declaring slice does not serve.\n\n## Links\n\nThe data catalog realizes each group as the read models it renders; the technology catalog fixes the client and the test harness.\n\n## Document\n\nThe map is the boundary the plan's decision 1 states: S12 invents no screen, and every row cites a declaring slice. A row with no declaring slice is an open question in the plan, not a screen; the map records the four groups the 22 rows actually form.\n"
+    },
+    {
+      "title": "Data Entity/Data Component Catalog \u2014 S12 UI Build-out (Phase C)",
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "BoardView",
+          "axis_b": "boards, cards, lanes, labels and fields read through boards.get and cards.*",
+          "value": {
+            "sse": "board:{id}, card:{id}"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "CardView and ApprovalOut",
+          "axis_b": "cards.get/update/claim/release, approvals.decide; decided_by_kind and via.channel",
+          "value": {
+            "sse": "run:{id}, approval:{id}"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "RevisionDiff",
+          "axis_b": "requirements.* and quality.score over governed_asset and revision",
+          "value": {
+            "source": "S07"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "process and process_step",
+          "axis_b": "processes.*, procedures.* (SOP), process_runs.start/cancel",
+          "value": {
+            "source": "S11"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "eval rows",
+          "axis_b": "evals.*, eval_versions.*, eval_cases.*, eval_runs.*, eval_results.*",
+          "value": {
+            "source": "S19"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "benchmark rows",
+          "axis_b": "benchmark_runs.*, benchmark_cases.*, the paired matrix and McNemar",
+          "value": {
+            "source": "S17/S18"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "inference rows",
+          "axis_b": "inference_usage.report, inference_calls.list, prompt_audits.*",
+          "value": {
+            "source": "S16"
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Business Capability Map \u2014 S12 UI Build-out (Phase B)",
+          "kind": "dependency"
+        },
+        {
+          "to": "Technology Standards Catalog \u2014 S12 UI Build-out (Phase D)",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Architecture artefact\n\n## Metadata\n\nType: catalog. Title: Data Entity/Data Component Catalog \u2014 S12 UI Build-out (Phase C). Version 1. Owner: the conveyor programme session. Reviewer: the Architecture Board's published standing delegation. Review date 2026-11-28. Phase A of the delivery ADM, plateau delivery. The related project is S12, the UI build-out; the record row is closed and this artefact set is the retrospective document the close gate reads. The read models the screens render.\n\n## Entries\n\nEach row names a read model and the action family that serves it. The UI owns none of these rows: it renders what the declaring slice serves, subscribes to the listed SSE channel where one exists, and writes only through the action invocation path. The catalog is the reason no screen needs a database client.\n\n## Links\n\nThe models realize the capability groups: the boards group renders BoardView and CardView, authoring renders the asset and revision projections, operations renders the admin and inference views, and measurement renders the eval and benchmark rows. The technology catalog fixes the client, the transport and the test harness each model is read through.\n\n## Document\n\nThe closure review cites this catalog when it records the screens' read contracts. The catalog also shows the app owns none of these rows, which is the evidence for the requirement that no screen calls the database.\n"
+    },
+    {
+      "title": "Technology Standards Catalog \u2014 S12 UI Build-out (Phase D)",
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "App",
+          "axis_b": "Leptos in Rust, compiled to wasm and served by the conveyor binary",
+          "value": {
+            "standard": "apps/web, cargo wasm32 target"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Action transport",
+          "axis_b": "POST /api/actions/{name}/invocations with the session bearer; reads use the declared projections",
+          "value": {
+            "standard": "CONTRACT \u00a710"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Live updates",
+          "axis_b": "SSE channels per aggregate; the view re-reads its projection on an event",
+          "value": {
+            "standard": "apps/web/src/sse.rs"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Test harness",
+          "axis_b": "Playwright with a webServer running the real binary against a seeded ephemeral database",
+          "value": {
+            "standard": "apps/web/playwright.config.ts"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Auth in tests",
+          "axis_b": "the dev cookie only in dev mode; the OIDC helper for the deployed run",
+          "value": {
+            "standard": "oidc.setup.ts, DEV_AUTH_TOKEN"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Coverage",
+          "axis_b": "the signed parity contract and its native acceptance map",
+          "value": {
+            "standard": "scripts/check-parity.py --require-native"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Data Entity/Data Component Catalog \u2014 S12 UI Build-out (Phase C)",
+          "kind": "dependency"
+        },
+        {
+          "to": "Solution Concept Diagram \u2014 S12 UI Build-out (Phase A)",
+          "kind": "reuse"
+        }
+      ],
+      "body": "# Architecture artefact\n\n## Metadata\n\nType: catalog. Title: Technology Standards Catalog \u2014 S12 UI Build-out (Phase D). Version 1. Owner: the conveyor programme session. Reviewer: the Architecture Board's published standing delegation. Review date 2026-11-28. Phase A of the delivery ADM, plateau delivery. The related project is S12, the UI build-out; the record row is closed and this artefact set is the retrospective document the close gate reads. The technology standards the UI is built on.\n\n## Entries\n\nEvery row is an existing standard: Leptos compiled to wasm, the action invocation transport, the SSE channels, the real-binary Playwright harness, the two auth modes and the signed parity contract. The UI adds no service, no client database and no second state store; the gaps #965 closes are test assertions inside these standards, not new components.\n\n## Links\n\nThe standards constrain the read models and are reused by the solution concept: the action client is the only write path, the SSE client the only live-read path, and the Playwright harness the only acceptance path. A screen that departs from any of the three is a design finding, not a local choice.\n\n## Document\n\nThis is the Phase D statement that the UI fits the estate's technology direction without an exception. The gaps #965 closes are assertions inside the existing harness, so the standard itself does not change.\n"
+    }
+  ],
+  "documents": [
+    {
+      "category": "architecture-artifact",
+      "title": "Architecture Artefact Index \u2014 S12 (retrospective, 2026-11-28)",
+      "body": "# Architecture artefact index\n\n## Metadata\n\nSeven A\u2013D artefacts for S12, the UI build-out, at the 2026-11-28 retrospective snapshot. Phase A carries four PSA artefacts (a stakeholder matrix, two catalogs and a diagram); Phases B, C and D carry one HLD artefact each. Owner: the conveyor programme session; reviewer: the Architecture Board's standing delegation; the related project is S12 and its record row is closed.\n## Entries\n\nThe artefacts are the Stakeholder Map, the Driver/Goal/Objective Catalog, the Requirements Catalog, the Solution Concept Diagram, the Business Capability Map, the Data Entity/Data Component Catalog and the Technology Standards Catalog. Each entry names its phase, plateau and kind in the pack's `artifacts` array and carries authored entries and at least one link within the set.\n## Links\n\nThe derivation chain is: driver catalog from stakeholder map, requirements catalog from driver catalog, solution concept realizing the requirements, capability map from the solution concept, data catalog realizing the capability map, and the technology catalog reused by the solution concept. An artefact with no link is an orphan and is refused before the create.\n## Document\n\nThis index is the pack's architecture-artifact document. The substance is in the artefacts: the requirements catalog carries the gate sentence and the audit's measured gap, and the data catalog names the read models the screens render. The closure review cites the requirements catalog for the gate status.\n"
+    },
+    {
+      "category": "user-stories",
+      "title": "User Stories \u2014 S12 UI Build-out (retrospective, 2026-11-28)",
+      "body": "# User stories\n\n## Personas\n\nThe tenant user works the board, the cockpit and the authoring screens; the approver decides in the cockpit and sees who decided and through which channel; the eval pilot signs off on the eval screens; the operations user reads the admin and audit screens; the cutover owner runs the same suite against the deployed app.\n## Stories\n\nAs a tenant user, I want a board that pages rather than hides its tail, so that a large programme stays workable. As an approver, I want each decision to show its decider kind and channel, so that an agent's decision is distinguishable from a person's. As an eval pilot, I want the input and grading reviews as full screens over one approval primitive, so that the number is trusted. As an operations user, I want the registry, its schema and the audit trail on one admin screen, so that the platform is inspectable.\n## Scenarios\n\nThe board's keyboard and pointer moves survive a reload (`board.spec.ts`). The cockpit renders decided_by_kind and via.channel (`cockpit.spec.ts`). The eval sign-off screen shows every input and the pilot's grades (`eval-signoff.spec.ts`). The eval report derives its numbers from the run's result rows (`eval-report.spec.ts`). A search with nothing typed explains itself rather than sending an empty query (`search.spec.ts`).\n## Verify\n\nEach scenario names its spec in `apps/web/e2e/`. The happy path is evidenced today; the empty and error halves are the ones #965 completes for board, prompt-audit and eval-audit, and extends across the six specs missing an empty state and the two missing a rendered refusal.\n"
+    },
+    {
+      "category": "acceptance-criteria",
+      "title": "Acceptance Criteria \u2014 S12 UI Build-out (retrospective, 2026-11-28)",
+      "body": "# Acceptance criteria\n\n## Scenarios\n\nA1: the 22 declared screens exist as routes with their screen modules and spec files (21 distinct files; screen 16 shares `evals.spec.ts`). A2: every spec asserts empty, error and happy. A3: the coverage table has no orphan. A4: writes go through the action invocation path. A5: the suite runs on the real binary against a seeded database.\n## Verify commands\n\nA1: `ls apps/web/e2e/*.spec.ts` and the plan's \u00a75 table. A2: the spec audit \u2014 `apps/web/e2e/board.spec.ts`, `prompt-audit.spec.ts` and `eval-audit.spec.ts` are happy-path-only; six specs miss an empty state; two miss a rendered refusal. A3: `python3 scripts/check-parity.py --require-native`. A4: `apps/web/src/api.rs` and the specs' request assertions. A5: `apps/web/playwright.config.ts`.\n## Results\n\nA1, A3, A4 and A5 pass at the baseline: 21 screen specs exist, the parity contract is signed and its native map present (1300 rows; used 218, rare 295, unused 543, dropped 244), the action client is the only write path, and the harness runs the real binary. A2 is partial: 10 specs carry all three states, 3 are happy-path-only and 8 miss one state; screen 16 has no dedicated spec.\n## Status\n\nDelivered: A1, A3, A4, A5. Open: A2, carried by #965 (test-only, one PR). The project's gate is therefore not met at this snapshot, and this pack does not close the project; the closure review is authored once #965 lands.\n"
+    },
+    {
+      "category": "definition-of-ready",
+      "title": "Definition of Ready \u2014 S12 UI Build-out (retrospective, 2026-11-28)",
+      "body": "# Definition of ready\n\n## Independent\n\nA UI unit lands in `apps/web` and its spec; it needs no other unit's files. The real orderings are typed: the read model comes from the declaring slice and the cutover is S14's, neither of which this project's units edit.\n## Negotiable\n\nThe outcome is the plan's screen table and gate; the markup, component split and exact assertions are settled at delivery, not in this brief.\n## Valuable\n\nA screen that shows its empty, error and happy state is what makes the UI's decisions auditable (`B1`), and the signed coverage check is what makes the delivery predictable (`B6`).\n## Estimable\n\nThe baseline is `main@ea03b188a`, the files are named (the screen modules, the 21 specs, the parity check) and every acceptance command is a path or a check.\n## Small\n\nOne unit is one issue, one branch and one PR; the remaining gate work is one test-only unit (#965) that edits spec files only.\n## Testable\n\nEvery scenario names its spec; a screen with no empty or error state is a product finding raised on the unit, not worked around in the test.\n## Dependencies\n\nS12 declares `needs` on S01, S02, S04, S05\u2013S11, S17 and S18; every one is built. The gate's remaining work depends on no other unit, and the closure waits on #965.\n"
+    },
+    {
+      "category": "definition-of-done",
+      "title": "Definition of Done \u2014 S12 UI Build-out (retrospective, 2026-11-28)",
+      "body": "# Definition of done\n\n## Acceptance criteria\n\nOne row per scenario A1\u2013A5, each keyed by its command or spec. A unit is done only when every row has a result at the merge head; a suite green on a different revision is not the evidence.\n## Evidence at completion\n\nThe command, its result and the merge SHA per row. A2's result is the spec audit's table; it is recorded as partial until #965 lands, and the closure review is written only after that.\n## Repo gate\n\nThe repository's preflight is the compile and lint verdict; the PR's public CI is the final gate. The Playwright suite runs on the real binary against a seeded database, and no test is skipped to make the gate green.\n## Merge and closure\n\nOne PR closes the unit's issue; the branch is deleted after the merge. The project closes only when its receipt is green at a pinned snapshot, which requires the closure review and the declared closure outputs that this pack deliberately does not author while the gate is partial.\n"
+    },
+    {
+      "category": "architecture-analysis",
+      "title": "Architecture Analysis \u2014 S12 UI Build-out (retrospective, 2026-11-28)",
+      "body": "# Architecture and analysis pack\n\n## Current state\n\nThe app exists as 46 screen modules under `apps/web/src/screens`, served by the conveyor binary as wasm; 51 Playwright specs exist, 21 of them for the plan's screen rows. The action client in `apps/web/src/api.rs` resolves the served registry and posts invocations; SSE channels update the views. The parity contract is signed and its native map present, and the suite runs the real binary.\n## Options considered\n\nThe alternative to a Leptos app over the action registry was a server-rendered admin, refused because the same actions must be callable from the web, the agent front end and MCP, and a second rendering stack would fork the write path. A mocked-API test harness was refused because a green run would then mean nothing; the real binary with a seeded database is the standard.\n## Risks\n\nThe measured risk is a screen that loses a state and still passes its suite: three specs assert only the happy path and eight miss one state. The check is the spec audit and the unit #965; the risk is not waived. The other risks are a screen reading the database directly, closed by the action client being the only write path, and a fixture-backed production screen, refused by the harness and the parity check.\n## Dependency map\n\nS12 needs S01 (the shell and actions), S02 (auth), S04 (the action contract), S05\u2013S11 (the read models and screens it renders), S17 and S18 (the benchmark and improvement views). The cutover is S14's, which reuses the same suite. No edge is open construction.\n"
+    },
+    {
+      "category": "architecture-design",
+      "title": "Architecture Design \u2014 S12 UI Build-out (retrospective, 2026-11-28)",
+      "body": "# Architecture design\n\n## Context and boundary\n\nS12 owns the web app: the shell, the screen modules and the Playwright suite. It owns no table, action or event; every write is an action invocation and every read is a declared projection. The workflow editor is S13's, not a twelfth row, and the V2 destinations are T18's; this design covers the 22 declared S12 rows.\n## Aggregates, tables and actions\n\nS12 adds no aggregate, table, action or event \u2014 a deliberate empty set recorded in the plan's decisions. The app consumes the registry: boards, cards, approvals, requirements, processes, evals, benchmarks and inference views are served by the slices that own them. The only state the app holds is view state, and the SSE subscription is a reader of the same projections.\n## Decisions\n\nOne app, one tenant population, cutover by host. No screen calls the database. No screen renders a fixture in production. The copilot screen is declared by S10 and recorded as a CONTRACT-CHANGE REQUEST rather than self-approved. The suite runs the real binary; the dev cookie is dev-only and the deployed run uses the OIDC helper.\n## Acceptance\n\nA1\u2013A5 of the acceptance document. A1, A3, A4 and A5 are delivered; A2 is the gate and is carried by #965, whose result the closure review will read.\n## Architecture artefacts\n\nThe seven A\u2013D artefacts: the stakeholder map, the driver and requirements catalogs, the solution concept, the capability map, the data catalog and the technology standards catalog. The data catalog is the record of what the app renders; the requirements catalog carries the gate and its measured gap.\n"
+    },
+    {
+      "category": "inception-analysis",
+      "title": "Inception Analysis \u2014 S12 UI Build-out (retrospective, 2026-11-28)",
+      "body": "# Inception analysis\n\n## Current state\n\nAt inception the app was a shell with a few screens and no coverage rule; the plan's screen table and the parity contract came later. The build delivered 22 declared rows, the action client, the SSE channels and the Playwright suite on the real binary. The plan's own amendment of 2026-11-09 records the process view and the process map as late additions.\n## Reuse sources\n\nThe served action registry, the read models of S05\u2013S20, the approval primitive, the parity contract and the OIDC helper. Reuse is the reason the app owns no store: a second read path would fork what the slices serve.\n## Build vs reuse\n\nBuild the shell, the screen modules and the suite; reuse every read model and every write action. The accessibility pass is one review after the last screen, not a per-screen component library. The V2 destinations are T18's build, not S12's.\n## Risks\n\nThe inception analysis named the risk of rebuilding S05\u2013S11's components inside S12 and the risk of a mocked suite. Delivery honoured the first by one component per first-needing screen; the second by the real-binary harness. The remaining risk is the measured spec-state gap, carried by #965.\n"
+    },
+    {
+      "category": "statement-of-architecture-work",
+      "title": "Statement of Architecture Work \u2014 S12 UI Build-out (retrospective, 2026-11-28)",
+      "body": "# Statement of Architecture Work\n\n## Assignment\n\nDeliver the web app for the declared screen set: every screen a route over the served actions, its states honest, and its suite on the real binary. The assignment is retrospective: the app shipped on its slice lanes and this statement records the architecture that shipped, at the 2026-11-28 snapshot.\n## Scope\n\nThe shell, the 22 declared screens and their screen modules, the action client, the SSE subscriptions and the Playwright suite; and the seven A\u2013D artefacts. Out of scope: the workflow editor (S13), the V2 destinations (T18), the cutover (S14) and the read models themselves (their declaring slices).\n## Responsibilities\n\nThe UI owner builds the screens and the suite; each declaring slice owns the read model and action a screen renders; the accessibility reviewer runs the one pass after the last screen; the cutover owner reuses the same suite; the programme owner decides the tranche. No role signs its own gate.\n## Acceptance criteria\n\nThe acceptance is A1\u2013A5 of the acceptance document, plus the closure review's outcome-vs-acceptance table. A1, A3, A4 and A5 are delivered; A2 is the gate and is carried by #965. The statement claims no tranche authority.\n## Contract\n\nThe delivery contract carries the commitments, the compliance method and the approval. This statement is its architecture half; the two are published together so the close gate reads one consistent record, and the closure review is authored once the gate is met.\n"
+    }
+  ],
+  "registers": {
+    "risk": [
+      {
+        "code": "S12-R1",
+        "title": "A screen loses a state and still passes its suite",
+        "body": "A spec that asserts only the happy path cannot fail when the empty or error state disappears. The audit measured three such specs and eight missing one state. #965 adds the assertions; the risk is not waived, and the project's gate stays unclaimed until it lands.",
+        "probability": "high",
+        "impact": 4,
+        "review_at": "2027-02-28",
+        "response": "close the gap with a test-only unit and re-run the audit",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "R2"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the UI owner"
+        }
+      },
+      {
+        "code": "S12-R2",
+        "title": "A screen becomes a second store",
+        "body": "A screen that reads the database or caches a model it does not own would fork the read path and drift from the slice that serves it. The action client is the only write path; the design records the rule and the specs assert the requests.",
+        "probability": "low",
+        "impact": 5,
+        "review_at": "2027-02-28",
+        "response": "no client database; writes through the action invocation path only",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "R3"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the UI owner"
+        }
+      },
+      {
+        "code": "S12-R3",
+        "title": "A mocked suite green-lights a broken screen",
+        "body": "Runtime request mocking would let the suite pass while the real API disagrees. The harness runs the real binary against a seeded database, and the deployed run uses the OIDC helper rather than the dev cookie.",
+        "probability": "low",
+        "impact": 5,
+        "review_at": "2027-02-28",
+        "response": "real binary, seeded database, no runtime mocks",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "R5"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the UI owner"
+        }
+      }
+    ],
+    "issue": [
+      {
+        "code": "S12-I1",
+        "title": "The gate is not met: three happy-path-only specs",
+        "body": "board, prompt-audit and eval-audit assert only a happy path. The project's gate sentence says a spec that only asserts the happy path fails review, so the closure review cannot be written as a pass until #965 lands."
+      },
+      {
+        "code": "S12-I2",
+        "title": "Eight specs miss one state and screen 16 has no dedicated spec",
+        "body": "Six specs have no empty-state assertion and two render no refusal; the eval-run screen is covered only inside evals.spec.ts. #965's parts P2 and P3 close them."
+      },
+      {
+        "code": "S12-I3",
+        "title": "The row was closed with no published closure review and no declared outputs",
+        "body": "The record's row is closed while `meta.closure_outputs` is empty and no closure review is published. Those packages clear only with a closure review, which this pack deliberately defers until the gate is met."
+      }
+    ],
+    "assumption": [
+      {
+        "code": "S12-A1",
+        "title": "The declaring slices' read models are stable",
+        "body": "S12 renders what S05\u2013S20 serve. The assumption holds while those slices' contracts stand; a change to a read model is their unit's, re-read by this app rather than forked."
+      },
+      {
+        "code": "S12-A2",
+        "title": "The record's closed status is a derived status",
+        "body": "The row's `status_source` records that it was derived from issue state, measured coverage and plan frontmatter, not from a closure decision. This pack authors the documents and defers the closure decision to the review the gate requires."
+      },
+      {
+        "code": "S12-A3",
+        "title": "The gate gap is a test gap, not a product gap",
+        "body": "The screens render their empty and error states; the suite does not assert them. #965's open question records the exception: a screen found without such a state becomes a product finding on that unit, not a workaround in the test."
+      }
+    ],
+    "dependency": [
+      {
+        "code": "S12-D1",
+        "title": "S18 supplies the improvement view",
+        "body": "The improvement screen renders benchmark_runs.trend over S18's rows; the dependency is a `needs` edge in the project row."
+      },
+      {
+        "code": "S12-D2",
+        "title": "S17 supplies the benchmark view",
+        "body": "The benchmarks screen renders S17's suites, runs and cases; S12 renders the report, it does not produce it."
+      },
+      {
+        "code": "S12-D3",
+        "title": "The tranche authorisation is the review's",
+        "body": "Tranche 10 is planned; this pack and the readiness rows claim no authorisation. The closure review is a programme act after the gate is met."
+      }
+    ],
+    "benefit": [
+      {
+        "code": "S12-B1",
+        "title": "Decisions are visible where they are taken",
+        "body": "The cockpit renders each decision's decider kind and channel, and the eval sign-off screens render every input as data. That is `B1` auditable decisions at the point a person acts."
+      },
+      {
+        "code": "S12-B2",
+        "title": "The delivery is predictable",
+        "body": "The signed parity contract and the real-binary suite make the UI's coverage measurable, which is `B6` predictable delivery's UI half."
+      },
+      {
+        "code": "S12-B3",
+        "title": "One app, one cutover",
+        "body": "The cutover reuses the same suite against the deployed app, so the host switch is a configuration change over a tested product rather than a second UI."
+      }
+    ]
+  },
+  "delivery_contract": {
+    "title": "Delivery Contract \u2014 S12 UI Build-out (retrospective, 2026-11-28)",
+    "body": {
+      "commitments": "S12 delivers the web app for the 22 declared screen rows: routes with their screen modules, one action client over the served registry, SSE subscriptions for the aggregates that publish them, and a Playwright suite that runs the real binary against a seeded database. The app owns no table, action or event.",
+      "compliance": "Compliance is judged at the pinned 2026-11-28 snapshot against the record and against the S12 gate. The coverage half of the gate is met (the signed parity contract with its native map); the state half is measured partial: three happy-path-only specs, eight specs missing one state and no dedicated eval-run spec, carried by a test-only unit. This pack therefore does not close the project and does not author a closure review; the receipt's closure packages stay open until the gate is met.",
+      "approval": "This contract's approval is the Architecture Board's standing delegation, published and cited by the compliance review; the tranche authorisation is the programme owner's separate act and is not claimed here.",
+      "manifest": "acceptance/programme/S12.toml \u2014 the project check carries no status pin; the close path is decided by the closure content this pack deliberately withholds until the gate is met.",
+      "acceptance_at": "The 2026-11-28 retrospective snapshot, taken from the replay record at schema 110 after the pack's documents were committed.",
+      "retrospective": "This contract is authored after delivery. It records the commitments the shipped app meets, the compliance method the receipt applies, and the measured gate gap; it does not re-open the delivered screens."
+    }
+  },
+  "wbs_deliverable": {
+    "title": "The web app \u2014 22 declared screens over the served actions, one action client, SSE subscriptions and a Playwright suite on the real binary",
+    "business_value": 8,
+    "time_criticality": 7,
+    "risk_reduction": 6,
+    "job_size": 8
+  },
+  "review": {
+    "level": "consistent",
+    "findings": [
+      {
+        "code": "PG-1",
+        "note": "The gate's coverage half is met: the parity contract is signed and its native map present; check-parity --require-native is green."
+      },
+      {
+        "code": "PG-2",
+        "note": "The gate's state half is partial: board, prompt-audit and eval-audit are happy-path-only; six specs miss an empty state; two render no refusal; screen 16 has no dedicated spec. Carried by #965."
+      },
+      {
+        "code": "PG-3",
+        "note": "The record's closed row has no published closure review and no declared closure outputs; those packages stay open until the gate is met and the closure review is authored."
+      }
+    ],
+    "evidence": {
+      "manifest": "acceptance/programme/S12.toml",
+      "suite": "apps/web/e2e/*.spec.ts (51 files; 21 for the declared screens)",
+      "parity": "scripts/check-parity.py --require-native \u2014 signed, 1300 rows, native map present",
+      "harness": "apps/web/playwright.config.ts; oidc.setup.ts",
+      "audit": "the per-spec empty/error/happy table in #965"
+    }
+  },
+  "project_brief_output": "# Project brief\n\n## Outcome\n\nOne web app over the conveyor's served actions: 22 declared screens with honest states, a single action client and a suite that runs the real binary. The outcome is true of the shipped app; the gate's state half is the measured gap a test-only unit closes.\n## Boundary\n\nIn scope: the shell, the 22 screens, the action client, the SSE subscriptions and the suite. Out of scope: the workflow editor (S13), the V2 destinations (T18), the cutover (S14) and the read models (their declaring slices). The app owns no table, action or event.\n## Reuse sources\n\nThe served action registry, the read models of S05\u2013S20, the approval primitive, the signed parity contract and the OIDC helper. Each is named in the requirements and data catalogs; the app reuses them rather than forking a read or write path.\n## Inception units\n\nThe S12 slice plan with its screen table and gate. No separate inception directory exists for S12, so the project brief and inception analysis are authored from the plan's sections and the record, and this output is the brief the close gate reads.\n## Dependencies\n\nS12 needs S01, S02, S04, S05\u2013S11, S17 and S18; every one is built. The cutover is S14's and reuses the suite. No dependency is open construction, and the gate work depends on no other unit.\n## Acceptance\n\nThe plan's gate: every spec asserts empty, error and happy, and the coverage table has no orphan. The coverage half is met; the state half is carried by a test-only unit, and the closure review is written only after it lands.\n## Capabilities\n\nThe web app capability covers boards and work, authoring, operations and measurement, with one app and one cutover. No other capability may fork the screen set or the action client.\n## Plan\n\n`docs/plans/slices/S12-ui-buildout.md` with its 22-row screen table, its build order and its gate. The tranche plan places S12 in tranche 10 with T5; the authorisation is the tranche review's act.\n",
+  "evidence_output": "# Evidence\n\n## Claim\n\nS12 delivers the web app over the served actions, with the coverage half of its gate met and its state half measured and carried by a test-only unit.\n## Evidence\n\n46 screen modules under `apps/web/src/screens`; 51 Playwright specs, 21 for the declared screens; the action client in `apps/web/src/api.rs`; the signed parity contract (1300 rows; used 218, rare 295, unused 543, dropped 244) with its native map present; the real-binary harness in `apps/web/playwright.config.ts`.\n## Verification\n\n`python3 scripts/check-parity.py --require-native` reports the signed contract and its native map; the suite runs with `npx playwright test` against the real binary and a seeded database. The spec audit in #965 is the instrument for the gate's state half, and the compile verdict is the repository's preflight.\n## Links\n\n`docs/plans/slices/S12-ui-buildout.md`, `acceptance/programme/S12.toml`, the parity contract under `parity/`, and the screen modules and specs the catalog names.\n## Gap\n\nThe gate's state half is partial: three happy-path-only specs, six missing an empty state, two missing a rendered refusal and no dedicated eval-run spec. #965 carries the repair; the closure review and the declared closure outputs wait for it. No other gap is claimed.\n"
+}

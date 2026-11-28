@@ -1,0 +1,16 @@
+{
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "cadence_id": "01a222e3-87fb-72ce-b917-493ac7487a89",
+  "finding_key": "k1",
+  "statement": "A pack that passes the content checker is not a pack that survives the receipt: the checker validates the categories a pack declares but does not require the four delivery documents or the four close-gate documents, while the stamped close gate does. Tranche 9's packs carry only the architecture-artefact index; every closing member of tranche 10 authors all nine documents before its pack is preflighted.",
+  "evidence": [
+    {
+      "kind": "path",
+      "value": "scripts/rework-content-check.py"
+    },
+    {
+      "kind": "path",
+      "value": "seed/output-standard.json"
+    }
+  ]
+}

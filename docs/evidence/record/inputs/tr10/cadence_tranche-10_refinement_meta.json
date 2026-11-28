@@ -1,0 +1,38 @@
+{
+  "id": "01a222e3-86d4-7812-9ab1-1f550a3c603c",
+  "meta": {
+    "tranche_id": "01a1e9e1-28de-7da4-a03d-3147cb34a775",
+    "tranche_number": 10,
+    "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+    "refinement": {
+      "period": "tranche-10",
+      "reordered": [
+        {
+          "item": "S12 first, then T5",
+          "from": "the seed's membership order (S12, T5)",
+          "to": "S12, T5",
+          "why": "S12's record documents come first because they are the cheapest to preflight and its gate gap is a test gap, not a construction gap: the pack authors the nine documents and the close-gate set, and the closure is deferred to #965. T5 is the tranche's only closing pack and carries the three CODE packages (#962), so it is preflighted against a settled S12 record. The factory's roster sorts by project key, which is the same order here."
+        }
+      ],
+      "reestimate": {
+        "S12": "5 open packages (1 P0 project_in_unauthorised_tranche, cleared by authorisation only; 4 P1: closed_without_closure_review and closure_outputs_undeclared, which stay open until #965 lands and the closure review is authored; unpublished_declared_output and mandatory_artefacts, cleared by this pack)",
+        "T5": "6 open packages (1 P0 project_in_unauthorised_tranche, cleared by authorisation only; 5 P1: contract_missing, mandatory_artefacts, and the three CODE packages v1-p119-1, v1-p93-1, v1-w1b-3 now carried by #962)",
+        "tranche-10": "2 open packages (2 P1: pi_cadence_missing, backlog_refinement_missing), cleared by this readiness set"
+      },
+      "wsjf_inputs": {
+        "S12": {
+          "business_value": 8,
+          "time_criticality": 7,
+          "risk_reduction": 6,
+          "job_size": 8
+        },
+        "T5": {
+          "business_value": 9,
+          "time_criticality": 6,
+          "risk_reduction": 9,
+          "job_size": 13
+        }
+      }
+    }
+  }
+}

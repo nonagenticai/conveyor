@@ -1,0 +1,80 @@
+{
+  "schema": "conveyor-tranche-cadences-plan/v1",
+  "tranche": 10,
+  "tranche_id": "01a1e9e1-28de-7da4-a03d-3147cb34a775",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+  "note": "The inputs for the tranche-10 readiness step, in order. Each is written through scripts/programme-record.py (write + read-back + evidence); the returned ids are recorded in cadences.json beside this file. The order is creates (pi, refinement, demo, retro), then the two P0-scoped PI documents (their ids are what meta.documents names), then the pi row's plan meta and the refinement row's WSJF record, then the delegated plan approval and the retro lesson. Tranche 10 stays `planned` until #755 records the tranche-9 review; these rows are construction, never authorisation.",
+  "creates": [
+    {
+      "kind": "pi",
+      "period": "tranche-10",
+      "input": {
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "pi",
+        "period": "tranche-10",
+        "meta": {
+          "tranche_id": "01a1e9e1-28de-7da4-a03d-3147cb34a775",
+          "tranche_number": 10,
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        }
+      }
+    },
+    {
+      "kind": "refinement",
+      "period": "tranche-10",
+      "input": {
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "refinement",
+        "period": "tranche-10",
+        "meta": {
+          "tranche_id": "01a1e9e1-28de-7da4-a03d-3147cb34a775",
+          "tranche_number": 10,
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        }
+      }
+    },
+    {
+      "kind": "demo",
+      "period": "tranche-10",
+      "input": {
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "demo",
+        "period": "tranche-10",
+        "meta": {
+          "tranche_id": "01a1e9e1-28de-7da4-a03d-3147cb34a775",
+          "tranche_number": 10,
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        }
+      }
+    },
+    {
+      "kind": "retro",
+      "period": "tranche-10",
+      "input": {
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "retro",
+        "period": "tranche-10",
+        "meta": {
+          "tranche_id": "01a1e9e1-28de-7da4-a03d-3147cb34a775",
+          "tranche_number": 10,
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        }
+      }
+    }
+  ],
+  "documents": [
+    {
+      "kind": "pi-plan",
+      "category": "pi-plan",
+      "title": "PI plan \u2014 tranche 10 (retrospective, 2026-11-28)",
+      "body_file": "pi-plan.json"
+    },
+    {
+      "kind": "pi-objectives",
+      "category": "pi-objectives",
+      "title": "PI objectives \u2014 tranche 10 (retrospective, 2026-11-28)",
+      "body_file": "pi-objectives.json"
+    }
+  ]
+}
