@@ -19,9 +19,139 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   06 architecture.artifacts_link ok
   07 architecture.artifacts_link ok
   document architecture-artifact: already present and published
+  08 documents.compose ok
+  09 documents.publish ok
+  document user-stories: published
+  10 documents.compose ok
+  11 documents.publish ok
+  document acceptance-criteria: published
+  12 documents.compose ok
+  13 documents.publish ok
+  document definition-of-ready: published
+  14 documents.compose ok
+  15 documents.publish ok
+  document definition-of-done: published
+  delivery contract: already live
+  register risk: The live one-live-run property depends on a partial index, because the existing unique index does not dedupe nulls already present
+  register risk: The reaper must skip project executions, and its correctness depends on that predicate already present
+  register risk: The `failed` state must never reach the wire, which makes the terminal check ordering load-bearing already present
+  register issue: The record claimed built while carrying no charter, baseline, contract or Phase-G review already present
+  register issue: The gate's first form could never match, and its zero-match run exited green already present
+  register issue: A progress percentage and push delivery are absent by scope, not by omission already present
+  register assumption: The 2026-11-28 rework snapshot is the authoritative record for S06c already present
+  register assumption: A conforming MCP client accepts polling as the only delivery mechanism already present
+  register assumption: One live execution per project is the right cardinality already present
+  register assumption: The approval is a sufficient input request already present
+  register dependency: S06c depends on S04, S05 and S06 already present
+  register dependency: S06b supplies the licence principal the task surface authenticates already present
+  register dependency: S13 populates `statusMessage` and the agent's own task support is a separate plan already present
+  register benefit: A long-running project becomes a durable task with no second store already present
+  register benefit: A blocked project is answerable through the protocol that started it already present
+  register benefit: One task-capable action keeps the surface small already present
+  register benefit: Ownership failures are indistinguishable already present
+  benefit transitions: none in the content
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
+  closure-review output: already published
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  16 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 1 change row(s) present
+  record fixes: none in the content
+  card discharge: no open rework card owned by the project
+  closure gate: already approved
+  destructive gate: already approved
 
-rework: documents.compose refused at act 8: error: documents.compose refused (422): the input does not match the action schema [category: user-stories is not an output category in seed/output-standard.json (unknown_category)]
-FAILED: documents.compose: transport exited 1
+rework: projects.close refused at act 17: error: projects.close refused (409): project S06c cannot close until its mandatory artefacts exist (missing: architecture-analysis, architecture-design, inception-analysis, project-registers, project-wbs, statement-of-architecture-work)
+FAILED: projects.close: transport exited 1
+
+[exit 1]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/scripts/publish-artefact-bodies.py --apply --project S06c --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S06c-snap-dh_9sce4/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S06c-snap-dh_9sce4/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/docs/evidence/rework/batch/tranche-7/S06c-bodies --local-bin /tmp/conv951-bin/conveyor
+
+
+Traceback (most recent call last):
+  File "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/scripts/publish-artefact-bodies.py", line 1275, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/scripts/publish-artefact-bodies.py", line 849, in main
+    applied, skipped, refused = apply_rows(
+                                ~~~~~~~~~~^
+        rows, args=args, bodies_out=args.bodies_out, journal_path=args.journal,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/scripts/publish-artefact-bodies.py", line 590, in apply_rows
+    summary = row["_summary"]
+              ~~~^^^^^^^^^^^^
+KeyError: '_summary'
+
+[exit 1]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/scripts/rework-project.py --project S06c --content docs/evidence/rework/tranche-7/rework-content-S06c.json --tranche-label tranche 7 --demo-cadence 01a22294-e26f-77e6-9424-3ae8e8c5eaa0
+
+  reopen: not needed
+  charter: already approved
+  closure outputs: already ['closure-review']
+  SoAW: already live
+  artefact: Stakeholder Map — S06c MCP Tasks (Phase A) already present
+  artefact: Driver/Goal/Objective Catalog — S06c MCP Tasks (Phase A) already present
+  artefact: Requirements Catalog — S06c MCP Tasks (Phase A) already present
+  artefact: Solution Concept Diagram — S06c MCP Tasks (Phase A) already present
+  artefact: Business Capability Map — S06c MCP Tasks (Phase B) already present
+  artefact: Data Entity/Data Component Catalog — S06c MCP Tasks (Phase C) already present
+  artefact: Technology Standards Catalog — S06c MCP Tasks (Phase D) already present
+  01 architecture.artifacts_link ok
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  document architecture-artifact: already present and published
+  document user-stories: already present and published
+  document acceptance-criteria: already present and published
+  document definition-of-ready: already present and published
+  document definition-of-done: already present and published
+  delivery contract: already live
+  register risk: The live one-live-run property depends on a partial index, because the existing unique index does not dedupe nulls already present
+  register risk: The reaper must skip project executions, and its correctness depends on that predicate already present
+  register risk: The `failed` state must never reach the wire, which makes the terminal check ordering load-bearing already present
+  register issue: The record claimed built while carrying no charter, baseline, contract or Phase-G review already present
+  register issue: The gate's first form could never match, and its zero-match run exited green already present
+  register issue: A progress percentage and push delivery are absent by scope, not by omission already present
+  register assumption: The 2026-11-28 rework snapshot is the authoritative record for S06c already present
+  register assumption: A conforming MCP client accepts polling as the only delivery mechanism already present
+  register assumption: One live execution per project is the right cardinality already present
+  register assumption: The approval is a sufficient input request already present
+  register dependency: S06c depends on S04, S05 and S06 already present
+  register dependency: S06b supplies the licence principal the task surface authenticates already present
+  register dependency: S13 populates `statusMessage` and the agent's own task support is a separate plan already present
+  register benefit: A long-running project becomes a durable task with no second store already present
+  register benefit: A blocked project is answerable through the protocol that started it already present
+  register benefit: One task-capable action keeps the surface small already present
+  register benefit: Ownership failures are indistinguishable already present
+  benefit transitions: none in the content
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
+  closure-review output: already published
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  08 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 1 change row(s) present
+  record fixes: none in the content
+  card discharge: no open rework card owned by the project
+  closure gate: already approved
+  destructive gate: already approved
+
+rework: projects.close refused at act 9: error: projects.close refused (409): project S06c cannot close until its mandatory artefacts exist (missing: architecture-analysis, architecture-design, inception-analysis, project-registers, project-wbs, statement-of-architecture-work)
+FAILED: projects.close: transport exited 1
 
 [exit 1]
 

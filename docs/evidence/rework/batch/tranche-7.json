@@ -1,48 +1,42 @@
 {
-  "blocked": 3,
-  "generated_at": "2026-11-28T15:02:11+00:00",
-  "green": 0,
+  "blocked": 2,
+  "generated_at": "2026-11-28T15:06:16+00:00",
+  "green": 1,
   "members": [
     {
       "factory_exit": 1,
       "gaps": [
         {
-          "detail": "rework: documents.compose refused at act 8: error: documents.compose refused (422): the input does not match the action schema [category: user-stories is not an output category in seed/output-standard.json (unknown_category)]",
+          "detail": "rework: projects.close refused at act 17: error: projects.close refused (409): project S06c cannot close until its mandatory artefacts exist (missing: architecture-analysis, architecture-design, inception-analysis, project-registers, project-wbs, statement-of-architecture-work)",
           "gap": "instrument",
           "id": null
         }
       ],
       "key": "S06c",
       "log": "docs/evidence/rework/batch/tranche-7/S06c.log",
-      "publish_exit": null,
+      "publish_exit": 1,
       "state": "BLOCKED"
     },
     {
-      "factory_exit": 1,
-      "gaps": [
-        {
-          "detail": "rework: documents.compose refused at act 8: error: documents.compose refused (422): the input does not match the action schema [category: user-stories is not an output category in seed/output-standard.json (unknown_category)]",
-          "gap": "instrument",
-          "id": null
-        }
-      ],
+      "factory_exit": 0,
+      "gaps": [],
       "key": "S15",
       "log": "docs/evidence/rework/batch/tranche-7/S15.log",
-      "publish_exit": null,
-      "state": "BLOCKED"
+      "publish_exit": 1,
+      "state": "RECEIPT_GREEN"
     },
     {
       "factory_exit": 1,
       "gaps": [
         {
-          "detail": "rework: documents.compose refused at act 8: error: documents.compose refused (422): the input does not match the action schema [category: user-stories is not an output category in seed/output-standard.json (unknown_category)]",
+          "detail": "rework: projects.close refused at act 17: error: projects.close refused (409): project S16 cannot close until its mandatory artefacts exist (missing: architecture-analysis, architecture-design, inception-analysis, project-registers, project-wbs, statement-of-architecture-work)",
           "gap": "instrument",
           "id": null
         }
       ],
       "key": "S16",
       "log": "docs/evidence/rework/batch/tranche-7/S16.log",
-      "publish_exit": null,
+      "publish_exit": 1,
       "state": "BLOCKED"
     }
   ],

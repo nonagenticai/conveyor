@@ -133,38 +133,35 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "4 unresolved P0/P1 package(s): std-delivery-acceptance-criteria-s15:S15 (P1), std-delivery-definition-of-done-s15:S15 (P1), std-delivery-definition-of-ready-s15:S15 (P1), std-delivery-user-stories-s15:S15 (P1)",
+      "detail": "no unresolved P0/P1 package for this project",
       "id": "S15-rework",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'S15-rework' did not pass",
+      "detail": "gate discharged by executable checks: S15-project, S15-baseline, S15-charter, S15-contract, S15-review, S15-waivers, S15-pi-cadence, S15-pi-plan, S15-pi-objectives, S15-wsjf, S15-demo-credits, S15-lessons, S15-product, S15-artefact-standard, S15-rework",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     }
   ],
-  "failures": [
-    "S15-rework (P0): 4 unresolved P0/P1 package(s): std-delivery-acceptance-criteria-s15:S15 (P1), std-delivery-definition-of-done-s15:S15 (P1), std-delivery-definition-of-ready-s15:S15 (P1), std-delivery-user-stories-s15:S15 (P1)",
-    "gate (P0): the gate check 'S15-rework' did not pass"
-  ],
+  "failures": [],
   "gate": "At the end, a card's run resolves its capability and executor, the capability's readiness is reported before the run starts, a cited passage is retrieved from a pinned `strata` pack, work-package memory is written, consolidated into `strata_rag`, and recalled by `source_id`.",
-  "generated_at": "2026-11-28T14:55:51.321731+00:00",
+  "generated_at": "2026-11-28T15:05:37.736940+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S15.toml",
   "name": "Capability, knowledge and memory",
   "project": "S15",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-28T14:55:44.898484+00:00",
+    "generated_at": "2026-11-28T15:05:17.458841+00:00",
     "git_sha": "7e93a325fe0176ba6e98ce47cae7e1ea2115543f",
     "path": "retained-snapshot/7e93a325fe0176ba6e98ce47cae7e1ea2115543f"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }
