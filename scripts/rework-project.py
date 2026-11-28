@@ -608,10 +608,46 @@ class Runner:
             str(row.get("id")): len(row.get("entries") or [])
             for row in (self.snapshot_json("architecture.json").get("artifacts") or [])
         }
+        def has_instance_document(row: dict) -> bool:
+            # The standard's artefact-instance rule resolves the `Document` section from a
+            # document of category `architecture-artifact-instance`. A v1 row's document has no
+            # category at all, so reusing it by id leaves the section unresolved and the package
+            # open while the row exists (measured on S00, 2026-11-26: the package stayed open
+            # after the artefacts were bound).
+            document = snapshot_documents.get(str(row.get("id"))) or row.get("document_id")
+            item = (
+                next(
+                    (doc for doc in self._published_outputs() if str(doc.get("id")) == str(document)),
+                    None,
+                )
+                if document
+                else None
+            )
+            return item is not None and str(item.get("category") or "") == (
+                "architecture-artifact-instance"
+            )
+
         for index, artefact in enumerate(self.content["artifacts"]):
             key = artefact_keys[index]
-            if artefact["title"] in titles:
-                row = titles[artefact["title"]]
+            row = titles.get(artefact["title"])
+            if row is None:
+                # A pre-rework row of the standard type is the row the standard counts: T19F's
+                # live gate created its seven artefacts under its own titles, so a title-only
+                # match authored a second artefact per type and left the original's instance
+                # package open. Repair the row of the standard type instead of duplicating it,
+                # preferring one the standard still reports as undocumented.
+                type_id = str(standard.get(key) or "")
+                candidates = [
+                    candidate
+                    for candidate in existing
+                    if str(candidate.get("artifact_type_id") or "") == type_id
+                    and candidate.get("status") not in ("superseded", "archived")
+                ]
+                row = next(
+                    (candidate for candidate in candidates if not has_instance_document(candidate)),
+                    candidates[0] if candidates else None,
+                )
+            if row is not None:
                 meta = dict(row.get("meta") or {})
                 document_id = snapshot_documents.get(str(row.get("id"))) or row.get("document_id")
                 # The standard's artefact-instance rule resolves the `Document` section from a

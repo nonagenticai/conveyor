@@ -1,0 +1,183 @@
+{
+  "checks": [
+    {
+      "check": "project",
+      "description": "T19F remains active; closure is deferred to the tranche-6 review",
+      "detail": "project T19F is active",
+      "id": "T19F-project",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "project_baseline",
+      "description": "the scope baseline is approved; the close gate reads the approved row",
+      "detail": "baseline 01a22113-386c-72ea-a05a-e4d06902e55f approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
+      "id": "T19F-baseline",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a210ba-b6cb-76cc-82a3-a2b45cfb498f\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
+      "description": "the charter asset exists and the charter gate is approved",
+      "detail": "exit 0",
+      "exit": 0,
+      "id": "T19F-charter",
+      "kind": "command",
+      "result": "pass",
+      "severity": "P0",
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "check": "contract",
+      "description": "a live board-approved delivery contract exists",
+      "detail": "contract 01a210bd-ba25-78c1-a363-3eea5aa71335 approved by board decision 01a210bd-cdb2-7f2f-ac9a-c314fb1856af about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+      "id": "T19F-contract",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "review",
+      "description": "the Phase-G review cites a published standing delegation",
+      "detail": "review 01a22113-53c4-72ff-9929-00904ace2f2e (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "id": "T19F-review",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "waivers",
+      "description": "no active waiver is expired or owned by its reviewer",
+      "detail": "0 active waiver(s), all dated and distinct from the reviewer",
+      "id": "T19F-waivers",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_cadence",
+      "description": "the project's PI has a cadence row and a backlog-refinement row",
+      "detail": "PI cadence 01a21c62-698d-7a02-b32a-1e3cad0ba69e and refinement 01a21c62-6a43-7d17-9d5b-836ad1801e45 for tranche-6",
+      "id": "T19F-pi-cadence",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_plan",
+      "description": "the project tranche's PI plan is published",
+      "detail": "the tranche-6 PI plan is published",
+      "id": "T19F-pi-plan",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_objectives",
+      "description": "the project tranche's PI objectives are published",
+      "detail": "the tranche-6 PI objectives are published",
+      "id": "T19F-pi-objectives",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "wsjf",
+      "description": "every WBS deliverable of the project carries the four typed WSJF inputs",
+      "detail": "1 WBS node(s) carry the four WSJF inputs",
+      "id": "T19F-wsjf",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "demo_credits",
+      "description": "every accepted deliverable has a demo credit carrying its evidence",
+      "detail": "1 accepted deliverable(s), each with a demo credit",
+      "id": "T19F-demo-credits",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "lessons",
+      "description": "the tranche retro produced at least one lesson",
+      "detail": "lesson 01a2210e-8d7d-7c7d-b14c-e7c63b7c7fb4 carries a statement and evidence from the tranche-6 retro",
+      "id": "T19F-lessons",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P1"
+    },
+    {
+      "check": "product_findings",
+      "description": "no open P0 product finding remains for the project",
+      "detail": "no open P0 package for this project",
+      "id": "T19F-product",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "artefact_standard",
+      "description": "every mandatory standard artefact this project owns is evidenced",
+      "detail": "7 mandatory artefact package(s) open: std-togaf-architecture-artifact-instance-01a210bb-cfc9-72ec-85f5-619bf730fff9:T19F, std-togaf-architecture-artifact-instance-01a210bb-f6ea-7d99-b23f-4dc3dace459c:T19F, std-togaf-architecture-artifact-instance-01a210bc-1f7b-7703-bb2d-a0d8695d12bd:T19F, std-togaf-architecture-artifact-instance-01a210bc-465a-7d83-b9c6-7c7b089d8b02:T19F, std-togaf-architecture-artifact-instance-01a210bc-6b09-7785-ab85-5e72fc64997a:T19F, std-togaf-architecture-artifact-instance-01a210bc-92bd-71d7-964f-8d9761e78baa:T19F, std-togaf-architecture-artifact-instance-01a210bc-b7e1-7a83-b322-81d74e0a903a:T19F",
+      "id": "T19F-artefact-standard",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P1"
+    },
+    {
+      "check": "rework_resolution",
+      "description": "no unresolved P0/P1 rework package remains for the project",
+      "detail": "no unresolved P0/P1 package for this project",
+      "id": "T19F-rework",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "command": "python3 scripts/t19f-live-gate-check.py --check",
+      "description": "the live decision-forum gate passes on the record",
+      "detail": "exit 0",
+      "exit": 0,
+      "id": "T19F-live-gate",
+      "kind": "command",
+      "result": "pass",
+      "severity": "P0",
+      "stderr": "",
+      "stdout": "PASS the live project row is T19F\nPASS the v1-pinned meeting still resolves version 1 (got 1)\nPASS the pinned meeting names the forum type\nPASS the forum type carries v1 and v2 (got 2 row(s))\nPASS the v2 policy is an active version\nPASS the sitting's approval is a row\nPASS the sitting's approval is approved (got 'approved')\nPASS one per-seat decision row carries via.surface='meeting' (got 1)\nPASS the meeting decision row names the chair seat\nPASS the sitting item closed as decision (got 1)\nPASS the materialised meeting names the cadence's forum type\nPASS the materialised meeting carries the cadence slot\nPASS the materialised meeting is non-cancelled\nall T19F live-gate checks passed\n"
+    },
+    {
+      "check": null,
+      "description": "the declared gate is discharged by executable checks",
+      "detail": "the gate check 'T19F-artefact-standard' did not pass",
+      "id": "gate",
+      "kind": "manifest",
+      "result": "fail",
+      "severity": "P0"
+    }
+  ],
+  "failures": [
+    "T19F-artefact-standard (P1): 7 mandatory artefact package(s) open: std-togaf-architecture-artifact-instance-01a210bb-cfc9-72ec-85f5-619bf730fff9:T19F, std-togaf-architecture-artifact-instance-01a210bb-f6ea-7d99-b23f-4dc3dace459c:T19F, std-togaf-architecture-artifact-instance-01a210bc-1f7b-7703-bb2d-a0d8695d12bd:T19F, std-togaf-architecture-artifact-instance-01a210bc-465a-7d83-b9c6-7c7b089d8b02:T19F, std-togaf-architecture-artifact-instance-01a210bc-6b09-7785-ab85-5e72fc64997a:T19F, std-togaf-architecture-artifact-instance-01a210bc-92bd-71d7-964f-8d9761e78baa:T19F, std-togaf-architecture-artifact-instance-01a210bc-b7e1-7a83-b322-81d74e0a903a:T19F",
+    "gate (P0): the gate check 'T19F-artefact-standard' did not pass"
+  ],
+  "gate": "A policy change is authored through the tenant's authoring route and published as a new immutable meeting_type version while an in-flight meeting keeps its pinned version; a board subject decision is taken in a board sitting with one approval_decision row per qualifying seat carrying via='meeting'; a cadence row names its meeting type and materialises exactly one meeting; the direct architecture.board_decide path is unchanged; and the project's closure review defers closure to the tranche-6 review.",
+  "generated_at": "2026-11-28T07:34:27.421628+00:00",
+  "kind": "all",
+  "manifest": "acceptance/programme/T19F.toml",
+  "name": "Decision-forum governance (follow-on)",
+  "project": "T19F",
+  "schema": "project-acceptance/v1",
+  "snapshot": {
+    "generated_at": "2026-11-28T07:34:20.139919+00:00",
+    "git_sha": "24e4d7c035946561a4082b46c1420d344a664394",
+    "path": "retained-snapshot/24e4d7c035946561a4082b46c1420d344a664394"
+  },
+  "verdict": "red",
+  "warnings": []
+}
