@@ -77,11 +77,14 @@ snapshot body).
 
 ## 5. Blockers and traps at handoff
 
-- **The v4 binary must be deployed.** The deployed pod is `9e2ebbeac` (pre-v4): `documents.compose`
-  refuses the four v4 categories because the seed is compiled in. The main-push image for
-  `232c0339d` was still building at handoff (run 46134466640, image job). Check
-  `kubectl exec deploy/conveyor -- printenv CONVEYOR_GIT_SHA` before any live act; if it is
-  < `232c0339d`, wait for the rollout — do not work around it.
+- **The v4 binary must be deployed.** The v4 image IS pushed (`ghcr.io/nonagenticai/conveyor`
+  `latest` and `sha-232c033` both report `CONVEYOR_GIT_SHA=232c0339d`; re-pull before trusting a
+  local tag). At handoff the **deployed pod still reports `6918ceee6`** (pre-v4) and refuses the
+  v4 categories because the seed is compiled in. Check
+  `kubectl exec deploy/conveyor -c conveyor -- printenv CONVEYOR_GIT_SHA` before any live act;
+  if it is < `232c0339d`, wait for the Flux ImagePolicy roll (or reconcile it) — do not work
+  around it. Note main had already moved to `da5e9b6b4` (refresh) at handoff; whichever main sha
+  deploys must still be ≥ `232c0339d`.
 - The v4 image must be **pulled and used** to recreate `conv852-bin` before the delivery
   rehearsal (the container recipe is in the session log; `latest` must report a v4 sha).
 - `documents.compose`/`publish` need `--if-match` in several places; the scripts here handle it.
