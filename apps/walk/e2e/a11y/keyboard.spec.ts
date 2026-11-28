@@ -14,8 +14,11 @@ test("the skip link and the room sheet are a keyboard path with focus return", a
     /ecs|fallback/,
     { timeout: 20_000 },
   );
-  await page.getByRole("link", { name: "Skip to content" }).focus();
-  await page.keyboard.press("Enter");
+  // `press` resolves and focuses the live node at action time, like the room button below: the
+  // shell rebuilds the skip link and the map while the world settles, and a `focus()` followed by
+  // a global key press can address a node that has already been replaced (measured once in a
+  // 224-test run; the assertion is unchanged).
+  await page.getByRole("link", { name: "Skip to content" }).press("Enter");
   await expect(page.locator("#screen")).toBeFocused();
 
   const map = page.getByRole("navigation", { name: "Rooms" });
