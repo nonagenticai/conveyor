@@ -1,7 +1,7 @@
 # Tranche-8 readiness gate — measured 2026-11-28
 
-snapshot: `/tmp/snap-8` — 933 data files, 915 platform outputs, manifest sha256
-`f75183454d15fb5154ec1ad2f6c0c9ff7d60543e8bfe2305c5e95b5930a6b477`.
+snapshot: `/tmp/snap-8` — 933 data files, 915 platform outputs, taken at `6d486b179`, manifest
+sha256 `f75183454d15fb5154ec1ad2f6c0c9ff7d60543e8bfe2305c5e95b5930a6b477`.
 
 ## Content packs
 
