@@ -6,6 +6,48 @@
   },
   "issues": [
     {
+      "number": 930,
+      "title": "standards: evidence the required artefacts for tranches 0\u20133 (61 documents)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/930",
+      "updatedAt": "2026-11-28T10:43:06Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 928,
+      "title": "standards: the evidence ratchet and the required/optional scorecard",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/928",
+      "updatedAt": "2026-11-28T10:46:26Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
       "number": 925,
       "title": "bug: migration 0098 fails in production \u2014 a NOT VALID change_impact row is re-checked by the table-wide UPDATE, so no image can deploy",
       "state": "CLOSED",
