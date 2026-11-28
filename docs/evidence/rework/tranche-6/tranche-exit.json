@@ -1,0 +1,49 @@
+{
+ "schema": "tranche-exit/v1",
+ "tranche": 6,
+ "snapshot_sha": "cdd32ea2e951f937472c90ad513d4c4a42c75cff",
+ "members": [
+  {
+   "key": "S06a",
+   "status": "archived",
+   "receipt_sha": "cdd32ea2e951f937472c90ad513d4c4a42c75cff",
+   "verdict": "green",
+   "state": "green",
+   "reason": "5 checks"
+  },
+  {
+   "key": "S06b",
+   "status": "closed",
+   "receipt_sha": "cdd32ea2e951f937472c90ad513d4c4a42c75cff",
+   "verdict": "green",
+   "state": "green",
+   "reason": "18 checks"
+  },
+  {
+   "key": "S10",
+   "status": "closed",
+   "receipt_sha": "cdd32ea2e951f937472c90ad513d4c4a42c75cff",
+   "verdict": "green",
+   "state": "green",
+   "reason": "18 checks"
+  },
+  {
+   "key": "S11",
+   "status": "closed",
+   "receipt_sha": "cdd32ea2e951f937472c90ad513d4c4a42c75cff",
+   "verdict": "green",
+   "state": "green",
+   "reason": "18 checks"
+  },
+  {
+   "key": "T19F",
+   "status": "active",
+   "receipt_sha": "cdd32ea2e951f937472c90ad513d4c4a42c75cff",
+   "verdict": "green",
+   "state": "green",
+   "reason": "17 checks"
+  }
+ ],
+ "ready": true,
+ "blocking": []
+}

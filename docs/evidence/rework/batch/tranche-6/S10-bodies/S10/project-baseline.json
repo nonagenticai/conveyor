@@ -1,0 +1,115 @@
+{
+  "body_sha256": "cc01f4733c45d16e72545c62659d958369ad7b46a32ae3f760b1f776337bd281",
+  "category": "project-baseline",
+  "headings": [
+    {
+      "heading": "Scope",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-baseline",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/project_baselines"
+        },
+        {
+          "category": "project-baseline",
+          "count": 3,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/project_baselines"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Schedule",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-baseline",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/project_baselines"
+        },
+        {
+          "category": "project-baseline",
+          "count": 0,
+          "file": "",
+          "kind": "absence",
+          "pointer": ""
+        },
+        {
+          "category": "project-baseline",
+          "count": 3,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/project_baselines"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Cost",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-baseline",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/project_baselines"
+        },
+        {
+          "category": "project-baseline",
+          "count": 0,
+          "file": "",
+          "kind": "absence",
+          "pointer": ""
+        },
+        {
+          "category": "project-baseline",
+          "count": 3,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/project_baselines"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Approval",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-baseline",
+          "count": 3,
+          "file": "work.json",
+          "kind": "rows",
+          "pointer": "/approvals"
+        },
+        {
+          "category": "project-baseline",
+          "count": 3,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/project_baselines"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "867f2ff6871888a0419142381b8cf4e10506ee1da0017d3e5d6776613f6eb7db",
+  "spec": "\u00a78.4",
+  "standard": "PMP",
+  "subject": {
+    "id": "01a1d039-0d2d-787e-853e-fef542ec8815",
+    "key": "S10",
+    "kind": "project",
+    "title": "Copilot / AG-UI \u2014 one action surface, proposals, conversations"
+  },
+  "title": "Project Baseline \u2014 Copilot / AG-UI \u2014 one action surface, proposals, conversations"
+}

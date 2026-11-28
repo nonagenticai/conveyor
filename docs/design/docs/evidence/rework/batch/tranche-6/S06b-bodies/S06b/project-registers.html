@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Project Registers — Agent direct interface — the conveyor's own MCP surface · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/S06b-bodies/S06b/project-registers.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="project-registers--agent-direct-interface--the-conveyors-own-mcp-surface">Project Registers — Agent direct interface — the conveyor's own MCP surface</h1>
+<h2 id="risks">Risks</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The local proof runs the whole task over the real `/mcp` HTTP surface as a licence principal, but it does not run the `agent` app&#39;s own importer or a deployed conveyor. The plan records both as S14&#39;s gate. Until that run exists the end-to-end consumer contract is evidenced on the loopback path only, and no retrospective pack may claim more than the suite proves.&quot;,
+      &quot;code&quot;: &quot;S06b-R1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:26:18.652187+00:00&quot;,
+      &quot;id&quot;: &quot;01a2210c-3820-767a-8cdb-cf85ca69a217&quot;,
+      &quot;impact&quot;: 3,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S06b-agent-direct-interface.md#7&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the release manager (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;medium&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2a-7ea9-b809-929452f221fd&quot;,
+      &quot;response&quot;: &quot;Run the agent app against the deployed conveyor at S14, record the importer&#39;s tool keys and the task&#39;s project, approval and decision ids, and re-read this risk against that receipt.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-11&quot;,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The deployed agent-app task is S14&#39;s gate, so the consumer path is proven locally only&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:26:18.652187+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The fail-closed rule is deliberate: an unreachable licences service refuses with 503 licence_unavailable and admits no principal. The cost is availability, not confidentiality \u2014 a licences outage stops every agent call. The 60-second cache bounds the blast radius but does not remove it, and the cache is keyed by token hash so a revoked token cannot ride another tenant&#39;s entry.&quot;,
+      &quot;code&quot;: &quot;S06b-R2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:26:18.801087+00:00&quot;,
+      &quot;id&quot;: &quot;01a2210c-38b4-74c6-baa3-ded7ed00904f&quot;,
+      &quot;impact&quot;: 3,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S06b-agent-direct-interface.md#5&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the operations lead (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;low&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2a-7ea9-b809-929452f221fd&quot;,
+      &quot;response&quot;: &quot;Track the licences service&#39;s availability with the estate&#39;s external probe; if an outage is measured during a delivery window, record the incident and re-open the cache TTL decision rather than weakening the fail-closed rule.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-11&quot;,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Licence introspection is on the request path, so a licences outage refuses every machine call&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:26:18.801087+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="issues">Issues</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Closed in an unauthorised tranche before the tranche review; accepted by the delegate as a retrospective exception under the standing delegation. The project is reworked in its batch and re-closed through the gates.&quot;,
+      &quot;code&quot;: &quot;U3-EXC-S06b&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T01:17:29.429007+00:00&quot;,
+      &quot;id&quot;: &quot;01a1fbae-0aa8-7b68-b46e-fbc98b445bc2&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2a-7ea9-b809-929452f221fd&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;P0&quot;,
+      &quot;status&quot;: &quot;accepted&quot;,
+      &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (S06b)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T01:17:29.429007+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;At the 2026-11-27 snapshot the project row records measured_status built while plan_status is planned, and the snapshot carries no charter, statement of architecture work, delivery contract, Phase A\u2013D set or Phase-G review for S06b. The capability and its suites exist; the lifecycle record did not. This pack supplies the missing set retrospectively and records the deferred live step explicitly.&quot;,
+      &quot;code&quot;: &quot;S06b-I1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:26:18.948033+00:00&quot;,
+      &quot;id&quot;: &quot;01a2210c-3947-75b1-b3ea-3837624599cc&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2a-7ea9-b809-929452f221fd&quot;,
+      &quot;response&quot;: &quot;This pack is the repair: the lifecycle set, the receipt and the Phase-G review are authored and verified at the pinned snapshot; the deferred agent-app run stays S14&#39;s gate.&quot;,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The record claimed built but carried no charter, baseline, contract or Phase-G review&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:26:18.948033+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The plan&#39;s property (b) \u2014 the agent&#39;s `mcp-import` yields `projects.create`-style keys rather than `tool.*` \u2014 is exercised on the conveyor side by the tool key and the parity suite, but the agent&#39;s importer runs in the agent repository. The S06b evidence file records this as S14 \u00a77&#39;s check, and the retrospective pack keeps it open rather than claiming the consumer.&quot;,
+      &quot;code&quot;: &quot;S06b-I2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:26:19.093323+00:00&quot;,
+      &quot;id&quot;: &quot;01a2210c-39d8-71c3-943a-e501fdf25e32&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2a-7ea9-b809-929452f221fd&quot;,
+      &quot;response&quot;: &quot;At S14, capture the importer&#39;s output for this conveyor&#39;s tool list and attach it to the cutover evidence; close this issue row against that capture.&quot;,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;low&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The agent app&#39;s own importer is not executed in this repository&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:26:19.093323+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="assumptions">Assumptions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The delivery contract judges acceptance against the record at the pinned rework snapshot; the content checker refuses any id that appears nowhere in it. Every judgement in this pack is read from that snapshot, so if it is incomplete or stale for S06b the pack&#39;s facts and any re-close move with it.&quot;,
+      &quot;code&quot;: &quot;S06b-A1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:26:19.23849+00:00&quot;,
+      &quot;id&quot;: &quot;01a2210c-3a6a-7a1c-bd8e-b2c229c8e625&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2a-7ea9-b809-929452f221fd&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;held&quot;,
+      &quot;title&quot;: &quot;The 2026-11-27 rework snapshot is the authoritative record for S06b&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:26:19.23849+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The machine authenticator calls the licences service for a non-JWT bearer and trusts its verdict for at most 60 seconds. The assumption is that the deployed service answers the introspection contract the S02 delivery settled; if it does not, every agent call refuses and the failure is loud rather than silent.&quot;,
+      &quot;code&quot;: &quot;S06b-A2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:26:19.392795+00:00&quot;,
+      &quot;id&quot;: &quot;01a2210c-3b07-7392-ab3f-3fd92fbd6785&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2a-7ea9-b809-929452f221fd&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;held&quot;,
+      &quot;title&quot;: &quot;The licences service&#39;s introspection endpoint behaves as the S02 contract declares&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:26:19.392795+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;S06d made the MCP channel&#39;s tool list a tenant policy whose compiled default is MCP_DEFAULT_ACTIONS, and the machine floor still refuses eval sign-off, held-out reads and administrative actions. The assumption is that no stored grant has widened the list beyond the floor; the suite asserts the agent&#39;s view and the floor&#39;s refusals.&quot;,
+      &quot;code&quot;: &quot;S06b-A3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:26:19.579155+00:00&quot;,
+      &quot;id&quot;: &quot;01a2210c-3bbd-7e33-95c0-f90feacc3e91&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2a-7ea9-b809-929452f221fd&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;held&quot;,
+      &quot;title&quot;: &quot;The agent principal&#39;s tool list is the compiled MCP_DEFAULT_ACTIONS&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:26:19.579155+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="dependencies">Dependencies</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The project row records depends_on needs S04, needs S05 and needs S06. S04 supplies the action registry and the `/mcp` transport, S05 the project and card actions, and S06 the approval state machine, the events and the SSE the agent reads instead of building a second surface. All three are green at the same snapshot.&quot;,
+      &quot;code&quot;: &quot;S06b-D1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:26:19.726057+00:00&quot;,
+      &quot;id&quot;: &quot;01a2210c-3c50-7c58-8d40-16dbbf8ae204&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2a-7ea9-b809-929452f221fd&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;met&quot;,
+      &quot;title&quot;: &quot;S06b depends on S04, S05 and S06&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:26:19.726057+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;S10&#39;s copilot is a projection of the same registry S06b exposes over `/mcp`, and S14&#39;s cutover runs the agent app&#39;s task against the deployed conveyor. Neither can be evidenced before the agent principal and the approval-request action exist, so both dependencies are carried as blocks rather than related work.&quot;,
+      &quot;code&quot;: &quot;S06b-D2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:26:19.915827+00:00&quot;,
+      &quot;id&quot;: &quot;01a2210c-3d0e-7cfd-8ac0-40ff281ed56d&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2a-7ea9-b809-929452f221fd&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;S06b blocks S10&#39;s copilot surface and S14&#39;s deployed task&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:26:19.915827+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="benefits">Benefits</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;D19 makes the conveyor&#39;s own `/mcp` the agent interface, so the estate carries one wire, one principal model and one action registry instead of an HMAC channel with its own grammar and shared secret. The benefit is declared in the charter and carried by the parity suite and the retired-S06a decision; it is a structural reduction, not a measured saving.&quot;,
+      &quot;code&quot;: &quot;S06b-B1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:26:20.059721+00:00&quot;,
+      &quot;id&quot;: &quot;01a2210c-3d9e-79ea-81e8-2d0e0b9aafae&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2a-7ea9-b809-929452f221fd&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;One agent interface replaces a second signed channel&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:26:20.059721+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The three actor_kind sites read the principal, so an agent&#39;s approval decision records decided_by_kind=&#39;agent&#39; with via naming the licence principal. The benefit is an audit property: the decision can be traced to a machine identity without reading the transport logs, and the mcp_agent suite asserts the field.&quot;,
+      &quot;code&quot;: &quot;S06b-B2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:26:20.202128+00:00&quot;,
+      &quot;id&quot;: &quot;01a2210c-3e2d-76b8-9ccd-5081c751e6ce&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2a-7ea9-b809-929452f221fd&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Machine decisions become attributable&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:26:20.202128+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;approvals.request uses insert_approval_tx and accepts a NULL run_id, so an agent can raise a decision while no run is open and the approval stays decidable. The benefit is that the escalation path exists outside the run lifecycle, which the plan&#39;s property (f) records and the suite proves.&quot;,
+      &quot;code&quot;: &quot;S06b-B3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:26:20.34688+00:00&quot;,
+      &quot;id&quot;: &quot;01a2210c-3ebe-74e0-bfa8-e40dc93bc355&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2a-7ea9-b809-929452f221fd&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Escalation no longer needs a running run&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:26:20.34688+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="changes">Changes</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: &quot;01a2210c-3f5e-7916-ad59-706b10c177ef&quot;,
+      &quot;body&quot;: &quot;The retrospective MSP/TOGAF/SAFe rework changed this project&#39;s record: its artefacts were re-versioned with documents and links, its register was written, and its schedule and cost baselines were taken. This change records that rework against the frozen scope baseline.&quot;,
+      &quot;code&quot;: &quot;CH-S06b-871458&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:26:33.527213+00:00&quot;,
+      &quot;id&quot;: &quot;01a2210c-723d-7d93-a47b-c58477871458&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;change&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {
+        &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+        &quot;impact&quot;: {
+          &quot;scope&quot;: &quot;the retrospective rework&#39;s record acts&quot;
+        }
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2a-7ea9-b809-929452f221fd&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;approved&quot;,
+      &quot;title&quot;: &quot;The retrospective rework of S06b&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:26:33.915507+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-6/S06b-bodies/S06b/project-registers.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

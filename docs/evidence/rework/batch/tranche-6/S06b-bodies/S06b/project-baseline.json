@@ -1,0 +1,115 @@
+{
+  "body_sha256": "63490f182be494f9ec057bca3fd585f8a61440e900173d81b7b21d59dd022e86",
+  "category": "project-baseline",
+  "headings": [
+    {
+      "heading": "Scope",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-baseline",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/project_baselines"
+        },
+        {
+          "category": "project-baseline",
+          "count": 3,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/project_baselines"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Schedule",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-baseline",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/project_baselines"
+        },
+        {
+          "category": "project-baseline",
+          "count": 0,
+          "file": "",
+          "kind": "absence",
+          "pointer": ""
+        },
+        {
+          "category": "project-baseline",
+          "count": 3,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/project_baselines"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Cost",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-baseline",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/project_baselines"
+        },
+        {
+          "category": "project-baseline",
+          "count": 0,
+          "file": "",
+          "kind": "absence",
+          "pointer": ""
+        },
+        {
+          "category": "project-baseline",
+          "count": 3,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/project_baselines"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Approval",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-baseline",
+          "count": 3,
+          "file": "work.json",
+          "kind": "rows",
+          "pointer": "/approvals"
+        },
+        {
+          "category": "project-baseline",
+          "count": 3,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/project_baselines"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "867f2ff6871888a0419142381b8cf4e10506ee1da0017d3e5d6776613f6eb7db",
+  "spec": "\u00a78.4",
+  "standard": "PMP",
+  "subject": {
+    "id": "01a1d039-0d2a-7ea9-b809-929452f221fd",
+    "key": "S06b",
+    "kind": "project",
+    "title": "Agent direct interface \u2014 the conveyor's own MCP surface"
+  },
+  "title": "Project Baseline \u2014 Agent direct interface \u2014 the conveyor's own MCP surface"
+}

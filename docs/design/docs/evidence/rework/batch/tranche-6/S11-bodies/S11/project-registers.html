@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Project Registers — Processes, steps and SOPs — executable documentation · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/S11-bodies/S11/project-registers.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="project-registers--processes-steps-and-sops--executable-documentation">Project Registers — Processes, steps and SOPs — executable documentation</h1>
+<h2 id="risks">Risks</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The executor proofs run in the integration harness against Postgres, with the API and worker driven in-process; the plan&#39;s \u00a77 block starts a real server and worker under CONVEYOR_DEV_AUTH=1 and drives them with curl as dev:alice and dev:reviewer. The harness exercises the same execute_step path, but it is not the \u00a77 rehearsal, and no run id from a two-process server session is recorded at this snapshot.&quot;,
+      &quot;code&quot;: &quot;S11-R1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:30:40.183769+00:00&quot;,
+      &quot;id&quot;: &quot;01a22110-35ba-7c8d-ae6b-b4d5efff3f21&quot;,
+      &quot;impact&quot;: 3,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S11-procedures.md#7&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the release manager (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;medium&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-7ec6-aef0-4096ea66e7a4&quot;,
+      &quot;response&quot;: &quot;Run the \u00a77 block against dev-a at the tranche-6 review, retain the run id and the three succeeded run_step rows, and re-read this risk against that capture.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-11&quot;,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The plan&#39;s \u00a77 two-process gate is the live acceptance and is not executed by this pack&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:30:40.183769+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The plan records George&#39;s 2026-11-09 deferral: S11 closes with zero seeded procedures, and build step 11 expects a tenant-scoped count of 0 published rows. A tenant must author and publish a process and an SOP before process_runs.start can succeed on a card. The default 280-flow catalogue is vocabulary data plus a follow-up derivation, not delivered state.&quot;,
+      &quot;code&quot;: &quot;S11-R2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:30:40.325091+00:00&quot;,
+      &quot;id&quot;: &quot;01a22110-3648-7562-99ca-bcd43f99f380&quot;,
+      &quot;impact&quot;: 3,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S11-procedures.md#5.6&quot;,
+          &quot;docs/plans/slices/S11-procedures.md#6&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;high&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-7ec6-aef0-4096ea66e7a4&quot;,
+      &quot;response&quot;: &quot;Derive one process per S0-evidenced cap.* flow from parity/evidence/executions.tsv plus a read-only census of the n8n workflow_entity nodes, record the census in parity/evidence/cap-flow-census.tsv, import seed/procedures.json through migrate --seed, and seed no zero-evidence flow.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-11&quot;,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The procedure seed is zero by decision, so no default process or SOP exists&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:30:40.325091+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Migration 0021 adds capability_id and capability_agent_id to run without foreign keys, and process_runs.start calls one resolve_start_context plus ensure_start_ready pair before writing anything. Today the resolver returns StartContext::Unresolved because no capability schema exists, so readiness and allowed_actions are not enforced at start; the enum makes the skip explicit rather than silent.&quot;,
+      &quot;code&quot;: &quot;S11-R3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:30:40.469182+00:00&quot;,
+      &quot;id&quot;: &quot;01a22110-36d8-7bf2-affb-6d5c2fabc200&quot;,
+      &quot;impact&quot;: 3,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S11-procedures.md#8&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;medium&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-7ec6-aef0-4096ea66e7a4&quot;,
+      &quot;response&quot;: &quot;S15 fills the Resolved body (readiness, 409 capability_not_ready with blocking[], allowed_actions passed into the invocation) and must not add a second start path; re-read this risk when S15 closes.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-11&quot;,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The executor-scoping seam is unresolved until S15&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:30:40.469182+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="issues">Issues</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 4,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Closed in an unauthorised tranche before the tranche review; accepted by the delegate as a retrospective exception under the standing delegation. The project is reworked in its batch and re-closed through the gates.&quot;,
+      &quot;code&quot;: &quot;U3-EXC-S11&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T01:17:45.768577+00:00&quot;,
+      &quot;id&quot;: &quot;01a1fbae-4a7e-71d1-991e-7828e73163cb&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-7ec6-aef0-4096ea66e7a4&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;P0&quot;,
+      &quot;status&quot;: &quot;accepted&quot;,
+      &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (S11)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T01:17:45.768577+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;At the 2026-11-27 snapshot the project row is closed with meta.measured_status built and plan_status built, while the receipt docs/evidence/rework/S11.json is red on 14 of its 19 checks: baseline, charter, closure outputs, contract, review, closure gate, PI cadence, PI plan, PI objectives, WSJF, demo credits, lessons, artefact standard and rework. Only project, waivers and product pass. The rework packages are project_in_unauthorised_tranche, closed_without_closure_review, closure_outputs_undeclared, unpublished_declared_output and mandatory_artefacts. The capability and its suites exist; the lifecycle record did not.&quot;,
+      &quot;code&quot;: &quot;S11-I1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:30:40.613629+00:00&quot;,
+      &quot;id&quot;: &quot;01a22110-3768-7793-9c2f-191d2fd88a95&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-7ec6-aef0-4096ea66e7a4&quot;,
+      &quot;response&quot;: &quot;This pack is the repair: it supplies the charter, the seven artefacts, five registers, the contract, the WBS, the Phase-G review, both declared outputs and the closure review; the factory re-runs the 17-check manifest in acceptance/programme/S11.toml after publishing.&quot;,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;high&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The project was closed with no lifecycle set and its receipt is red&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:30:40.613629+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The plan&#39;s \u00a77 negative expectation names 422 procedure.template_unresolved and 422 procedure.action_unknown, while the tree&#39;s refusal codes are process.template_unresolved and process.action_unknown. The plan&#39;s frontmatter also names migration 0033 for the process/step/SOP split, but 0033 is the D23 eval caller and the rename lands in migrations/0035_process_tree.sql. Both are documentation drift, not runtime defects; the suites assert the tree&#39;s behaviour.&quot;,
+      &quot;code&quot;: &quot;S11-I2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:30:40.756507+00:00&quot;,
+      &quot;id&quot;: &quot;01a22110-37f7-759e-8a42-4da978f8648e&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-7ec6-aef0-4096ea66e7a4&quot;,
+      &quot;response&quot;: &quot;Amend the plan&#39;s \u00a77 code names and its migration reference to match the tree; do not change running code to match a document.&quot;,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;low&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Plan and tree disagree on two names a reader would run&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:30:40.756507+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The 2026-11-25 receipt carried a P0 package project_in_unauthorised_tranche:S11 because tranche 6 was authorised only by the tranche-5 review on 2026-11-27. The programme record now carries tranche 6 authorised, and this project is one of its members; the package is expected to clear on the pinned post-authorisation snapshot, and this pack&#39;s receipt on that snapshot is the proof, not the older register&#39;s text.&quot;,
+      &quot;code&quot;: &quot;S11-I3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:30:40.894959+00:00&quot;,
+      &quot;id&quot;: &quot;01a22110-3881-7d27-9b58-11fda9beb116&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-7ec6-aef0-4096ea66e7a4&quot;,
+      &quot;response&quot;: &quot;Read the fresh receipt&#39;s rework_resolution check on the pinned snapshot; if the P0 package still appears there, the snapshot predates the authorisation and the receipt must be rebuilt.&quot;,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The pre-rework receipt carried a P0 unauthorised-tranche package from the pre-authorisation snapshot&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:30:40.894959+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="assumptions">Assumptions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 4,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The delivery contract judges acceptance against the record at the pinned rework snapshot; the content checker refuses any id that appears nowhere in it. Every judgement in this pack is read from that snapshot, so if it is incomplete or stale for S11 the pack&#39;s facts and any re-close move with it.&quot;,
+      &quot;code&quot;: &quot;S11-A1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:30:41.039091+00:00&quot;,
+      &quot;id&quot;: &quot;01a22110-3911-7d65-8d79-cd5b88269c8e&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-7ec6-aef0-4096ea66e7a4&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;held&quot;,
+      &quot;title&quot;: &quot;The 2026-11-27 rework snapshot is the authoritative record for S11&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:30:41.039091+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;A gated step parks as an S06 approval with kind=&#39;procedure&#39;, gate=gate_kind, meta carrying position, attempt and procedure_step_id, quorum from the gate catalogue and expires_at when present; approval resumes the step and rejection or expiry applies on_result. The assumption is that no second gate mechanism is introduced in the executor; the gate suite proves the park, the approve, the reject paths and the expiry path.&quot;,
+      &quot;code&quot;: &quot;S11-A2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:30:41.181373+00:00&quot;,
+      &quot;id&quot;: &quot;01a22110-39a0-736e-8cce-7bd666941127&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-7ec6-aef0-4096ea66e7a4&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;held&quot;,
+      &quot;title&quot;: &quot;The S06 approval state machine is the only gate machine for a process step&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:30:41.181373+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;process_runs.complete_step was dropped on 2026-11-09 because an external mark-complete would set a result without executing it; the executor claims a queued step with a status-guarded update and a terminal replay is a no-op. The assumption is that no consumer introduces a hand-write path; the suites assert that a terminal replay is a no-op and that a run cannot be finished by hand.&quot;,
+      &quot;code&quot;: &quot;S11-A3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:30:41.323092+00:00&quot;,
+      &quot;id&quot;: &quot;01a22110-3a2e-7157-a617-06e8947f525c&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-7ec6-aef0-4096ea66e7a4&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;held&quot;,
+      &quot;title&quot;: &quot;A run step is only ever written by the executor&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:30:41.323092+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;A run starts only from a published process row, and a published step is immutable; an edit forks v+1 and publish re-reads nothing at step time because the resolver reads the run&#39;s frozen materialisation. The assumption is that no seed, migration or operator path writes a published process outside the action&#39;s publish transaction; the start suite refuses a draft and the store&#39;s partial unique indexes hold the one-published rule.&quot;,
+      &quot;code&quot;: &quot;S11-A4&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:30:41.468358+00:00&quot;,
+      &quot;id&quot;: &quot;01a22110-3abf-7283-9ca3-ff135d816650&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-7ec6-aef0-4096ea66e7a4&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;held&quot;,
+      &quot;title&quot;: &quot;Publish is the only path that creates an executable version&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:30:41.468358+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="dependencies">Dependencies</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The project row records depends_on needs S03, needs S04, needs S06 and needs S07. S03 supplies run, approval, card_type, catalogue_entry and revision plus run::transition; S04 the action registry and JSON-Schema validation; S06 runs.*, approvals.decide|list, the job runner and SSE run:{id}; S07 owns migrate --seed and the card_type and gate catalogue the publish check reads. All four are green at the same snapshot.&quot;,
+      &quot;code&quot;: &quot;S11-D1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:30:41.611615+00:00&quot;,
+      &quot;id&quot;: &quot;01a22110-3b4e-7dd4-abfb-66a87c482885&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-7ec6-aef0-4096ea66e7a4&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;met&quot;,
+      &quot;title&quot;: &quot;S11 depends on S03, S04, S06 and S07&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:30:41.611615+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;S12 consumes the declared processes, procedures (SOP), process_step and run_step read models and SSE run:{id}; S13 owns sub-processes, the run tree, the judge and the bus, and the plan caps call depth at 3 until those exist. Neither can be evidenced before the process actions and the executor exist, so both are carried as blocks rather than related work.&quot;,
+      &quot;code&quot;: &quot;S11-D2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:30:41.752093+00:00&quot;,
+      &quot;id&quot;: &quot;01a22110-3bdb-7198-a7ca-19d09777e857&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-7ec6-aef0-4096ea66e7a4&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;S11 blocks S12&#39;s read models and S13&#39;s sub-process engine&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:30:41.752093+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Migration 0021 adds the run capability columns and process_runs.start calls one resolve_start_context plus ensure_start_ready pair; S15 must fill the Resolved arm without adding a second start path. Decision 6 records that S16&#39;s prompt audit changes the built procedures.publish by adding an optional acknowledge_findings member and a 422 refusal, with the override written to the publish audit_event. Both are seams into built actions and are recorded as open because neither is evidenced in this pack.&quot;,
+      &quot;code&quot;: &quot;S11-D3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:30:41.893116+00:00&quot;,
+      &quot;id&quot;: &quot;01a22110-3c68-73e1-abd5-98f3e36c6428&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-7ec6-aef0-4096ea66e7a4&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;S15 fills the executor-scoping arm and S16 changes the built publish action&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:30:41.893116+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="benefits">Benefits</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 4,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The plan&#39;s starting premise is that the per-type flows are not 280 programs: matrix legality is catalogue data, card types and gates are catalogue rows, and the executable part is a process of registry-action steps. The benefit is a structural reduction in code and configuration; it is declared, not measured, and the seed that would prove the default catalogue is deferred.&quot;,
+      &quot;code&quot;: &quot;S11-B1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:30:42.038476+00:00&quot;,
+      &quot;id&quot;: &quot;01a22110-3cf9-7658-a985-9c3e7472add6&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-7ec6-aef0-4096ea66e7a4&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The 280 card-type by list flows become vocabulary data plus a few processes&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:30:42.038476+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;A run keeps one run_step per position and attempt, with the resolved input persisted at claim and the output recorded after the call; a retry appends rather than overwrites. The benefit is an audit property: the run&#39;s history is read from the database, not reconstructed from logs, and process_trace and process_run_output read the same rows.&quot;,
+      &quot;code&quot;: &quot;S11-B2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:30:42.183192+00:00&quot;,
+      &quot;id&quot;: &quot;01a22110-3d8a-743b-9028-eb9934e06816&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-7ec6-aef0-4096ea66e7a4&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Every attempt is an immutable, inspectable row&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:30:42.183192+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The SOP carries definition of ready, definition of done, acceptance criteria, inspection and declared outputs, and its inspection is validated at creation; a step names the published SOP it is judged against. The benefit is that the standard travels with the process and can be inspected by a checker, a laya judgement or an eval rather than living in a document nobody executes.&quot;,
+      &quot;code&quot;: &quot;S11-B3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:30:42.324794+00:00&quot;,
+      &quot;id&quot;: &quot;01a22110-3e17-7c8e-8f59-2d323c7a5455&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-7ec6-aef0-4096ea66e7a4&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;A step is judged against a published SOP, not prose&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:30:42.324794+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;A process is a version family per tenant with draft, published and retired states; a second draft is refused with 409 process.draft_exists and a re-publish returns the same version. The benefit is that a tenant can change how its cards move through work without a code release, while publish remains the single validation gate.&quot;,
+      &quot;code&quot;: &quot;S11-B4&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:30:42.467426+00:00&quot;,
+      &quot;id&quot;: &quot;01a22110-3ea6-76f3-921f-a2de4d14e743&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-7ec6-aef0-4096ea66e7a4&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;A tenant authors its own process without a deploy&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:30:42.467426+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="changes">Changes</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: &quot;01a22110-3f41-731b-9f29-5e8f5908f0d6&quot;,
+      &quot;body&quot;: &quot;The retrospective MSP/TOGAF/SAFe rework changed this project&#39;s record: its artefacts were re-versioned with documents and links, its register was written, and its schedule and cost baselines were taken. This change records that rework against the frozen scope baseline.&quot;,
+      &quot;code&quot;: &quot;CH-S11-055179&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T07:30:55.434034+00:00&quot;,
+      &quot;id&quot;: &quot;01a22110-7150-70df-8542-b7e849055179&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;change&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {
+        &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+        &quot;impact&quot;: {
+          &quot;scope&quot;: &quot;the retrospective rework&#39;s record acts&quot;
+        }
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-7ec6-aef0-4096ea66e7a4&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;approved&quot;,
+      &quot;title&quot;: &quot;The retrospective rework of S11&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:30:55.815549+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-6/S11-bodies/S11/project-registers.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

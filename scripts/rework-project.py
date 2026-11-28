@@ -608,10 +608,46 @@ class Runner:
             str(row.get("id")): len(row.get("entries") or [])
             for row in (self.snapshot_json("architecture.json").get("artifacts") or [])
         }
+        def has_instance_document(row: dict) -> bool:
+            # The standard's artefact-instance rule resolves the `Document` section from a
+            # document of category `architecture-artifact-instance`. A v1 row's document has no
+            # category at all, so reusing it by id leaves the section unresolved and the package
+            # open while the row exists (measured on S00, 2026-11-26: the package stayed open
+            # after the artefacts were bound).
+            document = snapshot_documents.get(str(row.get("id"))) or row.get("document_id")
+            item = (
+                next(
+                    (doc for doc in self._published_outputs() if str(doc.get("id")) == str(document)),
+                    None,
+                )
+                if document
+                else None
+            )
+            return item is not None and str(item.get("category") or "") == (
+                "architecture-artifact-instance"
+            )
+
         for index, artefact in enumerate(self.content["artifacts"]):
             key = artefact_keys[index]
-            if artefact["title"] in titles:
-                row = titles[artefact["title"]]
+            row = titles.get(artefact["title"])
+            if row is None:
+                # A pre-rework row of the standard type is the row the standard counts: T19F's
+                # live gate created its seven artefacts under its own titles, so a title-only
+                # match authored a second artefact per type and left the original's instance
+                # package open. Repair the row of the standard type instead of duplicating it,
+                # preferring one the standard still reports as undocumented.
+                type_id = str(standard.get(key) or "")
+                candidates = [
+                    candidate
+                    for candidate in existing
+                    if str(candidate.get("artifact_type_id") or "") == type_id
+                    and candidate.get("status") not in ("superseded", "archived")
+                ]
+                row = next(
+                    (candidate for candidate in candidates if not has_instance_document(candidate)),
+                    candidates[0] if candidates else None,
+                )
+            if row is not None:
                 meta = dict(row.get("meta") or {})
                 document_id = snapshot_documents.get(str(row.get("id"))) or row.get("document_id")
                 # The standard's artefact-instance rule resolves the `Document` section from a
@@ -730,23 +766,141 @@ class Runner:
         self.ensure_artefact_links(artefact_ids)
         self.ensure_documents()
 
-        # 6. the delivery contract
-        contract = next(
-            (c for c in contracts
-             if c.get("kind") == "delivery_contract" and c.get("status") in ("live", "draft")),
-            None,
-        )
-        if contract is None:
-            for candidate in self._read(
-                "architecture.contracts_list", {"project_id": self.project_id}
-            ).get("items", []):
-                if candidate.get("kind") == "delivery_contract" and candidate.get("status") in (
-                    "live",
-                    "draft",
+        # 5b. every live row of a required standard type carries an instance document, not only
+        # the row this pack names: T19F's live gate created its seven artefacts under its own
+        # titles, so a title match documented the pack's row and left the original's package open.
+        # Repair each undocumented row with the pack's content for its type.
+        repaired: dict[str, str] = {}
+        for index, artefact in enumerate(self.content["artifacts"]):
+            key = artefact_keys[index]
+            type_id = str(standard.get(key) or "")
+            for row in existing:
+                if (
+                    str(row.get("artifact_type_id") or "") != type_id
+                    or row.get("status") in ("superseded", "archived")
+                    or has_instance_document(row)
                 ):
-                    contract = candidate
-                    break
-        if contract is None:
+                    continue
+                content = dict(artefact, title=str(row.get("title") or artefact["title"]))
+                document_id = self.publish_artefact_document(content)
+                draft = self.invoke(
+                    "architecture.artifacts_supersede",
+                    {"id": row["id"]},
+                    read_action="architecture.artifacts_get",
+                    read_id_from_output="id",
+                    if_match=row.get("version", 1),
+                )
+                meta = dict(draft.get("meta") or {})
+                meta.update(
+                    {
+                        "retrospective": True,
+                        "delegation_ref": self.delegation,
+                        "artifact_key": key,
+                    }
+                )
+                draft = self.invoke(
+                    "architecture.artifacts_update",
+                    {
+                        "id": draft["id"],
+                        "artifact_type_id": type_id,
+                        "meta": meta,
+                        "document_id": document_id,
+                        "entries": artefact.get("entries") or [],
+                    },
+                    read_action="architecture.artifacts_get",
+                    read_input={"id": draft["id"]},
+                    if_match=draft.get("version", 1),
+                )
+                self.invoke(
+                    "architecture.artifacts_approve",
+                    {"id": draft["id"]},
+                    actor=APPROVER,
+                    if_match=draft.get("version", 1),
+                )
+                repaired[str(row["id"])] = str(draft["id"])
+                print(f"  artefact: documented the pre-rework row {row.get('title')}")
+        # A supersede copies neither entries nor links. The instance's Links section is resolved
+        # from the links incident to the row, so a repaired row with no links stays partial
+        # (measured on T19F: seven documented drafts, all partial on an empty Links section).
+        # Carry every link incident to a repaired row onto its successor; a resumed run finds the
+        # successor by the type and title the supersede copied.
+        for row in existing:
+            if row.get("status") != "superseded" or str(row.get("id")) in repaired:
+                continue
+            successor = next(
+                (
+                    candidate
+                    for candidate in existing
+                    if candidate is not row
+                    and candidate.get("status") not in ("superseded", "archived")
+                    and str(candidate.get("artifact_type_id") or "")
+                    == str(row.get("artifact_type_id") or "")
+                    and str(candidate.get("title") or "") == str(row.get("title") or "")
+                ),
+                None,
+            )
+            if successor is not None:
+                repaired[str(row["id"])] = str(successor["id"])
+        if repaired:
+            links = self.snapshot_json("architecture.json").get("links") or []
+            edges = {
+                (str(link.get("from_artifact_id")), str(link.get("to_artifact_id")))
+                for link in links
+            }
+            for link in links:
+                source = repaired.get(str(link.get("from_artifact_id")))
+                target = repaired.get(str(link.get("to_artifact_id")))
+                if source is None and target is None:
+                    continue
+                source = source or str(link.get("from_artifact_id"))
+                target = target or str(link.get("to_artifact_id"))
+                if (source, target) in edges:
+                    continue
+                self.invoke(
+                    "architecture.artifacts_link",
+                    {
+                        "from_artifact_id": source,
+                        "to_artifact_id": target,
+                        "kind": str(link.get("kind") or "derivation"),
+                    },
+                    read_action="architecture.artifacts_links",
+                    read_input={"id": source},
+                    read_match=[f"to_artifact_id={target}"],
+                )
+                edges.add((source, target))
+                print("  artefact: carried the superseded row's links onto the repair")
+
+        # 6. the delivery contract
+        delivery = [
+            c for c in contracts
+            if c.get("kind") == "delivery_contract" and c.get("status") in ("live", "draft")
+        ]
+        if not delivery:
+            delivery = [
+                candidate for candidate in self._read(
+                    "architecture.contracts_list", {"project_id": self.project_id}
+                ).get("items", [])
+                if candidate.get("kind") == "delivery_contract"
+                and candidate.get("status") in ("live", "draft")
+            ]
+        live = next((c for c in delivery if c.get("status") == "live"), None)
+        draft = next((c for c in delivery if c.get("status") == "draft"), None)
+        pack_body = self.content["delivery_contract"]["body"] or {}
+
+        def supersede_live() -> None:
+            # The store refuses to approve a draft while a live sibling of the same
+            # (project, kind, phase) exists, and an approved row is never edited: the replacement
+            # is a superseding revision (measured on T19F, whose live gate left a live delivery
+            # contract the factory's first pass could not revise).
+            self.invoke(
+                "architecture.contracts_supersede",
+                {"id": live["id"]},
+                if_match=live.get("version", 1),
+                read_action="architecture.contracts_get",
+                read_input={"id": live["id"]},
+            )
+
+        if live is None and draft is None:
             requested = self.invoke(
                 "architecture.contracts_request",
                 {
@@ -754,7 +908,7 @@ class Runner:
                     "kind": "delivery_contract",
                     "phase_code": "f",
                     "title": self.content["delivery_contract"]["title"],
-                    "body": self.content["delivery_contract"]["body"],
+                    "body": pack_body,
                 },
                 read_action="architecture.contracts_get",
                 read_id_from_output="id",
@@ -762,20 +916,29 @@ class Runner:
             contract = self.approve_contract(
                 requested["id"], "approve the delivery contract", version=1
             )
-        elif contract.get("status") == "draft":
+        elif live is not None and draft is not None:
+            # A refused first pass left its revision pending: supersede the live row and approve
+            # the draft it already created rather than authoring a second one.
+            supersede_live()
             contract = self.approve_contract(
-                contract["id"], "approve the delivery contract",
-                version=contract.get("version", 1),
+                draft["id"], "approve the delivery contract revision",
+                version=draft.get("version", 1),
+            )
+            print("  delivery contract: approved the pending revision over the superseded row")
+        elif draft is not None:
+            contract = self.approve_contract(
+                draft["id"], "approve the delivery contract",
+                version=draft.get("version", 1),
             )
         else:
             # A live contract whose body lacks a field the standard's page reads is repaired by
             # a superseding revision, never by editing an approved row: the packs author
             # commitments/compliance/approval, and the record's contract must carry them for the
             # page's sections to resolve (measured 2026-11-25: every member's Commitments empty).
-            pack_body = self.content["delivery_contract"]["body"] or {}
-            live_body = contract.get("body") or {}
+            live_body = live.get("body") or {}
             missing = [name for name in pack_body if name not in live_body]
             if missing:
+                supersede_live()
                 requested = self.invoke(
                     "architecture.contracts_request",
                     {
@@ -784,7 +947,7 @@ class Runner:
                         "phase_code": "f",
                         "title": self.content["delivery_contract"]["title"],
                         "body": pack_body,
-                        "supersedes_id": contract["id"],
+                        "supersedes_id": live["id"],
                     },
                     read_action="architecture.contracts_get",
                     read_id_from_output="id",
@@ -796,6 +959,7 @@ class Runner:
                 )
                 print("  delivery contract: revised to carry the authored body")
             else:
+                contract = live
                 print("  delivery contract: already live")
 
         # 6b. the six-section project register, before the baseline freezes it (§8.4)

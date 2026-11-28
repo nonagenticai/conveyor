@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Delivery Contract — Copilot / AG-UI — one action surface, proposals, conversations · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/S10-bodies/S10/delivery-contract.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="delivery-contract--copilot--ag-ui--one-action-surface-proposals-conversations">Delivery Contract — Copilot / AG-UI — one action surface, proposals, conversations</h1>
+<h2 id="commitments">Commitments</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;delivery-contract&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;contract_id&quot;: &quot;01a2210f-1047-7899-bd0d-9eb6926acb0b&quot;,
+      &quot;field&quot;: &quot;commitments&quot;,
+      &quot;kind&quot;: &quot;contract_field&quot;,
+      &quot;title&quot;: &quot;commitments: S10 delivers the copilot&#39;s one action surface: `/api/copilot/actions` and `/mcp` `tools/list` are projections of the same `ActionSpec` set; a must-decide tool call becomes one `approval(kind=&#39;copilot.action&#39;)` in the same transaction as the terminal turn; an approved proposal executes exactly once under a claim, a scope re-check and a proposal idempotency key; the conversation is two tables plus an outbox event with `Last-Event-ID` replay; `completions.create` fails closed; and `copilot.chat` is the only declared coverage exemption. The project also records what it does not deliver: the chat UI, a deployed copilot run and a production router proof stay S12 and S14 work.&quot;,
+      &quot;value&quot;: &quot;S10 delivers the copilot&#39;s one action surface: `/api/copilot/actions` and `/mcp` `tools/list` are projections of the same `ActionSpec` set; a must-decide tool call becomes one `approval(kind=&#39;copilot.action&#39;)` in the same transaction as the terminal turn; an approved proposal executes exactly once under a claim, a scope re-check and a proposal idempotency key; the conversation is two tables plus an outbox event with `Last-Event-ID` replay; `completions.create` fails closed; and `copilot.chat` is the only declared coverage exemption. The project also records what it does not deliver: the chat UI, a deployed copilot run and a production router proof stay S12 and S14 work.&quot;
+    }
+  ],
+  &quot;source&quot;: &quot;computed:contract_field&quot;
+}</code></pre>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;delivery-contract&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a2210f-10d5-7ff5-8573-c8d933cdb52b&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-28T07:29:25.345257+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_at&quot;: &quot;2026-11-27&quot;,
+        &quot;approval&quot;: &quot;The contract is approved by the board decision the factory records for this pack, under the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3; the Phase-G review is compliant for the record set at the 2026-11-27 snapshot, and the closure decision is taken by an approver other than the requester.&quot;,
+        &quot;commitments&quot;: &quot;S10 delivers the copilot&#39;s one action surface: `/api/copilot/actions` and `/mcp` `tools/list` are projections of the same `ActionSpec` set; a must-decide tool call becomes one `approval(kind=&#39;copilot.action&#39;)` in the same transaction as the terminal turn; an approved proposal executes exactly once under a claim, a scope re-check and a proposal idempotency key; the conversation is two tables plus an outbox event with `Last-Event-ID` replay; `completions.create` fails closed; and `copilot.chat` is the only declared coverage exemption. The project also records what it does not deliver: the chat UI, a deployed copilot run and a production router proof stay S12 and S14 work.&quot;,
+        &quot;compliance&quot;: &quot;Compliance is evidenced by `crates/api/tests/copilot_*.rs` (fourteen suites), `crates/api/tests/agui_parity.rs`, `crates/actions/tests/copilot_coverage.rs`, `migrations/0018_copilot.sql` and the modules the artefact set names. The retrospective Phase-G review reads the same evidence and records the level compliant for the record set, while naming the pre-pack receipt `docs/evidence/rework/S10.json` as red on lifecycle checks. The pack is content-checked at the pinned snapshot; the repository&#39;s preflight and CI are the compile-and-run gate, and this retrospective does not claim a fresh local run.&quot;,
+        &quot;delegation_ref&quot;: &quot;01a1fb9f-ac2d-732d-b274-1079be3dd2b3&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/S10.toml \u2014 17 checks over the project row, the baseline, the charter, the closure outputs, the contract, the Phase-G review, the closure gate, the waivers, the PI cadence, the PI plan, the PI objectives, the WSJF, the demo credits, the lessons, the product findings, the artefact standard and the rework resolution.&quot;,
+        &quot;retrospective&quot;: &quot;This delivery contract is authored retrospectively for the tranche-6 rework. The S10 row was created on 2026-11-12 and closed without a contemporaneous contract; the pre-pack receipt was generated on 2026-11-25. The commitments are read from the tree and the suites at the 2026-11-27 snapshot and are not presented as an earlier agreement.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-28T07:29:25.060895+00:00&quot;,
+      &quot;id&quot;: &quot;01a2210f-1047-7899-bd0d-9eb6926acb0b&quot;,
+      &quot;kind&quot;: &quot;delivery_contract&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;f&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-787e-853e-fef542ec8815&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Delivery Contract \u2014 S10 Copilot / AG-UI (retrospective, 2026-11-27)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:29:25.345257+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="compliance-method">Compliance method</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;delivery-contract&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;contract_id&quot;: &quot;01a2210f-1047-7899-bd0d-9eb6926acb0b&quot;,
+      &quot;field&quot;: &quot;compliance&quot;,
+      &quot;kind&quot;: &quot;contract_field&quot;,
+      &quot;title&quot;: &quot;compliance: Compliance is evidenced by `crates/api/tests/copilot_*.rs` (fourteen suites), `crates/api/tests/agui_parity.rs`, `crates/actions/tests/copilot_coverage.rs`, `migrations/0018_copilot.sql` and the modules the artefact set names. The retrospective Phase-G review reads the same evidence and records the level compliant for the record set, while naming the pre-pack receipt `docs/evidence/rework/S10.json` as red on lifecycle checks. The pack is content-checked at the pinned snapshot; the repository&#39;s preflight and CI are the compile-and-run gate, and this retrospective does not claim a fresh local run.&quot;,
+      &quot;value&quot;: &quot;Compliance is evidenced by `crates/api/tests/copilot_*.rs` (fourteen suites), `crates/api/tests/agui_parity.rs`, `crates/actions/tests/copilot_coverage.rs`, `migrations/0018_copilot.sql` and the modules the artefact set names. The retrospective Phase-G review reads the same evidence and records the level compliant for the record set, while naming the pre-pack receipt `docs/evidence/rework/S10.json` as red on lifecycle checks. The pack is content-checked at the pinned snapshot; the repository&#39;s preflight and CI are the compile-and-run gate, and this retrospective does not claim a fresh local run.&quot;
+    }
+  ],
+  &quot;source&quot;: &quot;computed:contract_field&quot;
+}</code></pre>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;delivery-contract&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a2210f-10d5-7ff5-8573-c8d933cdb52b&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-28T07:29:25.345257+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_at&quot;: &quot;2026-11-27&quot;,
+        &quot;approval&quot;: &quot;The contract is approved by the board decision the factory records for this pack, under the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3; the Phase-G review is compliant for the record set at the 2026-11-27 snapshot, and the closure decision is taken by an approver other than the requester.&quot;,
+        &quot;commitments&quot;: &quot;S10 delivers the copilot&#39;s one action surface: `/api/copilot/actions` and `/mcp` `tools/list` are projections of the same `ActionSpec` set; a must-decide tool call becomes one `approval(kind=&#39;copilot.action&#39;)` in the same transaction as the terminal turn; an approved proposal executes exactly once under a claim, a scope re-check and a proposal idempotency key; the conversation is two tables plus an outbox event with `Last-Event-ID` replay; `completions.create` fails closed; and `copilot.chat` is the only declared coverage exemption. The project also records what it does not deliver: the chat UI, a deployed copilot run and a production router proof stay S12 and S14 work.&quot;,
+        &quot;compliance&quot;: &quot;Compliance is evidenced by `crates/api/tests/copilot_*.rs` (fourteen suites), `crates/api/tests/agui_parity.rs`, `crates/actions/tests/copilot_coverage.rs`, `migrations/0018_copilot.sql` and the modules the artefact set names. The retrospective Phase-G review reads the same evidence and records the level compliant for the record set, while naming the pre-pack receipt `docs/evidence/rework/S10.json` as red on lifecycle checks. The pack is content-checked at the pinned snapshot; the repository&#39;s preflight and CI are the compile-and-run gate, and this retrospective does not claim a fresh local run.&quot;,
+        &quot;delegation_ref&quot;: &quot;01a1fb9f-ac2d-732d-b274-1079be3dd2b3&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/S10.toml \u2014 17 checks over the project row, the baseline, the charter, the closure outputs, the contract, the Phase-G review, the closure gate, the waivers, the PI cadence, the PI plan, the PI objectives, the WSJF, the demo credits, the lessons, the product findings, the artefact standard and the rework resolution.&quot;,
+        &quot;retrospective&quot;: &quot;This delivery contract is authored retrospectively for the tranche-6 rework. The S10 row was created on 2026-11-12 and closed without a contemporaneous contract; the pre-pack receipt was generated on 2026-11-25. The commitments are read from the tree and the suites at the 2026-11-27 snapshot and are not presented as an earlier agreement.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-28T07:29:25.060895+00:00&quot;,
+      &quot;id&quot;: &quot;01a2210f-1047-7899-bd0d-9eb6926acb0b&quot;,
+      &quot;kind&quot;: &quot;delivery_contract&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;f&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-787e-853e-fef542ec8815&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Delivery Contract \u2014 S10 Copilot / AG-UI (retrospective, 2026-11-27)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:29:25.345257+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="approval">Approval</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;delivery-contract&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approved_at&quot;: &quot;2026-11-28T07:29:25.345257+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;id&quot;: &quot;01a2210f-10d5-7ff5-8573-c8d933cdb52b&quot;,
+      &quot;kind&quot;: &quot;contract_approval&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;approved&quot;,
+      &quot;title&quot;: &quot;approval 01a2210f-10d5-7ff5-8573-c8d933cdb52b \u2014 approved&quot;
+    }
+  ],
+  &quot;source&quot;: &quot;computed:contract_approval&quot;
+}</code></pre>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;delivery-contract&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a2210f-10d5-7ff5-8573-c8d933cdb52b&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-28T07:29:25.345257+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_at&quot;: &quot;2026-11-27&quot;,
+        &quot;approval&quot;: &quot;The contract is approved by the board decision the factory records for this pack, under the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3; the Phase-G review is compliant for the record set at the 2026-11-27 snapshot, and the closure decision is taken by an approver other than the requester.&quot;,
+        &quot;commitments&quot;: &quot;S10 delivers the copilot&#39;s one action surface: `/api/copilot/actions` and `/mcp` `tools/list` are projections of the same `ActionSpec` set; a must-decide tool call becomes one `approval(kind=&#39;copilot.action&#39;)` in the same transaction as the terminal turn; an approved proposal executes exactly once under a claim, a scope re-check and a proposal idempotency key; the conversation is two tables plus an outbox event with `Last-Event-ID` replay; `completions.create` fails closed; and `copilot.chat` is the only declared coverage exemption. The project also records what it does not deliver: the chat UI, a deployed copilot run and a production router proof stay S12 and S14 work.&quot;,
+        &quot;compliance&quot;: &quot;Compliance is evidenced by `crates/api/tests/copilot_*.rs` (fourteen suites), `crates/api/tests/agui_parity.rs`, `crates/actions/tests/copilot_coverage.rs`, `migrations/0018_copilot.sql` and the modules the artefact set names. The retrospective Phase-G review reads the same evidence and records the level compliant for the record set, while naming the pre-pack receipt `docs/evidence/rework/S10.json` as red on lifecycle checks. The pack is content-checked at the pinned snapshot; the repository&#39;s preflight and CI are the compile-and-run gate, and this retrospective does not claim a fresh local run.&quot;,
+        &quot;delegation_ref&quot;: &quot;01a1fb9f-ac2d-732d-b274-1079be3dd2b3&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/S10.toml \u2014 17 checks over the project row, the baseline, the charter, the closure outputs, the contract, the Phase-G review, the closure gate, the waivers, the PI cadence, the PI plan, the PI objectives, the WSJF, the demo credits, the lessons, the product findings, the artefact standard and the rework resolution.&quot;,
+        &quot;retrospective&quot;: &quot;This delivery contract is authored retrospectively for the tranche-6 rework. The S10 row was created on 2026-11-12 and closed without a contemporaneous contract; the pre-pack receipt was generated on 2026-11-25. The commitments are read from the tree and the suites at the 2026-11-27 snapshot and are not presented as an earlier agreement.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-28T07:29:25.060895+00:00&quot;,
+      &quot;id&quot;: &quot;01a2210f-1047-7899-bd0d-9eb6926acb0b&quot;,
+      &quot;kind&quot;: &quot;delivery_contract&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;f&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-787e-853e-fef542ec8815&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Delivery Contract \u2014 S10 Copilot / AG-UI (retrospective, 2026-11-27)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T07:29:25.345257+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-6/S10-bodies/S10/delivery-contract.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
