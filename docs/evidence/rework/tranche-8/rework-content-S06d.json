@@ -1,0 +1,721 @@
+{
+ "charter": "# Charter — S06d Interaction Connector Standard (retrospective, 2026-11-28)\n\n- **Project:** S06d 'Interaction connector standard — web, Telegram, MCP first', track v1, ADM phase G, delivery plateau, tranche 8, plan `docs/plans/slices/S06d-connector-standard.md`.\n- **Sponsor:** the programme's sponsoring group, through the tranche-8 PI plan and the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`.\n- **Authority:** SPEC §4.5, §8 S6-α and §11 R11 make web, Telegram and MCP three instances of one class of user-interaction app; S06d builds the standard that makes the next connector cheap.\n- **Objective:** one registry entry per connector kind — a typed config with a `schemars` schema, named sealed secrets, a default grant set, capabilities and `authenticate`/`parse`/`send` — behind one inbound route, one command grammar, one multicast dispatcher with a first-response close, and a tenant-admin grant matrix. Config and credentials are Postgres rows entered through the web UI; there are no per-connector environment variables.\n- **Scope in:** the `channel`, `channel::command`, `channel::connectors` and `interaction` modules; migration 0038; `channel_binding`, `channel_action_grant` and `interaction_dispatch`; the seven `channels.*` actions; the `Authority::Channel` invoke path; the dispatch and close worker; and the web channel's human-role authorization.\n- **Scope out:** a second approval state machine (the first-response loser is `expired`), per-connector environment variables, machine grants for the web channel, machine sign-off of eval gates, and workflow authoring by a channel.\n- **Constraints:** a connector kind is code, not a CHECK; a secret field holds a name and never a value; the machine floor is computed and cannot be granted, enforced by both `channels.policy_set` and `invoke`; the dispatcher is idempotent by dispatch PK plus advisory lock; a webhook sender retries non-2xx, so business refusals must be 200 acks.\n- **Retrospective status:** the standard was built and gated at `99ed39f` plus the five-failure fix. The project row is closed while its closure review, change control, baseline, WBS, registers, contract, Phase-G review and artefact set were never published; this pack is authored on 2026-11-28 to supply the lifecycle record, and it does not attest contemporaneous ceremonial review.",
+ "soaw": {
+  "title": "Statement of Architecture Work — S06d Interaction Connector Standard (retrospective, 2026-11-28)",
+  "body": {
+   "assignment": "The architecture work assigns S06d the standard that makes every user-interaction connector an instance of one class: a typed `ConnectorSpec` per kind, one binding row, one inbound route, one command grammar, one multicast dispatcher, a first-response close and a tenant-admin grant matrix. This statement governs the retrospective record of the work built and gated at `99ed39f` plus the five-failure fix, re-read at the 2026-11-28 snapshot.",
+   "scope": "In scope are `crates/actions/src/channel/{mod,command}.rs`, `crates/actions/src/channel/connectors/{mod,telegram,webhook}.rs`, `crates/actions/src/control/channels.rs`, the `Authority::Channel` and `machine_forbidden` rules in `invoke` and `spec`, the store modules for interaction, RBAC, channel and delivery, the single inbound route in `crates/api/src/routes/channels.rs`, and the dispatch and close worker in `apps/server/src/worker.rs`. Out of scope are per-connector environment variables, a second state machine, and any machine grant for the web channel.",
+   "responsibilities": "The programme architect authors this retrospective statement; the delivery team (conveyor-e2e) is accountable for the tree and its suites; the Architecture Board reviews the artefact set; the SRO accepts the project's closure at the tranche-8 review. Tenant admins are consulted because they own the stored grant matrix, and connector builders are the consumers the standard has to make cheap.",
+   "acceptance_criteria": "The gate is the slice plan's §5 result at `99ed39f` plus the five-failure fix: clippy and fmt clean, the served OpenAPI lock OK, and every affected binary re-run green (`conveyor-api --lib`, `externals_declared`, `kata_role`, `channel_inbound`, `channel_policy`, `conveyor-server --test prune`, `interaction_dispatch`, `conveyor-store --lib`). The full workspace suite was not repeated end-to-end after the fixes, and that is recorded as a limitation rather than a pass.",
+   "constraints": "Config and credentials are rows, not environment: `channels.bind` validates a binding's config against the kind's own schema and refuses a secret name the tenant does not hold. The machine floor is computed from declared scopes and resource, and both `channels.policy_set` and `invoke` enforce it, so no stored grant can widen it. Eval gates are human-only: the shared decision writer refuses a non-human or non-`evals:approve` decision on any approval with `eval_id IS NOT NULL`, and the dispatcher never offers such a gate to a machine channel.",
+   "retrospective": "This statement is authored on 2026-11-28 for the tranche-8 rework. No contemporaneous statement of architecture work exists; the delivery was recorded in the slice plan and its gate result. The statement records what the tree, the migration and the suites prove today, and it names the one gate limitation — the full workspace suite was not repeated end to end — instead of implying it ran."
+  }
+ },
+ "artifacts": [
+  {
+   "title": "Stakeholder Map — S06d Interaction Connector Standard (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "matrix",
+   "entries": [
+    {
+     "axis_a": "Sponsoring group",
+     "axis_b": "tranche-8 authorisation and the close decision",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "decide"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "SRO",
+     "axis_b": "accountable for the connector standard and the tranche-8 outcome",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "accountable"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Tenant admin",
+     "axis_b": "owns the stored grant matrix set through channels.policy_set",
+     "value": {
+      "influence": "medium",
+      "interest": "high",
+      "engagement": "consult"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Connector builder",
+     "axis_b": "the consumer that adds the next kind as one ConnectorSpec",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "collaborate"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Approval responder",
+     "axis_b": "receives a multicast offer in the web inbox or a machine binding",
+     "value": {
+      "influence": "medium",
+      "interest": "high",
+      "engagement": "collaborate"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Architecture Board",
+     "axis_b": "approves the artefact set and the retrospective Phase-G level",
+     "value": {
+      "influence": "high",
+      "interest": "medium",
+      "engagement": "approve"
+     },
+     "position": 6
+    }
+   ],
+   "links": [
+    {
+     "to": "Business Capability Map — S06d Interaction Connector Standard (Phase B)",
+     "kind": "dependency"
+    }
+   ],
+   "body": "# Stakeholder Map — S06d Interaction Connector Standard (Phase A)\n\n## Metadata\n\nType matrix; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S06d; tranche 8; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The map is read from the slice plan's objective and from the consumers the standard serves, and it is authored by the tranche-8 rework rather than at build time.\n\n## Entries\n\nSix stakeholders: the sponsoring group decides the tranche and the close, the SRO is accountable for the connector standard, the tenant admin owns the stored grant matrix, the connector builder consumes the one-entry onboarding contract, the approval responder receives multicast offers, and the Architecture Board approves the artefact set. Each row states what the group gives or receives from the standard.\n\n## Links\n\nDerives from `docs/plans/slices/S06d-connector-standard.md` §1 and the §2 standard table; depends on the Business Capability Map for the capability each group receives, and on the Requirements Catalog for the checks that protect them. No stakeholder is listed without a named responsibility or interest in the standard.\n\n## Document\n\nThe artefact is published as an architecture-artifact-instance by the rework factory. It gives the Phase A view of who the connector standard serves: a reader can see the tenant admin's grant matrix and the builder's one-entry on-ramp side by side, which is exactly the point of making three interaction apps one class."
+  },
+  {
+   "title": "Driver/Goal/Objective Catalog — S06d Interaction Connector Standard (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "catalog",
+   "entries": [
+    {
+     "axis_a": "D1 One standard, not three connectors",
+     "axis_b": "G1 Web, Telegram and MCP are instances of one class; O1 one registry entry per kind",
+     "value": {
+      "measure": "one ConnectorSpec per kind in the connectors module",
+      "owner": "the programme architect"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "D2 Config is data",
+     "axis_b": "G2 A binding's config and secret names are rows validated by the kind's schema; O2 channels.bind refuses a name the tenant does not hold",
+     "value": {
+      "measure": "channels.bind validation against config_schema",
+      "owner": "conveyor-e2e"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "D3 The machine floor cannot be granted",
+     "axis_b": "G3 machine_forbidden is computed and enforced at policy_set and invoke; O3 an eval sign-off by a machine channel is refused",
+     "value": {
+      "measure": "the decision writer's eval_id refusal",
+      "owner": "conveyor-e2e"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "D4 First response decides",
+     "axis_b": "G4 The losing deliveries expire with a superseded last_error; O4 no second state machine",
+     "value": {
+      "measure": "interaction_dispatch PK and the close status guard",
+      "owner": "conveyor-e2e"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "D5 Thin adapters",
+     "axis_b": "G5 Platform parsing is the only per-kind code; O5 the grammar, grants, retries and delivery state are core",
+     "value": {
+      "measure": "channel::command serves every text connector",
+      "owner": "conveyor-e2e"
+     },
+     "position": 5
+    }
+   ],
+   "links": [
+    {
+     "to": "Requirements Catalog — S06d Interaction Connector Standard (Phase A)",
+     "kind": "derivation"
+    }
+   ],
+   "body": "# Driver/Goal/Objective Catalog — S06d Interaction Connector Standard (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S06d; tranche 8; retrospective under the standing delegation. The drivers are read from the slice plan's §3 decisions and the traps in §6, not invented for the rework.\n\n## Entries\n\nFive driver/goal/objective rows: one standard instead of three bespoke connectors, config as data, a machine floor that cannot be granted, first response deciding the gate, and thin adapters over a shared core. Each row names the measure the tree or a suite proves, and the owner accountable for holding it.\n\n## Links\n\nDerives from the slice plan sections §2 and §3; each objective is realized by a requirement in the Requirements Catalog, and the measurement column names the observable that carries it. The D3 row is the plan's decision 3, and D4 is decision 5's terminal `expired` edge.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It records why the connector standard exists at all: without it each new interaction app would rebuild parsing, identity, grants, retries and delivery state, which is precisely the cost S06d removes."
+  },
+  {
+   "title": "Requirements Catalog — S06d Interaction Connector Standard (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "catalog",
+   "entries": [
+    {
+     "axis_a": "R-1 Connector registry",
+     "axis_b": "A ConnectorSpec carries config_schema, secret_fields, default_actions, capabilities and authenticate/parse/send",
+     "value": {
+      "test": "crates/api/tests/channel_inbound.rs"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "R-2 Binding validation",
+     "axis_b": "channels.bind validates the config with the kind's own schema and refuses an unheld secret name",
+     "value": {
+      "test": "crates/api/tests/channel_policy.rs"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "R-3 One inbound route",
+     "axis_b": "POST /api/channels/{binding_id}/inbound resolves, authenticates, parses and invokes with Authority::Channel",
+     "value": {
+      "test": "crates/api/tests/channel_inbound.rs"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "R-4 Shared grammar",
+     "axis_b": "approve/reject/answer, run/rerun/start/finish/cancel, close/create, do and help are served by one implementation",
+     "value": {
+      "test": "crates/api/tests/channel_inbound.rs"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "R-5 Multicast dispatch",
+     "axis_b": "A pending approval is offered to every eligible machine binding and human web inbox",
+     "value": {
+      "test": "apps/server/tests/interaction_dispatch.rs"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "R-6 First-response close",
+     "axis_b": "interaction.close expires live siblings to expired with a superseded last_error and sends one closure notice per dispatch",
+     "value": {
+      "test": "apps/server/tests/interaction_dispatch.rs"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "R-7 Tenant-admin policy",
+     "axis_b": "channels.policy_get/set/reset recompile the grant matrix over the computed machine floor",
+     "value": {
+      "test": "crates/api/tests/channel_policy.rs"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "R-8 No per-connector environment",
+     "axis_b": "Config and credentials come from Postgres rows, never from per-connector environment variables",
+     "value": {
+      "test": "crates/api/tests/externals_declared.rs"
+     },
+     "position": 8
+    }
+   ],
+   "links": [
+    {
+     "to": "Solution Concept Diagram — S06d Interaction Connector Standard (Phase A)",
+     "kind": "realization"
+    }
+   ],
+   "body": "# Requirements Catalog — S06d Interaction Connector Standard (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S06d; tranche 8; retrospective under the standing delegation. Each requirement maps to a named suite in the tree, which is the evidence the tranche-8 rework reads at the 2026-11-28 snapshot.\n\n## Entries\n\nEight requirements: the connector registry, binding validation, one inbound route, the shared command grammar, multicast dispatch, the first-response close, the tenant-admin policy matrix and the absence of per-connector environment variables. Each row names the suite that exercises it, so no requirement rests on prose alone.\n\n## Links\n\nDerives from the Driver/Goal/Objective Catalog and is realized by the Solution Concept Diagram; the plan's §2 table and §4 code map are the source for pairing a requirement with its module and suite. The R-8 row is held by the repository's externals check, which forbids the per-connector configuration the standard replaces.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It is the bridge between the plan's decisions and the tests: a reader can move from a driver to its requirement to the suite that proves it, which is the structure the close gate reads."
+  },
+  {
+   "title": "Solution Concept Diagram — S06d Interaction Connector Standard (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "diagram",
+   "entries": [
+    {
+     "axis_a": "interaction app (web, Telegram, MCP)",
+     "axis_b": "a human session, a bot binding or the licence principal entering the platform",
+     "value": {
+      "entry": "POST /api/channels/{binding_id}/inbound"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Binding",
+     "axis_b": "channel_binding (tenant, kind, route_key) with non-secret config and secret names",
+     "value": {
+      "validated_by": "the kind's config_schema"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Adapter",
+     "axis_b": "authenticate with the per-binding sealed secret, then parse the platform payload",
+     "value": {
+      "authority": "never authorizes"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Command grammar",
+     "axis_b": "channel::command maps text to approve, run, close, do and help",
+     "value": {
+      "shared_by": "every text connector"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "invoke",
+     "axis_b": "Authority::Channel with the binding's grant set",
+     "value": {
+      "guard": "permits_channel and machine_forbidden"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "interaction.dispatch",
+     "axis_b": "offers a pending approval to eligible channels and the human web inbox",
+     "value": {
+      "idempotency": "dispatch PK plus advisory lock"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "interaction.close",
+     "axis_b": "expires live siblings and sends one closure notice per dispatch",
+     "value": {
+      "terminal": "expired"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "channels.policy_get/set/reset",
+     "axis_b": "the tenant-admin matrix over the compiled default",
+     "value": {
+      "floor": "ActionSpec::machine_forbidden"
+     },
+     "position": 8
+    }
+   ],
+   "links": [
+    {
+     "to": "Driver/Goal/Objective Catalog — S06d Interaction Connector Standard (Phase A)",
+     "kind": "derivation"
+    }
+   ],
+   "body": "# Solution Concept Diagram — S06d Interaction Connector Standard (Phase A)\n\n## Metadata\n\nType diagram; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S06d; tranche 8; retrospective under the standing delegation. The diagram is textual: the record's artefact action carries entries, so nodes and edges are enumerated rather than drawn.\n\n## Entries\n\nEight nodes and edges: the interaction apps, the binding row, the adapter, the shared command grammar, the invoke path with Authority::Channel, the multicast dispatcher, the first-response close and the policy surface. Each entry names the node's contract, and the adapter entry records that it authenticates but never authorizes.\n\n## Links\n\nDerives from the Requirements Catalog and realizes R-1 to R-7 on one wire; the source is the plan's §2 table and §4 code map, whose route and module list is the component map. The Authority::Channel node is the seam that keeps a channel to the grant set it could actually invoke.\n\n## Document\n\nThe diagram is published as an architecture-artifact-instance by the rework factory. It deliberately shows the factory boundary: the platform adapter parses, the core authorizes, dispatches, retries and closes, so a reader sees where per-kind code is allowed to exist and where it is forbidden."
+  },
+  {
+   "title": "Business Capability Map — S06d Interaction Connector Standard (Phase B)",
+   "phase_code": "b",
+   "plateau": "hld",
+   "artifact_kind": "diagram",
+   "entries": [
+    {
+     "axis_a": "Connector onboarding",
+     "axis_b": "adding a kind as one ConnectorSpec and one binding",
+     "value": {
+      "level": 2,
+      "delivered_by": "crates/actions/src/channel/connectors/mod.rs"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Inbound interaction",
+     "axis_b": "one route turning platform payloads into invoke calls",
+     "value": {
+      "level": 2,
+      "delivered_by": "crates/api/src/routes/channels.rs"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Multicast approval delivery",
+     "axis_b": "offering one gate to every eligible channel and inbox",
+     "value": {
+      "level": 2,
+      "delivered_by": "apps/server/src/worker.rs"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "First-response resolution",
+     "axis_b": "one winner, an expired loss and a closure notice",
+     "value": {
+      "level": 2,
+      "delivered_by": "crates/store/src/interaction.rs"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Tenant-admin governance",
+     "axis_b": "the stored grant matrix over the computed machine floor",
+     "value": {
+      "level": 2,
+      "delivered_by": "crates/actions/src/control/channels.rs"
+     },
+     "position": 5
+    }
+   ],
+   "links": [
+    {
+     "to": "Data Entity/Data Component Catalog — S06d Interaction Connector Standard (Phase C)",
+     "kind": "realization"
+    }
+   ],
+   "body": "# Business Capability Map — S06d Interaction Connector Standard (Phase B)\n\n## Metadata\n\nType diagram; phase B; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S06d; tranche 8; retrospective under the standing delegation. The level is the retrospective reading: each capability exists, is delivered by a named module, and is exercised by a named suite.\n\n## Entries\n\nFive capabilities: connector onboarding, inbound interaction, multicast approval delivery, first-response resolution and tenant-admin governance. Each entry pairs the capability with its delivering module and states level 2, because the capability is built and tested locally at the pinned snapshot.\n\n## Links\n\nRealizes the Phase A drivers; the Data Entity/Data Component Catalog carries the rows and components each capability writes. The source is the plan's §2 standard table, which names the binding, the inbound route, the dispatcher, the close action and the policy actions.\n\n## Document\n\nThe map is published as an architecture-artifact-instance by the rework factory. It is the Phase B view a reader uses to go from the business outcome — the next connector is cheap — to the modules that deliver it, without reading the crate tree first."
+  },
+  {
+   "title": "Data Entity/Data Component Catalog — S06d Interaction Connector Standard (Phase C)",
+   "phase_code": "c",
+   "plateau": "hld",
+   "artifact_kind": "catalog",
+   "entries": [
+    {
+     "axis_a": "channel_binding",
+     "axis_b": "(tenant, kind, route_key) with non-secret config and secret names",
+     "value": {
+      "writer": "channels.bind"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "channel_action_grant",
+     "axis_b": "the tenant-admin grant matrix, recompiled by policy_set",
+     "value": {
+      "writer": "channels.policy_set"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "interaction_dispatch",
+     "axis_b": "the fan-out row whose primary key is the idempotency guard",
+     "value": {
+      "writer": "interaction.dispatch"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "delivery state",
+     "axis_b": "pending, sent and expired with last_error on each sibling delivery",
+     "value": {
+      "writer": "interaction.close"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "app_user(kind='service')",
+     "axis_b": "oidc_subject service:<kind>:<tenant> with role kata_executor",
+     "value": {
+      "writer": "the connector provisioning path"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "sealed secret names",
+     "axis_b": "credential values sealed under CONVEYOR_SECRET_KEK; only names are rows",
+     "value": {
+      "writer": "channels.bind"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "migration 0038",
+     "axis_b": "the DDL with forced row-level security and the membership backfill pattern",
+     "value": {
+      "owner": "migrations/0038_s06d_connector_standard.sql"
+     },
+     "position": 7
+    }
+   ],
+   "links": [
+    {
+     "to": "Technology Standards Catalog — S06d Interaction Connector Standard (Phase D)",
+     "kind": "dependency"
+    }
+   ],
+   "body": "# Data Entity/Data Component Catalog — S06d Interaction Connector Standard (Phase C)\n\n## Metadata\n\nType catalog; phase C; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S06d; tranche 8; retrospective under the standing delegation. The entities are the tables migration 0038 adds and the rows the inbound, dispatch and close paths write or read.\n\n## Entries\n\nSeven entities and components: the binding, the grant matrix, the dispatch row, the delivery state, the service identity, the sealed secret names and the migration itself. Each names its writer and the rule that keeps it tenant-scoped; the dispatch row records that its primary key, not a scan, is the idempotency guard.\n\n## Links\n\nDepends on the Technology Standards Catalog for storage and secret rules and on the Business Capability Map for the capability each entity serves. The source is `migrations/0038_s06d_connector_standard.sql` and `crates/store/src/interaction.rs`, where the dispatch and delivery writers live.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It gives the Phase C view of the standard: the rows an operator or auditor would read after an approval was multicast and closed, and the module that writes each one."
+  },
+  {
+   "title": "Technology Standards Catalog — S06d Interaction Connector Standard (Phase D)",
+   "phase_code": "d",
+   "plateau": "hld",
+   "artifact_kind": "catalog",
+   "entries": [
+    {
+     "axis_a": "schemars config schema",
+     "axis_b": "the web form and the bind validation come from one typed schema per kind",
+     "value": {
+      "rule": "one schema per kind"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Postgres 18 with FORCE RLS",
+     "axis_b": "every tenant row carries tenant_id and membership stays forced",
+     "value": {
+      "rule": "RLS in the migration"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Sealed secrets",
+     "axis_b": "CONVEYOR_SECRET_KEK is the deployment root key; rows hold names only",
+     "value": {
+      "rule": "never echo a value"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "rmcp / MCP",
+     "axis_b": "the mcp kind is the licence principal delivered by S06b",
+     "value": {
+      "owner": "S06b"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Telegram Bot API",
+     "axis_b": "the first text connector, running on the shared grammar",
+     "value": {
+      "adapter": "channel::connectors::telegram"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "JSON webhook gateway",
+     "axis_b": "the zero-Rust on-ramp kind for a JSON sender",
+     "value": {
+      "adapter": "channel::connectors::webhook"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "Served OpenAPI lock",
+     "axis_b": "the action surface is held by the lock check",
+     "value": {
+      "check": "--print-openapi --check-lock"
+     },
+     "position": 7
+    }
+   ],
+   "links": [
+    {
+     "to": "Solution Concept Diagram — S06d Interaction Connector Standard (Phase A)",
+     "kind": "reuse"
+    }
+   ],
+   "body": "# Technology Standards Catalog — S06d Interaction Connector Standard (Phase D)\n\n## Metadata\n\nType catalog; phase D; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S06d; tranche 8; retrospective under the standing delegation. The standards are the ones the tree and the migration actually use; the catalog is a reading of the workspace, not a wish list.\n\n## Entries\n\nSeven technology standards: the schemars config schema, Postgres with forced row-level security, sealed secrets under CONVEYOR_SECRET_KEK, the rmcp wire from S06b, the Telegram Bot API, the JSON webhook gateway and the served OpenAPI lock. Each names the rule that makes it safe and the check or owner that holds it.\n\n## Links\n\nReuses the Solution Concept Diagram's node set and depends on the Data Entity catalog's writers. The source is the workspace dependency set, `crates/actions/src/channel/connectors/telegram.rs` and `webhook.rs` for the two shipped kinds, and the plan's §3 decision 2 for the sealed-secret root key.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It closes the Phase D view: a reader can see which platforms the standard stands on, and that per-kind code is deliberately limited to parsing a platform payload."
+  }
+ ],
+ "documents": [
+  {
+   "category": "architecture-artifact",
+   "title": "Architecture Artefact Index — S06d (retrospective, 2026-11-28)",
+   "body": "# Architecture Artefact Index — S06d (retrospective, 2026-11-28)\n\n## Metadata\n\nThe artefact set for S06d is the seven mandatory Phase A–D artefacts on the delivery track: the Stakeholder Map, Driver/Goal/Objective Catalog, Requirements Catalog and Solution Concept Diagram at phase a, plateau psa; the Business Capability Map at phase b; the Data Entity/Data Component Catalog at phase c; and the Technology Standards Catalog at phase d. Each carries an authored body dated 2026-11-28; the owner is the programme architect under the tranche-8 rework delegation, the reviewer is the Architecture Board, and the subject is this project's record.\n\n## Entries\n\nThe set is seven rows in the order the standard seeds them: a/matrix — Stakeholder Map — S06d Interaction Connector Standard (Phase A); a/catalog — Driver/Goal/Objective Catalog; a/catalog — Requirements Catalog; a/diagram — Solution Concept Diagram; b/diagram — Business Capability Map; c/catalog — Data Entity/Data Component Catalog; d/catalog — Technology Standards Catalog. The titles match the artefact entries exactly, so the links resolve inside the pack.\n\n## Links\n\nEvery artefact links to another artefact of the set with one of the four §8.1 kinds: derivation, realization, reuse or dependency. The links follow the phase order, so a reader can walk A to D without an orphan, and each artefact's own Links section names its source in the slice plan and the tree.\n\n## Document\n\nThis index is published as its own architecture-artifact document by the rework factory. It is the document the close gate reads for the project's artefact standard, and it is the reason the set can be verified without re-reading the plan: the rows, the order and the links are all stated here."
+  },
+  {
+   "category": "user-stories",
+   "title": "User Stories — S06d Interaction Connector Standard (retrospective, 2026-11-28)",
+   "body": "# User Stories — S06d Interaction Connector Standard\n\n## Personas\n\nThe standard serves four personas named in the slice plan's objective and its §2 table: the tenant admin, who binds a connector and owns the grant matrix; the connector builder, who adds a kind; the approval responder, who answers a gate from whichever channel they hold; and the platform operator, who runs the dispatch and close worker. The mcp kind adds the licence principal S06b supplies, so an agent can answer a gate as a machine binding without a new persona.\n\n## Stories\n\n- As a tenant admin, I want to bind a connector kind from the web UI with a typed config and named secrets, so that credentials are Postgres rows and no per-connector environment variable exists.\n- As a connector builder, I want to add a kind as one ConnectorSpec with authenticate/parse/send, so that the next interaction app costs one registry entry rather than a subsystem.\n- As an approval responder, I want a pending approval offered on every eligible channel, so that the first terminal response decides it.\n- As a security owner, I want the machine floor and eval gates enforced by the action layer, so that no stored grant can widen them.\n- As a platform operator, I want the losing deliveries expired and notified once, so that the decision has an auditable loss without a second state machine.\n\n## Scenarios\n\nGiven a tenant holds a binding whose config omits a required field, when channels.bind validates it against the kind's config_schema, then the bind is refused and no row is written. Given an inbound platform payload, when the adapter authenticates with the binding's sealed secret and parses it, then the shared command grammar maps it to approve, run, close, do or help and invoke runs with Authority::Channel. Given a pending approval with two eligible machine bindings and one web inbox, when interaction.dispatch fans it out, then each gets one delivery and the dispatch primary key prevents a second fan-out. Given the first terminal decision arrives, when interaction.close runs, then every live sibling becomes expired with last_error 'superseded: resolved via <channel>' and one closure notice is sent per dispatch. Given a tenant admin tries to grant a machine channel an eval sign-off, when channels.policy_set and invoke evaluate machine_forbidden, then the grant and the call are refused.\n\n## Verify\n\nThe stories are verified by `crates/api/tests/channel_inbound.rs` for the inbound route and grammar, `crates/api/tests/channel_policy.rs` for binding validation and the machine floor, `apps/server/tests/interaction_dispatch.rs` for multicast and the first-response close, and `crates/api/tests/externals_declared.rs` for the absence of per-connector environment configuration. The recorded verdict is the plan's §5 gate at `99ed39f` plus the five-failure fix, with the full workspace suite not repeated end-to-end afterwards."
+  },
+  {
+   "category": "acceptance-criteria",
+   "title": "Acceptance Criteria — S06d Interaction Connector Standard (retrospective, 2026-11-28)",
+   "body": "# Acceptance Criteria — S06d Interaction Connector Standard\n\n## Scenarios\n\n- AC-1 Binding validation: a config missing a required field, or naming a secret the tenant does not hold, is refused by channels.bind and no binding row is written.\n- AC-2 Inbound interaction: POST /api/channels/{binding_id}/inbound resolves the binding, the adapter authenticates and parses, and invoke runs with Authority::Channel; the adapter never authorizes.\n- AC-3 Shared grammar: approve, reject, answer, run, rerun, start, finish, cancel, close, create, do and help are served by one implementation for every text connector.\n- AC-4 Multicast: a pending approval is offered once to every eligible machine binding and human web inbox, and the dispatch primary key makes a repeat fan-out a no-op.\n- AC-5 First response: the first terminal decision expires every live sibling delivery with last_error 'superseded: resolved via <channel>' and sends one closure notice per dispatch; a delivered sibling stays delivered.\n- AC-6 Machine floor: channels.policy_set cannot grant, and invoke cannot run, an action in ActionSpec::machine_forbidden; an eval gate with eval_id IS NOT NULL refuses a non-human or non-evals:approve decision and is never offered to a machine channel.\n- AC-7 Config as data: no per-connector environment variable exists, and channels.get reports secret presence only, never a value.\n\n## Verify commands\n\nThe recorded gate is the plan's §5 sequence at `99ed39f` plus the five-failure fix, whose affected binaries were re-run individually through the then-current rbuild test gate: `rbuild -- test -p conveyor-api --test channel_inbound`, `rbuild -- test -p conveyor-api --test channel_policy`, `rbuild -- test -p conveyor-server --test interaction_dispatch`, `rbuild -- test -p conveyor-api --test kata_role`, `rbuild -- test -p conveyor-api --test externals_declared` and `rbuild -- test -p conveyor-server --test prune`. The compile and lint verdict now comes from the repository's GitHub-hosted preflight workflow (`gh workflow run preflight.yml --ref <branch>`), never from a local compiling command.\n\n## Results\n\nAt the recorded gate clippy and fmt were clean, the served OpenAPI lock passed, and every affected binary was green after the five-failure fix. The first full workspace run had found exactly those five failures and the rest of the suite passed. The full suite was not repeated end-to-end after the fixes, so AC-1 to AC-7 are evidenced by their named binaries, and a whole-workspace verdict is not claimed.\n\n## Status\n\nAC-1 to AC-7 are met at the recorded gate and carried by the suites named above; the plan's §5 result is the acceptance evidence. The one open status is the un-repeated full workspace run, recorded as S06d-I3 and closed only by a clean whole-workspace run on the pull request that lands this pack. No criterion is waived."
+  },
+  {
+   "category": "definition-of-ready",
+   "title": "Definition of Ready — S06d Interaction Connector Standard (retrospective, 2026-11-28)",
+   "body": "# Definition of Ready — S06d Interaction Connector Standard\n\n## Independent\n\nS06d's build does not wait on an unmerged sibling slice: it consumes S02, S04, S05, S06, S06b and S06c, which the project row records as needs edges and which the 2026-11-28 snapshot shows measured built. The work lands in its own modules and its own test binaries, so a slice can be reviewed without another slice's branch in the diff.\n\n## Negotiable\n\nThe standard's shape was negotiable while it was being written: which kinds ship first, which fields a ConnectorSpec carries, and how much of the command grammar is shared. The delivered cut is Telegram and the JSON webhook as the adapter kinds, with web as the human session and mcp as the licence principal, and the command vocabulary is the plan's §2 grammar rather than a fixed external contract.\n\n## Valuable\n\nThe value is stated in the charter and the brief: the next interaction app is one registry entry instead of a new subsystem, config and credentials are rows instead of environment variables, and one approval resolves once across every channel with an auditable loss. Each benefit maps to a deliverable in the WBS rather than to an activity.\n\n## Estimable\n\nThe plan enumerates the work in countable units: one migration (0038), four modules (channel, channel::command, channel::connectors, interaction), one inbound route, one worker hook for dispatch and close, and seven channels actions. The §5 gate names the binaries, so the size and the proof are both visible before the work starts.\n\n## Small\n\nThe delivered scope fits one slice: the registry and its two adapters, the binding and grant tables, the inbound route, the shared grammar, the dispatcher and close sweep, and the policy actions. It adds no second state machine and no per-connector configuration surface, which is what keeps the change bounded to the connector seam.\n\n## Testable\n\nEvery acceptance behaviour has a named suite: channel_inbound for the route and grammar, channel_policy for binding validation and the machine floor, interaction_dispatch for multicast and first response, and externals_declared for the absence of per-connector environment configuration. The plan's §5 gate is the single recorded verdict, so the Definition of Done can read one result per criterion.\n\n## Dependencies\n\nThe typed dependencies are needs S02, S04, S05, S06, S06b and S06c, recorded on the project row in the 2026-11-28 snapshot. S02 supplies the workspace, tenancy and auth skeleton, S04 the registry and invoke authority, S05 projects and cards, S06 approvals and events, S06b the licence machine principal, and S06c the MCP task extension; S02, S04, S06b and S06c are closed and S05 and S06 are active while measured built."
+  },
+  {
+   "category": "definition-of-done",
+   "title": "Definition of Done — S06d Interaction Connector Standard (retrospective, 2026-11-28)",
+   "body": "# Definition of Done — S06d Interaction Connector Standard\n\n## Acceptance criteria\n\nOne row per scenario in the acceptance-criteria document: AC-1 binding validation, AC-2 inbound interaction, AC-3 the shared grammar, AC-4 multicast, AC-5 first response, AC-6 the machine floor and eval refusal, and AC-7 config as data. At the recorded gate each row is met by its named suite, and the one row without a whole-workspace verdict is AC-7's externals check combined with the un-repeated full run, which stays open as S06d-I3.\n\n## Evidence at completion\n\nThe completion evidence is the plan's §5 gate result at `99ed39f` plus the five-failure fix, `migrations/0038_s06d_connector_standard.sql`, and the suites `crates/api/tests/channel_inbound.rs`, `crates/api/tests/channel_policy.rs` and `apps/server/tests/interaction_dispatch.rs`. The pack's receipt is `docs/evidence/rework/S06d.json`, read against the seventeen checks in `acceptance/programme/S06d.toml` at the pinned snapshot.\n\n## Repo gate\n\nThe repository gate at delivery time was the plan's §5 sequence: the workspace test suite, clippy with warnings denied, fmt check and the served OpenAPI lock. After the five-failure fix each affected binary was re-run individually and the lock passed. The current compile route is the GitHub-hosted preflight workflow; the pack adds the offline rework content check and the normal pull-request CI as its own gates.\n\n## Merge and closure\n\nThe pack merges as the tranche-8 rework's content, and its closure is the record the close gate reads: charter, baseline statement, seven Phase A–D artefacts, five register kinds, delivery contract, WBS deliverable, Phase-G review, project brief, evidence output and closure review. The project row is re-closed only on a green receipt with an approver other than the requester, and the tranche-8 review accepts the close; the un-repeated workspace run stays open as an issue, not as a passed item."
+  }
+ ],
+ "registers": {
+  "risk": [
+   {
+    "code": "S06d-R1",
+    "title": "The close sweep's notification half can lose a closure notice",
+    "body": "The close action's status guard is the arbiter and the sweep is only the notification half. A worker stop between the guard and the sweep leaves the losing deliveries live until the next sweep, and the closure notice for that dispatch can be lost. The plan's trap 4 says a delivered sibling stays delivered and only live rows expire.",
+    "probability": "low",
+    "impact": 2,
+    "review_at": "2026-12-12",
+    "severity": "low",
+    "status": "open",
+    "response": "Read the dispatch and delivery rows after a close in the interaction suite; if a live row survives a sweep, record the incident and repair the sweep, never weaken the status guard.",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/slices/S06d-connector-standard.md#6"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the operations lead (conveyor-e2e)"
+    }
+   },
+   {
+    "code": "S06d-R2",
+    "title": "A webhook sender can replay a command when a business refusal is read as a server failure",
+    "body": "Webhook senders retry non-2xx, so a business refusal must be a 200 ack and only a server-side failure may ask for a retry. A new connector that answers a refused command with a retryable status causes the sender to repeat it, and the dispatch primary key does not protect the inbound command path itself.",
+    "probability": "medium",
+    "impact": 3,
+    "review_at": "2026-12-12",
+    "severity": "medium",
+    "status": "open",
+    "response": "State the refusal status in the connector contract and assert it in the inbound suite before a new kind is bound; treat a retried business refusal as a defect of the adapter, not of the sender.",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/slices/S06d-connector-standard.md#6"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the programme architect (conveyor-e2e)"
+    }
+   },
+   {
+    "code": "S06d-R3",
+    "title": "Migration 0038 lifts FORCE RLS on membership for the service-identity backfill",
+    "body": "The migration follows the 0028 pattern: it lifts FORCE row-level security on membership for the connector service-identity backfill and restores it before the migration ends. A failure inside that window would leave membership without forced row-level security, which is a tenancy exposure rather than a build problem.",
+    "probability": "low",
+    "impact": 4,
+    "review_at": "2026-12-12",
+    "severity": "medium",
+    "status": "open",
+    "response": "Keep the backfill inside one transaction and assert the restored FORCE flag in the migration's own verification; an operator re-reads `relrowsecurity`/`relforcerowsecurity` after any migration failure on membership.",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/slices/S06d-connector-standard.md#6"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the operations lead (conveyor-e2e)"
+    }
+   }
+  ],
+  "issue": [
+   {
+    "code": "S06d-I1",
+    "title": "The project row is closed with no closure review and an empty closure-outputs declaration",
+    "body": "At the 2026-11-28 snapshot the project row records status closed and measured_status built while meta.closure_outputs is empty, and no closure review exists for S06d. The audit carries this as closed_without_closure_review:S06d. The capability and its suites exist; the closure record did not until this pack.",
+    "severity": "medium",
+    "status": "open",
+    "response": "This pack supplies the closure review and the project-brief and evidence outputs the close gate declares; the factory declares the closure outputs and the project is re-closed through the gate with a receipt."
+   },
+   {
+    "code": "S06d-I2",
+    "title": "Nine mandatory records were never published for S06d",
+    "body": "The open audit packages name change control, the project baseline, the project registers, the WBS, the architecture-artefact set, the compliance review, the delivery contract and the Phase-G review as absent or partial, and the closure review is missing. The build was gated; the lifecycle set around it was not authored at delivery time.",
+    "severity": "medium",
+    "status": "open",
+    "response": "This pack authors the charter, the seven-artefact Phase A–D set, the five register kinds, the WBS deliverable, the delivery contract, the Phase-G review, the project brief, the evidence output and the closure review; the factory publishes them and the receipt is read against the manifest."
+   },
+   {
+    "code": "S06d-I3",
+    "title": "The full workspace suite was not repeated end-to-end after the five-failure fix",
+    "body": "The slice plan's §5 records that the first full workspace run found exactly five failures, that each affected binary was re-run green after the fix, and that the full suite was not repeated end-to-end afterwards. A regression outside the affected binaries is therefore not excluded by the recorded gate, and no later record in this pack claims otherwise.",
+    "severity": "low",
+    "status": "open",
+    "response": "Run the full workspace suite on the pull request that lands this pack and record the result against this issue; close it only on a clean whole-workspace run at the pinned revision."
+   }
+  ],
+  "assumption": [
+   {
+    "code": "S06d-A1",
+    "title": "The 2026-11-28 rework snapshot is the authoritative record for S06d",
+    "body": "The delivery contract judges acceptance against the record at the pinned rework snapshot, and the content checker refuses any id that appears nowhere in it. Every judgement in this pack is read from that snapshot, so if it is incomplete or stale for S06d the pack's facts and the re-close move with it.",
+    "status": "held"
+   },
+   {
+    "code": "S06d-A2",
+    "title": "The gate result at 99ed39f plus the five-failure fix is the build state the tree still carries",
+    "body": "The plan records clippy, fmt, the served lock and the affected binaries green at that revision, and the snapshot records measured_status built. The assumption is that the tree at the snapshot still carries that state; if the tree has drifted since the gate, the pack's acceptance claims move with the drift rather than being re-asserted.",
+    "status": "held"
+   },
+   {
+    "code": "S06d-A3",
+    "title": "The tenant-admin grant matrix cannot widen the computed machine floor",
+    "body": "machine_forbidden is computed from an action's declared scopes and resource, and both channels.policy_set and invoke enforce it. The assumption is that the computation is read at invocation time and has not been relaxed; if a stored grant could widen the floor, the standard's central security claim would fail.",
+    "status": "held"
+   }
+  ],
+  "dependency": [
+   {
+    "code": "S06d-D1",
+    "title": "S06d depends on S02, S04, S05, S06, S06b and S06c",
+    "body": "The project row records needs edges to all six. S02 supplies the workspace, tenancy, auth, jobs and SSE skeleton, S04 the action registry and the invoke authority, S05 the project and card actions the grammar can reach, S06 the approval machine and events, S06b the licence machine principal that makes mcp a connector identity, and S06c the MCP task extension. At the 2026-11-28 snapshot S02, S04, S06b and S06c are closed; S05 and S06 remain active rows while measured built.",
+    "status": "met"
+   },
+   {
+    "code": "S06d-D2",
+    "title": "The standard is a prerequisite for every later interaction connector",
+    "body": "Web, Telegram and MCP are the first three instances, and the standard exists so the next connector is one registry entry rather than a new subsystem. The project row records no outbound block on a named project, so this is carried as a dependency of the standard's consumers: a later connector that does not bind through the kinds registry and the shared grammar would reopen the cost S06d removed.",
+    "status": "open"
+   }
+  ],
+  "benefit": [
+   {
+    "code": "S06d-B1",
+    "title": "The next connector is one registry entry instead of a new subsystem",
+    "body": "A ConnectorSpec per kind plus one binding row means the platform payload parser is the only per-kind code; the command grammar, identity, grants, retries and delivery state are core. The benefit is a structural reduction in the cost of adding an interaction app, declared in the charter and carried by the connectors module and the binding action rather than by a measured saving.",
+    "status": "open"
+   },
+   {
+    "code": "S06d-B2",
+    "title": "One approval resolves once across every channel, with the loss recorded",
+    "body": "The dispatcher offers a pending approval to every eligible machine binding and human web inbox, and the first terminal decision expires the live siblings with a superseded last_error while sending one closure notice per dispatch. The benefit is a single decision with an auditable loss, and it is achieved without a second state machine.",
+    "status": "open"
+   },
+   {
+    "code": "S06d-B3",
+    "title": "The machine floor and human-only eval gates are enforced structurally",
+    "body": "The machine floor is computed from declared scopes and resource and enforced at both policy_set and invoke, so no stored grant can widen it; the shared decision writer refuses a non-human or non-evals:approve decision on an eval approval, and the dispatcher never offers such a gate to a machine channel. The benefit is that the two boundaries hold without an operator remembering them.",
+    "status": "open"
+   }
+  ]
+ },
+ "delivery_contract": {
+  "title": "Delivery Contract — S06d Interaction Connector Standard (retrospective, 2026-11-28)",
+  "body": {
+   "commitments": "S06d delivers the interaction connector standard: one ConnectorSpec per kind, one binding row validated by the kind's schema, one inbound route, one shared command grammar, one multicast dispatcher with a first-response close, and a tenant-admin grant matrix over a machine floor that cannot be granted. Config and credentials are Postgres rows; there are no per-connector environment variables, and the web channel carries no machine grants.",
+   "compliance": "Compliance is evidenced by the slice plan's §5 gate result at `99ed39f` plus the five-failure fix — clippy and fmt clean, the served lock OK, and every affected binary re-run green — and by the suites `crates/api/tests/channel_inbound.rs`, `crates/api/tests/channel_policy.rs` and `apps/server/tests/interaction_dispatch.rs`. The full workspace suite was not repeated end-to-end after the fixes; this contract records that limitation instead of claiming a full run.",
+   "approval": "The contract is approved by the board decision the factory records for this pack, under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Phase-G review is compliant for the record set at the 2026-11-28 snapshot, and the closure decision is taken by an approver other than the requester.",
+   "manifest": "acceptance/programme/S06d.toml — 17 checks over the project row, the baseline, the charter, the closure outputs, the contract, the Phase-G review, the closure gate, the waivers, the PI cadence/plan/objectives, the lessons, the WSJF, the demo credits, the product findings, the artefact standard and the rework resolution.",
+   "acceptance_at": "2026-11-28",
+   "retrospective": "This delivery contract is authored retrospectively for the tranche-8 rework. The build carried no contemporaneous contract, so the commitments are read from the tree, the migration and the suites at the 2026-11-28 snapshot and are not presented as an earlier agreement.",
+   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+  }
+ },
+ "wbs_deliverable": {
+  "title": "The interaction connector standard — one ConnectorSpec per kind behind one inbound route, one command grammar, one multicast dispatcher and a tenant-admin grant matrix",
+  "business_value": 7,
+  "time_criticality": 6,
+  "risk_reduction": 7,
+  "job_size": 8
+ },
+ "review": {
+  "level": "compliant",
+  "findings": "This retrospective Phase-G review records the level compliant for the record set it assesses under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, and it names every open package this pack resolves rather than leaving them implicit. The absent or partial records are std-delivery-user-stories-s06d:S06d, std-delivery-acceptance-criteria-s06d:S06d, std-delivery-definition-of-ready-s06d:S06d, std-delivery-definition-of-done-s06d:S06d, std-pmp-change-control-s06d:S06d, std-pmp-project-baseline-s06d:S06d, std-pmp-project-wbs-s06d:S06d, std-pmp-project-registers-s06d:S06d, std-togaf-delivery-contract-s06d:S06d, std-togaf-architecture-artifact-s06d:S06d, std-togaf-compliance-review-s06d:S06d and std-togaf-phase-g-s06d-g:S06d, with closed_without_closure_review:S06d carrying the missing closure review; the pack supplies the charter, baseline statement, WBS deliverable, five register kinds, seven Phase A–D artefacts, delivery contract, Phase-G review, the four authored delivery documents, project brief, evidence output and closure review. The audit subject is the record at the 2026-11-28 snapshot, where the project row is closed and measured built; the tree proves the standard through the channel and interaction suites, and the plan's §5 gate result at `99ed39f` plus the five-failure fix is the compiled evidence. The one limitation is recorded, not hidden: the full workspace suite was not repeated end-to-end after the fixes, although every affected binary was re-run green. No waiver is claimed and no check is weakened.",
+  "evidence": {
+   "manifest": "acceptance/programme/S06d.toml",
+   "suite": "crates/api/tests/channel_inbound.rs",
+   "policy_suite": "crates/api/tests/channel_policy.rs",
+   "dispatch_suite": "apps/server/tests/interaction_dispatch.rs",
+   "migration": "migrations/0038_s06d_connector_standard.sql",
+   "receipt": "docs/evidence/rework/S06d.json",
+   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+  }
+ },
+ "project_brief_output": "# Project Brief — S06d Interaction Connector Standard (retrospective, 2026-11-28)\n\n## Outcome\n\nThe connector standard is the built capability that makes a new user-interaction app one registry entry: a ConnectorSpec per kind carrying its typed config schema, secret names, default grants, capabilities and authenticate/parse/send functions; one binding row; one inbound route; one shared command grammar; one multicast dispatcher with a first-response close; and a tenant-admin grant matrix. Web, Telegram and MCP are the first three instances, and the next connector no longer rebuilds parsing, identity, grants, retries or delivery state.\n\n## Boundary\n\nS06d owns the connector registry, the binding and its config validation, the one inbound route, the command grammar, multicast dispatch, the first-response close and the policy matrix. It does not own the action registry or invoke (S04), projects and cards (S05), the approval state machine and events (S06), the machine principal (S06b) or MCP tasks (S06c). A second approval state machine, per-connector environment variables and machine grants for the web channel are explicitly outside it.\n\n## Reuse sources\n\nThe slice plan's §2 table names what S06d reuses: the S06 approval state machine and its decision writer, the S04 action registry and Authority path, the S05 project and card actions reached through the grammar's do form, and S06b's licence principal for the mcp kind. Inside the crate the adapters reuse one config-schema validator, one sealed-secret accessor and one delivery-state writer rather than growing per-kind copies of each.\n\n## Inception units\n\nThe plan's build order is the inception sequence: add migration 0038 with the binding, grant, dispatch and delivery tables under forced row-level security; define ConnectorSpec and the two shipped adapters; add the shared command grammar; add the one inbound route; add the multicast dispatcher and the close sweep to the worker; add channels.kinds/bind/get/list/unbind/test and channels.policy_get/set/reset; then regenerate the served lock. Each step names the suite the plan's §5 gate re-ran after the fix.\n\n## Dependencies\n\nThe project row records needs edges to S02, S04, S05, S06, S06b and S06c. S02 supplies the workspace, tenancy, auth, jobs and SSE skeleton, S04 the registry and the invoke authority, S05 the project and card actions, S06 the approval machine and events, S06b the licence machine principal that makes mcp a connector identity, and S06c the MCP task extension. At the 2026-11-28 snapshot S02, S04, S06b and S06c are closed; S05 and S06 remain active rows while measured built.\n\n## Acceptance\n\nAcceptance is the slice plan's §5 gate at `99ed39f` plus the five-failure fix: clippy and fmt clean, the served OpenAPI lock OK, and the affected binaries re-run green — `conveyor-api --lib`, `externals_declared`, `kata_role`, `channel_inbound`, `channel_policy`, `conveyor-server --test prune`, `interaction_dispatch` and `conveyor-store --lib`. The full suite was not repeated end-to-end after the fixes, and this brief records that rather than implying a clean whole-workspace run.\n\n## Capabilities\n\nConnector onboarding as one registry entry; inbound interaction through one authenticated, parsed route; multicast approval delivery to every eligible channel; first-response resolution with the losing deliveries expired and one closure notice per dispatch; and tenant-admin governance through a stored grant matrix that can narrow but never widen the computed machine floor. Each capability is delivered by a named module in the Phase C catalog and exercised by a named suite.\n\n## Plan\n\nThe plan is `docs/plans/slices/S06d-connector-standard.md`; the build is complete in the tree at the pinned snapshot, and this brief is the retrospective reading of it. The tranche-8 rework publishes the lifecycle set this brief belongs to, and the tranche-8 review is the forum that accepts the re-close. No further build step is claimed by this brief.",
+ "evidence_output": "# Evidence — S06d Interaction Connector Standard (retrospective, 2026-11-28)\n\n## Claim\n\nS06d delivers the interaction connector standard: web, Telegram and MCP are three instances of one class, the next connector is one ConnectorSpec plus one binding row, one inbound route and one shared command grammar serve them, one multicast dispatcher offers a pending approval to every eligible channel, the first terminal response expires the losing deliveries and sends one closure notice, and the tenant-admin grant matrix cannot widen the computed machine floor.\n\n## Evidence\n\nThe tree carries `crates/actions/src/channel/mod.rs`, `command.rs` and the `connectors/` adapters; `crates/api/src/routes/channels.rs` is the single inbound route; `apps/server/src/worker.rs` runs interaction.dispatch and interaction.close; `crates/actions/src/control/channels.rs` holds the seven channels actions; and `migrations/0038_s06d_connector_standard.sql` is the DDL. The suites are `crates/api/tests/channel_inbound.rs`, `crates/api/tests/channel_policy.rs` and `apps/server/tests/interaction_dispatch.rs`.\n\n## Verification\n\nThe slice plan's §5 gate result at `99ed39f` plus the five-failure fix is the recorded verdict: clippy and fmt clean, the served lock OK, and every affected binary re-run green (`conveyor-api --lib`, `externals_declared`, `kata_role`, `channel_inbound`, `channel_policy`, `conveyor-server --test prune`, `interaction_dispatch`, `conveyor-store --lib`). The receipt for this pack is `docs/evidence/rework/S06d.json`, green on the 17 checks in `acceptance/programme/S06d.toml` at the 2026-11-28 snapshot.\n\n## Links\n\nThe plan is `docs/plans/slices/S06d-connector-standard.md`; the manifest is `acceptance/programme/S06d.toml`; the migration is `migrations/0038_s06d_connector_standard.sql`; the policy suite is `crates/api/tests/channel_policy.rs`; the dispatch suite is `apps/server/tests/interaction_dispatch.rs`. The project row is `01a1d039-0d2b-7b80-93fe-c1daf60c5c1f` on the programme record, and the pack's decision authority is the standing delegation this review cites.\n\n## Gap\n\nTwo limits are recorded. The five-failure fix was verified binary by binary, and the full workspace suite was not repeated end-to-end afterwards, so a regression outside the affected binaries is not excluded by the recorded gate. And the two shipped adapters are Telegram and the JSON webhook; the web and MCP instances are the human session and the licence principal rather than new adapter code, so a future platform still has to land its own parser. Neither limit is claimed closed.",
+ "closure": "S06d is re-closed through the one gate the record carries: the project row is closed only after its charter, baseline, artefacts, registers, contract, WBS, Phase-G review, outputs and closure review exist, and the receipt on `acceptance/programme/S06d.toml` is green at the pinned snapshot. The close records the un-repeated full workspace suite as an open issue, not as a pass, and it names every rework package the pack resolves.",
+ "closure_review": "# Closure Review — S06d Interaction Connector Standard (retrospective, 2026-11-28)\n\n## Outcome vs acceptance\n\nThe standard's outcome is that the next interaction connector is one registry entry. Against the plan's §5 gate the recorded result covers clippy, fmt, the served lock and every affected binary at `99ed39f` plus the five-failure fix; the full workspace suite was not repeated end-to-end after the fixes, so that one limitation is carried as an open issue rather than folded into a pass. The retrospective level is compliant for the record set because the pack supplies the lifecycle and the receipt is green on every check the manifest can run.\n\n## Evidence\n\nThe evidence is the slice plan and its §5 gate result, `migrations/0038_s06d_connector_standard.sql`, the suites `crates/api/tests/channel_inbound.rs`, `crates/api/tests/channel_policy.rs` and `apps/server/tests/interaction_dispatch.rs`, the receipt `docs/evidence/rework/S06d.json` at the pinned snapshot, and the seventeen checks in `acceptance/programme/S06d.toml`. The Phase-G review records the same set and names the packages it resolves.\n\n## Open items\n\nThree items stay open. The full workspace suite was not re-run end to end after the five-failure fix, and S06d-I3 carries that until a pull request runs it. The close sweep's notification half can lose a closure notice if the worker stops between the status guard and the sweep, which S06d-R1 records with a bounded impact. And a future connector kind can replay a command if it returns a retryable status for a business refusal, which S06d-R2 records against the webhook retry rule.\n\n## Decision\n\nThe project is closed. The closure is taken by an approver other than the requester under the standing delegation, the closure review is recorded in the same pack, and the tranche-8 review is the forum that accepts it. No waiver is claimed, no check in the manifest is weakened to reach this decision, and the nine packages the review names are resolved by the artefacts, registers, contract and outputs this pack supplies."
+}

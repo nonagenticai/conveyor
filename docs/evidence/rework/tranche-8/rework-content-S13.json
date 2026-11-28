@@ -1,0 +1,902 @@
+{
+ "charter": "# Charter — S13 Process Engine, Judge, Map and Care-Bus (retrospective, 2026-11-28)\n\n- **Project:** S13 'Process engine, judge, map and care-bus — the process is the executor, the DAG retained as the tool-sequence engine, the 348 flows re-authored', track v1, ADM phase G, delivery plateau, tranche 8, plan `docs/plans/slices/S13-n8n-engine.md`; the project row records needs-edges to S03, S04, S11 and S15.\n- **Authority:** SPEC §8 S13 and R4 bind the slice: the process model replaces the DAG as the executor, the 348 flows are re-authored as processes and handlers and never converted, and the engine never depends on an editor. The owner ruling of 2026-11-09 retains `crates/workflow` as the tool-sequence executor; there is no drop migration.\n- **Objective:** the conveyor executes processes — ordered steps of kind agent, computed, gate or call, each step carrying an SOP and an inspection — with a judged step output, a run tree rooted once per card, the care-bus carrying step work, and a declarative process map that never executes.\n- **Scope in:** migrations `0035_process_tree.sql`, `0036_s19_output_grade.sql` and `0037_run_tree_workflow_step.sql`; process/SOP publish validation; the step executor; the judge; the run tree; `crates/bus` and its relay; the computed set; the 280-process default catalogue; the 348-row dispositions ledger; the trace gate over `run_step`.\n- **Scope out:** data migration D7; the map and stage editor beyond a read/author form (S12); the `cap.*` prompts (S15/S21); the benchmark and eval slices; w2v/media production; parallel fan-out; any Python; old-flow retirement, which the 2026-11-10 scope correction removed from the launch gate.\n- **Status:** built on 2026-11-10 across three sessions. Two qualifications survive the rework and are recorded, not smoothed: build-order item 13, the reusable workflow catalogue under `seed/processes/workflows/`, is not shipped (`v1-s13-1`), and the bus delivery test is CI-only in this environment because the build host has neither Docker nor a reachable Redis. This charter is authored retrospectively for the tranche-8 rework and does not attest contemporaneous ceremonial review.",
+ "soaw": {
+  "title": "Statement of Architecture Work — S13 Process Engine (retrospective, Phase A)",
+  "body": {
+   "assignment": "The architecture work assigns S13 the execution model of the conveyor: define how a process of ordered steps replaces the n8n graph as the executor, how each step's output is judged against its SOP, how a run tree lets a coach or capability child start under one live root, how the care-bus carries step work while Postgres remains the record, and how the retained workflow engine serves as the tool-sequence executor without becoming a second process engine. The statement governs the retrospective record of work completed on 2026-11-10 and re-read at the 2026-11-28 snapshot.",
+   "scope": "In scope are the three migrations, the process and SOP publish validation, the step executor with agent, computed, gate and call kinds, the judge with its reject and outage ladder, the run tree's root-only live index and depth bound, `crates/bus` with the relay and dead-letter stream, the computed set that absorbs `conveyor.start`, `wip.pull` and `err.card`, the 280-process default catalogue, and the 348-row dispositions ledger. Out of scope are data migration D7, the map and stage editor beyond a read/author form (S12), the `cap.*` prompts, the benchmark and eval slices, w2v/media production, parallel fan-out, any Python, and old-flow retirement.",
+   "responsibilities": "The programme architect authors the retrospective statement under the standing delegation; the delivery team is accountable for the evidence; the Architecture Board reviews the artefact set and the Phase-G level; the SRO is accountable for the process-execution outcome and accepts the re-closure at the tranche-8 review. The tenant admin consults because D29 makes processes tenant-definable rows, the platform engineer operates the worker and the care-bus, and S12 is informed because it owns the process and process-map screens.",
+   "acceptance_criteria": "The gate is the plan's §7 block: the process limb with the gate parked and resumed and a coach child on the parent's card; the judge's accept, reject with the reason, two-reject BLOCK and outage wait; the run tree's root refusal, child allowance, depth refusal and cascade cancel; the bus's duplicate idempotency, `FLUSHALL` re-delivery and dead-letter; the 280-process catalogue; the 348-row ledger with no `delta:` row; and the Postgres-only limb with Redis stopped. The record-side gate is the 17 checks in `acceptance/programme/S13.toml`.",
+   "constraints": "Steps are `agent`, `computed`, `gate` or `call`; there are no predicates, loop nodes or expression language, and a typed outcome is `continue`, `fail` or `retry`. One live root exists per card and one live child per (parent, step), with depth at most 3 and cascade cancel. The reject budget is the SOP's `max_rejects`, default 2, and a laya outage parks rather than rejects. Postgres is the record and Redis is a nudge; every outcome is written in the handler's transaction. Row-level security is forced, and idempotency is the envelope id plus `(run_id, position, attempt)`.",
+   "retrospective": "This statement is written after the fact and says so. Where the record's proof is narrower than the built claim {T} `seed/processes/workflows/` is not shipped, the judge's local proof uses a stub laya, and the bus test is CI-only in this environment {T} the gap is named in the evidence output and carried as an open risk rather than smoothed into a pass. The Phase-G level reflects that distinction: compliant for the lifecycle record set, with `v1-s13-1` explicitly open against the code."
+  }
+ },
+ "artifacts": [
+  {
+   "title": "Stakeholder Map — S13 Process Engine (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "matrix",
+   "entries": [
+    {
+     "axis_a": "Sponsoring group",
+     "axis_b": "the tranche-8 authorisation and the re-close decision",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "decide"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "SRO",
+     "axis_b": "accountable for the process-execution outcome and the re-closure",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "accountable"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Platform engineer",
+     "axis_b": "operates the worker, the care-bus and the catalogue loader",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "collaborate"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Tenant admin",
+     "axis_b": "instantiates, overrides or designs tenant processes under D29",
+     "value": {
+      "influence": "medium",
+      "interest": "high",
+      "engagement": "consult"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Architecture Board",
+     "axis_b": "approves the Phase A-D set and the Phase-G level",
+     "value": {
+      "influence": "high",
+      "interest": "medium",
+      "engagement": "approve"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "S12 process screens",
+     "axis_b": "owns screen 7 (processes) and screen 22 (process map)",
+     "value": {
+      "influence": "medium",
+      "interest": "medium",
+      "engagement": "inform"
+     },
+     "position": 6
+    }
+   ],
+   "links": [
+    {
+     "to": "Business Capability Map — S13 Process Engine (Phase B)",
+     "kind": "dependency"
+    }
+   ],
+   "body": "# Stakeholder Map — S13 Process Engine (Phase A)\n\n## Metadata\n\nType matrix; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S13; tranche 8; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the tranche-8 rework and does not attest contemporaneous intent.\n\n## Entries\n\nSix stakeholder positions on the influence/interest/engagement axes. The sponsoring group decides the tranche and the re-close; the SRO is accountable for the process-execution outcome; the platform engineer operates the worker, the care-bus and the catalogue loader; the tenant admin consults because D29 makes processes tenant-definable rows and the 280 a default catalogue; the Architecture Board approves the artefact set; S12 is informed because it owns the process and process-map screens.\n\n## Links\n\nDerives from `docs/plans/slices/S13-n8n-engine.md` §1-§3 and §9; realizes the Phase A stakeholder view for the process engine; depends on the Business Capability Map for the value each group receives. The programme roles are those the conveyor buildout programme already records, and the S12 and S15 interfaces are the plan's own boundary statements rather than new commitments.\n\n## Document\n\nThe artefact sits under the slice plan and the project's architecture set. S13 has no contemporaneous architecture publication of its own; this retrospective artefact is published as an architecture-artifact-instance document by the rework factory, and its subject is the record the 2026-11-28 snapshot carries for S13, including the closed status and the open `v1-s13-1` package.\n"
+  },
+  {
+   "title": "Driver/Goal/Objective Catalog — S13 Process Engine (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "catalog",
+   "entries": [
+    {
+     "axis_a": "D1 The process is the executor",
+     "axis_b": "G1 no n8n graph drives a process step; O1 steps are agent, computed, gate or call",
+     "value": {
+      "measure": "process.step dispatches on kind",
+      "owner": "the programme architect"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "D2 Judged acceptance",
+     "axis_b": "G2 a step's output is judged by its SOP's inspection; O2 accept, reject with the reason, or wait",
+     "value": {
+      "measure": "run_step.judge",
+      "owner": "conveyor-e2e"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "D3 Bounded failure",
+     "axis_b": "G3 a reject is not a retry storm; O3 max_rejects default 2, then BLOCKED to the coach",
+     "value": {
+      "measure": "judge.rs two-reject ladder",
+      "owner": "conveyor-e2e"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "D4 One live root per card",
+     "axis_b": "G4 a coach or capability child runs under a live parent; O4 root-only live index and depth at most 3",
+     "value": {
+      "measure": "uq_run_live WHERE parent_run_id IS NULL",
+      "owner": "conveyor-e2e"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "D5 The bus is a nudge",
+     "axis_b": "G5 a Redis loss loses no outcome; O5 the relay re-delivers unpublished event rows by seq",
+     "value": {
+      "measure": "FLUSHALL replay reproduces run state",
+      "owner": "the platform engineer"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "D6 The map is a document",
+     "axis_b": "G6 an edit to the map changes no run; O6 process_map is declarative per project type",
+     "value": {
+      "measure": "process_maps.get/list and the authoring actions",
+      "owner": "the programme architect"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "D7 The 280 are a catalogue",
+     "axis_b": "G7 a tenant may instantiate, override or design its own process; O7 seed rows are defaults, not code constants",
+     "value": {
+      "measure": "D29; a process is a row",
+      "owner": "the tenant admin"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "D8 The workflow engine is retained",
+     "axis_b": "G8 tool sequences stay executable; O8 a call step resolves process-first, workflow-second",
+     "value": {
+      "measure": "call_step.rs workflow limb",
+      "owner": "conveyor-e2e"
+     },
+     "position": 8
+    }
+   ],
+   "links": [
+    {
+     "to": "Requirements Catalog — S13 Process Engine (Phase A)",
+     "kind": "derivation"
+    }
+   ],
+   "body": "# Driver/Goal/Objective Catalog — S13 Process Engine (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S13; tranche 8; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The drivers are read from the slice plan's objective, its traps and its closed decisions, not invented for the retrospective.\n\n## Entries\n\nEight driver/goal/objective rows: the process model as executor, judged acceptance, bounded failure, one live root per card, the bus as a nudge rather than a record, the map as a document, the 280 as a default catalogue, and the retained workflow engine as the tool-sequence executor. Each row names the measure the tree proves and the role accountable for it, so a reader can move from the driver to its requirement and to the test target.\n\n## Links\n\nDerives from `docs/plans/slices/S13-n8n-engine.md` §1, §8 and §9; each objective is realized by a requirement in the Requirements Catalog, and the measurement column names the suite or record field that carries it. The D1 and D8 rows record the owner ruling of 2026-11-09 that retained the workflow engine, and D5 records the trap that the bus may carry state but never own it.\n\n## Document\n\nThe catalog is the retrospective statement of why S13 exists. It is published as an architecture-artifact-instance by the rework factory and is read together with the Requirements Catalog: the drivers justify the ten requirements, and the requirements carry the tests and generated files that evidence them at the snapshot.\n"
+  },
+  {
+   "title": "Requirements Catalog — S13 Process Engine (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "catalog",
+   "entries": [
+    {
+     "axis_a": "R-1 Schema",
+     "axis_b": "process and process_step renamed; SOP, process_map, run tree columns, capabilities and agent roles",
+     "value": {
+      "check": "cargo test -p conveyor-store process_tree",
+      "state": "proved"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "R-2 Publish validation",
+     "axis_b": "refuses no steps, duplicate or non-contiguous positions, an unregistered action, no process agent, no published SOP, an unpublished call, depth over 3, an unresolved map node and a reordered system process",
+     "value": {
+      "check": "the catalogue loader applies 280 processes twice on a fresh database",
+      "state": "proved"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "R-3 Step executor",
+     "axis_b": "process.step dispatches by kind and is idempotent on (run_id, position, attempt)",
+     "value": {
+      "check": "process_step.rs and call_step.rs",
+      "state": "proved"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "R-4 Judge",
+     "axis_b": "checker, laya or eval; a reject reruns with the reason at most max_rejects, then blocks; an outage parks the step",
+     "value": {
+      "check": "judge.rs with a stub laya",
+      "state": "proved locally; the live call is the gate"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "R-5 Run tree",
+     "axis_b": "one live root per card, one live child per (parent, step), depth at most 3, cancel cascades",
+     "value": {
+      "check": "cargo test -p conveyor-store process_tree",
+      "state": "proved"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "R-6 Bus",
+     "axis_b": "envelope, groups process and tool, XACK/XAUTOCLAIM, five deliveries then bus:dead, replay after FLUSHALL",
+     "value": {
+      "check": "bus_delivery.rs",
+      "state": "CI-only in this environment"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "R-7 Catalogue",
+     "axis_b": "70 type files, 280 default processes, 350 SOPs; the generated manifest is 280 entries and the import is 333 processes with 403 SOPs and 3 maps",
+     "value": {
+      "check": "seed/processes/manifest.yaml and process_catalogue.rs",
+      "state": "proved"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "R-8 Dispositions",
+     "axis_b": "348 rows, 333 distinct process targets, 3 absorbed rows, 12 n8n-retire rows and no delta row",
+     "value": {
+      "check": "parity/n8n-dispositions.tsv and n8n_migration.rs",
+      "state": "proved"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "R-9 Computed set",
+     "axis_b": "projects.create absorbs conveyor.start; wip.pull and err.card are handlers; the hook route and CONVEYOR_HOOK_SECRET are deleted",
+     "value": {
+      "check": "project_start.rs and computed_set.rs",
+      "state": "proved"
+     },
+     "position": 9
+    },
+    {
+     "axis_a": "R-10 Workflow catalogue",
+     "axis_b": "reusable tool sequences under seed/processes/workflows; the call step's workflow limb has no catalogue path outside hand-created rows",
+     "value": {
+      "check": "v1-s13-1 and call_step.rs",
+      "state": "open: build-order item 13 is not shipped"
+     },
+     "position": 10
+    }
+   ],
+   "links": [
+    {
+     "to": "Solution Concept Diagram — S13 Process Engine (Phase A)",
+     "kind": "realization"
+    }
+   ],
+   "body": "# Requirements Catalog — S13 Process Engine (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S13; tranche 8; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Each requirement maps to the named suite or generated file the plan's gate and build order carry; the tenth is the one requirement the record says is not met.\n\n## Entries\n\nTen requirements: the schema, publish validation, the step executor, the judge, the run tree, the bus, the catalogue, the dispositions, the computed set and the workflow catalogue. Nine name a proof that exists at the snapshot; the workflow catalogue names `v1-s13-1` instead, records its state as open, and repeats the plan's own phrase that item 13 is not shipped. No requirement is a prose aspiration without a test target or a named finding.\n\n## Links\n\nDerives from the Driver/Goal/Objective Catalog and is realized by the Solution Concept Diagram; the source is `docs/plans/slices/S13-n8n-engine.md` §5 and §6, whose build order pairs each requirement with its test binary, and it depends on the Business Capability Map for the value view. The requirement states are read at the 2026-11-28 snapshot and are not advanced by this retrospective pack.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It is the bridge between the drivers and the evidence: a reader can move from a driver to its requirement to the suite that proves it, and the one open row is visible rather than buried in the plan's build-order footnote. R-10 is the record's own statement of `v1-s13-1` and is the reason the review level is compliant for the record set while the code finding stays open.\n"
+  },
+  {
+   "title": "Solution Concept Diagram — S13 Process Engine (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "diagram",
+   "entries": [
+    {
+     "axis_a": "process.step executor",
+     "axis_b": "the one driver of an attempt: loads the run and step, writes run_step, dispatches by kind, judges and enqueues the next position",
+     "value": {
+      "component": "crates/actions process step",
+      "role": "executes"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "process and process_step",
+     "axis_b": "the versioned process definition and its ordered steps, one published per key",
+     "value": {
+      "store": "Postgres",
+      "writer": "the catalogue loader and the publish actions"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "SOP (procedure)",
+     "axis_b": "definition of ready and done, acceptance criteria, inspection and outputs; one published per key",
+     "value": {
+      "rule": "publish validation",
+      "reader": "the judge seam"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Judge seam",
+     "axis_b": "laya.judge as a registered external action, an eval from S19's eval_runs or a checker",
+     "value": {
+      "external": "https://api.nonagentic.ai/laya",
+      "record": "run_step.judge"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Run tree",
+     "axis_b": "a root run and its children by parent_run_id and step id, depth at most 3, cancel cascades",
+     "value": {
+      "index": "root-only uq_run_live",
+      "limit": "depth 0..3"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Care-bus",
+     "axis_b": "Redis Streams envelope, the process and tool groups, XACK/XAUTOCLAIM and the dead-letter stream",
+     "value": {
+      "module": "crates/bus",
+      "fallback": "the process.step job"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "Process map",
+     "axis_b": "a declarative per-project-type document of processes, capabilities, phases and milestones",
+     "value": {
+      "kind": "document",
+      "ui": "S12 screen 22"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "Workflow engine",
+     "axis_b": "crates/workflow retained as the tool-sequence executor; a call resolves process-first, workflow-second",
+     "value": {
+      "state": "retained, no drop migration",
+      "proof": "call_step.rs"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "Computed handlers",
+     "axis_b": "projects.create, cards.move, wip.pull and err.card: code, not processes",
+     "value": {
+      "kind": "absorbed flows",
+      "proof": "computed_set.rs"
+     },
+     "position": 9
+    }
+   ],
+   "links": [
+    {
+     "to": "Driver/Goal/Objective Catalog — S13 Process Engine (Phase A)",
+     "kind": "derivation"
+    }
+   ],
+   "body": "# Solution Concept Diagram — S13 Process Engine (Phase A)\n\n## Metadata\n\nType diagram; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S13; tranche 8; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The diagram is textual because the record's artefact action carries entries: the nodes and edges are enumerated, and each node names the contract it holds.\n\n## Entries\n\nNine nodes and their edges. The executor is the one driver of an attempt; the process and step rows are the definition; the SOP carries the inspection the judge reads; the judge is a seam over `laya.judge`, an eval or a checker; the run tree is enforced by the root-only index; the care-bus carries step work with the Postgres job as fallback; the map is a document; the retained workflow engine serves the call step's tool-sequence limb; and the four computed handlers absorb the named flows.\n\n## Links\n\nDerives from the drivers and realizes the Requirements Catalog. The source is `docs/plans/slices/S13-n8n-engine.md` §5, whose deliverables are the component map, and §8, whose traps fix the edges: the bus is not the record, the map is not the executor, and the workflow engine is not the process executor. Each edge in this diagram corresponds to one of those rules rather than to a drawing convention.\n\n## Document\n\nThe diagram is published as an architecture-artifact-instance by the rework factory. It deliberately shows the retained workflow engine as a node and the unshipped workflow catalogue as absent: a reader sees the call step's process-first, workflow-second rule and the open catalogue path in the same view, so the built claim is not mistaken for a complete tool-sequence catalogue.\n"
+  },
+  {
+   "title": "Business Capability Map — S13 Process Engine (Phase B)",
+   "phase_code": "b",
+   "plateau": "hld",
+   "artifact_kind": "diagram",
+   "entries": [
+    {
+     "axis_a": "Process authoring and publish",
+     "axis_b": "a tenant or the seed publishes a versioned process with its SOPs, and validation refuses an unresolvable step",
+     "value": {
+      "requirements": "R-1, R-2",
+      "delivered_by": "crates/store/src/process_seed.rs and the publish actions"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Process execution",
+     "axis_b": "one attempt runs one step of the declared kind and appends its outcome idempotently",
+     "value": {
+      "requirements": "R-3",
+      "delivered_by": "process.step"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Judged acceptance",
+     "axis_b": "the SOP's inspection accepts, rejects with a reason or parks on an outage",
+     "value": {
+      "requirements": "R-4",
+      "delivered_by": "the laya.judge seam and the checker/eval kinds"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Run-tree orchestration",
+     "axis_b": "a child starts under a live parent on the same card, depth at most 3, and cancel cascades",
+     "value": {
+      "requirements": "R-5",
+      "delivered_by": "the root-only run indexes and process_runs.start"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Durable bus delivery",
+     "axis_b": "step work travels on Redis Streams and is re-delivered from Postgres after a loss",
+     "value": {
+      "requirements": "R-6",
+      "delivered_by": "crates/bus and the relay"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Map authoring and read",
+     "axis_b": "a declarative per-project-type map is authored, published, retired and served; the UI overlays the live position",
+     "value": {
+      "requirements": "R-2",
+      "delivered_by": "process_maps.create|update|publish|retire|get|list"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "Flow disposition parity",
+     "axis_b": "every old n8n node has a mapping row and no delta row remains",
+     "value": {
+      "requirements": "R-8",
+      "delivered_by": "parity/n8n-dispositions.tsv and n8n_migration.rs"
+     },
+     "position": 7
+    }
+   ],
+   "links": [
+    {
+     "to": "Data Entity/Data Component Catalog — S13 Process Engine (Phase C)",
+     "kind": "realization"
+    }
+   ],
+   "body": "# Business Capability Map — S13 Process Engine (Phase B)\n\n## Metadata\n\nType diagram; phase B; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S13; tranche 8; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The capability levels are the retrospective reading: each capability is delivered by a named module or action family and is proven by a named suite or generated file, not by an aspiration.\n\n## Entries\n\nSeven capabilities: process authoring and publish, process execution, judged acceptance, run-tree orchestration, durable bus delivery, map authoring and read, and flow-disposition parity. Each entry names the requirement it satisfies and the module or action family that delivers it. The set covers the whole of the plan's §5 deliverables without adding a capability the tree does not hold, and it leaves the unshipped workflow catalogue out of the capability list because it is not delivered.\n\n## Links\n\nDerives from the Solution Concept Diagram and the Requirements Catalog; realizes the Phase A drivers in the business view; depends on the Data Entity catalog for the rows each capability writes and reads. The source is the plan's §5 deliverable table and §7 gate, which pair each capability with the test or generated file that proves it at the snapshot.\n\n## Document\n\nThe map is a value view, not an org view: it says what the platform can do for a tenant, not which team owns it. That distinction matters here because execution is engine code, the judge is an external action seam, the map is a document and the bus is a transport; a reader who conflates them will look for an executor in the map or a process in the bus. The capabilities are the seven the record supports today.\n"
+  },
+  {
+   "title": "Data Entity/Data Component Catalog — S13 Process Engine (Phase C)",
+   "phase_code": "c",
+   "plateau": "hld",
+   "artifact_kind": "catalog",
+   "entries": [
+    {
+     "axis_a": "process",
+     "axis_b": "the versioned process definition: capability, card type, list kind, project type and user-facing outputs",
+     "value": {
+      "writer": "the catalogue loader and the publish actions",
+      "scope": "tenant-scoped, RLS forced"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "process_step",
+     "axis_b": "the ordered step: kind, actor, capability, process agent, SOP, child key, on_result and max_attempts",
+     "value": {
+      "writer": "the publish actions",
+      "limit": "max_attempts at most 10"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "procedure (SOP)",
+     "axis_b": "definition_of_ready, definition_of_done, acceptance_criteria, inspection and outputs; one published per key",
+     "value": {
+      "writer": "the publish actions",
+      "reader": "the judge seam"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "process_map",
+     "axis_b": "the declarative nodes and edges bound to a project type; one published per (key, project_type)",
+     "value": {
+      "writer": "process_maps.create|update|publish",
+      "kind": "document"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "run",
+     "axis_b": "parent_run_id, step_id, workflow_step_id and depth 0..3; a child names exactly one step kind",
+     "value": {
+      "writer": "process_runs.start and the engine",
+      "index": "root-only uq_run_live"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "run_step",
+     "axis_b": "the attempt row: position, action, outcome and the judge record with criteria names and output hash",
+     "value": {
+      "writer": "process.step",
+      "record": "run_step.judge"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "event",
+     "axis_b": "the outbox row the relay publishes by seq, carrying bus_stream_id and published_at",
+     "value": {
+      "writer": "the handler's transaction",
+      "reader": "the relay"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "capability_agent",
+     "axis_b": "the binding of a capability to a process agent or tool agent with its process_key or toolset",
+     "value": {
+      "writer": "the capability actions",
+      "reader": "agent.run and the readiness seam"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "inference_call.caller_kind",
+     "axis_b": "the caller kind value moved from procedure_step to process_step by migration 0035",
+     "value": {
+      "writer": "the inference capture seam",
+      "rule": "one value, renamed"
+     },
+     "position": 9
+    },
+    {
+     "axis_a": "care-bus stream",
+     "axis_b": "the Redis envelope, process and tool groups, delivery counter and dead-letter stream; a component, never the record",
+     "value": {
+      "owner": "crates/bus",
+      "rule": "Postgres is the truth"
+     },
+     "position": 10
+    }
+   ],
+   "links": [
+    {
+     "to": "Technology Standards Catalog — S13 Process Engine (Phase D)",
+     "kind": "dependency"
+    }
+   ],
+   "body": "# Data Entity/Data Component Catalog — S13 Process Engine (Phase C)\n\n## Metadata\n\nType catalog; phase C; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S13; tranche 8; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The entities are the rows the executor, the judge, the relay and the published catalogue write or read, plus the one non-database component on the delivery path.\n\n## Entries\n\nTen data entities and components: process, process_step, the SOP, the process map, run, run_step, event, capability_agent, the renamed inference caller kind and the care-bus stream. Each names its writer and the rule or index that makes it safe. The run and run_step rows carry the liveness indexes and the judge record; the event row is the relay's source; the care-bus is listed because it is on the delivery path but is explicitly not the system of record.\n\n## Links\n\nDepends on the Technology Standards Catalog for the storage, migration, stream and idempotency standards. The source is `crates/store/src/run.rs` for the live-run indexes, `crates/store/src/process_seed.rs` for the catalogue writes, `crates/actions` for the step and judge writers, and the plan's §5.1 and §5.3 for the schema and run-tree columns.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It gives the Phase C view of the process engine: the rows an audit would read after a run, the writer of each, and the one component whose loss must be recoverable from Postgres. The absence of a workflows catalogue row is the data-side statement of `v1-s13-1`; the table family has no shipped source for that limb.\n"
+  },
+  {
+   "title": "Technology Standards Catalog — S13 Process Engine (Phase D)",
+   "phase_code": "d",
+   "plateau": "hld",
+   "artifact_kind": "catalog",
+   "entries": [
+    {
+     "axis_a": "PostgreSQL 18 with row-level security",
+     "axis_b": "the storage floor for every process, run and event row",
+     "value": {
+      "rule": "RLS forced; seed and backfill as owner see zero rows",
+      "failure_prevented": "a tenant reading another tenant's runs"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "sqlx migrations",
+     "axis_b": "0035_process_tree, 0036_s19_output_grade and 0037_run_tree_workflow_step, embedded and applied by the server's migrate path",
+     "value": {
+      "rule": "a new file needs a rebuild before the command sees it",
+      "failure_prevented": "a green migrate with no table"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Redis Streams care-bus",
+     "axis_b": "the envelope, process and tool groups, XACK/XAUTOCLAIM and the dead-letter stream ported from care-bus-agents@96c608c",
+     "value": {
+      "rule": "five deliveries then bus:dead; Postgres job fallback",
+      "failure_prevented": "a lost outcome after a Redis restart"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Action registry and external action client",
+     "axis_b": "laya.judge is a registered external action with a typed client and the conveyor's laya licence",
+     "value": {
+      "rule": "no plain unauthenticated HTTP call",
+      "failure_prevented": "an unauthenticated judge and an unattributable acceptance"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "serde_yaml and include_dir seed loader",
+     "axis_b": "70 type files, 280 processes and 350 SOPs applied after migrate --seed, with manifest.yaml as the generated index",
+     "value": {
+      "rule": "apply twice on a fresh database",
+      "failure_prevented": "a catalogue that cannot republish idempotently"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Idempotency",
+     "axis_b": "the envelope id plus (run_id, position, attempt), with uuidv5(run_id:step:attempt) as the action's key",
+     "value": {
+      "rule": "one side effect per attempt",
+      "failure_prevented": "a retry duplicating a write"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "pg_notify relay wake",
+     "axis_b": "the relay publishes unpublished event rows by seq and is woken by the notify",
+     "value": {
+      "rule": "the event row, not the wake, is the source",
+      "failure_prevented": "a dropped outcome when a notification is missed"
+     },
+     "position": 7
+    }
+   ],
+   "links": [
+    {
+     "to": "Solution Concept Diagram — S13 Process Engine (Phase A)",
+     "kind": "reuse"
+    }
+   ],
+   "body": "# Technology Standards Catalog — S13 Process Engine (Phase D)\n\n## Metadata\n\nType catalog; phase D; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S13; tranche 8; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The standards are the ones the tree and the plan actually use; the catalog is a reading of the workspace and the §5 deliverables, not a wish list.\n\n## Entries\n\nSeven standards: PostgreSQL with row-level security forced; the three sqlx migrations; the Redis Streams care-bus port with its groups and dead-letter stream; the action registry's external-action client for `laya.judge`; the serde_yaml and include_dir catalogue loader; the idempotency key; and the `pg_notify` relay wake whose source remains the event row. Each names the rule that makes it safe and the failure it prevents, so a review can test the rule rather than admire the choice.\n\n## Links\n\nReuses the Solution Concept Diagram's node set and depends on the Data Entity catalog for the writers each standard governs. The source is the plan's §5.1, §5.7 and §8, the workspace dependency set, and `crates/bus` for the stream shape. The retention of `crates/workflow` is a standard in its own right: it stays the tool-sequence executor and is never called by the process executor's graph planner.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It closes the Phase D view: a reader can see which standards the process engine rests on, which failure each rule prevents, and which build item the standards do not yet cover. The care-bus row records the trap that has already cost sessions elsewhere: a handler that writes Redis-only state loses it on restart, so the envelope is a nudge and the Postgres outcome is the record.\n"
+  }
+ ],
+ "documents": [
+  {
+   "category": "architecture-artifact",
+   "title": "Architecture Artefact Index — S13 (retrospective, 2026-11-28)",
+   "body": "# Architecture Artefact Index — S13 (retrospective, 2026-11-28)\n\n## Metadata\n\nThe artefact set for S13 is the seven mandatory Phase A-D artefacts on the delivery track: the Stakeholder Map, the Driver/Goal/Objective Catalog, the Requirements Catalog and the Solution Concept Diagram at phase a, plateau psa; the Business Capability Map at phase b; the Data Entity/Data Component Catalog at phase c; and the Technology Standards Catalog at phase d. Each carries an authored body dated 2026-11-28; the owner is the programme architect, the reviewer the Architecture Board, and the subject is the S13 record at the pinned snapshot.\n\n## Entries\n\nSeven rows in the standard's order: a/matrix — Stakeholder Map — S13 Process Engine (Phase A); a/catalog — Driver/Goal/Objective Catalog — S13 Process Engine (Phase A); a/catalog — Requirements Catalog — S13 Process Engine (Phase A); a/diagram — Solution Concept Diagram — S13 Process Engine (Phase A); b/diagram — Business Capability Map — S13 Process Engine (Phase B); c/catalog — Data Entity/Data Component Catalog — S13 Process Engine (Phase C); d/catalog — Technology Standards Catalog — S13 Process Engine (Phase D).\n\n## Links\n\nEvery artefact links to another of the set with one of the four §8.1 kinds: derivation, realization, reuse or dependency. The links follow the phase order and close into one set, so no artefact is an orphan, and each artefact's own Links section names the slice-plan section and the tree path its content is read from.\n\n## Document\n\nThis index is published as its own architecture-artifact document by the rework factory. It is the document the close gate reads for the project's artefact standard, and it lets a reader verify the set without re-reading the plan: the rows, the order and the link kinds are all stated here.\n"
+  },
+  {
+   "category": "user-stories",
+   "title": "User Stories — S13 Process Engine (retrospective, 2026-11-28)",
+   "body": "# User Stories — S13 Process Engine (retrospective, 2026-11-28)\n\n## Personas\n\nThe tenant process author designs or overrides a process and its SOPs; D29 makes that a row, not a code constant. The platform engineer operates the worker, the catalogue loader and the care-bus. The coach receives a card whose judged output exhausted its reject budget. The SRO is accountable for the tranche outcome, and the Architecture Board approves the artefact set. The programme office reads the dispositions ledger to reconcile the 348 old flows.\n\n## Stories\n\n- As a tenant process author, I want to publish a versioned process of agent, computed, gate and call steps, each with its SOP, so that a card's work has a reviewed definition of ready and done. @verify=S13-process-author\n- As a platform engineer, I want one executor that dispatches on the step's kind and is idempotent on (run_id, position, attempt), so that a retry cannot duplicate a side effect. @verify=S13-step-executor\n- As the coach, I want a rejected step to rerun with the judge's reason at most twice and then block to me, so that a bad output escalates instead of looping. @verify=S13-judge-ladder\n- As a workflow owner, I want a call step to resolve its target process-first and workflow-second, so that the retained tool sequences stay executable without becoming a second process engine. @verify=S13-call-step\n- As the programme office, I want every old n8n node mapped to a process, an absorbed handler or a retirement row with no delta, so that the 348 flows are dispositioned rather than silently dropped. @verify=S13-dispositions\n\n## Scenarios\n\n- Given a published process with a gate step, when the step executes, then the approval opens and the run parks until a decision resumes it. @verify=S13-gate-resume\n- Given a step whose judge rejects the output, when the reject budget is not exhausted, then the same position reruns with the reason; when the budget is exhausted, then the run fails and the card goes BLOCKED to the coach. @verify=S13-reject-ladder\n- Given a laya outage during judging, when the step is re-enqueued, then the outage parks the step and is never counted as a reject. @verify=S13-outage-wait\n- Given a live root run on a card, when a coach child starts, then the child is accepted at depth one while a second live root is refused. @verify=S13-run-tree\n- Given Redis is flushed mid-run, when the relay replays the unpublished event rows, then the run state is reproduced with one outcome per step. @verify=S13-bus-replay\n- Given the seed catalogue, when the loader applies it twice on a fresh database, then 280 type processes and 350 SOPs publish idempotently. @verify=S13-catalogue\n\n## Verify\n\nEach story's scenario is carried by the gate commands in `docs/plans/slices/S13-n8n-engine.md` §7: `process_step`, `project_start`, `computed_set`, `judge`, `process_tree`, `bus_delivery`, `n8n_migration`, `agent_run_resolved`, `call_step`, `process_catalogue` and `upstream_tokens`, plus the 280-entry manifest and the 348-line ledger. The project's 17-check manifest `acceptance/programme/S13.toml` is the record-side verification. A scenario whose proof is CI-only or stub-backed says so in the acceptance-criteria document rather than being counted as locally green.\n"
+  },
+  {
+   "category": "acceptance-criteria",
+   "title": "Acceptance Criteria — S13 Process Engine (retrospective, 2026-11-28)",
+   "body": "# Acceptance Criteria — S13 Process Engine (retrospective, 2026-11-28)\n\n## Scenarios\n\n- The process limb: a four-step process with a gate, a retry, a judged step and a coach child runs on the parent's card; the gate parks and resumes. @verify=S13-AC-1\n- The judge: accept, reject with the reason, two rejects to BLOCKED and an outage wait. @verify=S13-AC-2\n- The run tree: a second live root is refused; a child is allowed; depth four is refused; cancel cascades. @verify=S13-AC-3\n- The bus: duplicate delivery yields one outcome; a killed consumer re-delivers; a poison message dead-letters. @verify=S13-AC-4\n- The catalogue: the manifest is exactly 280 type processes and the import is 333 processes (280 card-type plus 53 named) with 403 SOPs and 3 maps. @verify=S13-AC-5\n- The dispositions: 348 rows, every old node mapped, no delta row. @verify=S13-AC-6\n- The Postgres-only limb: with Redis stopped the process tests still pass. @verify=S13-AC-7\n\n## Verify commands\n\nThe commands are the plan's §7 block: `cargo test -p conveyor-actions --test process_step`, `cargo test -p conveyor-api --test project_start`, `cargo test -p conveyor-api --test computed_set`, `cargo test -p conveyor-actions --test judge`, `cargo test -p conveyor-store process_tree`, `cargo test -p conveyor-actions --test bus_delivery`, `cargo test -p conveyor-actions --test n8n_migration`, `cargo test -p conveyor-actions --test agent_run_resolved`, `cargo test -p conveyor-actions --test call_step`, `cargo test -p conveyor-actions --test process_catalogue`, `cargo test -p conveyor-api --test capability_readiness`, `cargo test -p conveyor-server --test upstream_tokens`, the manifest count `yq -r '.processes | length' seed/processes/manifest.yaml` equal to 280, the absence of `delta:` in `parity/n8n-dispositions.tsv`, and its 348-line count.\n\n## Results\n\nThe plan records the process, judge, run-tree, catalogue, dispositions, trace and session-2 checks as green at 2026-11-10. The bus delivery test is CI-only in this environment because the build host has no Docker and no reachable Redis, and it fails closed rather than skipping. `capability_readiness` carries one ignored test that needs the real strata, and the judge's local proof uses a stub laya, so the first live call remains the gate for the external action's wire shape.\n\n## Status\n\nThe gate areas are recorded as passed except where a proof is CI-only, stub-backed or requires the live strata; those exceptions are named above. One build-order item remains open: `seed/processes/workflows/` is not shipped, carried as `v1-s13-1` with the route \"ship a minimal catalogue or withdraw the built claim\". The project is re-closed on the record set with that code finding explicitly open, and the ledger entry resolves only by a commit, test and evidence that this pack does not fabricate.\n"
+  },
+  {
+   "category": "definition-of-ready",
+   "title": "Definition of Ready — S13 Process Engine (retrospective, 2026-11-28)",
+   "body": "# Definition of Ready — S13 Process Engine (retrospective, 2026-11-28)\n\n## Independent\n\nS13's dependencies are typed on the project row as needs-edges to S03, S04, S11 and S15, and its gate is self-contained: the §7 command block runs the process, judge, run-tree, bus, catalogue and disposition checks without waiting on another member's closure. The retained workflow engine is inside this repository, so the tool-sequence limb needs no external service.\n\n## Negotiable\n\nThe 280 processes are a default catalogue, not a fixed system set: D29 lets a tenant instantiate, override or design its own process, and the plan's open questions leave the map's live-status source and the tenant map node shape open with defaults rather than locking them. The rework's own scope is negotiable in the same way: the pack supplies the lifecycle record and does not rewrite the delivery decisions.\n\n## Valuable\n\nR4's value is that the conveyor executes processes rather than n8n graphs, so a card's work has a stated definition of ready and done, a judged output and a bounded failure path. The 348-flow ledger makes the migration auditable node by node, and the run tree lets the coach work under the same card's live root instead of being refused the root slot.\n\n## Estimable\n\nThe work is estimated from three schema migrations, one executor seam, three inspection kinds, one bus crate and a generated catalogue of 70 type files, 280 processes and 350 SOPs. The manifest's 17 checks and the §7 command list give the size bounds without a separate estimate, and the one unshipped item is a named catalogue, not an open-ended research task.\n\n## Small\n\nThe delivery divides into three sessions' build order plus one outstanding item: schema and validation; executor, judge and run tree; the computed set and bus; the catalogue; the session-2 executor defects; the session-3 contracts and install path; and the unshipped workflow catalogue as item 13. No part requires a second execution model or a new service.\n\n## Testable\n\nEvery requirement in the Requirements Catalog names its test target, and the gate is executable: `process_step`, `judge`, `process_tree`, `bus_delivery`, `process_catalogue`, `n8n_migration` and the manifest and ledger counts. The bus test's CI-only nature and the judge's stub laya are stated up front so a green command is not mistaken for a live proof, and the dispositions count is a file check rather than a reading of prose.\n\n## Dependencies\n\nTyped needs-edges: S03 and S04 supply the run, procedure and executor surface; S11 the process and step tables; S15 the capability_agent readiness seam. S12 owns screens 7 and 22; S19's eval_runs carries the eval inspection; and `v1-s13-1` is the one build item that must be either shipped as a minimal catalogue or withdrawn from the built claim.\n"
+  },
+  {
+   "category": "definition-of-done",
+   "title": "Definition of Done — S13 Process Engine (retrospective, 2026-11-28)",
+   "body": "# Definition of Done — S13 Process Engine (retrospective, 2026-11-28)\n\n## Acceptance criteria\n\nThe 17 checks in `acceptance/programme/S13.toml` are the record gate: the project row, the approved baseline, the charter, the closure outputs, the delivery contract, the Phase-G review, the closure gate, waivers, the PI cadence, plan and objectives, lessons, the WSJF inputs, demo credits, product findings, the artefact standard and the rework resolution. The §7 process gate is the product gate, and both are read at the pinned snapshot.\n\n## Evidence at completion\n\nThe evidence is the test binaries the plan names, the generated 280-entry `seed/processes/manifest.yaml`, the 348-row `parity/n8n-dispositions.tsv` with no delta row, the record in `docs/evidence/S13-ENGINE.md`, and the closed project row with its charter, baseline, artefacts, registers, contract and closure review published by this pack.\n\n## Repo gate\n\nThe repository gate is the §7 command block against a migrated and seeded database, plus the project's preflight and the PR's CI for the compile verdict. The bus delivery test is CI-only here; the local gate therefore records that limb as proved in CI, not on the build host, and it never reports a skip as a pass.\n\n## Merge and closure\n\nThe unit lands as one issue, one branch and one PR under the repository's delivery contract; the closure is decided by an approver other than the requester, and the rework pack supplies the lifecycle the closed row was missing. `v1-s13-1` stays open against the code, and its resolution is a shipped minimal workflow catalogue with a test or the withdrawal of the built claim, carried in the ledger with commit, test and evidence.\n"
+  }
+ ],
+ "registers": {
+  "risk": [
+   {
+    "code": "S13-R1",
+    "title": "The reusable workflow catalogue is unshipped, so the call step's workflow limb has no catalogue path",
+    "body": "Build-order item 13 records `seed/processes/workflows/` as not blocked and not shipped. The call step's workflow limb is proved by `call_step.rs` for a hand-created row, but a tenant process that names a workflow key has no catalogue row to resolve, so the workflow-second limb is unusable outside tests. The package is `v1-s13-1` and is P1 CODE; the route is to ship a minimal catalogue with a test or to withdraw the built claim for that item, and the ledger entry resolves only when that commit, test and evidence lands.",
+    "probability": "high",
+    "impact": 3,
+    "review_at": "2026-12-12",
+    "severity": "high",
+    "status": "open",
+    "response": "Carry `v1-s13-1` to the build: either author the minimal reusable workflow catalogue under `seed/processes/workflows/` with a resolving test, or amend the plan's built claim for item 13; attach commit, test and evidence to the ledger entry before any package declares it resolved.",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/slices/S13-n8n-engine.md#6"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the programme architect (conveyor-e2e)"
+    }
+   },
+   {
+    "code": "S13-R2",
+    "title": "The bus delivery proof is CI-only in this environment, so a local green cannot carry it",
+    "body": "The bus test needs a Redis reachable from the build host, which has neither Docker nor a reachable Redis. It fails closed and never skips, which is the right behaviour, but it means the duplicate, re-delivery and dead-letter properties are evidenced by the repository's CI rather than by a command run beside the build. A local session that reports the bus green without naming CI has overclaimed.",
+    "probability": "medium",
+    "impact": 2,
+    "review_at": "2026-12-12",
+    "severity": "medium",
+    "status": "open",
+    "response": "Read the bus proof from the CI run named on the unit, not from a local attempt; keep the fail-closed test in place, and do not add a skip path to make a local run green.",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/slices/S13-n8n-engine.md#7"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the operations lead (conveyor-e2e)"
+    }
+   },
+   {
+    "code": "S13-R3",
+    "title": "The laya request shape is unpinned until the first live call",
+    "body": "The TypeSafe AI node is installed but its wire schema is not in this repository, so the judge's local proof uses a stub and the response margin is not proved against the live service. The plan's second open question says the first live call pins the shape; until then the conveyor side is fixed by the stub and the acceptance property is the map from the SOP criteria to the judged record, not the provider's own field order.",
+    "probability": "medium",
+    "impact": 3,
+    "review_at": "2026-12-12",
+    "severity": "medium",
+    "status": "open",
+    "response": "Make the first live `laya.judge` call part of the deployed proof, record the request and response shape in the evidence, and re-read the stub against it before the judge is claimed to match the provider.",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/slices/S13-n8n-engine.md#10"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the programme architect (conveyor-e2e)"
+    }
+   }
+  ],
+  "issue": [
+   {
+    "code": "S13-I1",
+    "title": "The record closed the project without a closure review or the lifecycle set",
+    "body": "At the 2026-11-28 snapshot the project row is closed and the engine is in the tree, but the record carries no published closure review and no authored charter, baseline, artefact set, registers or delivery contract for the close gate to read. The gap is a record gap rather than a product gap: this pack supplies the set and the project's receipt is the evidence that the record now exists.",
+    "severity": "P1",
+    "status": "open",
+    "response": "Supplied by this pack: the closure and closure-review outputs, the charter, the artefact index, the five registers, the delivery contract and the Phase-G review, all read at the pinned snapshot."
+   },
+   {
+    "code": "S13-I2",
+    "title": "v1-s13-1: the reusable workflow catalogue is unshipped while the slice is marked built",
+    "body": "The plan's status line says built and build-order item 13 says the reusable tool sequences under `seed/processes/workflows/` are not blocked and not shipped. The call step's workflow limb works only for hand-created rows, so the retained tool-sequence executor has no catalogue path from a process. The finding's acceptance is to ship the catalogue or declare the limb out of scope and stop claiming it as built.",
+    "severity": "P1",
+    "status": "open",
+    "response": "Take one of the two routes the finding names: ship a minimal catalogue with a resolving test, or withdraw the built claim for item 13; the ledger gains resolved_by only with the commit, test and evidence for the chosen route."
+   },
+   {
+    "code": "S13-I3",
+    "title": "The judge's live call and the map's live-status source remain open questions",
+    "body": "The judge's local proof is a stub, and the plan's second open question says the provider wire shape is pinned by the first live call. The first open question leaves the map node's live status to a per-card derivation with the process_maps.get plus run reads as the default. Both are recorded as defaults rather than settled facts, so a later session does not read the retrospective pack as deciding them.",
+    "severity": "P2",
+    "status": "open",
+    "response": "Record the first live judge call's shape in the evidence, and keep the map's live position derived per card until a decision changes it; neither default blocks the record close."
+   }
+  ],
+  "assumption": [
+   {
+    "code": "S13-A1",
+    "title": "The 2026-11-28 rework snapshot is the authoritative record for S13",
+    "body": "Every judgement in this pack is read from the pinned snapshot, and the content checker refuses an identifier that appears nowhere in it. A row that changed after the snapshot is out of scope for this pack by construction, and a later session must re-read the live record before treating any statement here as current.",
+    "status": "held"
+   },
+   {
+    "code": "S13-A2",
+    "title": "Postgres remains the record and Redis is only a nudge",
+    "body": "The care-bus carries the envelope and the stream ids, but every outcome is a Postgres row written in the handler's transaction. The assumption is that no handler is allowed to keep Redis-only state, which is what makes a Redis loss recoverable and what the replay property proves; a handler that violates it would turn a transport outage into a lost outcome.",
+    "status": "held"
+   },
+   {
+    "code": "S13-A3",
+    "title": "The 280 processes are a default catalogue, not a fixed system set",
+    "body": "The seed ships 70 type files and 280 processes as defaults, and D29 lets a tenant instantiate, override or design its own. The assumption is that the loader's idempotency and the publish validation hold for tenant-authored rows exactly as they do for the seed, which the catalogue test exercises on a fresh database but not for an arbitrary tenant fork.",
+    "status": "held"
+   },
+   {
+    "code": "S13-A4",
+    "title": "The judge's confidence margin is the signal, not the boolean label",
+    "body": "The plan reads the laya response as `{score, accepted, reason}` and treats the margin as the signal. The assumption is that the provider's score is comparable across the steps of one SOP; if it is not, the threshold and max_rejects remain per-SOP decisions and the judge record still carries the raw verdict for a later recalibration.",
+    "status": "held"
+   }
+  ],
+  "dependency": [
+   {
+    "code": "S13-D1",
+    "title": "S13 depends on S03, S04, S11 and S15",
+    "body": "The project row records needs-edges to S03, S04, S11 and S15. S03 and S04 supply the run and executor surface, S11 the process and step tables that migration 0035 renames, and S15 the capability_agent row with its readiness seam. The pack records the edges as the record carries them and does not claim a status for any upstream member.",
+    "status": "open"
+   },
+   {
+    "code": "S13-D2",
+    "title": "S12 owns screens 7 and 22",
+    "body": "The plan declares the UI surface to S12: screen 7 for processes, steps, SOP, judge verdicts and user-facing outputs, and screen 22 for the process map with the live position. The dependency is a declaration, not a build in this project, so this pack records it to stop a later session reading the absent screens as an S13 gap.",
+    "status": "open"
+   },
+   {
+    "code": "S13-D3",
+    "title": "S19's eval_runs carries the eval inspection",
+    "body": "An `eval` inspection uses S19's eval_runs and records the same judge shape as the laya and checker kinds; migration 0036 is the S19 output-grade path that travels with the process tree. The interface is S19's, and this project consumes it rather than reimplementing an eval store.",
+    "status": "open"
+   },
+   {
+    "code": "S13-D4",
+    "title": "The reusable workflow catalogue is the one build item with no dependency to wait on",
+    "body": "Build-order item 13 is not blocked: the actions it needs, including coding_jobs and the board, requirements, documents and artifacts families, are registered, and the call step's workflow limb is proved. What is missing is the authoring itself, so the route is a small catalogue with a test or a withdrawn built claim, not a dependency on another project.",
+    "status": "open"
+   }
+  ],
+  "benefit": [
+   {
+    "code": "S13-B1",
+    "title": "The process model replaces the n8n graph as the executor",
+    "body": "R4's structural benefit is one execution model: a process of ordered steps with SOPs, judged outputs and a run tree, while the 348 old flows are re-authored or absorbed and mapped in a ledger with no delta row. The benefit is a reduction in models rather than a measured saving, and it is observable in the dispositions file and the catalogue manifest.",
+    "status": "open",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/slices/S13-n8n-engine.md#1"
+     ],
+     "decisions": []
+    }
+   },
+   {
+    "code": "S13-B2",
+    "title": "Step acceptance becomes auditable",
+    "body": "The judge's verdict is written to `run_step.judge` with the decision, score or margin, reason, criteria names and output hash, so an acceptance can be replayed and challenged from the record rather than reconstructed from logs. The benefit is an audit property carried by the run_step row, not a claim that every judgement is correct.",
+    "status": "open",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/slices/S13-n8n-engine.md#5.5"
+     ],
+     "decisions": []
+    }
+   },
+   {
+    "code": "S13-B3",
+    "title": "A Redis loss loses no outcome",
+    "body": "Because every outcome is a Postgres row and the relay publishes event rows by seq, a flush of the stream is recovered by replay and the run state is reproduced with one outcome per step. The benefit is availability without a second source of truth, and the `FLUSHALL` replay property is the evidence rather than an operational hope.",
+    "status": "open",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/slices/S13-n8n-engine.md#5.7"
+     ],
+     "decisions": []
+    }
+   },
+   {
+    "code": "S13-B4",
+    "title": "The coach works under the same card's live root",
+    "body": "The run tree's root-only live index and one-live-child rule let the coach or a capability child start under a live parent on the same card, bounded at depth three with cascade cancel. The benefit is that escalation and capability work no longer compete for the single root slot, which was the concrete blocker the plan recorded against uq_run_live.",
+    "status": "open",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/slices/S13-n8n-engine.md#5.3"
+     ],
+     "decisions": []
+    }
+   }
+  ]
+ },
+ "delivery_contract": {
+  "title": "Delivery Contract — S13 Process Engine (retrospective)",
+  "body": {
+   "commitments": "S13 delivers the process executor: ordered steps of kind agent, computed, gate and call, each with its SOP and inspection; a judge that reruns a rejected output with the reason at most twice and then blocks, while an outage waits; a run tree with one live root per card, one live child per (parent, step) and depth at most 3; the care-bus with groups, a dead-letter stream and replay from Postgres; the 280-process default catalogue; and the 348-row dispositions ledger with no delta. It also commits the retained workflow engine as the tool-sequence executor and records the unshipped workflow catalogue as open rather than delivered.",
+   "compliance": "Compliance is demonstrated by the §7 command block and the 17 checks in `acceptance/programme/S13.toml`: `process_step`, `project_start`, `computed_set`, `judge`, `process_tree`, `bus_delivery`, `n8n_migration`, `agent_run_resolved`, `call_step`, `process_catalogue`, `capability_readiness` and `upstream_tokens`, the 280-entry catalogue manifest and the 348-row ledger. The bus test is proved in CI because the build host has no Redis, and the judge's local proof uses a stub laya; both qualifications are recorded rather than rounded up.",
+   "approval": "The contract is approved by the board decision the factory records for this pack under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The Phase-G review records the level compliant for the record set, and the closure is decided by an approver other than the requester; the session that authored this pack is neither the approver nor the acceptor.",
+   "manifest": "`acceptance/programme/S13.toml` {T} 17 checks over the project row, the approved baseline, the charter, the closure outputs, the contract, the Phase-G review, the closure gate, the waivers, the PI cadence, plan and objectives, the lessons, the WSJF inputs, the demo credits, the product findings, the artefact standard and the rework resolution.",
+   "acceptance_at": "2026-11-28",
+   "retrospective": "This delivery contract is authored retrospectively for the tranche-8 rework. The 2026-11-10 build carried no contemporaneous contract, so the commitments are read from the tree, the tests and the plan at the pinned snapshot and are not presented as a pre-build agreement.",
+   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+  }
+ },
+ "wbs_deliverable": {
+  "title": "The process executor, judge, run tree and care-bus — the process is the executor and the workflow engine stays the tool-sequence engine",
+  "business_value": 9,
+  "time_criticality": 7,
+  "risk_reduction": 9,
+  "job_size": 13
+ },
+ "review": {
+  "level": "compliant",
+  "findings": "This retrospective Phase-G review records the level compliant for the record set it assesses under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The packages it answers are named here. `closed_without_closure_review:S13` is resolved by the closure and closure-review outputs this pack publishes. `std-pmp-change-control-s13:S13`, `std-pmp-project-baseline-s13:S13`, `std-pmp-project-registers-s13:S13` and `std-pmp-project-wbs-s13:S13` resolve from the pack's baseline, registers, change posture and WSJF deliverable. `std-togaf-architecture-artifact-s13:S13`, `std-togaf-compliance-review-s13:S13`, `std-togaf-delivery-contract-s13:S13` and `std-togaf-phase-g-s13-g:S13` resolve from the artefact index and set, this review, the delivery contract and the Phase-G record. `std-delivery-user-stories-s13:S13`, `std-delivery-acceptance-criteria-s13:S13`, `std-delivery-definition-of-ready-s13:S13` and `std-delivery-definition-of-done-s13:S13` resolve from the four authored delivery documents in this pack. `v1-s13-1:S13` is P1 CODE and is not resolved by a record pack: the plan marks the slice built while `seed/processes/workflows/` is 'not blocked, not shipped', so the call step's workflow limb has no catalogue path outside hand-created rows. Its route is to ship a minimal reusable workflow catalogue with a test, or to withdraw the built claim for that item; the ledger gains resolved_by with the commit, test and evidence only when one of those lands, and this pack does not claim the code shipped.",
+  "evidence": {
+   "manifest": "acceptance/programme/S13.toml",
+   "plan": "docs/plans/slices/S13-n8n-engine.md",
+   "record": "docs/evidence/S13-ENGINE.md",
+   "catalogue_manifest": "seed/processes/manifest.yaml",
+   "dispositions": "parity/n8n-dispositions.tsv",
+   "finding": "v1-s13-1",
+   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+  }
+ },
+ "project_brief_output": "# Project Brief — S13 Process Engine, Judge, Map and Care-Bus (retrospective, 2026-11-28)\n\n## Outcome\n\nThe conveyor executes processes rather than n8n graphs: a card's work is an ordered list of agent, computed, gate and call steps, each with an SOP that states its definition of ready and done and the inspection that judges its output. A run is a tree rooted once per card, the coach can work under the same card's live root, and the 348 old flows are dispositioned node by node with no delta rows.\n\n## Boundary\n\nIn scope are the three migrations, the process and SOP publish validation, the step executor, the judge, the run tree, `crates/bus` and its relay, the computed set, the 280-process default catalogue and the dispositions ledger. Out of scope are data migration D7, the map and stage editor beyond a read/author form (S12), the `cap.*` prompts (S15/S21), the benchmark and eval slices, w2v/media production, parallel fan-out, any Python, and old-flow retirement, which the 2026-11-10 scope correction removed from the launch gate.\n\n## Reuse sources\n\nThe plan's §4 table is the source list: the v4 `model.md` and `capability-flows.md` vocabulary, the v4 `README.md` rules R348(2), R359(1-4) and R347(3) for the laya judge, `agent/crates/agent-api/src/runtime/bus.rs` from `care-bus-agents@96c608c` for the care-bus envelope and groups, the case and orchestrator shapes for a run that waits, S11's process and step storage, S15's capability readiness seam, and `docs/evidence/S13-ENGINE.md` for the DAG's measured history.\n\n## Inception units\n\nThe build order is the inception sequence: schema and validation; the step executor and run tree; the judge; `projects.create` and the start card; the computed handlers; the bus; the catalogue; the session-2 executor defects W4, W5, D29 readiness, the catalogue end to end and the per-tenant upstream tokens; and the session-3 step, gate/call, lifecycle, lease, judge-record, map and install contracts. Item 13, the reusable workflow catalogue, is the one inception unit not shipped.\n\n## Dependencies\n\nThe project row records needs-edges to S03, S04, S11 and S15. S12 owns screens 7 (processes) and 22 (process map), S19's `eval_runs` carries the eval inspection, and the retained workflow engine inside this repository supplies the tool-sequence limb. `v1-s13-1` is the open code finding whose route is a minimal workflow catalogue or a withdrawn built claim.\n\n## Acceptance\n\nThe plan's §7 gate is the acceptance: the process limb with the gate parked and resumed and the coach child; the judge's accept, reject-rerun, two-reject BLOCK and outage wait; the bus's duplicate idempotency, `FLUSHALL` re-delivery and dead-letter; the 280-process catalogue; the absence of a `delta:` row in the 348-row ledger; and the Postgres-only limb with Redis stopped. The 17 checks in `acceptance/programme/S13.toml` are the record-side gate.\n\n## Capabilities\n\nSeven capabilities: process authoring and publish, process execution, judged acceptance, run-tree orchestration, durable bus delivery, map authoring and read, and flow-disposition parity. Each is delivered by a named module in the Phase B and C artefacts and proven by a named test or generated file; none is an aspiration without a target.\n\n## Plan\n\nThe plan is `docs/plans/slices/S13-n8n-engine.md`. Its build order is complete except item 13, the reusable workflow catalogue; item 14's historical fixtures are in the repository and drive the workflow-side diff. The bus test is CI-only in this environment. The map's live-status source, the laya wire shape and the tenant map node remain the plan's open questions with defaults, and the tranche-8 rework is the project's re-closure forum.\n",
+ "evidence_output": "# Evidence — S13 Process Engine, Judge, Map and Care-Bus (retrospective, 2026-11-28)\n\n## Claim\n\nS13 delivers the process executor: a process of agent, computed, gate and call steps with an SOP and an inspection; a judge that reruns a rejected output with the reason at most twice and then blocks, while an outage waits; a run tree with a root-only live index and depth at most 3; the care-bus with groups, a dead-letter stream and replay from Postgres; the 280-process default catalogue; and the 348-row dispositions ledger with no delta row.\n\n## Evidence\n\nThe test binaries the plan names: `process_step`, `project_start`, `computed_set`, `judge`, `process_tree`, `bus_delivery`, `n8n_migration`, `agent_run_resolved`, `call_step`, `process_catalogue`, `capability_readiness` and `upstream_tokens`. The generated files: `seed/processes/manifest.yaml` at 280 type processes and `parity/n8n-dispositions.tsv` at 348 rows, 333 distinct targets, 3 absorbed rows and 12 n8n-retire rows. The record: `docs/evidence/S13-ENGINE.md` and the project's 17-check manifest.\n\n## Verification\n\nThe commands are the §7 block, from `cargo test -p conveyor-actions --test process_step` through `cargo test -p conveyor-server --test upstream_tokens`, with the catalogue count and the ledger checks in the same block. `bus_delivery` runs in CI because the build host has no Docker and no reachable Redis, and it fails closed rather than skipping; `capability_readiness` carries one ignored test that needs the real strata; `judge` uses a stub laya, so the live call remains the gate. The record side is the manifest at the pinned snapshot.\n\n## Links\n\n`docs/plans/slices/S13-n8n-engine.md`, `acceptance/programme/S13.toml`, `docs/evidence/S13-ENGINE.md`, `seed/processes/manifest.yaml`, `parity/n8n-dispositions.tsv`, and the Phase A-D artefacts in this pack's index document. The record also carries the project's PI cadence, PI plan and objectives, and the tranche-8 rework package set.\n\n## Gap\n\nTwo gaps are named and not absorbed. `v1-s13-1`: `seed/processes/workflows/` is not shipped, so the call step's workflow limb has no catalogue path outside hand-created rows; the route is a minimal catalogue with a test or a withdrawn built claim, and the ledger entry resolves only with commit, test and evidence. The first live laya call has not been made, so the judge's request shape is fixed by the stub and the response margin is unproved live. The bus proof is CI-only locally. The map's live-status source and the tenant map node remain open questions with defaults.\n",
+ "closure": "S13 is re-closed through the gate the record carries: the project row is closed only after its charter, approved baseline, artefact set, registers, delivery contract, WBS deliverable, Phase-G review, outputs and closure review exist, and the receipt on `acceptance/programme/S13.toml` is green at the pinned snapshot. The close records `v1-s13-1`, the unshipped workflow catalogue, and the unproved live laya call as open items rather than passes, and it does not claim a shipped catalogue the tree does not hold.",
+ "closure_review": "# Closure Review — S13 Process Engine, Judge, Map and Care-Bus (retrospective, 2026-11-28)\n\n## Outcome vs acceptance\n\nThe outcome is the process model as the executor. Against the plan's §7 gate, the process limb, the judge ladder, the run tree, the catalogue, the dispositions, the trace and the session-2 checks are recorded as green at 2026-11-10; the bus limb is proved in CI because the build host has no Redis, and the judge's live call is unproved because the local proof uses a stub. The retrospective level is compliant for the record set because the pack supplies the lifecycle and the receipt is green on every check the manifest can run, with the unproved halves named here rather than absorbed.\n\n## Evidence\n\nThe evidence is the test binaries the plan names, the generated 280-entry `seed/processes/manifest.yaml`, the 348-row `parity/n8n-dispositions.tsv` with no delta row, the record in `docs/evidence/S13-ENGINE.md`, and the seventeen checks in `acceptance/programme/S13.toml`. The bus test's CI-only nature is itself evidenced by its fail-closed design and by the build host's lack of Docker and Redis, which the plan states.\n\n## Open items\n\n`v1-s13-1` is open: `seed/processes/workflows/` is not shipped, and the route is a minimal catalogue with a test or a withdrawn built claim, with the ledger resolved_by requiring commit, test and evidence. The first live laya call has not pinned the request shape. The bus proof lives in CI rather than beside the build. The map's live-status source and the tenant map node remain the plan's open questions with defaults.\n\n## Decision\n\nClose the record set as compliant and keep the project closed, with `v1-s13-1` carried as an open P1 code finding outside this pack's power to resolve, and with the live laya call and the CI-only bus proof recorded as proof qualifications. The decision asserts that the lifecycle record now exists and is proved at the snapshot; it does not assert that the reusable workflow catalogue has shipped.\n"
+}

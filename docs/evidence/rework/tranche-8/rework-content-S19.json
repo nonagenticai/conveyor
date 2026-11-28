@@ -1,0 +1,835 @@
+{
+  "charter": "# Charter — S19 Eval Builder (retrospective, 2026-11-28)\n\n- **Project:** S19 'Eval builder', track v1, ADM phase G, delivery plateau, tranche 8, plan `docs/plans/slices/S19-eval-builder.md`.\n- **Sponsor:** the programme's sponsoring group, through the tranche-8 PI plan and the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`.\n- **Authority:** SPEC V2 §3 D25 with §5.2, §5.7, §6 and the §8 S19 definition. S19 ports no old surface, so its parity id is `PENDING-S0` and nothing in the plan is a re-implementation of an existing product.\n- **Objective:** the `claude-api` `build-eval` and `eval-audit` methods become an ordinary product surface. A person defines one flow, builds an input set, signs off the inputs, chooses metrics and a grader, signs off the grading, runs a pilot and then a baseline, and reads a report — all against rows, not against a `.claude/hillclimb/<flow>/` directory of `results.jsonl`, `traces/` and `report.html`.\n- **Scope:** the ten tables of `02-DATA-ARCHITECTURE §2.19`; the `approval.eval_id` column and `uq_appr_eval_pending`; thirty-three actions, three scopes and seven events; four jobs; three built-in versioned prompts; screens 15–20 declared for S12; parts A (define, inputs, sign-off), B (run, grade, capture) and C (report, audit, interop).\n- **Acceptance:** the twelve-step gate of the plan's §7, carried by `acceptance/programme/S19.toml`, whose P0 checks are the project row, the approved baseline, the charter asset, the delivery contract, the Phase-G review, the waivers, the PI cadence, plan and objectives, the WSJF inputs, the demo credits, the product findings, the artefact standard and the rework resolution.\n- **Status:** the project stays active. This charter, the lifecycle set that follows and the two declared outputs are authored retrospectively for the tranche-8 rework; they record what the pinned snapshot holds and do not claim the product's twelve-step gate has been re-run for the pack.\n",
+  "soaw": {
+    "title": "Statement of Architecture Work — S19 Eval Builder (retrospective, 2026-11-28)",
+    "body": {
+      "assignment": "The architecture work assigns S19 the eval instrument as a product surface: ten eval tables, a frozen `eval_version` under one digest, cases with a write-only `expected`, metrics with a declared grader kind, two literal sign-off pauses, a per-case driver that invokes through the action engine, four graders, a recomputable report and a construction audit. The work replaces the skill's file layout — `results.jsonl`, `traces/` and `report.html` under `.claude/hillclimb/<flow>/` — with rows: the rows are the record, the files are the export. The statement is retrospective, describing the assignment the plan set and the state the 2026-11-28 snapshot carries.",
+      "scope": "In scope are the ten tables, the `approval.eval_id` column and its partial unique index, the thirty-three actions, the `evals:read`, `evals:write` and `evals:approve` scopes, the seven events, the four jobs (`eval.case.run`, `eval.run.tick`, `eval.reap`, `eval.prune`), the three built-in versioned prompts, and screens 15–20 declared so S12 cannot invent them. Out of scope are any UI built here, any model call of S19's own — the runner invokes a registered action and never reconstructs a request — model or embedding hosting, the hillclimb loop and cost search (S20), the benchmark instrument (S17/S18), absorbing `inference-router` or `billing_service`, and grading paths rather than outcomes for agentic subjects.",
+      "responsibilities": "The programme architect authors this retrospective set under the standing delegation; the Architecture Board reviews the Phase A–D artefacts and the SoAW; the SRO is accountable for the capability and the tranche outcome; the eval author, a tenant member holding `evals:write`, builds and edits the instrument; an owner or admin holding `evals:approve` signs the inputs, the grading, the cost and the harness, and starts a full run; S12 owns the six screens the plan declares. The author of the pack is not the accepting role, so the separation of duties holds.",
+      "acceptance_criteria": "The gate is the plan's §7 twelve-step sequence: ten tables row-level-security forced and migration 0026 present in `_sqlx_migrations`; a second pending sign-off refused by `uq_appr_eval_pending`; no run without both sign-offs, with the refusal naming the missing gate and an edit voiding a decided sign-off whose artifact digest no longer matches; the subject input type carrying no `expected` bytes; the held-out wall enforced by access rather than by a prompt; a failed attempt unable to occupy its `(case, rep)` slot; cost derived with a negative column count asserting no eval table has a cost column; the oracle ≈100% and null ≈0% controls plus the judge's three known negatives; the variant grammar, the grade-object shape and the label length enforced as database invariants; no answer-key or sign-off action machine-reachable; the served surface matching `served-spec.lock.json`; and the whole suite under fmt and clippy. `acceptance/programme/S19.toml` is the manifest that carries this gate.",
+      "contract": "The contract commits to one invocation path — the runner calls a registered action through S04's engine and never builds a model request of its own — and to one model call, S10's `completions.create` against `inference-router`. Sign-offs are S06 `approval` rows with a nullable `eval_id` and their own partial unique index, an additive ALTER on S03's table recorded as a contract change, so a sign-off is answerable in the web, Telegram and MCP channels with no second escalation primitive. Cost is derived from `inference_call`, never stored (D23): `inference_call.caller_kind` gains `eval` and the table gains a nullable `eval_run_id` that references S19's run and never a `benchmark_run` id. The answer key is structurally unreachable — no view, export or agent tool carries `expected`, and `evals:approve` is absent from `AGENT_TOOLS` along with `eval_signoffs.*` and `eval_runs.start`.",
+      "retrospective": "This statement is authored on 2026-11-28 for the tranche-8 rework. No contemporaneous statement of architecture work exists: the delivery was recorded in the slice plan and its issues, and the project row stays active. The statement therefore records the terms the plan set, the decisions §9 closes and the open questions §10 leaves, and it names what the snapshot does and does not prove rather than implying a ceremonial review that never happened."
+    }
+  },
+  "artifacts": [
+    {
+      "title": "Stakeholder Map — S19 Eval Builder (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "entries": [
+        {
+          "axis_a": "Sponsoring group",
+          "axis_b": "the tranche-8 authorisation and the tranche review that reads S19's receipt",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "SRO",
+          "axis_b": "accountable for the eval capability and the tranche outcome",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "accountable"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Eval author (tenant member)",
+          "axis_b": "defines the eval, builds the input set and edits cases, metrics and versions under evals:write",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "collaborate"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Sign-off approver (owner or admin)",
+          "axis_b": "holds evals:approve; decides the four sign-off gates and starts full runs",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Architecture Board",
+          "axis_b": "approves the Phase A–D artefact set and the retrospective Phase-G level",
+          "value": {
+            "influence": "high",
+            "interest": "medium",
+            "engagement": "approve"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "S12 screens owner",
+          "axis_b": "builds screens 15–20, which S19 declares so S12 cannot invent them",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Business Capability Map — S19 Eval Builder (Phase B)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Stakeholder Map — S19 Eval Builder (Phase A)\n\n## Metadata\n\nType matrix; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S19; tranche 8; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nSix stakeholders on the influence, interest and engagement axes. The sponsoring group decides the tranche; the SRO is accountable for the capability; the eval author builds under `evals:write`; an owner or admin signs the four gates under `evals:approve`; the Architecture Board approves the artefact set; S12 is consulted because it owns screens 15–20. The split between builder and signer is the central relationship: building is not signing, which is why the signer is a distinct row.\n\n## Links\n\nDerives from `docs/plans/slices/S19-eval-builder.md` §1, §3 and §9; realizes the Phase A stakeholder view for the eval instrument; depends on the Business Capability Map for the value each group receives. The roles are the programme's existing ones, and the only new authorization fact is the `evals:approve` scope, which the plan deliberately withholds from `kata_executor` because a scope a machine holds cannot be a sign-off.\n\n## Document\n\nThe artefact sits under the slice plan and the project's architecture set. S19 has no contemporaneous architecture publication of its own; this retrospective artefact is published as an architecture-artifact-instance document by the rework factory, and its subject is the record the 2026-11-28 snapshot carries for S19.\n"
+    },
+    {
+      "title": "Driver/Goal/Objective Catalog — S19 Eval Builder (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "D1 Rows, not a directory",
+          "axis_b": "G1 The instrument is product data; O1 ten tables and thirty-three actions replace results.jsonl, traces and report.html",
+          "value": {
+            "measure": "no eval surface reads a .claude/hillclimb path",
+            "owner": "the programme architect"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "D2 One versioned instrument",
+          "axis_b": "G2 A run names a frozen version under one digest; O2 a cross-version compare is refused",
+          "value": {
+            "measure": "eval_version.digest and the frozen copy",
+            "owner": "conveyor-e2e"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "D3 The answer key is unreachable",
+          "axis_b": "G3 expected never leaves the grader; O3 the subject-input type has no expected field",
+          "value": {
+            "measure": "subject_input_carries_no_expected_bytes",
+            "owner": "conveyor-e2e"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "D4 Signed inputs and grading",
+          "axis_b": "G4 A run needs both sign-offs and a cost ceiling; O4 approval rows with eval_id and the partial unique index",
+          "value": {
+            "measure": "uq_appr_eval_pending refuses a second pending sign-off",
+            "owner": "the tenant owner or admin"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "D5 A number that can be believed",
+          "axis_b": "G5 The report carries a confidence interval, a noise floor and a headroom; O5 an audit validates the instrument's controls",
+          "value": {
+            "measure": "oracle near 100 percent and null near 0 percent",
+            "owner": "conveyor-e2e"
+          },
+          "position": 5
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements Catalog — S19 Eval Builder (Phase A)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Driver/Goal/Objective Catalog — S19 Eval Builder (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S19; tranche 8; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nFive drivers, each with a goal and an objective that names its measure. The first moves the method's file layout into rows; the second freezes the instrument so a grader change cannot silently invalidate a comparison; the third makes the answer key structurally unreachable; the fourth puts the two sign-offs on the one approval primitive; the fifth turns the report into a number with a confidence interval, a noise floor and an audit. The measures are the fields and tests the plan's §7 gate names, not aspirations.\n\n## Links\n\nDerives from `docs/plans/slices/S19-eval-builder.md` §1 and §9; each objective is realized by a requirement in the Requirements Catalog. D2 is the design cross-check of 2026-11-09, which recorded that scores before and after a grader change are not comparable, and D3 is the plan's structural isolation decision rather than a prompt-level defence.\n\n## Document\n\nThe catalog is the retrospective statement of why S19 exists. It is published as an architecture-artifact-instance by the rework factory and is read with the Requirements Catalog: the drivers justify the requirements, and the requirements name the suites that hold them at the snapshot.\n"
+    },
+    {
+      "title": "Requirements Catalog — S19 Eval Builder (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "R-1 Ten tables under RLS",
+          "axis_b": "The ten eval tables are row-level-security forced and 0026 is in the ledger",
+          "value": {
+            "check": "conveyor-store eval_schema",
+            "state": "planned gate"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "R-2 Sign-off index",
+          "axis_b": "uq_appr_eval_pending refuses a second pending sign-off; a check-then-insert is not the guarantee",
+          "value": {
+            "check": "conveyor-store eval_signoff_idx",
+            "state": "planned gate"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "R-3 Both sign-offs before a run",
+          "axis_b": "A run is refused until the inputs and grading gates are decided; an edit voids a stale sign-off",
+          "value": {
+            "check": "conveyor-actions eval_signoff_gate",
+            "state": "planned gate"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "R-4 Answer key isolation",
+          "axis_b": "The subject-input type carries no expected field and no view or export returns it",
+          "value": {
+            "check": "conveyor-domain eval_isolation",
+            "state": "planned gate"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "R-5 Held-out wall by access",
+          "axis_b": "A test-split result needs evals:approve and an agent reads the instrument but never the held-out half",
+          "value": {
+            "check": "conveyor-api eval_heldout",
+            "state": "planned gate"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "R-6 The slot is earned",
+          "axis_b": "A failed attempt writes eval_attempt_error and leaves the (case, rep) slot empty",
+          "value": {
+            "check": "conveyor-store eval_slot",
+            "state": "planned gate"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "R-7 Cost is derived",
+          "axis_b": "No eval table carries a cost column; the report computes cost from inference_call",
+          "value": {
+            "check": "conveyor-store eval_constraints",
+            "state": "planned gate"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "R-8 Instrument controls",
+          "axis_b": "Oracle near 100 percent, null near 0 percent, an induced error is a classified attempt and the judge fails its three negatives",
+          "value": {
+            "check": "conveyor-server eval_controls",
+            "state": "planned gate"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "R-9 Database invariants",
+          "axis_b": "The variant grammar baseline or vN, the grade-object shape and the label length are CHECKs, not conventions",
+          "value": {
+            "check": "conveyor-store eval_constraints",
+            "state": "planned gate"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "R-10 No machine sign-off",
+          "axis_b": "No answer-key or sign-off action is machine-reachable; AGENT_TOOLS omits eval_signoffs, test-split reads and eval_runs.start",
+          "value": {
+            "check": "conveyor-actions registry",
+            "state": "planned gate"
+          },
+          "position": 10
+        },
+        {
+          "axis_a": "R-11 Served surface matches the lock",
+          "axis_b": "The printed OpenAPI document matches served-spec.lock.json after the thirty-three actions land",
+          "value": {
+            "check": "conveyor-server --print-openapi --check-lock",
+            "state": "planned gate"
+          },
+          "position": 11
+        }
+      ],
+      "links": [
+        {
+          "to": "Solution Concept Diagram — S19 Eval Builder (Phase A)",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Requirements Catalog — S19 Eval Builder (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S19; tranche 8; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nEleven requirements, each the observable behind one numbered step of the plan's §7 gate. R-1 and R-2 are schema facts read from the ledger and the catalogue; R-3 to R-5 are the access rules that keep a held-out trace and an answer key unreachable; R-6 keeps resume honest; R-7 is a negative column count asserted in Rust so it can go red; R-8 and R-9 are the instrument's own controls; R-10 and R-11 are the surface rules. Each row names the suite the plan assigns, and the state records that these are the gate's planned checks at the snapshot.\n\n## Links\n\nDerives from the Driver/Goal/Objective Catalog and is realized by the Solution Concept Diagram. The source is `docs/plans/slices/S19-eval-builder.md` §7, whose twelve commands are the acceptance; the plan's §8 traps are the reason several requirements are phrased as refusals rather than as features. The requirement identifiers are local to this pack and do not claim a live requirement register.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It is the bridge from driver to test: a reader can move from a driver through its requirement to the suite that would prove it, without reading the plan's prose first, and can see which requirements are access rules rather than behaviours.\n"
+    },
+    {
+      "title": "Solution Concept Diagram — S19 Eval Builder (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "entries": [
+        {
+          "axis_a": "Eval and eval_version",
+          "axis_b": "the instrument: one flow, a frozen version with cases, metrics, graders, prices and harness paths under one digest",
+          "value": {
+            "state": "draft to active",
+            "freeze": "copy-on-write"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Sign-off approvals",
+          "axis_b": "S06 approval rows with a nullable eval_id and the partial unique index",
+          "value": {
+            "gates": "eval_inputs, eval_grading, eval_cost, eval_harness",
+            "writer": "insert_approval_tx"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "eval.case.run",
+          "axis_b": "one (case, rep) through the action engine; the subject input carries no expected",
+          "value": {
+            "refusal": "judge_is_subject for a judge that is the subject",
+            "writer": "eval_case_result plus eval_trace"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Four jobs",
+          "axis_b": "eval.case.run, eval.run.tick, eval.reap and eval.prune on S06 jobs",
+          "value": {
+            "queue": "FOR UPDATE SKIP LOCKED with leases",
+            "finaliser": "eval.run.tick"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Graders",
+          "axis_b": "programmatic, rubric, pairwise and human; the two model graders use structured output",
+          "value": {
+            "rubric": "eval_judge_rubric_v1",
+            "pairwise": "eval_judge_pairwise_v1"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "eval_runs.report and export",
+          "axis_b": "mean with a confidence interval, noise floor, headroom, per-tag counts, cost derived; export to an S09 document",
+          "value": {
+            "sink": "S09 document, gzip JSONL plus traces",
+            "screen": "S12 screens 15 to 20"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "eval_audits.start",
+          "axis_b": "the construction audit over the instrument and optionally a target run",
+          "value": {
+            "prompt": "eval_audit_v1",
+            "output": "eval_audit plus eval_audit_finding"
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Business Capability Map — S19 Eval Builder (Phase B)",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Solution Concept Diagram — S19 Eval Builder (Phase A)\n\n## Metadata\n\nType diagram; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S19; tranche 8; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nThe concept has seven parts. An eval owns a frozen version; sign-offs are approval rows that gate a run; `eval.case.run` builds the subject input from the case's input alone and invokes through the engine; four jobs run and finalise the work; four grader kinds score it, and the two model graders call `completions.create` with structured output; the report and export read raw rows; and the audit reads the instrument itself. The entries deliberately show the seams the plan's traps defend.\n\n## Links\n\nRealizes the Requirements Catalog; depends on the Business Capability Map and the Data Entity catalog. The source is `docs/plans/slices/S19-eval-builder.md` §5, whose deliverable table is the component map, and the module list `crates/domain/src/eval`, `crates/store/src/eval` and `crates/actions/src/eval`. The diagram is textual because the record's artefact action carries entries rather than an image.\n\n## Document\n\nThe diagram keeps the model call outside S19: the runner invokes a registered action and never reconstructs a request, which the plan names as the method's reimplementation failure. It is published as an architecture-artifact-instance by the rework factory, and its whole point is that the rows, the sign-offs and the jobs are the product, while the files are only an export.\n"
+    },
+    {
+      "title": "Business Capability Map — S19 Eval Builder (Phase B)",
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "entries": [
+        {
+          "axis_a": "Author an eval",
+          "axis_b": "a flow becomes a draft eval, a frozen version, cases, metrics and a seeded stratified split",
+          "value": {
+            "actions": "evals, eval_versions, eval_cases, eval_metrics, evals.draw_split",
+            "requirement": "R-1, R-9"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Sign the instrument",
+          "axis_b": "a member's build becomes an approved input and grading set",
+          "value": {
+            "actions": "eval_signoffs.request and decide",
+            "requirement": "R-2, R-3"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Run and grade",
+          "axis_b": "a pilot or a baseline becomes per-case scores with transcripts",
+          "value": {
+            "actions": "eval_runs.start, eval.case.run, the four graders",
+            "requirement": "R-6, R-8"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Report and export",
+          "axis_b": "raw rows become a report with a confidence interval, or a portable bundle",
+          "value": {
+            "actions": "eval_runs.report, eval_runs.export, eval_cases.import",
+            "requirement": "R-7, R-11"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Audit the instrument",
+          "axis_b": "a construction review becomes findings a person decides",
+          "value": {
+            "actions": "eval_audits, eval_findings.decide",
+            "requirement": "R-8"
+          },
+          "position": 5
+        }
+      ],
+      "links": [
+        {
+          "to": "Data Entity/Data Component Catalog — S19 Eval Builder (Phase C)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Business Capability Map — S19 Eval Builder (Phase B)\n\n## Metadata\n\nType diagram; phase B; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S19; tranche 8; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nFive capabilities. Authoring turns a flow into a draft eval, a frozen version, a case set, metrics and a seeded split. Signing turns a member's build into an approved instrument. Running and grading turns a pilot or baseline into scored cases with transcripts. Reporting turns raw rows into a confidence interval or a portable bundle. Auditing turns a construction review into decidable findings. Each names the action family and the requirement it satisfies.\n\n## Links\n\nDerives from the Solution Concept Diagram and the Requirements Catalog; feeds the Data Entity and Technology Standards catalogs. The capability boundary is the plan's §3 IN list: no capability owns a model call, a UI or a second queue. The sign-off capability is deliberately separate from authoring, because `evals:approve` is an owner or admin scope and building is not signing.\n\n## Document\n\nThe map is published as an architecture-artifact-instance by the rework factory. It gives the Phase B view a reader uses to go from a business outcome — a prompt, model or procedure change measured with a confidence interval — to the action families and the requirement that keeps each one honest.\n"
+    },
+    {
+      "title": "Data Entity/Data Component Catalog — S19 Eval Builder (Phase C)",
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "eval, eval_version, eval_case, eval_metric",
+          "axis_b": "the instrument: a flow, its frozen version, the cases and the metric declarations",
+          "value": {
+            "tenant": "required",
+            "rls": "forced",
+            "expected": "grader-only"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "eval_run",
+          "axis_b": "one run of one version by one variant with reps and a mode",
+          "value": {
+            "tenant": "required",
+            "rls": "forced",
+            "variant": "baseline or vN"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "eval_case_result",
+          "axis_b": "the scored slot at (run, case, rep)",
+          "value": {
+            "tenant": "required",
+            "rls": "forced",
+            "grade": "object when more than one metric"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "eval_attempt_error",
+          "axis_b": "the append-only failure record across resumes",
+          "value": {
+            "writer": "eval.case.run",
+            "supersede": "kept after a later success"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "eval_trace and eval_audit, eval_audit_finding",
+          "axis_b": "the per-case transcript and the construction audit",
+          "value": {
+            "retention": "eval_trace 90 days",
+            "audit": "findings decidable by a person"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "approval.eval_id and inference_call.eval_run_id",
+          "axis_b": "the two additive contract changes S19 takes on S03 and S16",
+          "value": {
+            "approval": "uq_appr_eval_pending partial unique index",
+            "caller_kind": "gains eval"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Technology Standards Catalog — S19 Eval Builder (Phase D)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Data Entity/Data Component Catalog — S19 Eval Builder (Phase C)\n\n## Metadata\n\nType catalog; phase C; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S19; tranche 8; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nSix entity groups and two additive changes. The instrument tables carry the eval, its frozen version, cases and metrics; `eval_run` names a version and a variant; the result row is the earned slot; `eval_attempt_error` is append-only; traces and audits carry the transcript and the construction review. The two amendments are S03's `approval.eval_id` with its partial unique index and S16's `inference_call.eval_run_id` with `caller_kind` gaining `eval`. No entity carries a cost column.\n\n## Links\n\nDerives from the Business Capability Map; realizes all five capabilities; depends on the Technology Standards catalog for the RLS, invariant and derivation rules. The source is `docs/plans/slices/S19-eval-builder.md` §2 and §5 plus `02-DATA-ARCHITECTURE §2.19`, which is the DDL of record. The two amendments are named as contract changes in the plan's §9 decisions.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. The entity choices are the architecture: the answer key is absent from every viewable type, the failed attempt cannot write the slot, and cost is derived from the inference ledger, so no eval table can disagree with the bill.\n"
+    },
+    {
+      "title": "Technology Standards Catalog — S19 Eval Builder (Phase D)",
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "Postgres 18 with forced RLS",
+          "axis_b": "every eval table carries tenant_id and row-level security",
+          "value": {
+            "rule": "tenant_id on every row",
+            "failure_prevented": "a tenant reading another tenant's eval or trace"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "sqlx migrations and the ledger",
+          "axis_b": "migration 0026 is invisible until the crate rebuilds; the ledger is the proof",
+          "value": {
+            "rule": "verify _sqlx_migrations version 26 and success",
+            "failure_prevented": "a migration that exits zero without applying"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "The partial unique index as the guarantee",
+          "axis_b": "uq_appr_eval_pending over tenant, eval_id and gate for pending rows",
+          "value": {
+            "rule": "no check-then-insert",
+            "failure_prevented": "two pending sign-offs on one gate"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Structured output for model graders",
+          "axis_b": "the rubric and pairwise judges call completions.create with structured output",
+          "value": {
+            "rule": "no free-text JSON parsing",
+            "failure_prevented": "an unescaped quote in an explanation failing the grade"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Derived cost on the inference ledger",
+          "axis_b": "inference_call is the only cost record; eval_run_id never references a benchmark run",
+          "value": {
+            "rule": "D23, no cost column anywhere in eval",
+            "failure_prevented": "a second cost figure that disagrees with the bill"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Database invariants and Leptos escaping",
+          "axis_b": "the variant grammar, grade shape and label length are CHECKs; the report is a Leptos screen",
+          "value": {
+            "rule": "database invariants and one escaping view",
+            "failure_prevented": "a hand-rolled HTML report and a miscast variant"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Solution Concept Diagram — S19 Eval Builder (Phase A)",
+          "kind": "reuse"
+        }
+      ],
+      "body": "# Technology Standards Catalog — S19 Eval Builder (Phase D)\n\n## Metadata\n\nType catalog; phase D; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S19; tranche 8; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nSix standards, each with the failure it prevents. Postgres row-level security with a tenant column on every table; migrations verified through the ledger rather than a log line; the partial unique index as the sign-off guarantee instead of a check-then-insert; structured output for the two model graders; cost derived from the one inference ledger under D23 with no eval cost column; and database invariants plus a single escaping Leptos view so the report cannot become hand-rolled HTML.\n\n## Links\n\nDerives from the Data Entity catalog; realizes the technology half of the Solution Concept Diagram; reuses the platform's existing migration, RLS, approval and registry conventions rather than adding a parallel one. The source is the plan's §8 traps and §9 decisions, which record each rule against a measured failure mode rather than a preference.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. The standards are the ones the plan actually leans on: a reader can see which failure each convention prevents, which is what makes them enforceable in review instead of aspirational.\n"
+    }
+  ],
+  "documents": [
+    {
+      "category": "architecture-artifact",
+      "title": "Architecture Artefact Index — S19 (retrospective, 2026-11-28)",
+      "body": "# Architecture Artefact Index — S19 (retrospective, 2026-11-28)\n\n## Metadata\n\nThe artefact set for S19 is the seven mandatory Phase A–D artefacts on the delivery track: the Stakeholder Map, the Driver/Goal/Objective Catalog, the Requirements Catalog and the Solution Concept Diagram at phase a, plateau psa; the Business Capability Map at phase b; the Data Entity/Data Component Catalog at phase c; and the Technology Standards Catalog at phase d. Each carries an authored body dated 2026-11-28; the owner is the programme architect under the tranche-8 rework delegation, the reviewer is the Architecture Board, and the subject is this project's record at the pinned snapshot.\n\n## Entries\n\nThe set is seven rows in the order the standard seeds them: a/matrix — Stakeholder Map — S19 Eval Builder (Phase A); a/catalog — Driver/Goal/Objective Catalog — S19 Eval Builder (Phase A); a/catalog — Requirements Catalog — S19 Eval Builder (Phase A); a/diagram — Solution Concept Diagram — S19 Eval Builder (Phase A); b/diagram — Business Capability Map — S19 Eval Builder (Phase B); c/catalog — Data Entity/Data Component Catalog — S19 Eval Builder (Phase C); d/catalog — Technology Standards Catalog — S19 Eval Builder (Phase D).\n\n## Links\n\nEvery artefact links to another artefact of the set with one of the four kinds the record's link action allows: derivation, realization, reuse or dependency. The links follow the phase order, so a reader can walk from A to D without an orphan, and each artefact's own Links section names its source in the slice plan and the tree. The deepest source is `docs/plans/slices/S19-eval-builder.md` §3, §5, §7 and §9.\n\n## Document\n\nThis index is published as its own architecture-artifact document by the rework factory. It is the document the close gate reads for the project's artefact standard, and it is why the set can be verified without re-reading the plan: the titles, the order and the link kinds are all stated here, and the seven rows match the seven artefacts one for one.\n"
+    },
+    {
+      "category": "user-stories",
+      "title": "User Stories — S19 Eval Builder (retrospective, 2026-11-28)",
+      "body": "# User Stories — S19 Eval Builder (retrospective, 2026-11-28)\n\n## Personas\n\nThe eval author is a tenant member holding `evals:write`: they define the flow, write and import cases, choose metrics and graders, and re-freeze a version when the instrument changes. The sign-off approver is a tenant owner or admin holding `evals:approve`: they decide the input, grading, cost and harness gates and start a full run. The eval consumer is an agent principal on `/mcp`, which reads the instrument, cases and results but never a test-split result, a sign-off or an answer key. The auditor is a quality role that starts a construction audit and decides its findings.\n\n## Stories\n\nAs an eval author, I want an eval with a frozen version, cases, metrics and a seeded split, so that a change to the instrument is a new version rather than a silent edit. As a sign-off approver, I want the inputs and the grading to be literal pauses, so that I sign a digest rather than a claim. As an eval author, I want a pilot and then a baseline against the same version, so that my first look at the numbers cannot become the baseline by accident. As an eval consumer, I want a report I can recompute, so that a score arrives with a confidence interval, a noise floor and the count of excluded results.\n\n## Scenarios\n\nScenario 1, @verify=s19-signoff-gate: a run is refused until both the input and grading sign-offs are decided, and the refusal names the missing gate. Scenario 2, @verify=s19-stale-signoff: an edit after a decided sign-off voids it, and the next run is refused. Scenario 3, @verify=s19-second-pending: a second pending sign-off on the same gate is refused by the partial unique index. Scenario 4, @verify=s19-answer-key: the subject input carries no expected bytes and no case-list view or export returns them. Scenario 5, @verify=s19-heldout: an agent principal reads the instrument but never a test-split result. Scenario 6, @verify=s19-slot: a failed attempt writes eval_attempt_error and leaves the slot empty.\n\n## Verify\n\nThe verifying commands are the plan's §7 suite names: `eval_signoff_gate`, `eval_signoff_idx`, `eval_isolation`, `eval_heldout`, `eval_slot` and `eval_controls`, plus the registry suite's `no_eval_signoff_or_answer_key_action_is_machine_reachable`. The plan records them in its historical `rbuild` form, written before the 2026-11-20 owner direction retired local compilation; today the compile and lint verdict comes from the repository's GitHub-hosted preflight and the PR's CI, and every libtest filter is listed by exact name before it is run because a filter that selects zero tests exits zero.\n"
+    },
+    {
+      "category": "acceptance-criteria",
+      "title": "Acceptance Criteria — S19 Eval Builder (retrospective, 2026-11-28)",
+      "body": "# Acceptance Criteria — S19 Eval Builder (retrospective, 2026-11-28)\n\n## Scenarios\n\nScenario 1, @verify=s19-schema: the ten eval tables are row-level-security forced and migration 0026 is present and successful in `_sqlx_migrations`. Scenario 2, @verify=s19-signoff-index: a second pending sign-off on the same eval gate is refused by `uq_appr_eval_pending`, not by a check-then-insert. Scenario 3, @verify=s19-run-refused: no run starts without both sign-offs, the refusal names the missing gate, and an edit voids a decided sign-off whose artifact digest no longer matches. Scenario 4, @verify=s19-answer-key: the subject input type carries no `expected` field and no view or export returns it. Scenario 5, @verify=s19-heldout-wall: the held-out half is enforced by the `evals:approve` scope, and an agent reads the instrument but never the held-out half. Scenario 6, @verify=s19-attempt-slot: a failed attempt cannot occupy its `(case, rep)` slot and its error row survives a later success. Scenario 7, @verify=s19-cost-derived: no eval table has a cost column, asserted as a negative column count. Scenario 8, @verify=s19-controls: the oracle scores near 100 percent, the null near 0 percent, an induced error is a classified attempt and the judge fails its three known negatives. Scenario 9, @verify=s19-invariants: the variant grammar, the grade-object shape and the label length are database invariants. Scenario 10, @verify=s19-machine-reach: no answer-key or sign-off action is machine-reachable. Scenario 11, @verify=s19-served-lock: the served surface matches `served-spec.lock.json`. Scenario 12, @verify=s19-gate: fmt, clippy with warnings denied, and the whole suite pass.\n\n## Verify commands\n\nThe plan's §7 pairs each scenario with a test binary: `eval_schema`, `eval_signoff_idx`, `eval_signoff_gate`, `eval_isolation`, `eval_heldout`, `eval_slot`, `eval_constraints`, `eval_controls` and the registry suite, ending with the OpenAPI lock check and the full gate. The commands are recorded in the plan's historical `rbuild` form; the current route is the GitHub-hosted preflight for the compile and lint verdict and `cargo-guard.py` on m4 for interactive work. A libtest filter must be listed by exact name first, because a filter that matches zero tests exits zero and would read as a pass.\n\n## Results\n\nThe record at the pinned snapshot carries the project row with `measured_status` built against a plan status of planned, and the ten eval tables, the actions and the modules are the state the plan describes. This pack does not claim a fresh execution of the twelve-step gate: the manifest `acceptance/programme/S19.toml` is the acceptance and the build lane's preflight is the compile verdict. The results this review records are the record set's existence and consistency with the plan, not a green product gate re-run for the pack.\n\n## Status\n\nS19 stays active. The twelve product scenarios above remain the build lane's acceptance and are not discharged by authoring this pack; what the pack discharges is the record gap — the charter, the baseline, the artefact set, the registers, the contract, the WBS, the two declared outputs and the Phase-G review. A tranche review that reads this pack must read the manifest's receipt for the product state and must not read this Status section as a closure.\n"
+    },
+    {
+      "category": "definition-of-ready",
+      "title": "Definition of Ready — S19 Eval Builder (retrospective, 2026-11-28)",
+      "body": "# Definition of Ready — S19 Eval Builder (retrospective, 2026-11-28)\n\n## Independent\n\nS19 ports no old surface: its `parity_ids` is `PENDING-S0` because there is no legacy id to port, and its tables, modules and actions are net-new rather than a rewrite of another member's work. The only couplings are additive contract changes to S03's `approval` and S16's `inference_call`, each recorded in the plan's §9 decisions, so the member can be built and reviewed on its own lane without editing another member's behaviour.\n\n## Negotiable\n\nThe scope boundary is explicit and was negotiable in the plan's own terms: no UI is built here — screens 15–20 are declared so S12 cannot invent them — no model call of S19's own, no hosting, no embeddings; the hillclimb loop and the cost search belong to S20; the benchmark instrument stays S17/S18's; and `inference-router` and `billing_service` are not absorbed. What remains negotiable inside the boundary is the implementation shape, not the surface.\n\n## Valuable\n\nThe value is one sentence with a number behind it: did this prompt, model or procedure change help? The instrument answers with a confidence interval, a per-case transcript behind every score, and a health audit that says whether the number can be believed. That replaces a directory of `results.jsonl`, `traces/` and `report.html` with rows a person and an agent can both read under the same scopes.\n\n## Estimable\n\nThe plan estimates the work as seventeen ordered steps across three parts, each naming its modules and its test target: migration and domain, store, actions, the case driver, the four runner properties, the jobs, the graders, the served-model assertion, the report, the audit, the interop round trip, the scope sites, and the lock regeneration. The module list is explicit — `crates/domain/src/eval`, `crates/store/src/eval`, `crates/actions/src/eval` — so the work can be sized against named files rather than a theme.\n\n## Small\n\nEach part is independently demonstrable: Part A proves an eval reaches `inputs_approved` and a run is refused until it does; Part B proves a five-case pilot yields five complete result rows with a transcript and a grade object; Part C proves a report recomputes from raw rows and an audit reproduces. The copy-on-write version is cheap at the plan's own ceiling of about one hundred cases, and the four jobs reuse S06's queue rather than adding a second one.\n\n## Testable\n\nEvery acceptance item is a named test binary with an exact filter, and several are deliberately negative: a column count that must be zero, an index that must refuse a duplicate, a slot that must stay empty after a failure, an oracle that must score near 100 percent and a null that must score near 0 percent. The plan also warns that a libtest filter matching zero tests exits zero, so each filter is listed before it runs; that warning is itself part of testability.\n\n## Dependencies\n\nThe project's recorded dependencies are S02, S03, S04, S06, S09, S10, S11 and S16. S04 supplies the registry and invocation engine, S06 the approval and job primitives, S10 the one model call, S11 the procedure and run-step trace sources, S09 the document and object store for export, S02 and S03 the platform schema and control plane, and S16 the inference ledger. S16 is planned and not built at the snapshot — migration 0024 is reserved and unapplied — which is the plan's open question 1 and the reason the cost derivation is the first risk row.\n"
+    },
+    {
+      "category": "definition-of-done",
+      "title": "Definition of Done — S19 Eval Builder (retrospective, 2026-11-28)",
+      "body": "# Definition of Done — S19 Eval Builder (retrospective, 2026-11-28)\n\n## Acceptance criteria\n\nThe twelve scenarios of the acceptance-criteria document are the done condition: the ten tables under forced RLS with 0026 in the ledger; the second pending sign-off refused by the partial unique index; no run without both sign-offs and an edit voiding a stale one; the answer key absent from the subject input; the held-out wall enforced by access; a failed attempt unable to occupy its slot; cost derived with a negative column count; the oracle and null controls plus the judge's three negatives; the variant, grade and label invariants; no machine-reachable sign-off or answer-key action; the served surface matching the lock; and fmt, clippy and the suite green.\n\n## Evidence at completion\n\nEach criterion carries an artefact, not a promise: the ledger query for 0026, the index's own refusal test, the sign-off gate suite, `subject_input_carries_no_expected_bytes`, `an_agent_reads_the_instrument_but_never_the_held_out_half`, the slot suite, the negative cost-column count, the controls suite, the constraints suite, the registry test `no_eval_signoff_or_answer_key_action_is_machine_reachable`, the `--print-openapi --check-lock` result and the gate log. The evidence is attached to the delivery PR and re-read at the manifest's receipt; a step GitHub does not carry is the release manager's, and it is never invented.\n\n## Repo gate\n\nThe repository's local gate is deliberately sub-second: the hooks run `cargo fmt --all -- --check`, `cargo metadata --locked` and actionlint on changed workflows. A compiling `cargo` command is denied on local hardware by the owner direction of 2026-11-20, so the compile and lint verdict comes from the GitHub-hosted `preflight.yml`, and the PR's CI is the final gate. One bounded check, never a watch loop; the plan's `rbuild` lines are the historical record of how the slice was gated before that direction.\n\n## Merge and closure\n\nOne issue, one branch and exactly one PR per unit, opened non-draft only when the local gate is green and the PR body carries `Closes #<n>`; slices are commits on that branch and never a second PR. The merge queue is the last CI run, and a merge is not shipped until the deployed state is probed. S19's own closure is not this pack's decision: the project stays active and its closure would need the product gate green, the manifest receipt and an approver other than the author, which is why this pack carries no closure keys.\n"
+    }
+  ],
+  "registers": {
+    "risk": [
+      {
+        "code": "S19-R1",
+        "title": "S16's inference ledger is planned and not built, so cost derivation has no source at the snapshot",
+        "body": "S19 derives cost from `inference_call` and stores none (D23), but S16's `inference_call` is planned and not built: migration 0024 is reserved and unapplied. Open question 1's default is to block on S16, and if it slips, to record `usage` on `eval_case_result` from the action response and derive cost with the same arithmetic — identical columns, different source. Until one of the two exists, a report's cost figure has nothing to read, and the risk is recorded rather than hidden behind a placeholder.",
+        "probability": "high",
+        "impact": 3,
+        "review_at": "2026-12-12",
+        "severity": "high",
+        "status": "open",
+        "response": "Hold the cost assertion to the plan's default: block on S16, or record usage on the result row and derive with the same arithmetic, and prove the chosen path in the report suite before any receipt claims cost.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S19-eval-builder.md#10"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
+      },
+      {
+        "code": "S19-R2",
+        "title": "A silently substituted served model invalidates every comparison and reads as signal",
+        "body": "The plan's trap 7 records that `model` must come from the response rather than the config: a silently substituted served model invalidates the comparison, and the failure would look like a regression in the subject. The defence is an assertion that fails the attempt loudly, plus the `judge_is_subject` refusal when the judge model is the subject model. Without both, a routing change upstream becomes a false finding about a prompt.",
+        "probability": "medium",
+        "impact": 4,
+        "review_at": "2026-12-12",
+        "severity": "high",
+        "status": "open",
+        "response": "Assert the served model on every attempt and refuse a judge that resolves to the subject; treat any mismatch as a classified attempt error rather than a score.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S19-eval-builder.md#8"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
+      },
+      {
+        "code": "S19-R3",
+        "title": "Without the tick finaliser a run stays running forever after its last case",
+        "body": "N times R jobs finalise nothing on their own. The plan's trap 9 records that without `eval.run.tick` a run stays `running` after its last case, and that the reaper must key on `last_polled_at` rather than on case silence — the S17 lesson. A run that never finalises holds its cost ceiling, blocks the report and makes a cancellation look like a hang, so the finaliser and the heartbeat are load-bearing rather than housekeeping.",
+        "probability": "medium",
+        "impact": 3,
+        "review_at": "2026-12-12",
+        "severity": "medium",
+        "status": "open",
+        "response": "Prove the finaliser and the heartbeat in the jobs suite, and make the reaper read `last_polled_at`; a run that is silent but heartbeating must not be reaped.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S19-eval-builder.md#5"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
+      },
+      {
+        "code": "S19-R4",
+        "title": "Case text is untrusted input and reaches a rendered frame",
+        "body": "Cases are imported from transcripts and tickets, so their text is untrusted. The plan's trap 10 requires no `inner_html`, html or svg attachments inside a sandboxed frame, binaries as S09 document references, and a size cap on turns. A report or an interop import that renders case text directly would turn an imported transcript into script in a reviewer's session, and a cap that is absent turns one case into an unbounded row.",
+        "probability": "medium",
+        "impact": 3,
+        "review_at": "2026-12-12",
+        "severity": "medium",
+        "status": "open",
+        "response": "Keep case text out of any raw HTML sink, render it through the one escaping view, store binaries as S09 documents and enforce the turns cap at import.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S19-eval-builder.md#8"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
+      }
+    ],
+    "issue": [
+      {
+        "code": "S19-I1",
+        "title": "The record carried no charter, baseline, artefact set, contract or Phase-G review",
+        "body": "At the 2026-11-28 snapshot the project row is active with `measured_status` built against a plan status of planned, and the audit carries the PMP and TOGAF packages `std-pmp-change-control-s19:S19`, `std-pmp-project-baseline-s19:S19`, `std-pmp-project-registers-s19:S19`, `std-togaf-architecture-artifact-s19:S19`, `std-togaf-compliance-review-s19:S19`, `std-togaf-delivery-contract-s19:S19` and `std-togaf-phase-g-s19-g:S19`. This pack supplies that lifecycle set retrospectively and records the product's gate as the manifest's, not as this pack's claim.",
+        "severity": "P1",
+        "status": "open",
+        "response": "Supplied by this pack and read off the project's receipt at the pinned snapshot; the product gate stays the build lane's."
+      },
+      {
+        "code": "S19-I2",
+        "title": "The declared delivery-standard documents were absent, so the project's standard set was incomplete",
+        "body": "The audit also carries `std-delivery-user-stories-s19:S19`, `std-delivery-acceptance-criteria-s19:S19`, `std-delivery-definition-of-ready-s19:S19` and `std-delivery-definition-of-done-s19:S19`, and the v4 output standard requires each delivery category to resolve its headings from a document of its own category. This pack authors all four against the plan's §7 gate and §9 decisions; no other artefact can satisfy those categories.",
+        "severity": "P1",
+        "status": "open",
+        "response": "Authored in this pack's documents array and published by the factory; the receipt is read at the pinned snapshot."
+      },
+      {
+        "code": "S19-I3",
+        "title": "Two declared outputs were unpublished and the project had no WBS node",
+        "body": "The tranche-8 cards `closure_outputs_undeclared:tranche-8`, `unpublished_declared_output:tranche-8` and `wbs_absent:tranche-8` record that the project declares outputs it has not published and has no WBS node; the project-scoped register carries the same facts as `unpublished_declared_output:S19` and `wbs_absent:S19`. The pack's `project_brief_output` and `evidence_output` are the two outputs the record declares, and the `wbs_deliverable` row is the missing node with its four typed WSJF inputs.",
+        "severity": "P1",
+        "status": "open",
+        "response": "The two declared outputs and the WBS deliverable are authored here; the findings clear on the receipt rather than on an allowlist edit."
+      },
+      {
+        "code": "S19-I4",
+        "title": "The tranche itself has no gate decision, which no content pack can supply",
+        "body": "`project_in_unauthorised_tranche:S19` records that the project is active in tranche 8 whose state is planned. That is a programme-level authorisation question: only the sponsoring group's or the programme owner's gate decision can authorise or re-plan the tranche, and a pack that wrote its own authorisation would be exactly the failure the audit exists to catch. The issue is recorded here so the tranche review sees it rather than reading the pack as authority.",
+        "severity": "P1",
+        "status": "open",
+        "response": "Escalate to the programme owner with this pack's receipt; the tranche state is changed by their decision, never by a content file."
+      }
+    ],
+    "assumption": [
+      {
+        "code": "S19-A1",
+        "title": "The 2026-11-28 tranche-8 snapshot is the authoritative record for S19",
+        "body": "Every judgement in this pack is read from the pinned snapshot, and the content checker refuses any identifier that appears nowhere in it. The project row, its dependency edges and its measured status are read there; a row that changes when the build lane merges is out of scope until the pack is re-preflighted, which is why the pack quotes the snapshot rather than the live service.",
+        "status": "held"
+      },
+      {
+        "code": "S19-A2",
+        "title": "The judge model is a different model from the subject and is reachable through completions.create",
+        "body": "The rubric and pairwise graders call S10's one model call with structured output, and the plan refuses a judge that resolves to the subject with `judge_is_subject`. The assumption is that `inference-router` serves at least two distinct models and reports the served model in the response; if it served one model only, the two model graders could not be used against a subject on that model, and the refusal would be the correct behaviour rather than a bug.",
+        "status": "held"
+      },
+      {
+        "code": "S19-A3",
+        "title": "The upstream members supply the primitives the plan lists as existing",
+        "body": "The plan's starting state treats S04's registry and invocation engine, S06's approval and job primitives, S10's `completions.create`, S11's procedure and run-step rows, and S09's document and object store as present, and the snapshot records those edges as needs. The assumption is that their behaviour at the same snapshot still matches what the plan read; S16 is explicitly excluded because it is planned and not built.",
+        "status": "held"
+      },
+      {
+        "code": "S19-A4",
+        "title": "A version is owned by one eval and import copies rather than links",
+        "body": "Open question 5 closes the sharing question: two evals may not share a case set, a version is owned by one eval, and `eval_cases.import` copies rather than links. The assumption is that the copy is complete — cases, tags, gold provenance and attachments by S09 reference — so an imported set is an independent instrument and a later edit to the source cannot move another eval's baseline.",
+        "status": "held"
+      }
+    ],
+    "dependency": [
+      {
+        "code": "S19-D1",
+        "title": "S19 depends on S02, S03, S04, S06, S09, S10, S11 and S16",
+        "body": "The project row records needs S02, S03, S04, S06, S09, S10, S11 and S16, which are the same edges the slice plan's frontmatter declares. S04 supplies the one invocation path, S06 the approval and job primitives, S10 the one model call, S11 the trace sources, S09 the export sink, S02 and S03 the platform and control schema, and S16 the inference ledger. S16 is the one member that is planned and not built at the snapshot.",
+        "status": "open"
+      },
+      {
+        "code": "S19-D2",
+        "title": "S19 unblocks S20's hillclimb loop and cost search",
+        "body": "The plan puts the hillclimb loop and the cost search out of S19's scope and into S20. S20's loop needs a versioned instrument, scored result rows with transcripts, and a report that recomputes from raw rows, which is exactly what S19 delivers; before that, a hillclimb would be optimising against files rather than against a versioned baseline. The dependency is carried as a block rather than as related work.",
+        "status": "open"
+      },
+      {
+        "code": "S19-D3",
+        "title": "S19 declares screens 15–20, which S12 owns and must build",
+        "body": "The plan declares six screens — Evals, Eval run, Eval report, Eval audit, Eval sign-off and Eval interop — each with an `apps/web/e2e/<name>.spec.ts`, so S12 cannot invent them. The dependency runs from S19 to S12: the actions, scopes, events and SSE topics must exist for the screens to bind, and the screens cannot ship before the surface they read does. No UI is built inside S19.",
+        "status": "open"
+      }
+    ],
+    "benefit": [
+      {
+        "code": "S19-B1",
+        "title": "A prompt, model or procedure change gets a number with a confidence interval",
+        "body": "The instrument turns \"did this change help?\" into a measured comparison: a frozen version, a pilot and then a baseline, a mean with a confidence interval, a noise floor of one over the square root of n times reps, a headroom figure and a per-tag breakdown. The benefit is that a change is accepted or refused on evidence a reviewer can recompute from raw rows, rather than on a directory of files whose meaning lived in the method's prose.",
+        "status": "open",
+        "links": {
+          "requirements": [
+            "docs/plans/slices/S19-eval-builder.md#1"
+          ],
+          "cards": [],
+          "decisions": []
+        }
+      },
+      {
+        "code": "S19-B2",
+        "title": "The answer key and the held-out half are unreachable by construction",
+        "body": "The subject-input type has no `expected` field, no view or export returns it, and no answer-key action is agent-reachable; the held-out half needs `evals:approve`. The benefit is that the isolation is a property of the types and scopes rather than a request in a prompt, so a later agent tool cannot quietly widen the surface without the registry suite going red.",
+        "status": "open",
+        "links": {
+          "requirements": [
+            "docs/plans/slices/S19-eval-builder.md#9"
+          ],
+          "cards": [],
+          "decisions": []
+        }
+      },
+      {
+        "code": "S19-B3",
+        "title": "The instrument is versioned, so a cross-version comparison is refused rather than wrong",
+        "body": "`eval_version` freezes the case set, metrics, graders, prices and harness paths under one digest, and a run names a version; a compare across versions is refused. The benefit is a provenance property: the audit's requirement that scores before and after a grader change are not comparable becomes a structural refusal instead of a reviewer's memory, and the frozen copy is cheap at the plan's ceiling of about one hundred cases.",
+        "status": "open",
+        "links": {
+          "requirements": [
+            "docs/plans/slices/S19-eval-builder.md#9"
+          ],
+          "cards": [],
+          "decisions": []
+        }
+      },
+      {
+        "code": "S19-B4",
+        "title": "Cost comes from the one inference ledger, so the report and the bill cannot disagree",
+        "body": "D23 makes cost derived rather than stored: the report computes it from `inference_call`, `caller_kind` gains `eval`, and no eval table carries a cost column, asserted as a negative column count. The benefit is that there is one cost record for the platform, and an eval run cannot drift into a second figure that disagrees with the bill or with the benchmark instrument it must never be confused with.",
+        "status": "open",
+        "links": {
+          "requirements": [
+            "docs/plans/slices/S19-eval-builder.md#9"
+          ],
+          "cards": [],
+          "decisions": []
+        }
+      }
+    ]
+  },
+  "delivery_contract": {
+    "title": "Delivery Contract — S19 Eval Builder (retrospective, 2026-11-28)",
+    "body": {
+      "commitments": "S19 delivers the eval builder as product rows: the ten tables of §2.19 under forced row-level security; the `approval.eval_id` column and `uq_appr_eval_pending`; thirty-three actions across three scopes; seven events; four jobs; three built-in versioned prompts; and screens 15–20 declared for S12. It commits to one invocation path through S04's engine, one model call through S10, sign-offs as S06 approval rows, the answer key structurally unreachable, and cost derived from the inference ledger with no eval cost column.",
+      "compliance": "Compliance is demonstrated by the manifest `acceptance/programme/S19.toml` and the plan's §7 twelve-step gate: the ledger check for migration 0026, the index's own refusal test, the sign-off gate, the isolation and held-out suites, the slot suite, the negative cost-column count, the controls suite, the constraints and registry suites, the served-lock check and the full suite. The plan's commands are recorded in their historical `rbuild` form; the compile verdict comes from the GitHub-hosted preflight and the PR's CI, and a filtered test is listed by exact name before it is run.",
+      "approval": "The contract is approved under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The approving role is the Architecture Board and the accepting role is the SRO; the session that authored this pack is neither, so the record must carry the approver's own decision rather than an inference from silence. The project stays active, and this contract does not close it.",
+      "manifest": "`acceptance/programme/S19.toml` is the manifest of record: fifteen checks over the project row, the approved baseline, the charter asset, the delivery contract, the Phase-G review, the waivers, the PI cadence, the PI plan, the PI objectives, the lessons row, the four typed WSJF inputs, the demo credits, the product findings, the artefact standard and the rework resolution. It declares no closure checks because this project stays active.",
+      "acceptance_at": "2026-11-28",
+      "retrospective": "This contract is authored retrospectively for the tranche-8 rework. The build carried no contemporaneous contract in the snapshot, so the commitments are read from the slice plan and the record at the 2026-11-28 snapshot and are not presented as an agreement made before the build.",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+    }
+  },
+  "wbs_deliverable": {
+    "title": "The eval builder — a versioned eval instrument with signed inputs and grading, pilot and baseline runs, per-case transcripts, a recomputable report with a confidence interval and an audit, the answer key unreachable and cost derived from the inference ledger",
+    "business_value": 8,
+    "time_criticality": 6,
+    "risk_reduction": 8,
+    "job_size": 8
+  },
+  "review": {
+    "level": "compliant",
+    "findings": "This retrospective Phase-G review records the level compliant for the record set this pack supplies at the 2026-11-28 snapshot under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The open packages it discharges are std-pmp-change-control-s19:S19 and std-pmp-project-baseline-s19:S19 (P0); std-pmp-project-registers-s19:S19; std-togaf-delivery-contract-s19:S19; the four delivery-standard packages std-delivery-user-stories-s19:S19, std-delivery-acceptance-criteria-s19:S19, std-delivery-definition-of-ready-s19:S19 and std-delivery-definition-of-done-s19:S19; and the partial TOGAF artefacts std-togaf-architecture-artifact-s19:S19, std-togaf-compliance-review-s19:S19 and std-togaf-phase-g-s19-g:S19. The tranche-8 cards closure_outputs_undeclared:tranche-8, unpublished_declared_output:tranche-8 and wbs_absent:tranche-8 are answered by the two declared outputs and the WBS deliverable this pack authors, and the project-scoped register's unpublished_declared_output:S19 and wbs_absent:S19 by the same rows. project_in_unauthorised_tranche:S19 is not a content pack's to discharge: only the programme owner's gate decision can authorise the tranche, and it is recorded open rather than papered over. The pack does not claim the product's twelve-step gate has been re-run at this snapshot; acceptance/programme/S19.toml is the acceptance and the build lane's preflight is the compile verdict.",
+    "evidence": {
+      "manifest": "acceptance/programme/S19.toml",
+      "gate": "the twelve-checks gate of docs/plans/slices/S19-eval-builder.md#7",
+      "suites": [
+        "conveyor-store eval_schema",
+        "conveyor-store eval_signoff_idx",
+        "conveyor-actions eval_signoff_gate",
+        "conveyor-domain eval_isolation",
+        "conveyor-api eval_heldout",
+        "conveyor-store eval_slot",
+        "conveyor-store eval_constraints",
+        "conveyor-server eval_controls",
+        "conveyor-actions registry"
+      ],
+      "plan": "docs/plans/slices/S19-eval-builder.md",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+    }
+  },
+  "project_brief_output": "# Project Brief — S19 Eval Builder (retrospective, 2026-11-28)\n\n## Outcome\n\nA person defines one flow, builds an input set, signs off the inputs, chooses metrics and a grader, signs off the grading, runs a pilot and then a baseline, and reads a report — all against rows, rather than against a `.claude/hillclimb/<flow>/` directory of `results.jsonl`, `traces/` and `report.html`. The outcome is that \"did this prompt, model or procedure change help?\" has a number with a confidence interval, a per-case transcript behind every score, and a health audit that says whether the number can be believed at all.\n\n## Boundary\n\nS19 owns the eval instrument: cases, metrics, graders, sign-offs, runs, results, traces, reports, audits and interop. It does not own any UI — screens 15–20 are declared for S12 — a model call of its own, model or embedding hosting, the hillclimb loop and cost search (S20), the benchmark instrument (S17/S18), `inference-router` or `billing_service`, or grading paths rather than outcomes for agentic subjects. It also does not own the approval or job primitives it extends: those stay S06's, with one additive nullable column.\n\n## Reuse sources\n\nThe plan's source table names S04's `invoke` and `record_bookkeeping` as the one invocation path, S06's `approval` with `uq_appr_pending` and `job` with its dedupe, lease and attempt columns, S10's `completions.create`, S11's `procedure` and `run_step` as trace sources, and S09's `document` and object store as the export sink. From the skill it carries the method and field set verbatim, the audit's checks as construction requirements, and the report schema's column and turn shapes, including the label length rule; it carries none of the file layout as a requirement.\n\n## Inception units\n\nPart A, steps 1–7: the migration and its ledger proof, the domain state machine, the store, the eval and version actions, the case actions with write-only `expected`, the seeded split, and the sign-off actions. Part B, steps 8–12: the case driver, the four runner properties, the jobs and finaliser, the four graders, the served-model assertion and human labelling. Part C, steps 13–17: the report, the audit, the interop round trip, the scope and lock sites, and the gate. Each step names its module and its test target.\n\n## Dependencies\n\nThe project's recorded dependencies are S02, S03, S04, S06, S09, S10, S11 and S16. S16's `inference_call` is planned and not built — migration 0024 is reserved and unapplied — so the plan's open question 1 defaults to blocking on S16, with a fallback that records `usage` on the result row and derives cost with the same arithmetic. S19 in turn unblocks S20's hillclimb and the six S12 screens, and S12 cannot build them before the surface exists.\n\n## Acceptance\n\n`acceptance/programme/S19.toml` carries the acceptance, and the plan's §7 twelve-step gate is its content: the ledger, the sign-off index, the run refusal, the answer-key isolation, the held-out wall, the slot, the negative cost column, the controls, the database invariants, the machine-reach refusal, the served lock and the full suite. The manifest's fifteen checks add the lifecycle set this pack supplies. A green product gate is the build lane's to report, not this pack's to claim.\n\n## Capabilities\n\nFive. Author an eval: a flow becomes a draft, a frozen version, cases, metrics and a seeded split. Sign the instrument: a member's build becomes an approved input and grading set. Run and grade: a pilot or baseline becomes scored cases with transcripts. Report and export: raw rows become a confidence interval or a portable bundle. Audit the instrument: a construction review becomes decidable findings. None of the five owns a model call or a second queue.\n\n## Plan\n\nThe plan is `docs/plans/slices/S19-eval-builder.md`, seventeen ordered steps across three parts. The project stays active: this brief accompanies the record set and the two declared outputs, and it does not close the project. The product gate, the S16 ledger dependency and the six screens stay open, and the tranche review reads them from the manifest's receipt rather than from this brief.\n",
+  "evidence_output": "# Evidence — S19 Eval Builder (retrospective, 2026-11-28)\n\n## Claim\n\nS19 delivers the eval builder as an ordinary product surface: a versioned instrument with cases, metrics and graders; two literal sign-offs on the one approval primitive; a per-case driver that invokes through the action engine and never reconstructs a request; pilot and baseline runs with per-case transcripts; a report with a confidence interval, a noise floor and derived cost; and a construction audit. The answer key is structurally unreachable, the held-out half is enforced by the `evals:approve` scope, and cost is derived from the inference ledger with no eval cost column.\n\n## Evidence\n\n`acceptance/programme/S19.toml` is the manifest of record with fifteen checks. The plan's §7 names the proofs: `eval_schema` for the ten tables and migration 0026 in the ledger, `eval_signoff_idx` for the partial unique index, `eval_signoff_gate` for the two-gate refusal and the stale-digest void, `eval_isolation` for the absent `expected` field, `eval_heldout` for the access wall, `eval_slot` for the earned slot, `eval_constraints` for the invariants and the negative cost column, `eval_controls` for the oracle, null and judge negatives, the registry suite for the machine-reach refusal, and the OpenAPI lock check. The modules are `crates/domain/src/eval`, `crates/store/src/eval` and `crates/actions/src/eval`, with the read routes in `crates/api/src/eval.rs` and four worker arms.\n\n## Verification\n\nThe manifest is read at the pinned snapshot through the programme record, and the Phase-G review reads the same receipt. The plan's `rbuild` commands are the historical gate: since the 2026-11-20 owner direction retired local compilation, the compile and lint verdict comes from the repository's GitHub-hosted preflight and the PR's CI, with `cargo-guard.py` on m4 only for interactive work. Every libtest filter is listed by exact name first, because a filter that selects zero tests exits zero and would read as a pass; a piped command's exit status is the pipeline's, so the gate log is captured to a file.\n\n## Links\n\nThe source of truth is `docs/plans/slices/S19-eval-builder.md`; the acceptance is `acceptance/programme/S19.toml`; the artefact set is indexed by the architecture-artifact document in this pack; the four delivery-standard documents sit beside it. The open packages the pack answers are named in the Phase-G review's findings, including the PMP and TOGAF keys and the tranche-8 cards for declared outputs and the WBS.\n\n## Gap\n\nThe project stays active and this pack does not close it. S16's `inference_call` is planned and not built, so cost derivation follows the plan's open question 1 and has no ledger source at the snapshot. The six screens 15–20 are S12's and are not built here; the hillclimb and cost search are S20's; and `project_in_unauthorised_tranche:S19` needs the programme owner's tranche decision, which no content pack can supply. No green product gate and no deployed receipt are claimed.\n"
+}
