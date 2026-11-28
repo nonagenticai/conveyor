@@ -1,0 +1,29 @@
+{
+  "schema": "conveyor-tranche-member-pin/v1",
+  "project": "T15",
+  "project_id": "01a1d039-0d37-7f20-9959-979c31daeb5e",
+  "measured_at": "2026-11-28",
+  "before": {
+    "record_status": "closed",
+    "measured_status": "built",
+    "closure_outputs": ["closure-review"],
+    "manifest_pin": "active",
+    "gate_text": "T15 is NOT built, and its acceptance ... is the condition on which it may be closed, not a claim that it is met.",
+    "check_project": "fails P0: the row is closed, the pin expects active",
+    "closes_project": false,
+    "consequence": "a closed project with an active pin cannot carry closure content through the factory; the closure review the record already published could never be placed by the pack"
+  },
+  "after": {
+    "manifest_pin": "closed",
+    "gate_text": "T15 is closed on delivered acceptance — SPEC_V2 §12 ... delivered by PR #666 (merge a2ef9194eb2c) and recorded by the published closure review 01a2121b-2e58-7407-84a3-3329dc2c1a8c",
+    "check_project": "passes: the pin and the row agree",
+    "closes_project": true,
+    "factory_route": "the pack carries closure and closure_review; the factory composes the retrospective closure review, accepts the WBS deliverable, credits the demo and approves the baseline",
+    "content_still_required": "rework-project.py refuses a close without content.closure and content.closure_review"
+  },
+  "readbacks": {
+    "pin_assertion": "python3 -c '<T15-project regex>' -> T15 manifest: closed, gate text reconciled",
+    "record_row": "project 01a1d039-0d37-7f20-9959-979c31daeb5e status closed, meta.measured_status built, meta.closure_outputs [closure-review]",
+    "closure_review": "document 01a2121b-2e58-7407-84a3-3329dc2c1a8c, category closure-review, project T15, published"
+  }
+}
