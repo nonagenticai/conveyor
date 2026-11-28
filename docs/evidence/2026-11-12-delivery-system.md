@@ -100,3 +100,49 @@ re-point live-proof dependencies.
 
 Commands: `gh issue list --state open --label unit --json number,labels`,
 `git ls-remote --heads origin`, `gh pr list --state open --json number,headRefName,body`.
+
+## Re-measurement — 2026-11-28 (after the #526 rework landed)
+
+**Reading:** 2026-11-28T14:05:02Z–14:05:18Z, `main@f2d0bb608`. The record above is kept as
+written; this section is what changed since, and every number carries its command.
+
+### Queue
+
+- `gh issue list --label unit --state open --json labels` → **21 open unit issues**: 13
+  `status:claimed`, 4 `status:blocked`, 2 `status:needs-human`, 2 `status:ready`.
+- `gh issue list --label unit --state open --json number,labels` + `git ls-remote --heads origin
+  'issue/*'` + `gh pr list --state open --json number,headRefName` → **2 label mismatches**:
+
+| Issue | Label | Life | Why |
+|---|---|---|---|
+| #9 | `status:needs-human` | branch `issue/9-s15-strata-readback` | a live session paused for an owner decision; the branch is its claim |
+| #916 | `status:claimed` | no branch, no PR | a claim with nothing pushed; the board's 48 h rule reaps it |
+
+Both belong to their owning sessions; this unit records them and edits neither.
+
+### Branch cleanup
+
+- `git branch -r --merged origin/main | grep -E 'origin/(lane|slice)/'` → empty. Zero pushed
+  `lane/*`/`slice/*` tips are ancestors of `origin/main`, so there is nothing to delete.
+- `git worktree list` (same reading) → the only checked-out `lane/*`/`slice/*` branches are
+  `lane/gemba-walk-docs`, `slice/526-artefacts` and `slice/526-board`; all are unmerged live
+  claims, and the protocol never deletes a live claim.
+
+### Split map
+
+- `gh issue view 6|8|12|13 --json state` → #6 closed, #8 closed, #13 closed, #12 open (claimed).
+- Each parent body carries the written "Split record (owner decision, 2026-11-11)": #6 keeps P1–P2
+  with siblings #26/#27/#28; #8 keeps P2–P6 with #29; #12 keeps P1–P5 with its live receipt #30;
+  #13 keeps P1–P5 with the Tier-3 auditor #31. `docs/plans/03-DELIVERY.md:34-38` records the set.
+
+### Adoption and P7
+
+- `gh issue view 24 --json state` → CLOSED; `git ls-remote --heads origin refs/heads/lane/spec-v2`
+  → no head, so the pre-public PR #36's branch is gone.
+- `git cat-file -e origin/main:docs/evidence/2026-11-12-delivery-system.md` → 0; this file exists
+  (created by unit #26 after the 2026-11-12 record above was written).
+
+### S06d
+
+- `git show origin/main:docs/plans/slices/S06d-connector-standard.md | head -3` → `status: built`;
+  the queue carries no S06d remainder.
