@@ -582,6 +582,13 @@ def apply_rows(
             # second published row for the same pair. Only an explicit --republish-stale does.
             skipped.append(public_row(row))
             continue
+        if row.get("authored"):
+            # An authored template is satisfied only by a written body; the publisher never
+            # composes one. A missing authored document is the author's gap — the close gate and
+            # the rework register name it — not a composition this factory can perform. Without
+            # this skip an authored-due row reaches `row["_summary"]` and crashes the apply.
+            skipped.append(public_row(row))
+            continue
         if row.get("refusal"):
             entry = public_row(row)
             entry["refusal"] = row["refusal"]
