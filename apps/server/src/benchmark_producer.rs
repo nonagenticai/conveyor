@@ -1031,9 +1031,6 @@ fn parse_hunk_header(header: &str) -> Result<(usize, usize), String> {
         .split_once(' ')
         .ok_or_else(|| String::from("a hunk header with no new range"))?;
     let old_count = parse_hunk_range(old_spec, '-')?;
-    let rest = rest
-        .strip_prefix('+')
-        .ok_or_else(|| String::from("a hunk header whose new range has no `+`"))?;
     let (new_spec, tail) = rest
         .split_once(' ')
         .ok_or_else(|| String::from("a hunk header with no closing `@@`"))?;
@@ -1063,18 +1060,23 @@ mod tests {
     use super::unified_diff_shape;
 
     /// A well-formed `git diff` the sandbox can apply: one file, one hunk, real counts.
-    const VALID: &str = "diff --git a/django/core.py b/django/core.py\n\
---- a/django/core.py\n\
-+++ b/django/core.py\n\
-@@ -60,7 +60,7 @@ class Base:\n\
- class Base:\n\
- \n\
-     def render(self):\n\
--        return self.value\n\
-+        return str(self.value)\n\
- \n\
-     def close(self):\n\
-         pass\n";
+    ///
+    /// `concat!`, not `\`-continuations: a backslash-newline in a string literal also strips the
+    /// next line's leading whitespace, which would remove every context marker.
+    const VALID: &str = concat!(
+        "diff --git a/django/core.py b/django/core.py\n",
+        "--- a/django/core.py\n",
+        "+++ b/django/core.py\n",
+        "@@ -60,7 +60,7 @@ class Base:\n",
+        " class Base:\n",
+        " \n",
+        "     def render(self):\n",
+        "-        return self.value\n",
+        "+        return str(self.value)\n",
+        " \n",
+        "     def close(self):\n",
+        "         pass\n",
+    );
 
     #[test]
     fn a_well_formed_diff_passes_the_shape_check() {
@@ -1119,24 +1121,26 @@ mod tests {
 
     #[test]
     fn a_multi_hunk_multi_file_diff_is_accepted() {
-        let diff = "diff --git a/x.py b/x.py\n\
-index 111..222 100644\n\
---- a/x.py\n\
-+++ b/x.py\n\
-@@ -1,2 +1,3 @@\n\
- a\n\
-+b\n\
- c\n\
-@@ -9,2 +10,2 @@\n\
--x\n\
-+y\n\
- z\n\
-diff --git a/y.py b/y.py\n\
---- a/y.py\n\
-+++ b/y.py\n\
-@@ -4 +4 @@\n\
--p\n\
-+q\n";
+        let diff = concat!(
+            "diff --git a/x.py b/x.py\n",
+            "index 111..222 100644\n",
+            "--- a/x.py\n",
+            "+++ b/x.py\n",
+            "@@ -1,2 +1,3 @@\n",
+            " a\n",
+            "+b\n",
+            " c\n",
+            "@@ -9,2 +10,2 @@\n",
+            "-x\n",
+            "+y\n",
+            " z\n",
+            "diff --git a/y.py b/y.py\n",
+            "--- a/y.py\n",
+            "+++ b/y.py\n",
+            "@@ -4 +4 @@\n",
+            "-p\n",
+            "+q\n",
+        );
         assert_eq!(unified_diff_shape(diff), Ok(()));
     }
 
