@@ -83,6 +83,17 @@ async fn documents_publish(
     // The standard's gate is on the transition: publishing an unpublished text output needs its
     // category's required headings. An unpublish is always free, and an already-published row is
     // never re-checked — the 86 outputs published before the templates stay public.
+    //
+    // v1-outputs-1: the public pack renders a published output from its text body
+    // (`list_published_outputs_tx` filters `body IS NOT NULL`), so a body-less row would be
+    // published and invisible. Refuse that transition; the caller stores the decision text first.
+    if input.publish && !was_published && body.is_none() {
+        return Err(ActionError::new(
+            409,
+            "text_body_missing",
+            "a published output is rendered from its text body; this document has none, so publishing it would leave it invisible — store the decision text as the body first",
+        ));
+    }
     if input.publish && !was_published {
         super::require_complete(category.as_deref(), body.as_deref())?;
     }

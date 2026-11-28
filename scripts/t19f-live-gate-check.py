@@ -106,6 +106,31 @@ def read(action, payload):
     return parts.get("read", {})
 
 
+def read_approval(approval_id):
+    """The approval by id, paging `approvals.list` until the row is found.
+
+    The list is newest-first and paged (default 50, max 200). A busy record can put the
+    sitting's row far past the first page — measured 2026-11-27: 592 approvals were newer
+    than it, and the un-paged lookup failed while the row was present and approved. The
+    gate asserts the row wherever it sits rather than weakening the check.
+    """
+    cursor = None
+    for _ in range(500):
+        # `ApprovalListIn` flattens the shared `PageIn` envelope, so the fields are top-level.
+        payload = {"limit": 200}
+        if cursor:
+            payload["cursor"] = cursor
+        page = read("approvals.list", payload)
+        items = page.get("items") or []
+        for item in items:
+            if item.get("id") == approval_id:
+                return item
+        cursor = page.get("next_cursor")
+        if not cursor or not items:
+            return None
+    return None
+
+
 def evidence_file(name, header):
     EVIDENCE.mkdir(parents=True, exist_ok=True)
     path = EVIDENCE / name
@@ -594,10 +619,9 @@ def check() -> int:
         expect(any(v.get("version") == 2 and v.get("status") == "active" for v in rows),
                "the v2 policy is an active version")
 
-    approval = None
-    # The sitting's approval is tenant-scoped (its subject lives in meta), not project-scoped.
-    approvals = read("approvals.list", {}).get("items", [])
-    approval = next((a for a in approvals if a.get("id") == state["sitting"]["approval_id"]), None)
+    # The sitting's approval is tenant-scoped (its subject lives in meta), not project-scoped,
+    # so the lookup pages the tenant's list until the row appears.
+    approval = read_approval(state["sitting"]["approval_id"])
     expect(approval is not None, "the sitting's approval is a row")
     if approval is not None:
         expect(approval.get("status") == "approved",

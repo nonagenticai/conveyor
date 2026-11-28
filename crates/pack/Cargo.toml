@@ -9,6 +9,7 @@ publish.workspace = true
 
 [dependencies]
 chrono = { workspace = true }
+conveyor-actions = { path = "../actions" }
 conveyor-domain = { path = "../domain" }
 conveyor-store = { path = "../store" }
 # Platform outputs: the Markdown -> HTML renderer.
@@ -22,3 +23,7 @@ sqlx = { workspace = true }
 thiserror = { workspace = true }
 tracing = { workspace = true }
 uuid = { workspace = true }
+
+[dev-dependencies]
+# The snapshot integration tests reuse `apps/server/tests/common` (an ephemeral Postgres 18).
+tokio = { workspace = true }

@@ -1,0 +1,16 @@
+{
+ "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+ "contract_id": "01a20287-696c-76a4-a2db-28c6092b5813",
+ "level": "compliant",
+ "findings": [
+  {
+   "verdict": "pass",
+   "statement": "The T10 Statement of Architecture Work is delivered as written: its scope items are the project's approved artefacts and its approach is the lifecycle the retrospective closure review records; the contract is live and approved by a distinct approver, with no deviation a waiver would cover."
+  }
+ ],
+ "evidence": {
+  "manifest": "acceptance/programme/T10.toml",
+  "closure_review": "01a20533-ddef-745a-a510-de2a58a42e2a"
+ },
+ "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+}

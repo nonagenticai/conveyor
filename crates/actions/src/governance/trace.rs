@@ -14,17 +14,26 @@
 //!
 //! No events: S07 §5.8's register defines none for trace links. An edge is a derived fact
 //! about two rows that already announced themselves, so a subscriber has nothing to act on.
+//!
+//! `trace_links.view` is the bounded read of the whole chain (v1-w2c-5, SPEC_V2 §8.5): one
+//! requirement or one run in, its cards → runs → steps/artefacts/evidence out, capped at
+//! every hop. It is a read, so it shares `trace_links.list`'s scope.
 
 use conveyor_store as store;
 use conveyor_store::trace_link::{
     END_TYPES, LINK_KINDS, NewTraceLink, TraceFilter, TraceLinkRecord, TraceLinkStoreError,
+    TraceRoot, TraceView,
 };
 use sqlx::PgConnection;
 
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 
-use super::{IdIn, Page, TraceLinkCreateIn, TraceLinkListIn, TraceLinkOut, invalid, store_error};
+use super::{
+    IdIn, Page, TraceLinkCreateIn, TraceLinkListIn, TraceLinkOut, TraceViewArtefactOut,
+    TraceViewCardOut, TraceViewEvidenceOut, TraceViewIn, TraceViewOut, TraceViewRootOut,
+    TraceViewRunOut, TraceViewStepOut, invalid, store_error,
+};
 
 /// One trace edge as every trace action returns it.
 fn trace_link_out(record: &TraceLinkRecord) -> TraceLinkOut {
@@ -73,8 +82,9 @@ fn check_kind(kind: &str) -> Result<(), ActionError> {
 ///
 /// A missing end is a `404` (the CONTRACT §2 tenancy rule, not an FK error), a duplicate edge
 /// is a `409`, and an unknown vocabulary value is a `422` — never a `500` for input the
-/// caller supplied.
-fn trace_error(error: TraceLinkStoreError, action: &str) -> ActionError {
+/// caller supplied. `pub(crate)` because `cards.create` writes the card's birth edge through
+/// the same writer and must refuse it identically (v1-w2c-6).
+pub(crate) fn trace_error(error: TraceLinkStoreError, action: &str) -> ActionError {
     match error {
         TraceLinkStoreError::UnknownType(end_type) => invalid(
             "type",
@@ -96,6 +106,11 @@ fn trace_error(error: TraceLinkStoreError, action: &str) -> ActionError {
             404,
             "not_found",
             format!("the {side} end {id} does not exist in this tenant"),
+        ),
+        TraceLinkStoreError::RootNotFound { root, id } => ActionError::new(
+            404,
+            "not_found",
+            format!("the {root} {id} does not exist in this tenant"),
         ),
         TraceLinkStoreError::Conflict => {
             ActionError::new(409, "conflict", "this trace link already exists")
@@ -240,4 +255,118 @@ async fn trace_links_list(
         items: rows.iter().map(trace_link_out).collect(),
         next_cursor: None,
     })
+}
+
+/// The bounded governance view of one requirement or run (v1-w2c-5, SPEC_V2 §8.5).
+///
+/// Exactly one root is required: a `requirement_id` reads the asset's cards and everything
+/// below them; a `run_id` starts at the run's own card. The view is capped at every hop and
+/// `truncated` says whether a cap cut a set, so a screen never loads an unbounded page.
+#[crate::action(
+    name = "trace_links.view",
+    version = 1,
+    kind = "internal",
+    scopes = ["governance:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn trace_links_view(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: TraceViewIn,
+) -> Result<TraceViewOut, ActionError> {
+    let root = match (input.requirement_id, input.run_id) {
+        (Some(id), None) => TraceRoot::Requirement(id),
+        (None, Some(id)) => TraceRoot::Run(id),
+        (Some(_), Some(_)) => {
+            return Err(invalid(
+                "run_id",
+                "invalid_value",
+                "pass exactly one of requirement_id or run_id, not both",
+            ));
+        }
+        (None, None) => {
+            return Err(invalid(
+                "requirement_id",
+                "required",
+                "pass exactly one of requirement_id or run_id",
+            ));
+        }
+    };
+    let view = store::trace_link::view_trace_tx(&mut *tx, ctx.tenant, root)
+        .await
+        .map_err(|error| trace_error(error, "trace_links.view"))?;
+    Ok(trace_view_out(view))
+}
+
+/// A store view as the action's document.
+fn trace_view_out(view: TraceView) -> TraceViewOut {
+    TraceViewOut {
+        root: TraceViewRootOut {
+            root_type: view.root.root_type.to_owned(),
+            id: view.root.id.to_string(),
+            title: view.root.title,
+            kind: view.root.kind,
+            status: view.root.status,
+            card_id: view.root.card_id.map(|id| id.to_string()),
+        },
+        cards: view
+            .cards
+            .into_iter()
+            .map(|card| TraceViewCardOut {
+                id: card.id.to_string(),
+                name: card.name,
+            })
+            .collect(),
+        runs: view
+            .runs
+            .into_iter()
+            .map(|run| TraceViewRunOut {
+                id: run.id.to_string(),
+                card_id: run.card_id.map(|id| id.to_string()),
+                status: run.status,
+                created_at: run.created_at,
+            })
+            .collect(),
+        steps: view
+            .steps
+            .into_iter()
+            .map(|step| TraceViewStepOut {
+                id: step.id.to_string(),
+                run_id: step.run_id.to_string(),
+                position: step.position,
+                action: step.action,
+                status: step.status,
+            })
+            .collect(),
+        artefacts: view
+            .artefacts
+            .into_iter()
+            .map(|artefact| TraceViewArtefactOut {
+                id: artefact.id.to_string(),
+                run_id: artefact.run_id.to_string(),
+                name: artefact.name,
+                sha256: artefact.sha256,
+                bytes: artefact.bytes,
+            })
+            .collect(),
+        evidence: view
+            .evidence
+            .into_iter()
+            .map(|row| TraceViewEvidenceOut {
+                id: row.id.to_string(),
+                run_id: row.run_id.map(|id| id.to_string()),
+                run_step_id: row.run_step_id.map(|id| id.to_string()),
+                card_id: row.card_id.map(|id| id.to_string()),
+                tool_key: row.tool_key,
+                status: row.status,
+                http_status: row.http_status,
+            })
+            .collect(),
+        edges: view.edges.iter().map(trace_link_out).collect(),
+        truncated: view.truncated,
+    }
 }

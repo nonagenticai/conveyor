@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Compliance Review — UI spike — Leptos CSR vs Leptos SSR · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="compliance-review" data-provenance-version="1" data-provenance-hash="3ac09231f3c49e4ac392d71f6a41639d830634848e88ad18262aaeb7d2172a39" data-provenance-status="active" data-provenance-owner="georgiedekker" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>compliance-review</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>3ac09231f3c49e4ac392d71f6a41639d830634848e88ad18262aaeb7d2172a39</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>georgiedekker</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Compliance Review — UI spike — Leptos CSR vs Leptos SSR</h1>
+<h2>Relationship</h2>
+<p>Exactly one of irrelevant, consistent, compliant, conformant, fully conformant or non-conformant.</p>
+<pre><code class="language-json">{
+  "category": "compliance-review",
+  "count": 1,
+  "rows": [
+    {
+      "contract_id": "01a1ff31-30fe-7003-8d62-59278699d128",
+      "created_at": "2026-11-21T17:40:34.548051+00:00",
+      "evidence": {
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "manifest": "acceptance/programme/S01.toml",
+        "result": "green",
+        "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
+      },
+      "findings": [
+        {
+          "code": "S01-1",
+          "note": "the ADR records the decision with the measured numbers; SSR did not beat CSR on TTI"
+        },
+        {
+          "code": "S01-2",
+          "note": "metrics 5\u20137 are partially or not measured and the record says so"
+        }
+      ],
+      "id": "01a1ff32-159a-7028-a2d2-b4bcc1ce9eef",
+      "level": "compliant",
+      "outcome": null,
+      "project_id": "01a1d039-0d27-724c-9bae-af96b2d926b1",
+      "reviewed_at": "2026-11-21T17:40:34.548051+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-21T17:40:34.548051+00:00",
+      "version": 1
+    }
+  ],
+  "source": "architecture.json#/compliance_reviews"
+}
+</code></pre>
+<h2>Findings</h2>
+<p>The evidence for each finding, against the contract.</p>
+<pre><code class="language-json">{
+  "category": "compliance-review",
+  "count": 1,
+  "rows": [
+    {
+      "contract_id": "01a1ff31-30fe-7003-8d62-59278699d128",
+      "created_at": "2026-11-21T17:40:34.548051+00:00",
+      "evidence": {
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "manifest": "acceptance/programme/S01.toml",
+        "result": "green",
+        "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
+      },
+      "findings": [
+        {
+          "code": "S01-1",
+          "note": "the ADR records the decision with the measured numbers; SSR did not beat CSR on TTI"
+        },
+        {
+          "code": "S01-2",
+          "note": "metrics 5\u20137 are partially or not measured and the record says so"
+        }
+      ],
+      "id": "01a1ff32-159a-7028-a2d2-b4bcc1ce9eef",
+      "level": "compliant",
+      "outcome": null,
+      "project_id": "01a1d039-0d27-724c-9bae-af96b2d926b1",
+      "reviewed_at": "2026-11-21T17:40:34.548051+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-21T17:40:34.548051+00:00",
+      "version": 1
+    }
+  ],
+  "source": "architecture.json#/compliance_reviews"
+}
+</code></pre>
+<h2>Waivers</h2>
+<p>Each accepted deviation with its owner, reason, cost, risk and reassessment date.</p>
+<pre><code class="language-json">{
+  "category": "compliance-review",
+  "count": 1,
+  "rows": [
+    {
+      "kind": "waiver_status",
+      "title": "None recorded \u2014 0 waivers for this project",
+      "waivers": 0
+    }
+  ],
+  "source": "computed:waiver_status"
+}
+</code></pre>
+<h2>Decision</h2>
+<p>The outcome and the conditions that attach to it.</p>
+<pre><code class="language-json">{
+  "category": "compliance-review",
+  "count": 1,
+  "rows": [
+    {
+      "conditions": null,
+      "findings": [
+        {
+          "code": "S01-1",
+          "note": "the ADR records the decision with the measured numbers; SSR did not beat CSR on TTI"
+        },
+        {
+          "code": "S01-2",
+          "note": "metrics 5\u20137 are partially or not measured and the record says so"
+        }
+      ],
+      "id": "01a1ff32-159a-7028-a2d2-b4bcc1ce9eef",
+      "kind": "governing_review",
+      "level": "compliant",
+      "outcome": null,
+      "reviewed_at": "2026-11-21T17:40:34.548051+00:00",
+      "reviewed_by_name": "conveyor-approver",
+      "title": "governing review 01a1ff32-159a-7028-a2d2-b4bcc1ce9eef: compliant / no outcome"
+    }
+  ],
+  "source": "computed:governing_review"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>UI spike — Leptos CSR vs Leptos SSR · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -14,8 +14,9 @@ tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 
 mkdir -p "$tmp/docs/design/scripts" "$tmp/docs/design/docs" "$tmp/docs/design/data" \
-  "$tmp/docs/evidence" "$tmp/scripts" "$tmp/governance" "$tmp/seed" "$tmp/homepage/design" \
-  "$tmp/fixture" "$tmp/fixture-docs" "$tmp/bin"
+  "$tmp/docs/evidence" "$tmp/docs/evidence/record-w3" "$tmp/docs/evidence/record-w4" \
+  "$tmp/docs/evidence/record-w5" "$tmp/scripts" "$tmp/governance" "$tmp/seed" \
+  "$tmp/homepage/design" "$tmp/fixture" "$tmp/fixture-docs" "$tmp/bin"
 
 cp "$repo/docs/design/scripts/publish-data.sh" "$tmp/docs/design/scripts/publish-data.sh"
 # Order-proving stand-ins: the real generators read the whole tree, so the test proves the
@@ -56,10 +57,21 @@ printf '%s' '{"issues": [{"number": 9001, "title": "fetched registry", "state": 
 SH
 cp "$repo/scripts/audit-programme-conformance.py" "$tmp/scripts/audit-programme-conformance.py"
 cp "$repo/scripts/generate-standards.py" "$tmp/scripts/generate-standards.py"
+cp "$repo/scripts/redact-public-register.py" "$tmp/scripts/redact-public-register.py"
+# The register redactor and the docs renderer both import the shared redaction rules.
+cp "$repo/scripts/private_refs.py" "$tmp/scripts/private_refs.py"
 cp "$repo/governance/conformance.json" "$tmp/governance/conformance.json"
 cp "$repo/seed/programme.json" "$tmp/seed/programme.json"
 cp "$repo/seed/programme-definition.json" "$tmp/seed/programme-definition.json"
 cp "$repo/seed/output-standard.json" "$tmp/seed/output-standard.json"
+cp "$repo/docs/evidence/record-w3/deep-review-findings.json" \
+  "$tmp/docs/evidence/record-w3/deep-review-findings.json"
+# publish-data.sh merges all three deep-review sidecars into the register; any one missing fails
+# the audit before it can report.
+cp "$repo/docs/evidence/record-w4/deep-review-findings.json" \
+  "$tmp/docs/evidence/record-w4/deep-review-findings.json"
+cp "$repo/docs/evidence/record-w5/deep-review-findings.json" \
+  "$tmp/docs/evidence/record-w5/deep-review-findings.json"
 chmod +x "$tmp/scripts/fetch-issues.sh" "$tmp/docs/design/scripts/build-docs.py"
 
 cat > "$tmp/fixture/programme.json" <<'JSON'
@@ -113,14 +125,18 @@ set -euo pipefail
 out=""
 docs=""
 conf=""
+manifest_only=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --out) out="$2"; shift 2 ;;
     --outputs-dir) docs="$2"; shift 2 ;;
     --conformance) conf="$2"; shift 2 ;;
+    --manifest-only) manifest_only=1; shift ;;
     *) shift ;;
   esac
 done
+# The finalise pass only rehashes the pack; it writes no snapshot and needs no outputs dir.
+[ "$manifest_only" = 1 ] && exit 0
 mkdir -p "$out" "$docs"
 cp "$FIXTURE"/*.json "$out/"
 cp "$FIXTURE_DOCS/outputs.js" "$docs/"

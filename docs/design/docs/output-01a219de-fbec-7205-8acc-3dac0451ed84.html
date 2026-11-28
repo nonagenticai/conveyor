@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T19 — Data entity catalog · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="architecture-artifact-instance" data-provenance-version="1" data-provenance-hash="fb7a93e376e020bdf4fb5f13335f9906367ff1ece9a3967b1b223dfda33f3541" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>architecture-artifact-instance</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>fb7a93e376e020bdf4fb5f13335f9906367ff1ece9a3967b1b223dfda33f3541</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>T19 — Data entity catalog</h1>
+<h2>Metadata</h2>
+<p>Type catalog; phase C; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a20c80-b9b8-7214-abc6-f2c4f75a1fc1; artefact 01a20cde-adbf-7626-9b2b-58faf7164755, status approved; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.</p>
+<h2>Entries</h2>
+<p>Ten entities carry the model. The five new tables own the forum policy, the convened card, the agenda, the attendance and the typed positions. The remaining rows are references the slice must not duplicate: the existing approval and its approval_decision rows, the card that the meeting is or an action becomes, the project_dependency a commitment may become, and the governed_asset that holds minutes. The catalog names the keys that give each table its identity, including the (tenant_id, key, version) uniqueness of meeting_type and the one-live-meeting-per-slot constraint on meeting.</p>
+<h2>Links</h2>
+<p>Derives from SPEC_V2 §6.8's row table and from docs/plans/T19-decision-forums.md §6 (data model), with the migration ledgers and the participant extension recorded there. The acceptance gate is acceptance/programme/T19.toml, and the live delivery contract 01a20cea-91bb-77f4-a880-044c90bb5f0e carries compliance.</p>
+<h2>Document</h2>
+<p>The catalog's central rule is that meeting_position is not a decision: the only decision rows are approval_decision records on the linked approval, written once per qualifying seat with via='meeting'. A meeting can therefore never lower an approval's dual control, waive its evidence or bypass the P4 conflict exclusion; the decision arithmetic applies the meeting's rule first and the approval's policy second, and the stricter result wins. No transcript, chat or messages table exists, and none may be added under this slice.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Decision forums (meetings) · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -742,6 +742,37 @@ pub async fn update_card_tx(
     }
 }
 
+/// The newest live card on a board whose `meta[key] = value`.
+///
+/// A system-opened record (a tool request) is idempotent by its own key: the action that opens
+/// it asks whether one is already there before creating a second. `archived_at` excludes the
+/// spent records, so a fulfilled request does not block a new one.
+pub async fn find_live_card_by_meta_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    board_id: Uuid,
+    key: &str,
+    value: &str,
+) -> Result<Option<CardRecord>, sqlx::Error> {
+    let id: Option<Uuid> = sqlx::query_scalar(
+        "SELECT id FROM card
+          WHERE tenant_id = $1 AND board_id = $2 AND archived_at IS NULL
+            AND meta ->> $3 = $4
+          ORDER BY created_at DESC
+          LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(board_id)
+    .bind(key)
+    .bind(value)
+    .fetch_optional(&mut *conn)
+    .await?;
+    match id {
+        Some(id) => get_card_record_tx(conn, tenant, id).await,
+        None => Ok(None),
+    }
+}
+
 /// Replace a card's `meta` document, guarded by its version. `None` means absent or stale.
 ///
 /// The caller computes the merged document: `meta` is a free-form object whose keys belong to
@@ -803,6 +834,36 @@ pub async fn bump_card_version_tx(
         None => Ok(None),
         Some(_) => get_card_record_tx(conn, tenant, id).await,
     }
+}
+
+/// The live rework cards that charge an open P0 package to `owner_project`.
+///
+/// `materialise-rework.py` writes one card per rework package with `meta.rework_key`,
+/// `meta.severity` and `meta.owner_project`; a package is closed when its card is archived or
+/// moved to a `done`/`archive` lane. This is the materialised-card half of the close gate's
+/// P0 rule (v1-close-1) — the committed findings ledger is the other half, and neither reads
+/// the generated rework register.
+pub async fn open_p0_rework_packages_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    owner_project: &str,
+) -> Result<Vec<String>, sqlx::Error> {
+    sqlx::query_scalar(
+        "SELECT c.meta->>'rework_key'
+           FROM card c
+           JOIN list l ON l.tenant_id = c.tenant_id AND l.id = c.list_id
+          WHERE c.tenant_id = $1
+            AND c.archived_at IS NULL
+            AND l.kind NOT IN ('done', 'archive')
+            AND c.meta->>'rework_key' IS NOT NULL
+            AND c.meta->>'severity' = 'P0'
+            AND c.meta->>'owner_project' = $2
+          ORDER BY c.meta->>'rework_key'",
+    )
+    .bind(tenant.as_uuid())
+    .bind(owner_project)
+    .fetch_all(&mut *conn)
+    .await
 }
 
 /// Write a lane transition the domain already approved.

@@ -1,0 +1,14 @@
+{
+ "title": "Conformance baseline acceptance v2 \u2014 2026-11-23 (head d7e2e4fb)",
+ "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+ "body": "# Conformance baseline acceptance v2 \u2014 2026-11-23 (head d7e2e4fb)\n\n## Context\n\nThe baseline was first re-accepted at snapshot `a2c48db0`. The seed was then regenerated from its\nown sources (the slice plans, the issue registry and the measured coverage), as the repository's\nseed builder requires. The regeneration shows that S21's plan status is `active`, matching its live\nrecord; the earlier `closed` seed status was stale seed data, not an under-delivery. T0 and T4\nremain plan-closed and live-active, and are real rework.\n\n## Decision\n\nThe programme's conformance baseline is re-accepted from the head snapshot at `d7e2e4fb`:\n\n- `seed_live_drift S21` is **deleted** from the baseline: the regenerated seed and the live record\n  agree, so there is no live gap. This is a deletion, not a re-dating.\n- `seed_live_drift T0` remains owned under the programme owner with the 2027-02-18 reassessment\n  date. T0 is in tranche 0, which is closed, so it may close through its own chain.\n- `seed_live_drift T4` remains owned under the programme owner with the 2027-02-18 reassessment\n  date. T4 is in tranche 4, which is authorised, so it may close through its own chain.\n- Every other entry is derived from the live gaps in this snapshot; an entry whose gap is gone is\n  deleted, never re-dated, and no disposition is changed to hide a gap.\n\n## Consequences\n\nThe strict gate passes with zero unbaselined P0/P1 and no expired entry. The seed is never\nhand-edited to hide a gap; it is regenerated from its sources and this record names the difference.\nT0 and T4 close through their own tranche chains. S21 stays active until its tranche is authorised.\n\n## Evidence\n\n- Head snapshot: `d7e2e4fb`; 295 snapshot files; the manifest sha256 is recorded in the baseline\n  header.\n- Strict audit: `audit-programme-conformance.py --strict --fail-on P0,P1 --baseline\n  docs/evidence/conformance-baseline.json`.\n- Journal: the acceptance is replayed through `documents.compose` and read back by id.\n",
+ "category": "decision",
+ "publishable": true,
+ "meta": {
+  "sha256": "16d73bb433b3a34476bfce03fb4ab4510bbc5a4bd25ec75666d1fd7c20f17c4f",
+  "category": "decision",
+  "size_bytes": 1982,
+  "content_type": "text/markdown",
+  "w3_natural_key": "programme-artefact:decision:16d73bb433b3a344"
+ }
+}

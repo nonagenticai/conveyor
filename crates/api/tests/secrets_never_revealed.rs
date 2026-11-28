@@ -146,7 +146,7 @@ async fn a_secret_is_written_read_rotated_and_never_returned() {
     // ── no action could reveal one ──────────────────────────────────────────────────────
     let registry = conveyor_actions::registry::registry();
     for spec in registry.iter() {
-        let name = spec.name;
+        let name = spec.name.as_ref();
         assert!(
             !(name.starts_with("secrets.") && (name.contains("reveal") || name.contains("read"))),
             "the registry has a reveal-shaped action: {name}"
@@ -154,7 +154,7 @@ async fn a_secret_is_written_read_rotated_and_never_returned() {
         if name.starts_with("secrets.") {
             // Property NAMES, not substrings: `key_id`'s description mentions the ciphertext, and a check on
             // the serialised text would flag prose. What matters is that no field could hold a value.
-            let schema = serde_json::to_value((spec.output)()).expect("schema");
+            let schema = serde_json::to_value(spec.output_schema()).expect("schema");
             if let Some(properties) = schema.get("properties").and_then(Value::as_object) {
                 for property in properties.keys() {
                     assert!(

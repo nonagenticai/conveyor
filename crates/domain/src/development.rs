@@ -41,6 +41,14 @@ pub enum ApproverKind {
     Human,
     /// The tenant's earned auto-merge policy decides, when its conditions hold.
     Auto,
+    /// The triage agent decides (the lane's explicit non-governance declaration, §5.4).
+    TriageAgent,
+    /// A deterministic rule decides.
+    Rule,
+    /// Another agent decides.
+    Agent,
+    /// A per-tenant channel service account decides (S06d's connector identity).
+    Service,
 }
 
 impl ApproverKind {
@@ -49,6 +57,10 @@ impl ApproverKind {
         match self {
             Self::Human => "human",
             Self::Auto => "auto",
+            Self::TriageAgent => "triage_agent",
+            Self::Rule => "rule",
+            Self::Agent => "agent",
+            Self::Service => "service",
         }
     }
 }
@@ -71,7 +83,23 @@ impl FromStr for ApproverKind {
         match raw {
             "human" => Ok(Self::Human),
             "auto" => Ok(Self::Auto),
+            "triage_agent" => Ok(Self::TriageAgent),
+            "rule" => Ok(Self::Rule),
+            "agent" => Ok(Self::Agent),
+            "service" => Ok(Self::Service),
             other => Err(ApproverKindError(other.to_owned())),
+        }
+    }
+}
+
+impl From<crate::approval::DeciderKind> for ApproverKind {
+    fn from(kind: crate::approval::DeciderKind) -> Self {
+        match kind {
+            crate::approval::DeciderKind::Human => Self::Human,
+            crate::approval::DeciderKind::TriageAgent => Self::TriageAgent,
+            crate::approval::DeciderKind::Rule => Self::Rule,
+            crate::approval::DeciderKind::Agent => Self::Agent,
+            crate::approval::DeciderKind::Service => Self::Service,
         }
     }
 }

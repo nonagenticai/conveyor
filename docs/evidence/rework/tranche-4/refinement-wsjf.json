@@ -1,0 +1,176 @@
+{
+ "schema": "conveyor-pi-refinement-wsjf/v1",
+ "tranche": 4,
+ "tranche_id": "01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce",
+ "cadence_id": "01a202a2-2705-7392-a2d1-03ca2b3a174e",
+ "period": "tranche-4",
+ "head": "364ffd79",
+ "recorded_at": "2026-11-24",
+ "basis": {
+  "register": "/tmp/w0c-register/rework.json at 1bf2fb7c: 790 packages = 19 P0 / 215 P1 / 556 P2",
+  "plan": "PI plan tranche-4, document 01a20e7e-6cac-767e-b385-a5b732341aee: O1 BV 10, O2 BV 9, O3 8, O4 7, O5 6, O6 5",
+  "method": "business_value from the objective the member serves; time_criticality from the plan order (T9/T10 first); risk_reduction from the member's open P0/P1 count; job_size from the member's open package count. The four inputs are the PI refinement's re-estimate, recorded here and in the refinement cadence."
+ },
+ "members": {
+  "T9": {
+   "business_value": 10,
+   "time_criticality": 13,
+   "risk_reduction": 10,
+   "job_size": 8,
+   "objective": "O1",
+   "open_packages": {
+    "total": 23,
+    "P0": 0,
+    "P1": 5,
+    "P2": 18
+   },
+   "why": "O1: the tranche plan and objectives the other members' evidence reads; committed first because every receipt cites them. 23 open packages (5 P1), mostly the TOGAF G/H and PMP baseline/register documents."
+  },
+  "T10": {
+   "business_value": 10,
+   "time_criticality": 13,
+   "risk_reduction": 10,
+   "job_size": 8,
+   "objective": "O1",
+   "open_packages": {
+    "total": 22,
+    "P0": 0,
+    "P1": 3,
+    "P2": 19
+   },
+   "why": "O1: the cadence pair with T9; the same plan/objectives/lesson gate. 22 open packages (3 P1)."
+  },
+  "T4": {
+   "business_value": 10,
+   "time_criticality": 8,
+   "risk_reduction": 9,
+   "job_size": 13,
+   "objective": "O1",
+   "open_packages": {
+    "total": 22,
+    "P0": 0,
+    "P1": 5,
+    "P2": 17
+   },
+   "why": "O1: the coach record set. 22 open packages (5 P1: candidate solutions, benefits and context diagrams, phase G/H)."
+  },
+  "T14": {
+   "business_value": 10,
+   "time_criticality": 9,
+   "risk_reduction": 10,
+   "job_size": 8,
+   "objective": "O1+O2",
+   "open_packages": {
+    "total": 10,
+    "P0": 2,
+    "P1": 5,
+    "P2": 3
+   },
+   "why": "O1 with the governed_assets family of O2. Two P0 packages (change control, project baseline) and 5 P1; the live toolkit probes run before the chain."
+  },
+  "T16": {
+   "business_value": 10,
+   "time_criticality": 8,
+   "risk_reduction": 7,
+   "job_size": 8,
+   "objective": "O1",
+   "open_packages": {
+    "total": 14,
+    "P0": 0,
+    "P1": 1,
+    "P2": 13
+   },
+   "why": "O1: the record set. 14 open packages, one P1 (the TOGAF phase-G document); the contract and Phase-G review are the small repairs."
+  },
+  "T18": {
+   "business_value": 9,
+   "time_criticality": 7,
+   "risk_reduction": 10,
+   "job_size": 5,
+   "objective": "O2",
+   "open_packages": {
+    "total": 5,
+    "P0": 2,
+    "P1": 1,
+    "P2": 2
+   },
+   "why": "O2: the T18 harness. Two P0 packages (change control, project baseline); the coverage output is stale. Smallest open set of the ten."
+  },
+  "T19": {
+   "business_value": 10,
+   "time_criticality": 8,
+   "risk_reduction": 10,
+   "job_size": 13,
+   "objective": "O1",
+   "open_packages": {
+    "total": 24,
+    "P0": 2,
+    "P1": 9,
+    "P2": 13
+   },
+   "why": "O1: the meetings record set and the v1-meetings-1 CODE package. 24 open packages, the largest set; two P0 packages."
+  },
+  "S05": {
+   "business_value": 10,
+   "time_criticality": 8,
+   "risk_reduction": 10,
+   "job_size": 5,
+   "objective": "O1",
+   "open_packages": {
+    "total": 8,
+    "P0": 2,
+    "P1": 4,
+    "P2": 2
+   },
+   "why": "O1: the board slice record set. Two P0 packages and 4 P1; the closed-on-red closure review is re-recorded through the gate."
+  },
+  "S07": {
+   "business_value": 10,
+   "time_criticality": 8,
+   "risk_reduction": 10,
+   "job_size": 8,
+   "objective": "O1",
+   "open_packages": {
+    "total": 10,
+    "P0": 2,
+    "P1": 6,
+    "P2": 2
+   },
+   "why": "O1: the requirements slice record set. Two P0 and 6 P1; the largest P1 block of the three delivery slices."
+  },
+  "S09": {
+   "business_value": 10,
+   "time_criticality": 8,
+   "risk_reduction": 10,
+   "job_size": 5,
+   "objective": "O1",
+   "open_packages": {
+    "total": 8,
+    "P0": 2,
+    "P1": 4,
+    "P2": 2
+   },
+   "why": "O1: the documents slice record set. Two P0 and 4 P1."
+  }
+ },
+ "commitment_order": [
+  "T9",
+  "T10",
+  "T4",
+  "T14",
+  "T16",
+  "S05",
+  "S07",
+  "S09",
+  "T19",
+  "T18"
+ ],
+ "reordered": [
+  {
+   "item": "T9 and T10 first",
+   "from": "WSJF score 4.1 (third)",
+   "to": "committed first",
+   "why": "the plan and objectives the other members' evidence reads; the ART commits this order over the computed score"
+  }
+ ]
+}

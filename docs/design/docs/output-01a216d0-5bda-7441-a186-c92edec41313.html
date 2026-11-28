@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Compliance Review — Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="compliance-review" data-provenance-version="1" data-provenance-hash="9a318f24fc5157b1199bf9a77ba07517769e16b0242226f76e250d5b151dbe22" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>compliance-review</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>9a318f24fc5157b1199bf9a77ba07517769e16b0242226f76e250d5b151dbe22</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Compliance Review — Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest</h1>
+<h2>Relationship</h2>
+<p>Exactly one of irrelevant, consistent, compliant, conformant, fully conformant or non-conformant.</p>
+<pre><code class="language-json">{
+  "category": "compliance-review",
+  "count": 2,
+  "rows": [
+    {
+      "contract_id": "01a20256-6ede-7d70-aae8-5dbfe681a1b7",
+      "created_at": "2026-11-22T09:09:53.122806+00:00",
+      "evidence": {
+        "acceptance_manifest": "acceptance/programme/S04.toml",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "gate_proof": "HTTP/MCP parity 7/7 at 582e2dc6",
+        "snapshot_sha": "582e2dc67e5882eb63f40de67c129f8c2863c376",
+        "standards_findings": [
+          "std-togaf-delivery-contract-s04",
+          "std-pmp-project-registers-s04",
+          "std-togaf-architecture-artifact-s04"
+        ],
+        "work_table": "https://github.com/nonagenticai/conveyor/issues/526#issuecomment-7076904694"
+      },
+      "findings": {
+        "deviations": [
+          {
+            "finding": "the post-F delivery contract is not yet recorded; the SoAW governs phases A-G until this tranche's close records it",
+            "id": "s04-g-1",
+            "severity": "P1"
+          },
+          {
+            "finding": "the project register set is partial: not all six kinds carry a named owner",
+            "id": "s04-g-2",
+            "severity": "P2"
+          },
+          {
+            "finding": "the architecture-artifact instance's required sections do not all resolve (metadata and document linkage)",
+            "id": "s04-g-3",
+            "severity": "P2"
+          },
+          {
+            "finding": "the plan frontmatter said planned while the code and the parity proof were live; corrected with evidence in the same record",
+            "id": "s04-g-4",
+            "severity": "P2"
+          },
+          {
+            "finding": "the gate clause was not executed by the manifest; the 7/7 parity run is encoded as the gate clause under the acceptance-standard change",
+            "id": "s04-g-5",
+            "severity": "P2"
+          },
+          {
+            "finding": "the mandatory artefact set for S04 is not complete at this review; this record closes the compliance-review P0 and the other three findings are dated packages, not waivers",
+            "id": "s04-g-6",
+            "severity": "P1"
+          }
+        ],
+        "summary": "S04's action registry is compliant with its governing Statement of Architecture Work: the same contract is served over HTTP and MCP (7/7 parity at 582e2dc6). Six deviations are recorded; none is a P0 and none is waived."
+      },
+      "id": "01a20284-e742-757a-ae91-0b8fb19ad3c0",
+      "level": "compliant",
+      "outcome": null,
+      "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+      "reviewed_at": "2026-11-22T09:09:53.122806+00:00",
+      "reviewed_by": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+      "reviewed_by_name": "FR Test",
+      "updated_at": "2026-11-22T09:09:53.122806+00:00",
+      "version": 1
+    },
+    {
+      "contract_id": "01a2054c-4cab-752d-a62d-9446c9274d70",
+      "created_at": "2026-11-22T22:07:21.060132+00:00",
+      "evidence": {
+        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+      },
+      "findings": "x",
+      "id": "01a2054c-ade9-7229-8ad9-4c4d239e9ae7",
+      "level": "conformant",
+      "outcome": null,
+      "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+      "reviewed_at": "2026-11-22T22:07:21.060132+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-22T22:07:21.060132+00:00",
+      "version": 1
+    }
+  ],
+  "source": "architecture.json#/compliance_reviews"
+}
+</code></pre>
+<h2>Findings</h2>
+<p>The evidence for each finding, against the contract.</p>
+<pre><code class="language-json">{
+  "category": "compliance-review",
+  "count": 2,
+  "rows": [
+    {
+      "contract_id": "01a20256-6ede-7d70-aae8-5dbfe681a1b7",
+      "created_at": "2026-11-22T09:09:53.122806+00:00",
+      "evidence": {
+        "acceptance_manifest": "acceptance/programme/S04.toml",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "gate_proof": "HTTP/MCP parity 7/7 at 582e2dc6",
+        "snapshot_sha": "582e2dc67e5882eb63f40de67c129f8c2863c376",
+        "standards_findings": [
+          "std-togaf-delivery-contract-s04",
+          "std-pmp-project-registers-s04",
+          "std-togaf-architecture-artifact-s04"
+        ],
+        "work_table": "https://github.com/nonagenticai/conveyor/issues/526#issuecomment-7076904694"
+      },
+      "findings": {
+        "deviations": [
+          {
+            "finding": "the post-F delivery contract is not yet recorded; the SoAW governs phases A-G until this tranche's close records it",
+            "id": "s04-g-1",
+            "severity": "P1"
+          },
+          {
+            "finding": "the project register set is partial: not all six kinds carry a named owner",
+            "id": "s04-g-2",
+            "severity": "P2"
+          },
+          {
+            "finding": "the architecture-artifact instance's required sections do not all resolve (metadata and document linkage)",
+            "id": "s04-g-3",
+            "severity": "P2"
+          },
+          {
+            "finding": "the plan frontmatter said planned while the code and the parity proof were live; corrected with evidence in the same record",
+            "id": "s04-g-4",
+            "severity": "P2"
+          },
+          {
+            "finding": "the gate clause was not executed by the manifest; the 7/7 parity run is encoded as the gate clause under the acceptance-standard change",
+            "id": "s04-g-5",
+            "severity": "P2"
+          },
+          {
+            "finding": "the mandatory artefact set for S04 is not complete at this review; this record closes the compliance-review P0 and the other three findings are dated packages, not waivers",
+            "id": "s04-g-6",
+            "severity": "P1"
+          }
+        ],
+        "summary": "S04's action registry is compliant with its governing Statement of Architecture Work: the same contract is served over HTTP and MCP (7/7 parity at 582e2dc6). Six deviations are recorded; none is a P0 and none is waived."
+      },
+      "id": "01a20284-e742-757a-ae91-0b8fb19ad3c0",
+      "level": "compliant",
+      "outcome": null,
+      "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+      "reviewed_at": "2026-11-22T09:09:53.122806+00:00",
+      "reviewed_by": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+      "reviewed_by_name": "FR Test",
+      "updated_at": "2026-11-22T09:09:53.122806+00:00",
+      "version": 1
+    },
+    {
+      "contract_id": "01a2054c-4cab-752d-a62d-9446c9274d70",
+      "created_at": "2026-11-22T22:07:21.060132+00:00",
+      "evidence": {
+        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+      },
+      "findings": "x",
+      "id": "01a2054c-ade9-7229-8ad9-4c4d239e9ae7",
+      "level": "conformant",
+      "outcome": null,
+      "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+      "reviewed_at": "2026-11-22T22:07:21.060132+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-22T22:07:21.060132+00:00",
+      "version": 1
+    }
+  ],
+  "source": "architecture.json#/compliance_reviews"
+}
+</code></pre>
+<h2>Waivers</h2>
+<p>Each accepted deviation with its owner, reason, cost, risk and reassessment date.</p>
+<pre><code class="language-json">{
+  "category": "compliance-review",
+  "count": 1,
+  "rows": [
+    {
+      "kind": "waiver_status",
+      "title": "None recorded \u2014 0 waivers for this project",
+      "waivers": 0
+    }
+  ],
+  "source": "computed:waiver_status"
+}
+</code></pre>
+<h2>Decision</h2>
+<p>The outcome and the conditions that attach to it.</p>
+<pre><code class="language-json">{
+  "category": "compliance-review",
+  "count": 1,
+  "rows": [
+    {
+      "conditions": null,
+      "findings": "x",
+      "id": "01a2054c-ade9-7229-8ad9-4c4d239e9ae7",
+      "kind": "governing_review",
+      "level": "conformant",
+      "outcome": null,
+      "reviewed_at": "2026-11-22T22:07:21.060132+00:00",
+      "reviewed_by_name": "conveyor-approver",
+      "title": "governing review 01a2054c-ade9-7229-8ad9-4c4d239e9ae7: conformant / no outcome"
+    }
+  ],
+  "source": "computed:governing_review"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

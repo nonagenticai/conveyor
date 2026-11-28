@@ -16,7 +16,7 @@ fn only_projects_execute_is_task_capable() {
     let capable: Vec<&str> = conveyor_actions::registry::registry()
         .iter()
         .filter(|spec| spec.task_capable)
-        .map(|spec| spec.name)
+        .map(|spec| spec.name.as_ref())
         .collect();
     assert_eq!(
         capable,

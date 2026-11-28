@@ -23,7 +23,12 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1 id="s17--native-benchmark-harness">S17 — Native benchmark harness</h1>
+    <main class="doc-body"><!-- historical-rbuild -->
+
+<blockquote>
+<p>⚠️ <strong>Historical build order.</strong> <code>rbuild</code> was retired on 2026-11-20 (CONTRACT §16). The <code>rbuild -- …</code> lines below record how this slice was gated then, not a route to run now. The current route is the GitHub-hosted <code>preflight.yml</code> for the compile/lint verdict and <code>~/.claude/scripts/cargo-guard.py</code> on m4 for interactive feedback; never a local gate.</p>
+</blockquote>
+<h1 id="s17--native-benchmark-harness">S17 — Native benchmark harness</h1>
 <p>Programme project: S17 · issues #21</p>
 <p>⚠️ <strong>Process model 2026-11-09:</strong> the subject is the <strong>process</strong> (<code>process_id</code>); the old <code>procedure_id</code> pin migrates in <code>0033</code> (a SOP is not a measured subject). The <code>conveyor</code> arm resolves the run's <strong>process agent</strong>.</p>
 <h2 id="1-objective">1. Objective</h2>
@@ -89,7 +94,7 @@
 <h2 id="5-deliverables">5. Deliverables</h2>
 <p><code>migrations/0025_s17_benchmark.sql</code> (DDL exactly as <code>02-DATA-ARCHITECTURE §2.18</code>; update BOTH migration-ledger lists — <code>crates/store/src/migrate.rs</code> and <code>crates/store/tests/s07_schema.rs</code>), <code>seed/benchmark/verified50-v1.json</code></p>
 <ul>
-<li><code>seed/benchmark/images-verified50-v1.lock.json</code>, <code>tools/seed-benchmark/</code> (standalone crate: parquet reader + artifact writer), <code>crates/domain/src/benchmark/{mod,arm,grade,parsers,mcnemar,specgen}.rs</code>, <code>crates/domain/tests/{benchmark_specgen.rs,fixtures/benchmark/golden-eval-scripts.json}</code>, <code>crates/store/src/seed_benchmark.rs</code>, <code>crates/store/src/benchmark.rs</code>, <code>crates/actions/src/benchmark/{mod,runs,cases}.rs</code>, <code>apps/server/src/sandbox.rs</code>, <code>apps/server/src/worker.rs</code> (the driver + reaper). Tests: <code>crates/actions/tests/benchmark_parity.rs</code> (+ its frozen fixtures), <code>crates/api/tests/benchmark_rls.rs</code>, <code>apps/server/tests/benchmark_jobs.rs</code>, <code>apps/server/tests/sandbox_live.rs</code> (<code>#[ignore]</code>, needs the cluster). Plus <code>spec.rs</code> (two scopes), <code>crates/actions-derive/src/lib.rs</code> (the wire table), <code>served-spec.lock.json</code>, and the S12 screen declaration.</li>
+<li><code>seed/benchmark/images-verified50-v1.lock.json</code>, <code>tools/seed-benchmark/</code> (standalone crate: parquet reader + artifact writer), <code>crates/domain/src/benchmark/{mod,arm,grade,parsers,mcnemar,specgen}.rs</code>, <code>crates/domain/tests/{benchmark_specgen.rs,fixtures/benchmark/golden-eval-scripts.json}</code>, <code>crates/store/src/seed_benchmark.rs</code>, <code>crates/store/src/benchmark.rs</code>, <code>crates/actions/src/benchmark/{mod,runs,cases}.rs</code>, <code>apps/server/src/sandbox.rs</code>, <code>apps/server/src/worker.rs</code> (the driver + reaper). Tests: <code>crates/actions/tests/benchmark_parity.rs</code> (+ its frozen fixtures), <code>crates/api/tests/benchmark_rls.rs</code>, <code>apps/server/tests/benchmark_jobs.rs</code> (the shipped sandbox proof: manifest/isolation contract, fail-closed config, and the driver against a stubbed API). <strong>No live sandbox test exists at this baseline:</strong> <code>apps/server/tests/sandbox_live.rs</code> is absent and no <code>#[ignore]</code> sandbox test exists in the workspace — the live proof is a named gap (§7), not a target. Plus <code>spec.rs</code> (two scopes), <code>crates/actions-derive/src/lib.rs</code> (the wire table), <code>served-spec.lock.json</code>, and the S12 screen declaration.</li>
 </ul>
 <table>
 <thead>
@@ -163,7 +168,7 @@
 <li><strong>Parity test</strong> <code>crates/actions/tests/benchmark_parity.rs</code>, over fixtures copied to <code>crates/actions/tests/fixtures/benchmark/2026-09-17/</code> (the grade dirs' <code>results.jsonl</code> + <code>eval-logs.tgz</code>, the drive dirs' <code>predictions.jsonl</code>/<code>provenance.jsonl</code>/<code>summary.json</code>, and the seed) — every banked grade run's logs reproduce its <code>results.jsonl</code> row for row. This is the slice's central proof; do it before any sandbox code.</li>
 <li><code>store::benchmark</code> — suite/instance seed (idempotent by <code>seed_sha256</code>; conflict ⇒ 409), run create/get/list/ cancel, case finalise, compare query (paired on the graded intersection), baseline promote, reap. RLS tests.</li>
 <li><code>actions::benchmark</code> — the eight handlers; scopes at the five code sites; registry <code>EXPECTED</code> and the api-lib count; a <code>parity_http_mcp</code> sample for each action.</li>
-<li><code>apps/server/src/sandbox.rs</code> — <code>kube</code> client, ConfigMap + Job, pod log, delete; deterministic names; fail-closed config. Unit-test the manifest builder; one <code>#[ignore]</code> live proof against the cluster.</li>
+<li><code>apps/server/src/sandbox.rs</code> — <code>kube</code> client, ConfigMap + Job, pod log, delete; deterministic names; fail-closed config. The manifest builder, isolation contract and fail-closed config are proved in <code>apps/server/tests/benchmark_jobs.rs</code>; the live cluster proof does not exist (named gap, §7) — do not cite a <code>sandbox_live</code> target.</li>
 <li>Worker: <code>benchmark.run.poll</code> (start ≤ concurrency, poll, grade, finalise, re-enqueue per tick with <code>max_attempts=1</code>) and <code>benchmark.reap</code> in <code>DEFAULT_SCHEDULES</code> + <code>prune.rs</code>'s exact list.</li>
 <li><code>--write-lock</code>; schema/action/op counts in the index; <code>cargo test --workspace</code>; clippy; <code>/tmp/s17-gate.sh</code>.</li>
 </ol>
@@ -172,7 +177,8 @@
 cd $HOME/Movies/conveyor
 step() { printf &#39;\n=== %s ===\n&#39; &quot;$1&quot;; }
 
-# Rust runs on the build host (CONTRACT §16): `~/.local/bin/cargo` refuses inside a Cargo project on the dev box.
+# CONTRACT §16 (amended 2026-11-20): rbuild is retired. Read every `rbuild -- test` below as the
+# same command run by the GitHub-hosted preflight; locally it is cargo-guard.py for feedback only.
 step &quot;fmt + clippy&quot;
 rbuild -- fmt --all -- --check
 rbuild -- clippy --workspace --all-targets -- -D warnings
@@ -217,7 +223,7 @@ step &quot;the sandbox is fail-closed&quot;
 rbuild -- test -p conveyor-server --test benchmark_jobs
 
 printf &#39;\nGATE_GREEN\n&#39;</code></pre>
-<p>A live sandbox proof is <strong>not</strong> in this block: it needs the grading node (§10). It is one <code>#[ignore]</code> test, <code>rbuild -- test -p conveyor-server --test sandbox_live -- --ignored</code>, run once when the node exists.</p>
+<p>A live sandbox proof is <strong>not in this block and has no test artifact</strong>. It needs the grading node (§10). ⚠️ <strong>NAMED GAP (v1-s17-1, 2026-11-21):</strong> <code>apps/server/tests/sandbox_live.rs</code> is absent and no <code>#[ignore]</code> sandbox test exists anywhere in the workspace, so the documented command <code>rbuild -- test -p conveyor-server --test sandbox_live -- --ignored</code> exits target-not-found. The shipped proof is <code>apps/server/tests/benchmark_jobs.rs</code> (manifest, isolation contract, fail-closed config, stubbed driver). The live cluster proof stays <strong>NOT PROVEN</strong> until that ignored test and the grading node exist; no runnable command is claimed here.</p>
 <h2 id="8-traps">8. Traps</h2>
 <ol type="1">
 <li><strong>The parser is the score.</strong> A regex that silently matches nothing turns a testbed fault into a model failure. The parity test must compare every instance, and an unparseable case is <code>infra_error</code>, never <code>unresolved</code>.</li>

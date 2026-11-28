@@ -72,6 +72,28 @@ pub enum ResolvedHandler {
     Workflow,
 }
 
+/// Intern a spec name once, so `HandlerCtx.action` can hold a `&'static str`.
+///
+/// Compiled names are already static; imported ones are owned `String`s read from a row. The
+/// set is bounded by the registry, so leaking each distinct name is the intended lifetime.
+pub fn intern_name(name: &str) -> &'static str {
+    use std::collections::HashSet;
+    use std::sync::{Mutex, OnceLock};
+
+    static NAMES: OnceLock<Mutex<HashSet<&'static str>>> = OnceLock::new();
+    let names = NAMES.get_or_init(|| Mutex::new(HashSet::new()));
+    let mut guard = match names.lock() {
+        Ok(guard) => guard,
+        Err(poisoned) => poisoned.into_inner(),
+    };
+    if let Some(existing) = guard.get(name) {
+        return existing;
+    }
+    let leaked: &'static str = Box::leak(name.to_owned().into_boxed_str());
+    guard.insert(leaked);
+    leaked
+}
+
 /// One action, ready to authorise and dispatch.
 #[derive(Clone, Debug)]
 pub struct ResolvedAction {
@@ -97,6 +119,8 @@ pub struct ResolvedAction {
     pub confirm: Confirm,
     /// The resolution scope.
     pub tenancy: Tenancy,
+    /// Whether the call buys a billable model call (the run-budget gate reads it).
+    pub captures_usage: bool,
     /// Where the work happens.
     pub handler: ResolvedHandler,
     /// Where the definition came from.
@@ -123,7 +147,7 @@ impl ResolvedAction {
     /// Project a compiled spec into the resolved shape.
     pub fn from_spec(spec: &crate::spec::ActionSpec) -> Self {
         Self {
-            name: spec.name.to_owned(),
+            name: spec.name.to_string(),
             version: spec.version,
             kind: spec.kind,
             input: spec.input_schema(),
@@ -134,9 +158,10 @@ impl ResolvedAction {
             effect: spec.effect,
             confirm: spec.confirm,
             tenancy: spec.tenancy,
-            handler: match spec.handler {
+            captures_usage: spec.captures_usage,
+            handler: match &spec.handler {
                 crate::spec::HandlerRef::Workflow => ResolvedHandler::Workflow,
-                handler => ResolvedHandler::Compiled(handler),
+                handler => ResolvedHandler::Compiled((*handler).clone()),
             },
             source: ActionSource::Compiled,
         }
@@ -243,6 +268,7 @@ impl ResolvedAction {
             effect,
             confirm,
             tenancy,
+            captures_usage: false,
             handler,
             source: ActionSource::Registry {
                 id: row.id,
@@ -458,8 +484,8 @@ pub async fn assert_boot_registry(pool: &PgPool) -> Result<(), String> {
         let _ = tx.rollback().await;
         for row in rows {
             if let Some(spec) = crate::registry::registry().get(&row.name) {
-                if let crate::spec::HandlerRef::External { service, .. } = spec.handler
-                    && crate::invoke::service_url(service).is_none()
+                if let crate::spec::HandlerRef::External { service, .. } = &spec.handler
+                    && crate::invoke::service_url(service.as_ref()).is_none()
                 {
                     return Err(format!(
                         "action {:?} names service {:?}, which has no configured base URL",

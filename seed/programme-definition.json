@@ -4,6 +4,28 @@
     "name": "conveyor buildout",
     "status": "active"
   },
+  "jobs": [
+    {
+      "key": "sro",
+      "title": "Senior Responsible Owner",
+      "family": "programme governance"
+    },
+    {
+      "key": "bcm",
+      "title": "Business Change Manager",
+      "family": "programme governance"
+    },
+    {
+      "key": "sponsoring_group",
+      "title": "Sponsoring Group",
+      "family": "programme governance"
+    },
+    {
+      "key": "board",
+      "title": "Programme Board",
+      "family": "programme governance"
+    }
+  ],
   "benefits": [
     {
       "reference": "B1",
@@ -13,6 +35,8 @@
       "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
       "measurement_method": "Count decision rows per run from the action ledger.",
       "owner_role": "BCM",
+      "owner_job_key": "bcm",
+      "benefit_owner_job_key": "bcm",
       "project_key": null
     },
     {
@@ -23,6 +47,8 @@
       "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
       "measurement_method": "The tool_call ledger's per-toolkit counts, read at the tranche review; retirement is a decision.",
       "owner_role": "BCM",
+      "owner_job_key": "bcm",
+      "benefit_owner_job_key": "bcm",
       "project_key": "T13"
     },
     {
@@ -33,6 +59,8 @@
       "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
       "measurement_method": "The development project's run, CI and deploy records; the lane and PR are the evidence.",
       "owner_role": "BCM",
+      "owner_job_key": "bcm",
+      "benefit_owner_job_key": "bcm",
       "project_key": "T6"
     },
     {
@@ -43,6 +71,8 @@
       "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
       "measurement_method": "The GitHub issue registry and merged PR authors; the publications are recorded on the programme issues.",
       "owner_role": "BCM",
+      "owner_job_key": "bcm",
+      "benefit_owner_job_key": "bcm",
       "project_key": "DESIGN-PUBLISH"
     },
     {
@@ -53,6 +83,8 @@
       "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
       "measurement_method": "The T0 gate test and the absorption inventory; a second store is a defect.",
       "owner_role": "BCM",
+      "owner_job_key": "bcm",
+      "benefit_owner_job_key": "bcm",
       "project_key": "T0"
     },
     {
@@ -63,6 +95,8 @@
       "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
       "measurement_method": "coverage.json and seed/programme.json regenerated and checked in CI; the P0 checklist counts the published set.",
       "owner_role": "BCM",
+      "owner_job_key": "bcm",
+      "benefit_owner_job_key": "bcm",
       "project_key": "P0"
     },
     {
@@ -73,6 +107,8 @@
       "baseline": "not measured - no meeting rows exist before T19; the current record is the approval row only",
       "measurement_method": "Read-time aggregates over meeting, meeting_agenda_item, meeting_attendance, meeting_position, approval_decision and project_dependency; a metric reads rows and writes nothing.",
       "owner_role": "BCM",
+      "owner_job_key": "bcm",
+      "benefit_owner_job_key": "bcm",
       "project_key": "T19"
     }
   ],

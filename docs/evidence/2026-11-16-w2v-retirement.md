@@ -21,7 +21,7 @@ statement.
 | `services-istio/w2v/virtualservice.yaml` → VS `w2v` | 1 VS | it routed the two hosts below at the dead backends |
 | `services-istio/w2v/destinationrule.yaml` | 1 DR | its only subject was `w2v-frontend` |
 
-**Kept, and stated in the kustomization:** the namespace, `pv-worker3.yaml`, `storage.yaml`
+**Kept, and stated in the kustomization:** the namespace, `pv-registry-1.yaml`, `storage.yaml`
 (**the data**), the default-deny `networkpolicy.yaml`, the ConfigMaps and the Secrets, and the
 `w2v-legacy-redirect` VirtualService (which carries no backend — it is why `w2v.nonagentic.ai`
 still answers at all). This unit deletes no data; every manifest is one revert away.
@@ -44,7 +44,7 @@ deployment.apps/redis                           0/0     0            0          
 deployment.apps/slide-service                   0/0     0            0           192d
 deployment.apps/tts-gateway                     0/0     0            0           138d
 deployment.apps/tts-gateway-worker              0/0     0            0           137d
-deployment.apps/tts-gateway-worker-mini1        0/0     0            0           137d
+deployment.apps/tts-gateway-worker-media-1        0/0     0            0           137d
 deployment.apps/video-analyzer-service          0/0     0            0           192d
 deployment.apps/video-production-service        0/0     0            0           192d
 deployment.apps/w2v-frontend                    0/0     0            0           192d
@@ -60,7 +60,7 @@ No pod lines in that output: there were none. 16 Services were live (`kubectl -n
 | Survivor | Why it stays |
 |---|---|
 | namespace `w2v` | still holds the PVs, the secrets and the default-deny policy |
-| `pv-worker3.yaml`, `storage.yaml` | **the data** — this unit deletes none |
+| `pv-registry-1.yaml`, `storage.yaml` | **the data** — this unit deletes none |
 | `networkpolicy.yaml` | the namespace keeps its default-deny whether or not a pod exists |
 | `configmaps.yaml`, the 31 Secrets | the retired fleet's configuration and credentials |
 | VS `w2v-legacy-redirect` | carries no backend; the only reason `w2v.nonagentic.ai` answers |

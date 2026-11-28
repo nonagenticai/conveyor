@@ -1,0 +1,61 @@
+{
+ "artifact_kind": "diagram",
+ "artifact_type_id": "01a1f2c1-1456-7505-bb5b-5b8656aa8a1b",
+ "contract_id": "01a20a8b-b32c-7185-808f-8ea0b4c5ec46",
+ "entries": [
+  {
+   "axis_a": "Procedure governance",
+   "axis_b": "ingest and publish",
+   "value": {
+    "evidence": "procedures.ingest_sop / ingest_rdf / ingest_process; publish behind a gate",
+    "maturity": "live"
+   }
+  },
+  {
+   "axis_a": "Knowledge management",
+   "axis_b": "knowledge packs",
+   "value": {
+    "evidence": "knowledge_pack_ref bound to the procedure",
+    "maturity": "live"
+   }
+  },
+  {
+   "axis_a": "Process execution",
+   "axis_b": "PDDL steps",
+   "value": {
+    "evidence": "bound job runs the PDDL steps",
+    "maturity": "live"
+   }
+  },
+  {
+   "axis_a": "Version management",
+   "axis_b": "re-ingest",
+   "value": {
+    "evidence": "procedure_versioning",
+    "maturity": "live"
+   }
+  },
+  {
+   "axis_a": "Assurance",
+   "axis_b": "unreviewed sources",
+   "value": {
+    "evidence": "an unreviewed source cannot bind",
+    "maturity": "live"
+   }
+  }
+ ],
+ "meta": {
+  "author": "conveyor-e2e",
+  "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+  "recorded_on": "2026-11-23",
+  "retrospective": true,
+  "reviewer": "conveyor-approver",
+  "unit": "526"
+ },
+ "phase_code": "b",
+ "plateau": "hld",
+ "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+ "purpose": "The capabilities the project leaves behind.",
+ "scope": "T16",
+ "title": "Business capability map \u2014 T16 procedure ingestion (retrospective, 2026-11-23)"
+}

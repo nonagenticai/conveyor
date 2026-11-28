@@ -1,0 +1,8 @@
+{
+ "input": {
+  "run_id": "01a21a06-aea7-7f8a-9d81-c4b02971fa4b",
+  "toolkit_key": "retrieval",
+  "effect_ceiling": "read",
+  "credential_alias": "strata.token"
+ }
+}

@@ -21,9 +21,12 @@ trap 'rm -rf "$tmp"' EXIT
 
 plant() { # $1 = root
   local root="$1"
-  mkdir -p "$root/docs/design/scripts" "$root/docs/design/docs" "$root/docs/plans" "$root/bin"
+  mkdir -p "$root/docs/design/scripts" "$root/docs/design/docs" "$root/docs/plans" "$root/bin" \
+    "$root/scripts"
   cp "$repo/docs/design/scripts/build-docs.py" "$root/docs/design/scripts/build-docs.py"
   cp "$repo/docs/design/scripts/doc-template.html" "$root/docs/design/scripts/doc-template.html"
+  # build-docs.py imports the shared redaction rules from scripts/private_refs.py.
+  cp "$repo/scripts/private_refs.py" "$root/scripts/private_refs.py"
   printf '# Fixture plan\n\nA source document.\n' > "$root/docs/plans/00-INDEX.md"
   printf '# Fixture document\n\nAnother source.\n' > "$root/docs/sample.md"
   cat > "$root/bin/pandoc" <<'SH'

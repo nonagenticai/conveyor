@@ -17,6 +17,7 @@
       .std-meta dd { margin:.15rem 0 0; }
       .std-state { font-size:.75rem; text-transform:uppercase; letter-spacing:.06em; opacity:.7; }
       .std-absent { border-left:3px solid #b45309; padding:.35rem .75rem; background:#fff7ed; }
+      .std-intent { max-width:68ch; }
       .std-source { font-size:.85rem; opacity:.8; }
       .std-index { list-style:none; padding:0; }
       .std-index li { border-top:1px solid var(--line, #e5e5e5); padding:.5rem 0; }
@@ -40,29 +41,42 @@
         <div><dt>SPEC</dt><dd>§8.3</dd></div>
         <div><dt>Gate</dt><dd>not recorded</dd></div>
         <div><dt>Package</dt><dd><code>std-msp-tranche-review-tranche-1:PLATFORM</code></dd></div>
-        <div><dt>Provenance</dt><dd>2026-11-26T21:15:00Z · 34753fa35fc2</dd></div>
+        <div><dt>Provenance</dt><dd>2026-11-27T12:10:18.740973+00:00 · 17f470d5c621</dd></div>
       </dl>
       <h2>Evidence</h2>
+<p class="std-intent">The baselines, the benefit status and the risk and issue register the review judged.</p>
 <p class="std-source">Source: <code>msp.json#/tranche_reviews</code> — 1 row(s)</p>
 <ul>
 <li>01a1ffa9-c06f-7921-9d6b-611d871ce6cc</li>
 </ul><h2>Benefit status</h2>
+<p class="std-intent">Each benefit against its profile: measured, on track, at risk or unmeasured.</p>
 <p class="std-source">Source: <code>msp.json#/benefit_profiles</code> — 7 row(s)</p>
 <ul>
-<li>Auditable decisions <span class="std-state">draft</span></li>
-<li>Less bespoke tooling <span class="std-state">draft</span></li>
+<li>Auditable decisions <span class="std-state">active</span></li>
+<li>Less bespoke tooling <span class="std-state">active</span></li>
 <li>Self-development <span class="std-state">draft</span></li>
-<li>Public collaboration <span class="std-state">draft</span></li>
-<li>One model <span class="std-state">draft</span></li>
-<li>Predictable delivery <span class="std-state">draft</span></li>
+<li>Public collaboration <span class="std-state">active</span></li>
+<li>One model <span class="std-state">active</span></li>
+<li>Predictable delivery <span class="std-state">active</span></li>
 <li>Deliberated cross-department decisions <span class="std-state">draft</span></li>
 </ul><h2>Risk and issue register</h2>
-<p class="std-source">Source: <code>msp.json#/register_items</code> — 3 row(s)</p>
+<p class="std-intent">The open risks and issues, with owners.</p>
+<p class="std-source">Source: <code>msp.json#/register_items</code> — 92 row(s)</p>
 <ul>
-<li>V2 acceptance (#88/T12) remains open <span class="std-state">open</span></li>
-<li>The six benefit baselines are placeholders <span class="std-state">open</span></li>
-<li>Tranches 5 and 10-13 cannot deliver on proposed projects <span class="std-state">open</span></li>
+<li>The dated samples cannot be re-measured, so a later reader cannot reproduce the counts <span class="std-state">open</span></li>
+<li>A used id that no later slice builds would break S14&#x27;s 100 % gate <span class="std-state">open</span></li>
+<li>A surface dropped by decision may still receive live traffic after sign-off <span class="std-state">open</span></li>
+<li>Metrics 5–7 cannot be re-established, so the measured table is narrower than the eight-metric protocol <span class="std-state">open</span></li>
+<li>The drag-smoothness threshold was missed by both stacks and passes to S12 as an unmet target <span class="std-state">open</span></li>
+<li>The replay record lost the artefact rows, so a re-creation could duplicate a surviving row <span class="std-state">open</span></li>
+<li>The two-worker lease proof is timing-sensitive and could flake under load <span class="std-state">open</span></li>
+<li>The rework could close S02 while issue #2 still reads open <span class="std-state">open</span></li>
+<li>The lease-exclusivity claim is not exercised by the 32-racer test (v1-s03-1) <span class="std-state">admitted</span></li>
+<li>The archive-exclusion claim covers only the two board-scan indexes (v1-s03-2) <span class="std-state">admitted</span></li>
+<li>A projection reads a second source and the four surfaces drift apart <span class="std-state">open</span></li>
+<li>An approved imported action is executable by a tenant that should not see it <span class="std-state">open</span></li>
 </ul><h2>Decision</h2>
+<p class="std-intent">Continue, pause or stop, with the reason and the conditions.</p>
 <p class="std-source">Source: <code>msp.json#/tranche_reviews</code> — 1 row(s)</p>
 <ul>
 <li>01a1ffa9-c06f-7921-9d6b-611d871ce6cc</li>

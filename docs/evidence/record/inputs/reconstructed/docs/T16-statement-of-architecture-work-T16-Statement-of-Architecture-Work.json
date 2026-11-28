@@ -1,0 +1,8 @@
+{
+ "title": "T16 \u2014 Statement of Architecture Work",
+ "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+ "category": "statement-of-architecture-work",
+ "body": "# Statement of Architecture Work \u2014 T16 ingestion\n\n## Assignment\n\nThe T16 slice (SPEC_V2 \u00a712; issues #85, #448) under the programme's architecture governance: ingest the\norganisation's procedure sources as governed, human-reviewed procedures and let a bound job execute them.\n\n## Scope\n\n`procedures.ingest_sop`, `procedures.ingest_rdf`, `procedures.ingest_process`, `procedures.review_source`,\n`procedures.publish`, re-ingest versioning and a bound job's PDDL steps. Not in scope: the procedure catalogue\nUI (T18) and the process engine (S13).\n\n## Responsibilities\n\nThe author job requests and drafts; the approver job decides every gate and is never its requester; the\nprogramme architect owns the contract and the Phase-G review; the BCM owns the benefit.\n\n## Acceptance criteria\n\nSPEC_V2 \u00a712 T16: a real SOP, an OWL file and a BPMN diagram are each ingested end to end; the draft is\npublished behind a human gate; a re-ingest creates the next draft version while the published row keeps its\nsource and pack; a job bound to the procedure runs the PDDL steps; an unreviewed source never binds. Proven by\n25/25 tests at lane head `46fc49e2` (transcript `/tmp/u5a-v14/evidence/T16-acceptance.md`).\n\n## Contract\n\nThe live delivery contract `01a20a8b-b32c-7185-808f-8ea0b4c5ec46`, requested by the author job and approved by the Architecture\nBoard under the standing delegation `01a1fb9f-ac2d-732d-b274-1079be3dd2b3`; its Phase-G review is compliant and cites that delegation.\n",
+ "publishable": true,
+ "unit": "T16"
+}

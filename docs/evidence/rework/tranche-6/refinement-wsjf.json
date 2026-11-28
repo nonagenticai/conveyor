@@ -1,0 +1,55 @@
+{
+  "schema": "conveyor-pi-refinement-wsjf/v1",
+  "tranche": 6,
+  "tranche_id": "01a1e9e1-07d3-75d3-8c99-4002d5bfe8f7",
+  "cadence_id": "01a21c62-6a43-7d17-9d5b-836ad1801e45",
+  "period": "tranche-6",
+  "recorded_at": "2026-11-27",
+  "members": {
+    "S06a": {
+      "business_value": 5,
+      "time_criticality": 8,
+      "risk_reduction": 5,
+      "job_size": 1
+    },
+    "S06b": {
+      "business_value": 10,
+      "time_criticality": 13,
+      "risk_reduction": 8,
+      "job_size": 8
+    },
+    "S10": {
+      "business_value": 9,
+      "time_criticality": 8,
+      "risk_reduction": 8,
+      "job_size": 9
+    },
+    "S11": {
+      "business_value": 8,
+      "time_criticality": 7,
+      "risk_reduction": 7,
+      "job_size": 8
+    },
+    "T19F": {
+      "business_value": 9,
+      "time_criticality": 6,
+      "risk_reduction": 10,
+      "job_size": 14
+    }
+  },
+  "reordered": [
+    {
+      "item": "S06a first (retirement), then S06b, S10, S11, T19F",
+      "from": "the seed's membership order",
+      "to": "S06a, S06b, S10, S11, T19F",
+      "why": "S06a is a recorded retirement; S06b is the agent interface and the control plane S10 and S11 read; T19F's live decision-forum gate closes the tranche."
+    }
+  ],
+  "reestimate": {
+    "S06a": "0 open packages (record retirement)",
+    "S06b": "8 open packages",
+    "S10": "9 open packages",
+    "S11": "8 open packages",
+    "T19F": "14 open packages (2 P1, 12 P2)"
+  }
+}

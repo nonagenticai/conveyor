@@ -90,7 +90,12 @@ pub mod interaction;
 // S16: the inference ledger — the engine's write, the keyset list and the usage aggregate.
 pub mod inference;
 pub mod invite;
+// #526 (SPEC_V2 §6.7, ledger v1-w1b-5): the tenant's meta-role × action authority matrix and
+// the run-bound resolver — the binding narrows, the tenant row decides, an absent row is the
+// compiled §6.7 cell.
+pub mod job_authority;
 pub mod jobs;
+
 // T5 (SPEC_V2 §6.3, §9.3–§9.4; issue #77): the kata record, its six Gets and the held-out
 // measurement.
 pub mod kata;
@@ -100,6 +105,7 @@ pub mod lesson;
 // T6 (SPEC_V2 §5.4, §6.4, §9.1, §9.3; issue #80): the development charter, its immutable step
 // evidence and the closure record.
 pub mod development;
+
 pub mod label;
 // T2 (SPEC_V2 §7): the decision ladder's policies, refinements, laya configs and decisions.
 pub mod ladder;

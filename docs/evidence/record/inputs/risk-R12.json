@@ -1,0 +1,22 @@
+{
+ "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+ "kind": "risk",
+ "code": "R12",
+ "title": "Seed quality: wrong statuses or duplicate ADR ids",
+ "probability": "M",
+ "impact": 5,
+ "owner_job_id": "01a1db6b-4f0e-7ded-9a2c-42628510422a",
+ "links": {
+  "cards": [],
+  "requirements": [
+   {
+    "kind": "relates_to",
+    "target": "benefit/B1"
+   }
+  ],
+  "decisions": []
+ },
+ "review_at": "2026-11-29",
+ "severity": "medium",
+ "status": "open"
+}

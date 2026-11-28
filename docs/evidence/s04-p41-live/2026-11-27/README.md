@@ -14,7 +14,7 @@ its response or error stream sit beside this file.
 | Contract | Verdict | Command | Actor | Returned | Evidence |
 |---|---|---|---|---|---|
 | coding | **executed against the real coding service** | `tools.call` `coding.jobs_create` on run `01a21bab-93d2-7ea7-b0a8-e69af2e17a23`, bound to toolkit `01a1f353-cf2b-7ed5-b470-2290ef635b0e` (effect ceiling `write`) | the tenant's first active member (CLI default) | job `7c5b90bb-7fa0-4e5a-8840-e38d8bb5c6f5`, `queued` 06:23:36Z; read back through `coding.jobs_get` → `running`, started 06:23:37Z | `24-coding.json`, `25-coding-get.json` |
-| worker | **executed over conveyor's durable queue** (#450 retired the Python upstream) | `workers.list` | same | 47 `(kind,status)` queue buckets (for example `approval.closed.emit` succeeded × 20905, `benchmark.reap` succeeded × 4163) and 2 registered hosts (`mini1`, `mini2`) | `10-workers.json` |
+| worker | **executed over conveyor's durable queue** (#450 retired the Python upstream) | `workers.list` | same | 47 `(kind,status)` queue buckets (for example `approval.closed.emit` succeeded × 20905, `benchmark.reap` succeeded × 4163) and 2 registered hosts (`media-1`, `media-2`) | `10-workers.json` |
 | billing | **executed over conveyor's ledger** (#46) | `billing.summary` `{window_days: 30}` | same | window 2026-10-28T06:21:42Z → 2026-11-27T06:21:42Z; `total_usd` 1.417925; 649 inference calls; 25 tool calls | `11-billing.json` |
 
 ## The coding path
@@ -50,7 +50,7 @@ The run and bind sequence, all live:
 The engine had rolled since the receipt (`sha256:4cd9a9f3…` → `sha256:2aafb685…`). Read again
 through the same CLI transport, read-only:
 
-- `workers.list` → still 47 `(kind,status)` buckets and hosts `mini1`, `mini2`
+- `workers.list` → still 47 `(kind,status)` buckets and hosts `media-1`, `media-2`
   (`30-recheck-workers.json`);
 - `billing.summary {window_days:30}` → `total_usd` 1.417925 again; 649 inference calls, 27 tool
   calls (two more than the 06:21Z reading — the ledger moved, the figure held)

@@ -497,9 +497,9 @@ async fn resolve_bound(
                 format!("{name} is not a registered action"),
             ));
         };
-        let parameters = serde_json::to_value((spec.input)())
+        let parameters = serde_json::to_value(spec.input_schema())
             .unwrap_or_else(|_| json!({"type": "object", "additionalProperties": true}));
-        projected.insert(spec.name.to_owned());
+        projected.insert(spec.name.to_string());
         tools.push(json!({
             "type": "function",
             "function": {"name": spec.name, "parameters": parameters}
@@ -814,6 +814,7 @@ pub(crate) async fn drive(
                     registry(),
                     tenant,
                     InvokeRequest {
+                        credential_alias: None,
                         action: MODEL_ACTION.to_owned(),
                         input,
                         precondition: None,
@@ -882,6 +883,7 @@ pub(crate) async fn drive(
                         registry(),
                         tenant,
                         InvokeRequest {
+                            credential_alias: None,
                             action,
                             input: tool_input,
                             precondition: None,

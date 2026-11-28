@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Token spend per accepted deliverable — pre-transition baseline · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/benefits/token-spend-baseline.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="token-spend-per-accepted-deliverable--pre-transition-baseline">Token spend per accepted deliverable — pre-transition baseline</h1>
+<p><strong>Measured</strong> from the full-fidelity snapshot at <code>ec799ee1</code> (2026-11-21T23:27:35Z, live tenant <code>nonagentic</code>, migration 67), built by the branch binary from the restored production copy. T5 landed on <code>issue/526-u5a</code> on 2026-11-22 but is not deployed, so this is the pre-transition baseline.</p>
+<h2 id="definition">Definition</h2>
+<p>An <strong>accepted deliverable</strong> is a published output document attached to a project — <code>artefacts.json.documents</code> with <code>publishable = true</code>. The snapshot has <strong>145</strong>. The ratio is portfolio-level, not a per-run causal attribution: a run may produce no output, an output may predate the inference ledger, and project/card attribution exists for only 3 projects and 5 cards. The post-transition measurement must use the same definition over a window at least as long.</p>
+<h2 id="measured">Measured</h2>
+<table>
+<thead>
+<tr>
+<th>Measure</th>
+<th style="text-align: right;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Inference calls</td>
+<td style="text-align: right;">609</td>
+</tr>
+<tr>
+<td>Prompt / completion tokens</td>
+<td style="text-align: right;">9,374,195 / 84,273</td>
+</tr>
+<tr>
+<td><strong>Total tokens</strong></td>
+<td style="text-align: right;"><strong>9,458,468</strong></td>
+</tr>
+<tr>
+<td>Cost (priced calls; 81 unpriced)</td>
+<td style="text-align: right;">$1.318791</td>
+</tr>
+<tr>
+<td><strong>Tokens per published output</strong></td>
+<td style="text-align: right;"><strong>65,231</strong></td>
+</tr>
+<tr>
+<td>Cost per published output</td>
+<td style="text-align: right;">$0.0091</td>
+</tr>
+<tr>
+<td>Tokens per closed project (26 closed)</td>
+<td style="text-align: right;">363,787</td>
+</tr>
+<tr>
+<td>Tokens per run (371 runs)</td>
+<td style="text-align: right;">25,495</td>
+</tr>
+<tr>
+<td>Tokens per succeeded run (2 succeeded)</td>
+<td style="text-align: right;">4,729,234</td>
+</tr>
+<tr>
+<td>Run failure rate</td>
+<td style="text-align: right;"><strong>98.65%</strong> (366 / 371)</td>
+</tr>
+<tr>
+<td>Cache-miss / unknown / non-OK calls</td>
+<td style="text-align: right;">606 / 3 / 0</td>
+</tr>
+</tbody>
+</table>
+<p>By caller: <code>agent_run</code> 604 calls / 9,457,017 tokens; <code>other</code> 5 calls / 1,451 tokens.</p>
+<h2 id="why-this-is-a-ceiling-not-a-cost">Why this is a ceiling, not a cost</h2>
+<p>366 of 371 runs failed. The tokens were spent overwhelmingly on work that produced no accepted deliverable. A per-deliverable improvement that simply rejects more work would look good on the primary ratio and bad on the secondary one; both are therefore recorded.</p>
+<p>The frozen <code>a33e6562</code> pack reported 165 outputs; this fresh snapshot reports 145. The fresh snapshot is authoritative — the frozen pack's outputs projection was incomplete.</p>
+<h2 id="proposed-target-owner-confirmation-required">Proposed target (owner confirmation required)</h2>
+<ul>
+<li><strong>≤ 52,185 tokens per published output</strong> (−20% against the baseline).</li>
+<li><strong>Run failure rate ≤ 20%</strong>, measured over the same post-transition window.</li>
+</ul>
+<p>The six live benefit profiles currently say <em>"not measured — no instrument exists"</em>. The token KPI is not yet one of them; U6 must add or amend a profile and record the target and the post-transition measurement at the same <code>measured_at</code> as this baseline. The committed data is <code>docs/evidence/benefits/token-spend-baseline.json</code>.</p>
+<h2 id="reproduce">Reproduce</h2>
+<pre><code>PROGRAMME_RECORD_BIN=&lt;branch conveyor&gt; scripts/snapshot-live.sh &lt;out&gt;   # read-only live projection
+jq &#39;.inference.totals&#39; &lt;out&gt;/data/measure.json
+jq &#39;[.documents[] | select(.publishable)] | length&#39; &lt;out&gt;/data/artefacts.json
+jq &#39;[.runs[] | .status] | group_by(.) | map({(.[0]): length}) | add&#39; &lt;out&gt;/data/work.json</code></pre>
+<p>The benefit row and this file must keep the same <code>measured_at</code>; the lane owner announces the row date.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/benefits/token-spend-baseline.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

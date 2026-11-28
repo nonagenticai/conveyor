@@ -322,8 +322,23 @@
       "rework": {
         "title": "Correct the architecture waivers",
         "dod": [
-          "Every waiver names an owner and a review date and is unexpired",
+          "Every architecture waiver names an owner and a review date and is unexpired",
           "The audit reports zero waiver_invalid gaps"
+        ]
+      }
+    },
+    "waiver_not_permitted": {
+      "severity": "P1",
+      "standard": "MSP",
+      "spec": "ADR 0012 \u00a7Decision 1",
+      "artefact": "waiver",
+      "scope": "programme",
+      "owner_project": "P0",
+      "rework": {
+        "title": "Execute the work a waiver or allow block deferred",
+        "dod": [
+          "No open finding, rework package or artefact carries a waiver, deferral or [[allow]]",
+          "The audit reports zero waiver_not_permitted gaps"
         ]
       }
     },
@@ -474,6 +489,119 @@
         "dod": [
           "The project has a WBS with at least one work_package node carrying acceptance criteria",
           "The audit reports no wbs_absent gap for the project"
+        ]
+      }
+    },
+    "pi_plan_missing": {
+      "severity": "P0",
+      "standard": "SAFe",
+      "spec": "\u00a78.2",
+      "artefact": "pi-plan",
+      "scope": "tranche",
+      "owner_project": "T10",
+      "rework": {
+        "title": "Publish the tranche's PI plan before its cards materialise",
+        "dod": [
+          "Every authorised tranche that carries projects has a published pi-plan output naming that tranche",
+          "No card is materialised from a PI plan a person has not approved",
+          "The audit reports zero pi_plan_missing gaps"
+        ]
+      }
+    },
+    "pi_cadence_missing": {
+      "severity": "P1",
+      "standard": "SAFe",
+      "spec": "\u00a78.2",
+      "artefact": "programme_cadence",
+      "scope": "tranche",
+      "owner_project": "T10",
+      "rework": {
+        "title": "Give every carrying tranche a PI cadence",
+        "dod": [
+          "A programme_cadence row of kind pi exists for each tranche that carries projects",
+          "The cadence names the tranche's period or number",
+          "The audit reports zero pi_cadence_missing gaps"
+        ]
+      }
+    },
+    "pi_objectives_missing": {
+      "severity": "P1",
+      "standard": "SAFe",
+      "spec": "\u00a78.2",
+      "artefact": "pi-objectives",
+      "scope": "tranche",
+      "owner_project": "T10",
+      "rework": {
+        "title": "Publish the PI objectives with the plan",
+        "dod": [
+          "Every authorised tranche has a published pi-objectives output naming that tranche",
+          "The objectives are published with the PI plan, not after delivery",
+          "The audit reports zero pi_objectives_missing gaps"
+        ]
+      }
+    },
+    "demo_credit_missing": {
+      "severity": "P1",
+      "standard": "SAFe",
+      "spec": "\u00a78.2",
+      "artefact": "demo_credit",
+      "scope": "project",
+      "owner_project": "T10",
+      "rework": {
+        "title": "Credit every accepted deliverable at the demo",
+        "dod": [
+          "Every accepted deliverable in an authorised tranche has a demo credit",
+          "Every credit carries non-empty evidence",
+          "The audit reports zero demo_credit_missing gaps"
+        ]
+      }
+    },
+    "retro_lesson_missing": {
+      "severity": "P1",
+      "standard": "SAFe",
+      "spec": "\u00a78.2",
+      "artefact": "lesson",
+      "scope": "tranche",
+      "owner_project": "T10",
+      "rework": {
+        "title": "Close every retro with at least one lesson",
+        "dod": [
+          "Every closed tranche has a retro cadence for its period",
+          "The retro produced at least one lesson with a statement",
+          "The audit reports zero retro_lesson_missing gaps"
+        ]
+      }
+    },
+    "wsjf_inputs_missing": {
+      "severity": "P1",
+      "standard": "SAFe",
+      "spec": "\u00a78.2",
+      "artefact": "wbs_node",
+      "scope": "project",
+      "owner_project": "T10",
+      "rework": {
+        "title": "Score every WBS deliverable from its four inputs",
+        "dod": [
+          "Every deliverable has job_size at least 1",
+          "At least one of business_value, time_criticality and risk_reduction is positive",
+          "The order is computed from the inputs, never stored as a score",
+          "The audit reports zero wsjf_inputs_missing gaps"
+        ]
+      }
+    },
+    "backlog_refinement_missing": {
+      "severity": "P1",
+      "standard": "SAFe",
+      "spec": "\u00a78.2",
+      "artefact": "programme_cadence",
+      "scope": "tranche",
+      "owner_project": "T10",
+      "rework": {
+        "title": "Refine the backlog before the PI plan",
+        "dod": [
+          "Every carrying tranche has a refinement cadence for its period",
+          "The refinement is dated before the PI plan it feeds",
+          "The audit reports zero backlog_refinement_missing gaps"
         ]
       }
     }

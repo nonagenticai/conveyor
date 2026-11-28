@@ -1,0 +1,10 @@
+{
+  "effect_ceiling": "spend",
+  "enabled": true,
+  "id": "01a21a04-0450-75ba-b6de-2e22ad3ef561",
+  "run_id": "01a21a04-03b3-7f69-9a7c-f570fb0fe8e5",
+  "toolkit_id": "01a21a02-3653-77f3-9d73-eaac2da79182",
+  "toolkit_key": "image_gen",
+  "toolkit_version": 2,
+  "version": 1
+}

@@ -1,0 +1,22 @@
+{
+ "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+ "kind": "risk",
+ "code": "R8",
+ "title": "Standard completeness: a tailored profile omits a clause",
+ "probability": "M",
+ "impact": 5,
+ "owner_job_id": "01a1db6b-4efe-73bf-9e8b-004de1b88c50",
+ "links": {
+  "cards": [],
+  "requirements": [
+   {
+    "kind": "relates_to",
+    "target": "benefit/B5"
+   }
+  ],
+  "decisions": []
+ },
+ "review_at": "2026-11-29",
+ "severity": "medium",
+ "status": "open"
+}

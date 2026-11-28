@@ -1,0 +1,185 @@
+{
+  "checks": [
+    {
+      "check": "project",
+      "description": "T11 is closed",
+      "detail": "project T11 is closed",
+      "id": "T11-project",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "project_baseline",
+      "description": "the scope baseline is approved; the close gate reads the approved row",
+      "detail": "baseline 01a1ff8f-47cb-78cf-9db8-d98d863e7dd0 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
+      "id": "T11-baseline",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d36-782b-8b18-ff07a64dedbe\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
+      "description": "the charter asset exists and the charter gate is approved",
+      "detail": "exit 0",
+      "exit": 0,
+      "id": "T11-charter",
+      "kind": "command",
+      "result": "pass",
+      "severity": "P0",
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "check": "closure_outputs",
+      "description": "the declared closure outputs are declared and published",
+      "detail": "1 closure outputs published",
+      "id": "T11-closure-outputs",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "contract",
+      "description": "a live board-approved delivery contract exists",
+      "detail": "contract 01a1ff8d-a0ad-7a91-b026-d9a2575daa3f approved by board decision 01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "id": "T11-contract",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "review",
+      "description": "the Phase-G review cites a published standing delegation",
+      "detail": "review 01a217e9-df2d-7df3-ac63-82ea8bdbf7a1 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "id": "T11-review",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "closure_gate",
+      "description": "the closure gate was decided by an approver other than its requester",
+      "detail": "latest closure gate 01a217f7-691d-7cce-9892-ad46586bd980 decided by a distinct approver",
+      "id": "T11-closure-gate",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "waivers",
+      "description": "no active waiver is expired or owned by its reviewer",
+      "detail": "0 active waiver(s), all dated and distinct from the reviewer",
+      "id": "T11-waivers",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_cadence",
+      "description": "the project's PI has a cadence row and a backlog-refinement row",
+      "detail": "PI cadence 01a1ff73-df1f-78c5-8793-101de5a3dd60 and refinement 01a1ff74-8982-77b9-971e-e4517c55d09a for tranche-1",
+      "id": "T11-pi-cadence",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_plan",
+      "description": "the tranche-1 PI plan is published",
+      "detail": "the tranche-1 PI plan is published",
+      "id": "T11-pi-plan",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_objectives",
+      "description": "the tranche-1 PI objectives are published",
+      "detail": "the tranche-1 PI objectives are published",
+      "id": "T11-pi-objectives",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "wsjf",
+      "description": "every WBS deliverable of the project carries the four typed WSJF inputs",
+      "detail": "1 WBS node(s) carry the four WSJF inputs",
+      "id": "T11-wsjf",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "demo_credits",
+      "description": "every accepted deliverable has a demo credit carrying its evidence",
+      "detail": "1 accepted deliverable(s), each with a demo credit",
+      "id": "T11-demo-credits",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "lessons",
+      "description": "the tranche-1 retro produced at least one lesson",
+      "detail": "lesson 01a1ff83-3f5c-7734-830a-c8bb6c45024f carries a statement and evidence from the tranche-1 retro",
+      "id": "T11-lessons",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P1"
+    },
+    {
+      "check": "product_findings",
+      "description": "no open P0 product finding remains for the project",
+      "detail": "no open P0 package for this project",
+      "id": "T11-product",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "artefact_standard",
+      "description": "every mandatory standard artefact this project owns is evidenced",
+      "detail": "no open standard artefact package for this project",
+      "id": "T11-artefact-standard",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P1"
+    },
+    {
+      "check": "rework_resolution",
+      "description": "no unresolved P0/P1 rework package remains for the project",
+      "detail": "no unresolved P0/P1 package for this project",
+      "id": "T11-rework",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "description": "the declared gate is discharged by executable checks",
+      "detail": "gate discharged by executable checks: T11-project, T11-baseline, T11-charter, T11-closure-outputs, T11-contract, T11-review, T11-closure-gate, T11-waivers, T11-pi-cadence, T11-pi-plan, T11-pi-objectives, T11-wsjf, T11-demo-credits, T11-lessons, T11-product, T11-artefact-standard, T11-rework",
+      "id": "gate",
+      "kind": "manifest",
+      "result": "pass",
+      "severity": "P0"
+    }
+  ],
+  "failures": [],
+  "gate": "The A\u2013D artefacts, the delivery contract, the closure review and the declared outputs exist; the project re-closes through the one gate.",
+  "generated_at": "2026-11-26T13:07:07.042134+00:00",
+  "kind": "all",
+  "manifest": "acceptance/programme/T11.toml",
+  "name": "Metrics, metering and maturity",
+  "project": "T11",
+  "schema": "project-acceptance/v1",
+  "snapshot": {
+    "generated_at": "2026-11-26T13:05:12.847496+00:00",
+    "git_sha": "7796da7f0b839f31fe1c331ee3f2c21d089fc8f0",
+    "path": "retained-snapshot/7796da7f0b839f31fe1c331ee3f2c21d089fc8f0"
+  },
+  "verdict": "green",
+  "warnings": []
+}

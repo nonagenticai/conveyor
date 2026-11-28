@@ -1,0 +1,171 @@
+{
+  "checks": [
+    {
+      "check": "project",
+      "description": "S01 is closed",
+      "detail": "project S01 is closed",
+      "id": "S01-project",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "project_baseline",
+      "description": "the scope baseline is approved; the close gate reads the approved row",
+      "detail": "baseline 01a1ff31-72ec-766e-8ad3-227d927f64ab approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
+      "id": "S01-baseline",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d27-724c-9bae-af96b2d926b1\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
+      "description": "the charter asset exists and the charter gate is approved",
+      "detail": "exit 0",
+      "exit": 0,
+      "id": "S01-charter",
+      "kind": "command",
+      "result": "pass",
+      "severity": "P0",
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "check": "closure_outputs",
+      "description": "the declared closure outputs are declared and published",
+      "detail": "1 closure outputs published",
+      "id": "S01-closure-outputs",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "contract",
+      "description": "a live board-approved delivery contract exists",
+      "detail": "contract 01a1ff2e-7974-74cd-be6d-377e3c0071a4 approved by board decision 01a1ff2f-c76b-7bfe-b71a-a39294a95644 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "id": "S01-contract",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "review",
+      "description": "the Phase-G review cites a published standing delegation",
+      "detail": "review 01a21741-e820-7cad-aef6-554b55330b6e (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "id": "S01-review",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "closure_gate",
+      "description": "the closure gate was decided by an approver other than its requester",
+      "detail": "latest closure gate 01a21742-1b7b-7816-82bd-a5a10edd2221 decided by a distinct approver",
+      "id": "S01-closure-gate",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "waivers",
+      "description": "no active waiver is expired or owned by its reviewer",
+      "detail": "0 active waiver(s), all dated and distinct from the reviewer",
+      "id": "S01-waivers",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "command": "python3 -c '\nimport json, os, pathlib\ns = os.environ[\"VERIFY_SNAPSHOT\"]\nprogramme = json.load(open(s + \"/programme.json\"))\nrow = next(p for p in programme[\"projects\"] if p[\"key\"] == \"S01\")\ntext = open(s + \"/../docs/outputs.js\").read()\nindex = json.loads(text[text.find(\"{\"):text.rfind(\"}\") + 1])\noutputs = [o for o in index[\"outputs\"] if o.get(\"project_id\") == row[\"id\"]]\nassert outputs, \"S01 publishes no output\"\npages = []\nfor o in outputs:\n    if o.get(\"path\"):\n        pages.append(pathlib.Path(s).parent.joinpath(\"docs\", pathlib.Path(o[\"path\"]).name).read_text())\nbody = \"\\n\".join(pages).lower()\nassert \"not recoverable\" in body, \"the decision record does not mark an unrecoverable value\"\n'\n",
+      "description": "the decision record marks the values nobody can now establish as not recoverable",
+      "detail": "exit 0",
+      "exit": 0,
+      "id": "S01-decision-record",
+      "kind": "command",
+      "result": "pass",
+      "severity": "P0",
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "check": "pi_cadence",
+      "description": "the project's PI has a cadence row and a backlog-refinement row",
+      "detail": "PI cadence 01a1ff21-33f0-7e5a-bafc-b09b6fc73c13 and refinement 01a1ff21-547f-73e8-b256-4bee7fdc9c70 for tranche-0",
+      "id": "S01-pi-cadence",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "wsjf",
+      "description": "every WBS deliverable of the project carries the four typed WSJF inputs",
+      "detail": "1 WBS node(s) carry the four WSJF inputs",
+      "id": "S01-wsjf",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "demo_credits",
+      "description": "every accepted deliverable has a demo credit carrying its evidence",
+      "detail": "1 accepted deliverable(s), each with a demo credit",
+      "id": "S01-demo-credits",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "product_findings",
+      "description": "no open P0 product finding remains for the project",
+      "detail": "no open P0 package for this project",
+      "id": "S01-product",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "artefact_standard",
+      "description": "every mandatory standard artefact this project owns is evidenced",
+      "detail": "no open standard artefact package for this project",
+      "id": "S01-artefact-standard",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P1"
+    },
+    {
+      "check": "rework_resolution",
+      "description": "no unresolved P0/P1 rework package remains for the project",
+      "detail": "no unresolved P0/P1 package for this project",
+      "id": "S01-rework",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "description": "the declared gate is discharged by executable checks",
+      "detail": "gate discharged by executable checks: S01-project, S01-baseline, S01-charter, S01-closure-outputs, S01-contract, S01-review, S01-closure-gate, S01-waivers, S01-decision-record, S01-pi-cadence, S01-wsjf, S01-demo-credits, S01-product, S01-artefact-standard, S01-rework",
+      "id": "gate",
+      "kind": "manifest",
+      "result": "pass",
+      "severity": "P0"
+    }
+  ],
+  "failures": [],
+  "gate": "The decision record states what is observable and marks the rest not recoverable; the project re-closes through the one gate.",
+  "generated_at": "2026-11-26T11:48:06.081166+00:00",
+  "kind": "all",
+  "manifest": "acceptance/programme/S01.toml",
+  "name": "UI spike \u2014 Leptos CSR vs Leptos SSR",
+  "project": "S01",
+  "schema": "project-acceptance/v1",
+  "snapshot": {
+    "generated_at": "2026-11-26T11:47:36.077817+00:00",
+    "git_sha": "7f0df874e7c26681ee36923b5c17e76a99254b24",
+    "path": "retained-snapshot/7f0df874e7c26681ee36923b5c17e76a99254b24"
+  },
+  "verdict": "green",
+  "warnings": []
+}

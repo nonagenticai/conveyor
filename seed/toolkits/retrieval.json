@@ -3,9 +3,9 @@
   "service": "strata_rag",
   "title": "Pinned-leaf retrieval",
   "owner": "platform",
-  "auth_adapter": "none",
+  "auth_adapter": "sealed-profile",
   "licence_app": null,
-  "status": "draft",
+  "status": "published",
   "health_path": "/health",
   "tools": [
     { "key": "query", "action": "retrieval.query" }

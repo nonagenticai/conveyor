@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 
-import { expect, type APIRequestContext } from "@playwright/test";
+import { expect, type APIRequestContext, type Page } from "@playwright/test";
 
 const TOKEN_FILE = process.env.E2E_TOKEN_FILE ?? "test-results/oidc-token.txt";
 let oidc: string | undefined;
@@ -65,35 +65,65 @@ export async function invoke<T = unknown>(
   return document.output as T;
 }
 
+/** The reason a fixture records instead of typed evidence; it is not the gate's subject. */
+export const FIXTURE_EVIDENCE_WAIVER =
+  "e2e fixture: the gate's subject is the row the spec created";
+
 /**
- * This tenant lets a requester decide their own gate for `action` (#285's self-approval path).
+ * Record the tenant's decision for one action.
  *
- * The console disables a requester's own Approve unless the action's policy says `allowed`, so
- * a spec that needs that control enabled sets the policy instead of borrowing a second
- * principal. `approval: required` is kept: the gate still exists and is still decided — that
- * is the console's flow, not a bypass of it.
+ * §5.4 makes the requester's exclusion an invariant, so `self_approval` is sent as its only
+ * storable spelling, `forbidden` (ledger v1-w4b-4). A spec that needs a gate states `required`
+ * and decides it with [`decideAsReviewer`]; no spec may reintroduce the self-approval opt-out.
  */
-export async function allowSelfApproval(
+export async function setApprovalPolicy(
   request: APIRequestContext,
   action: string,
-  login = "alice",
+  approval: "required" | "waived",
 ): Promise<void> {
+  if (approval === "required") {
+    await invoke(request, "approval_policies.set", {
+      action,
+      approval,
+      self_approval: "forbidden",
+    });
+    return;
+  }
+  // An earned waiver is itself a gated change (§6.4, v1-w4b-3): open a gate whose target is the
+  // governed action (a literal target, the shape a console fixture uses), have the distinct
+  // reviewer decide it, then write the earned row with the approval id. A bare `waived` row is
+  // refused and no longer skips the gate.
+  const gate = await invoke<{ id: string }>(request, "approvals.request", {
+    gate: "approval_policies.set",
+    kind: "action",
+    target: action,
+    description: `e2e: an earned waiver for ${action}`,
+    evidence_waiver_reason: FIXTURE_EVIDENCE_WAIVER,
+  });
+  await decideAsReviewer(request, "approvals.decide", gate.id);
   await invoke(
     request,
     "approval_policies.set",
-    { action, approval: "required", self_approval: "allowed" },
+    {
+      action,
+      approval: "waived",
+      self_approval: "forbidden",
+      approver_kind: "auto",
+      conditions: { max_reverts: 0 },
+      expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    },
     undefined,
-    login,
+    "alice",
+    gate.id,
   );
 }
 
 /**
  * Decide one gate as `dev:reviewer`, the seed's second dev-a admin.
  *
- * The store refuses a requester deciding their own gate (409) unless the action's policy allows
- * it, and `approval_policies.set` only accepts registered destructive actions — so a card or
- * eval gate can only ever be decided by another person. Guard the caller with [`isDevAuth`]:
- * the deployed suite has one principal.
+ * The store refuses a requester deciding their own gate unconditionally (§5.4 / P4); no policy
+ * row can relax it, so the only way to resolve a gate is another person. Guard the caller with
+ * [`isDevAuth`]: the deployed suite has one principal and nobody else can decide.
  */
 export async function decideAsReviewer(
   request: APIRequestContext,
@@ -109,11 +139,103 @@ export async function decideAsReviewer(
   );
 }
 
+/** The ids of the tenant's pending gates, as a snapshot to diff against. */
+export async function pendingGateIds(request: APIRequestContext): Promise<Set<string>> {
+  return new Set((await pendingGates(request)).map((gate) => gate.id));
+}
+
+/** The one gate that appeared since `before`. Matching the DIFFERENCE, not just the name,
+ * keeps a suite that carries other fixtures' gates from deciding the wrong one. */
+export async function newGate(
+  request: APIRequestContext,
+  before: Set<string>,
+  gate: string,
+  kind: string,
+): Promise<PendingGate> {
+  const opened = (await pendingGates(request)).find(
+    (row) => !before.has(row.id) && row.gate === gate && row.kind === kind,
+  );
+  if (!opened) {
+    throw new Error(`no new ${kind} gate on ${gate} is pending`);
+  }
+  return opened;
+}
+
 /**
- * Request a gate for `action`, approve it as the same principal, and invoke with its id.
+ * Activate a job so its release may publish and a binding may pin it.
+ *
+ * A job is born a draft (v1-w1a-4), and the store refuses to publish a release or bind a draft
+ * with `409 job_not_live`. `job_catalogue.update {status: "active"}` is what asks for the
+ * activation; its effect is a `job_activation` gate a second principal decides.
+ */
+export async function activateJob(
+  request: APIRequestContext,
+  jobId: string,
+  version = 1,
+): Promise<void> {
+  const before = await pendingGateIds(request);
+  await invoke(request, "job_catalogue.update", { id: jobId, version, status: "active" });
+  const activation = await newGate(request, before, "job_catalogue.update", "job_activation");
+  await decideAsReviewer(request, "approvals.decide", activation.id);
+}
+
+/**
+ * Create a job binding and activate it.
+ *
+ * A binding is never born live (v1-p44-2): `job_bindings.create` writes it `draft` and opens its
+ * own `job_binding` activation gate, and a run that pins a draft binding is refused
+ * `409 job_binding_stale` — the same code a genuinely stale release gets, so a fixture that
+ * skips this step would pass a stale-pin assertion for the wrong reason.
+ */
+export async function createActiveBinding<T>(
+  request: APIRequestContext,
+  input: Record<string, unknown>,
+): Promise<T> {
+  const before = await pendingGateIds(request);
+  const created = await invoke<T>(request, "job_bindings.create", input);
+  const gate = await newGate(request, before, "job_bindings.create", "job_binding");
+  await decideAsReviewer(request, "approvals.decide", gate.id);
+  return created;
+}
+
+/**
+ * Drive a UI write and prove it landed, re-driving it while it has not.
+ *
+ * The board screen recreates its forms on every refetch — an SSE resync does it right after a
+ * board loads, and a fixture's own start run lands a coach card seconds later — and a click
+ * dispatched inside that window is delivered to a node that no longer carries the handler, so
+ * no request is posted. Measured 2026-11-27: `projects.create` answered 201 while no
+ * `cards.create` ever reached the wire, and the same again on the label form. `settled` is a
+ * read of the SERVER, never the DOM, so the caller keeps its own assertion; this only decides
+ * whether to press the control again. It gives up after `attempts`, leaving the caller's
+ * assertion to fail with its own evidence.
+ */
+export async function submitUntil(
+  act: () => Promise<void>,
+  settled: () => Promise<boolean>,
+  attempts = 4,
+  perAttemptMs = 8_000,
+): Promise<void> {
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    if (await settled()) return;
+    await act();
+    const deadline = Date.now() + perAttemptMs;
+    while (Date.now() < deadline) {
+      await new Promise((resolve) => setTimeout(resolve, 250));
+      if (await settled()) return;
+    }
+  }
+}
+
+/**
+ * Fixture path: request a gate for `action`, have a distinct approver decide it, then invoke
+ * with its id.
  *
  * The fixture path for a spec that needs a destructive call to have happened (a cleanup, a
- * seeded row) without driving the console. Pair it with [`allowSelfApproval`].
+ * seeded row) without driving the console. A destructive gate requires evidence, and a fixture
+ * is not the gate's subject, so the request records the same explicit `evidence_waiver_reason`
+ * an operator's prompt records — never a silent bypass. §5.4 forbids the requester deciding it,
+ * so the decision is [`decideAsReviewer`]'s. Guard the caller with [`isDevAuth`].
  */
 export async function approvedInvoke<T = unknown>(
   request: APIRequestContext,
@@ -121,6 +243,11 @@ export async function approvedInvoke<T = unknown>(
   input: unknown,
   login = "alice",
 ): Promise<T> {
+  if (!isDevAuth()) {
+    throw new Error(
+      `${name}: a fixture gate needs a distinct approver; the deployed suite has one principal`,
+    );
+  }
   const gate = await invoke<{ id: string }>(
     request,
     "approvals.request",
@@ -130,18 +257,97 @@ export async function approvedInvoke<T = unknown>(
       action: name,
       input,
       proposed_input: input,
+      evidence_waiver_reason: FIXTURE_EVIDENCE_WAIVER,
     },
     undefined,
     login,
   );
-  await invoke(
-    request,
-    "approvals.decide",
-    { approval_id: gate.id, decision: "approve" },
-    undefined,
-    login,
-  );
+  await decideAsReviewer(request, "approvals.decide", gate.id);
   return invoke<T>(request, name, input, undefined, login, gate.id);
+}
+
+export type PendingGate = {
+  id: string;
+  gate: string;
+  kind?: string;
+  status: string;
+  target?: string;
+};
+
+/** The tenant's pending gates, newest first. */
+export async function pendingGates(request: APIRequestContext): Promise<PendingGate[]> {
+  const page = await invoke<{ items: PendingGate[] }>(request, "approvals.list", {
+    status: "pending",
+    limit: 50,
+  });
+  return page.items;
+}
+
+/** `cards.archive`'s target for one card — the string the invoke boundary compares. */
+export function archiveTarget(cardId: string): string {
+  return `card/${cardId}/archive`;
+}
+
+/** Poll until the pending gate for one target exists, and return it. */
+export async function pendingGateFor(
+  request: APIRequestContext,
+  target: string,
+): Promise<PendingGate> {
+  let found: PendingGate | undefined;
+  await expect
+    .poll(
+      async () => {
+        found = (await pendingGates(request)).find((row) => row.target === target);
+        return Boolean(found);
+      },
+      { timeout: 15_000 },
+    )
+    .toBe(true);
+  return found!;
+}
+
+/** The operator's answer to the console's §5.4 waiver prompt: a reason, or `null` to cancel. */
+export type WaiverAnswer = string | null;
+
+/**
+ * Answer the console's §5.4 evidence-waiver prompt as an operator would.
+ *
+ * The app asks `window.prompt` only after `approvals.request` refuses `422
+ * gate_evidence_missing`: Cancel (`null`) keeps the refusal and retries nothing, a non-empty
+ * reason retries the same request once with `evidence_waiver_reason`, and a blank answer is
+ * asked again. The last answer repeats if the app asks more times, so a bug cannot hang the
+ * spec; `dialogs` is the number of prompts the app actually showed.
+ */
+export function answerWaiverPrompt(
+  page: Page,
+  answers: WaiverAnswer[],
+): { dialogs: number } {
+  const seen = { dialogs: 0 };
+  let index = 0;
+  page.on("dialog", (dialog) => {
+    const answer = answers[Math.min(index, answers.length - 1)];
+    index += 1;
+    seen.dialogs += 1;
+    void (answer === null ? dialog.dismiss() : dialog.accept(answer));
+  });
+  return seen;
+}
+
+/** One `approvals.request` input the page sent, in order. */
+export type GateRequest = { input: Record<string, unknown> };
+
+/** Every `approvals.request` input the page sends, in order. */
+export function recordGateRequests(page: Page): GateRequest[] {
+  const bodies: GateRequest[] = [];
+  page.on("request", (request) => {
+    if (
+      request.method() === "POST" &&
+      new URL(request.url()).pathname === "/api/actions/approvals.request/invocations"
+    ) {
+      bodies.push(request.postDataJSON() as GateRequest);
+    }
+  });
+  return bodies;
 }
 
 export async function getJson<T = unknown>(
@@ -220,6 +426,8 @@ export async function createBoardCard(
     {
       title,
       project_type_code: "delivery",
+      // v1-e2e-1: a fixture is not programme work. The public pack excludes and lists it.
+      test_row: true,
     },
     undefined,
     login,

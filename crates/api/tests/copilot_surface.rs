@@ -1,14 +1,15 @@
-//! S10 §7 (e): a scope-absent tool is omitted from BOTH surfaces.
+//! S10 §7 (e): a scope-absent tool is omitted from BOTH surfaces and a call to it is refused.
 //!
-//! The claim proved here is the **omission**: `/api/copilot/actions` and `/mcp` `tools/list` are one
-//! projection of one `ActionSpec` set, so a low-scope principal sees the same (smaller) set on both.
+//! The first claim proved here is the **omission**: `/api/copilot/actions` and `/mcp` `tools/list`
+//! are one projection of one `ActionSpec` set, so a low-scope principal sees the same (smaller) set
+//! on both.
 //!
-//! ⚠️ The slice's §5.2 table also says calling an absent tool answers `action-not-found`, never `403`.
-//! That is true for an **agent** principal (S06b's allowlist: an out-of-list tool is `-32602`;
-//! `crates/api/tests/machine_login.rs`). For a human principal S04-D6 is deliberately weaker: the
-//! tool is absent from `tools/list`, and `tools/call` on a known name is `403 action-forbidden` —
-//! `crates/actions/src/mcp.rs:163-168` states it, and this test asserts the shipped rule rather than
-//! silently changing a signed slice's transport semantics.
+//! The second is the shipped S04-D6 rule, which S10 §5.2 and §7(e) were corrected to state
+//! (2026-11-21, v1-s10-1): for a **human** principal the tool is absent from `tools/list`, and a
+//! call to its known name is `403 action-forbidden` — the same refusal HTTP returns. The omission
+//! is the guarantee, not indistinguishability at `tools/call`. (An **agent** principal is
+//! different: S06b's allowlist answers an out-of-list name `-32602`,
+//! `crates/api/tests/machine_login.rs`.) A name outside the registry is `-32602` here too.
 
 mod copilot;
 
@@ -107,4 +108,39 @@ async fn a_low_scope_principal_omits_the_same_tools_on_both_surfaces() {
         refused.get("error").is_some(),
         "an unknown tool must be a JSON-RPC error: {refused}"
     );
+
+    // A KNOWN name outside this principal's set is the shipped S04-D6 refusal, not -32602:
+    // the HTTP invocation route answers `403 action-forbidden` ...
+    let (status, forbidden) = running
+        .invoke(
+            "projects.create",
+            "dev:dave",
+            json!({"title": "a viewer cannot create this"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 403, "{forbidden}");
+    assert_eq!(forbidden["type"], "action-forbidden", "{forbidden}");
+
+    // ... and `/mcp` returns the same problem as an `isError` tool result, not a protocol
+    // error: the name resolves, and `invoke` refuses it exactly as it refuses the HTTP call.
+    let forbidden = mcp
+        .call(
+            "projects_create",
+            json!({"title": "a viewer cannot create this"}),
+            None,
+        )
+        .await;
+    assert!(
+        forbidden.get("error").is_none(),
+        "a known-but-forbidden tool is a tool result, not -32602: {forbidden}"
+    );
+    assert_eq!(forbidden["isError"], true, "{forbidden}");
+    assert_eq!(
+        forbidden["structuredContent"]["type"], "action-forbidden",
+        "{forbidden}"
+    );
+    assert_eq!(forbidden["structuredContent"]["status"], 403, "{forbidden}");
 }

@@ -572,7 +572,7 @@ mod tests {
             "http://10.0.0.7/hook",
             "http://[fd00::1]/hook",
             "https://webhooks.example.com/hook",
-            "http://worker3.example.com:8080/hook",
+            "http://registry-1.example.com:8080/hook",
         ] {
             assert!(
                 super::validate_url(raw).is_ok(),

@@ -1,0 +1,21 @@
+{
+  "actual_value": 630565.0,
+  "benefit_id": "01a204d2-dbf6-750a-a031-9f00f5fe7754",
+  "evidence": {
+    "detail": {
+      "demo_credited_deliverables": 15,
+      "tokens": 9458468
+    },
+    "instrument": "inference ledger total tokens / demo-credited deliverables",
+    "reference": "B7",
+    "value": 630565.0
+  },
+  "id": "01a204d3-89a2-7c66-a315-937c3b4e02dd",
+  "kind": "baseline",
+  "measured_at": "2026-11-22T20:00:00Z",
+  "method": "inference ledger total tokens / demo-credited deliverables",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "target_value": null,
+  "tranche_id": null,
+  "unit": "tokens per demo-credited deliverable"
+}

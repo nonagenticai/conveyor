@@ -1,0 +1,52 @@
+{
+  "toolkits": [
+    {
+      "key": "coding",
+      "outcome": "version_bumped",
+      "status": "published",
+      "toolkit_version": 2
+    },
+    {
+      "key": "speech",
+      "outcome": "version_bumped",
+      "status": "published",
+      "toolkit_version": 2
+    },
+    {
+      "key": "transcription",
+      "outcome": "version_bumped",
+      "status": "published",
+      "toolkit_version": 2
+    },
+    {
+      "key": "image_gen",
+      "outcome": "version_bumped",
+      "status": "published",
+      "toolkit_version": 2
+    },
+    {
+      "key": "retrieval",
+      "outcome": "version_bumped",
+      "status": "published",
+      "toolkit_version": 2
+    },
+    {
+      "key": "scientific",
+      "outcome": "created",
+      "status": "published",
+      "toolkit_version": 1
+    },
+    {
+      "key": "webscraper",
+      "outcome": "created",
+      "status": "draft",
+      "toolkit_version": 1
+    },
+    {
+      "key": "lean4",
+      "outcome": "created",
+      "status": "draft",
+      "toolkit_version": 1
+    }
+  ]
+}

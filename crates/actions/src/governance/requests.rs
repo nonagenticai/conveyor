@@ -104,7 +104,7 @@ fn request_error(error: ProjectRequestStoreError, action: &str) -> ActionError {
         ProjectRequestStoreError::UnknownStatus(status) => invalid(
             "status",
             "invalid_value",
-            format!("{status:?} is not one of draft, approved, rejected, promoted"),
+            format!("{status:?} is not one of draft, approved, rejected, promoted, expired"),
         ),
         ProjectRequestStoreError::Project(error) => project_error(error, action),
         ProjectRequestStoreError::Database(error) => store_error(error, action),

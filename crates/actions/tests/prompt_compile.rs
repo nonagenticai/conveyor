@@ -9,6 +9,7 @@
 mod support;
 
 use conveyor_store::begin_scoped;
+use serde_json::json;
 use uuid::Uuid;
 
 use conveyor_actions::prompt::{PromptError, compile_for_audit, compile_for_copilot};
@@ -259,5 +260,110 @@ async fn a_section_budget_names_the_section_through_the_action_seam() {
         field.detail.contains("the system section"),
         "the detail names the section: {}",
         field.detail
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn an_action_set_budget_refuses_over_budget() {
+    let (pg, seeded) = fixture().await;
+    let running = support::Running::start(&pg).await;
+
+    // The ceiling is written through the action surface, not raw SQL: this is the write path
+    // finding v1-p77-2 found missing, so the refusal must be reachable from a tenant config.
+    let text = "You audit prompts.";
+    let budget = u32::try_from(text.chars().count()).expect("fits") - 1;
+    let section = |title: &str, budget: u32| {
+        json!({
+            "key": "action_tight",
+            "title": title,
+            "budget_chars": budget,
+            "sections": [{
+                "position": 1,
+                "source_kind": "system",
+                "required": true,
+                "template": text
+            }]
+        })
+    };
+    let (status, response) = running
+        .invoke(
+            "prompt_recipes.create",
+            "dev:alice",
+            section("Action tight", budget),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{response}");
+    let (status, response) = running
+        .invoke(
+            "prompt_recipes.activate",
+            "dev:alice",
+            json!({"key": "action_tight", "version": 1}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{response}");
+
+    let refused = compile_for_audit(&pg.runtime, seeded.tenant, "action_tight@1")
+        .await
+        .expect_err("over budget");
+    let measured = match &refused {
+        PromptError::BudgetExceeded {
+            section,
+            measured,
+            limit,
+            ..
+        } => {
+            assert!(
+                section.is_none(),
+                "the whole prompt is over its budget, not one section"
+            );
+            assert_eq!(*limit, budget, "the refusal carries the configured ceiling");
+            assert!(*measured > *limit, "the refusal carries the rendered size");
+            *measured
+        }
+        other => panic!("expected BudgetExceeded, got {other:?}"),
+    };
+    let error = refused.into_action_error("prompt_audit");
+    assert_eq!(error.status, 409);
+    assert_eq!(error.code, "capability_not_ready");
+    assert_eq!(
+        error.errors.first().expect("one field error").code,
+        "prompt_over_budget"
+    );
+
+    // Seeing the measured size, the tenant raises the ceiling through the same action: the
+    // refusal was the budget, not a recipe that cannot compile at all.
+    let (status, response) = running
+        .invoke(
+            "prompt_recipes.create",
+            "dev:alice",
+            section("Action tight v2", measured),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{response}");
+    let (status, response) = running
+        .invoke(
+            "prompt_recipes.activate",
+            "dev:alice",
+            json!({"key": "action_tight", "version": 2}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{response}");
+    assert!(
+        compile_for_audit(&pg.runtime, seeded.tenant, "action_tight@2")
+            .await
+            .is_ok(),
+        "exactly at the measured size must compile"
     );
 }

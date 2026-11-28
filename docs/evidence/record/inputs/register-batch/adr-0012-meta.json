@@ -1,0 +1,29 @@
+{
+ "id": "01a2052b-282c-754f-835c-b8e7914a65d3",
+ "meta": {
+  "adr_number": 12,
+  "approval_id": "01a2052b-0497-7ce5-9f56-cb934def34b6",
+  "content_sha256": "2b57f4a79a4b4fe3c48d5e9eebadee4ac5453aa1474764bb622a1185ddbfcccc",
+  "date": "2026-11-22",
+  "decided_at": "2026-11-22",
+  "decided_by_kind": "rule",
+  "deciders": [
+   "the assistant under the owner's delegation"
+  ],
+  "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+  "document": "01a202a6-c20c-7079-9e0e-488009d21e86",
+  "documents": [
+   "01a202a6-c20c-7079-9e0e-488009d21e86",
+   "01a202a3-76b1-72da-8a41-7a1662b91fc7",
+   "01a2029c-9254-7605-8a7c-3013b28ee794"
+  ],
+  "number": "0012",
+  "path": "docs/decisions/0012-no-deferrals.md",
+  "record": "#526",
+  "register_item": "01a2029f-5a5f-70aa-be13-029435893a40",
+  "source": "docs/decisions/0012-no-deferrals.md",
+  "status": "approved",
+  "status_line": "Status: Accepted \u00b7 Date: 2026-11-22 \u00b7 Slice: #526 (programme)",
+  "supersedes": "01a20208-5261-7085-a4a7-74f061e4842b"
+ }
+}

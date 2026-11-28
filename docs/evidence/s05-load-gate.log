@@ -1,0 +1,313 @@
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: tests/load/board.js
+        output: -
+
+     scenarios: (100.00%) 2 scenarios, 55 max VUs, 10m32s max duration (incl. graceful stop):
+              * board_cards: 20.00 iterations/s for 1m0s (maxVUs: 20-50, gracefulStop: 30s)
+              * five_pages: 1 iterations for each of 5 VUs (maxDuration: 10m0s, exec: fivePages, startTime: 2s, gracefulStop: 30s)
+
+
+running (00m01.0s), 00/25 VUs, 20 complete and 0 interrupted iterations
+board_cards   [   2% ] 00/20 VUs  0m01.0s/1m0s  20.00 iters/s
+five_pages  • [   0% ] waiting    1.0s         
+
+running (00m02.0s), 00/25 VUs, 40 complete and 0 interrupted iterations
+board_cards   [   3% ] 00/20 VUs  0m02.0s/1m0s  20.00 iters/s
+five_pages  • [   0% ] waiting    0.0s         
+
+running (00m03.0s), 00/25 VUs, 65 complete and 0 interrupted iterations
+board_cards   [   5% ] 00/20 VUs  0m03.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m04.0s), 00/25 VUs, 85 complete and 0 interrupted iterations
+board_cards   [   7% ] 00/20 VUs  0m04.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m05.0s), 00/25 VUs, 105 complete and 0 interrupted iterations
+board_cards   [   8% ] 00/20 VUs  0m05.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m06.0s), 00/25 VUs, 125 complete and 0 interrupted iterations
+board_cards   [  10% ] 00/20 VUs  0m06.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m07.0s), 00/25 VUs, 145 complete and 0 interrupted iterations
+board_cards   [  12% ] 00/20 VUs  0m07.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m08.0s), 00/25 VUs, 165 complete and 0 interrupted iterations
+board_cards   [  13% ] 00/20 VUs  0m08.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m09.0s), 00/25 VUs, 185 complete and 0 interrupted iterations
+board_cards   [  15% ] 00/20 VUs  0m09.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m10.0s), 00/25 VUs, 205 complete and 0 interrupted iterations
+board_cards   [  17% ] 00/20 VUs  0m10.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m11.0s), 00/25 VUs, 225 complete and 0 interrupted iterations
+board_cards   [  18% ] 00/20 VUs  0m11.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m12.0s), 00/25 VUs, 245 complete and 0 interrupted iterations
+board_cards   [  20% ] 00/20 VUs  0m12.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m13.0s), 00/25 VUs, 265 complete and 0 interrupted iterations
+board_cards   [  22% ] 00/20 VUs  0m13.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m14.0s), 00/25 VUs, 285 complete and 0 interrupted iterations
+board_cards   [  23% ] 00/20 VUs  0m14.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m15.0s), 00/25 VUs, 305 complete and 0 interrupted iterations
+board_cards   [  25% ] 00/20 VUs  0m15.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m16.0s), 00/25 VUs, 325 complete and 0 interrupted iterations
+board_cards   [  27% ] 00/20 VUs  0m16.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m17.0s), 00/25 VUs, 345 complete and 0 interrupted iterations
+board_cards   [  28% ] 00/20 VUs  0m17.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m18.0s), 00/25 VUs, 365 complete and 0 interrupted iterations
+board_cards   [  30% ] 00/20 VUs  0m18.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m19.0s), 00/25 VUs, 385 complete and 0 interrupted iterations
+board_cards   [  32% ] 00/20 VUs  0m19.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m20.0s), 00/25 VUs, 405 complete and 0 interrupted iterations
+board_cards   [  33% ] 00/20 VUs  0m20.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m21.0s), 00/25 VUs, 425 complete and 0 interrupted iterations
+board_cards   [  35% ] 00/20 VUs  0m21.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m22.0s), 00/25 VUs, 445 complete and 0 interrupted iterations
+board_cards   [  37% ] 00/20 VUs  0m22.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m23.0s), 00/25 VUs, 465 complete and 0 interrupted iterations
+board_cards   [  38% ] 00/20 VUs  0m23.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m24.0s), 00/25 VUs, 485 complete and 0 interrupted iterations
+board_cards   [  40% ] 00/20 VUs  0m24.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m25.0s), 00/25 VUs, 505 complete and 0 interrupted iterations
+board_cards   [  42% ] 00/20 VUs  0m25.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m26.0s), 00/25 VUs, 525 complete and 0 interrupted iterations
+board_cards   [  43% ] 00/20 VUs  0m26.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m27.0s), 00/25 VUs, 545 complete and 0 interrupted iterations
+board_cards   [  45% ] 00/20 VUs  0m27.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m28.0s), 00/25 VUs, 565 complete and 0 interrupted iterations
+board_cards   [  47% ] 00/20 VUs  0m28.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m29.0s), 00/25 VUs, 585 complete and 0 interrupted iterations
+board_cards   [  48% ] 00/20 VUs  0m29.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m30.0s), 00/25 VUs, 605 complete and 0 interrupted iterations
+board_cards   [  50% ] 00/20 VUs  0m30.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m31.0s), 00/25 VUs, 625 complete and 0 interrupted iterations
+board_cards   [  52% ] 00/20 VUs  0m31.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m32.0s), 00/25 VUs, 645 complete and 0 interrupted iterations
+board_cards   [  53% ] 00/20 VUs  0m32.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m33.0s), 00/25 VUs, 665 complete and 0 interrupted iterations
+board_cards   [  55% ] 00/20 VUs  0m33.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m34.0s), 00/25 VUs, 685 complete and 0 interrupted iterations
+board_cards   [  57% ] 00/20 VUs  0m34.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m35.0s), 00/25 VUs, 705 complete and 0 interrupted iterations
+board_cards   [  58% ] 00/20 VUs  0m35.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m36.0s), 00/25 VUs, 725 complete and 0 interrupted iterations
+board_cards   [  60% ] 00/20 VUs  0m36.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m37.0s), 00/25 VUs, 745 complete and 0 interrupted iterations
+board_cards   [  62% ] 00/20 VUs  0m37.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m38.0s), 00/25 VUs, 765 complete and 0 interrupted iterations
+board_cards   [  63% ] 00/20 VUs  0m38.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m39.0s), 00/25 VUs, 785 complete and 0 interrupted iterations
+board_cards   [  65% ] 00/20 VUs  0m39.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m40.0s), 00/25 VUs, 805 complete and 0 interrupted iterations
+board_cards   [  67% ] 00/20 VUs  0m40.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m41.0s), 00/25 VUs, 825 complete and 0 interrupted iterations
+board_cards   [  68% ] 00/20 VUs  0m41.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m42.0s), 00/25 VUs, 845 complete and 0 interrupted iterations
+board_cards   [  70% ] 00/20 VUs  0m42.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m43.0s), 00/25 VUs, 865 complete and 0 interrupted iterations
+board_cards   [  72% ] 00/20 VUs  0m43.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m44.0s), 00/25 VUs, 885 complete and 0 interrupted iterations
+board_cards   [  73% ] 00/20 VUs  0m44.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m45.0s), 00/25 VUs, 905 complete and 0 interrupted iterations
+board_cards   [  75% ] 00/20 VUs  0m45.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m46.0s), 00/25 VUs, 925 complete and 0 interrupted iterations
+board_cards   [  77% ] 00/20 VUs  0m46.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m47.0s), 00/25 VUs, 945 complete and 0 interrupted iterations
+board_cards   [  78% ] 00/20 VUs  0m47.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m48.0s), 00/25 VUs, 965 complete and 0 interrupted iterations
+board_cards   [  80% ] 00/20 VUs  0m48.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m49.0s), 00/25 VUs, 985 complete and 0 interrupted iterations
+board_cards   [  82% ] 00/20 VUs  0m49.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m50.0s), 00/25 VUs, 1005 complete and 0 interrupted iterations
+board_cards   [  83% ] 00/20 VUs  0m50.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m51.0s), 00/25 VUs, 1025 complete and 0 interrupted iterations
+board_cards   [  85% ] 00/20 VUs  0m51.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m52.0s), 00/25 VUs, 1045 complete and 0 interrupted iterations
+board_cards   [  87% ] 00/20 VUs  0m52.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m53.0s), 00/25 VUs, 1065 complete and 0 interrupted iterations
+board_cards   [  88% ] 00/20 VUs  0m53.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m54.0s), 00/25 VUs, 1085 complete and 0 interrupted iterations
+board_cards   [  90% ] 00/20 VUs  0m54.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m55.0s), 00/25 VUs, 1105 complete and 0 interrupted iterations
+board_cards   [  92% ] 00/20 VUs  0m55.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m56.0s), 00/25 VUs, 1125 complete and 0 interrupted iterations
+board_cards   [  93% ] 00/20 VUs  0m56.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m57.0s), 00/25 VUs, 1145 complete and 0 interrupted iterations
+board_cards   [  95% ] 00/20 VUs  0m57.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m58.0s), 00/25 VUs, 1165 complete and 0 interrupted iterations
+board_cards   [  97% ] 00/20 VUs  0m58.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (00m59.0s), 00/25 VUs, 1185 complete and 0 interrupted iterations
+board_cards   [  98% ] 00/20 VUs  0m59.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+running (01m00.0s), 00/25 VUs, 1205 complete and 0 interrupted iterations
+board_cards   [ 100% ] 00/20 VUs  1m00.0s/1m0s    20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU
+
+
+  █ THRESHOLDS 
+
+    checks
+    ✓ 'rate==1' rate=100.00%
+
+    five_page_ms
+    ✓ 'max<=500' max=76.7ms
+
+    http_req_duration{name:board_cards}
+    ✓ 'p(95)<=120' p(95)=19.53ms
+
+    http_req_failed{name:board_cards}
+    ✓ 'rate==0' rate=0.00%
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 2420    40.331383/s
+    checks_succeeded...: 100.00% 2420 out of 2420
+    checks_failed......: 0.00%   0 out of 2420
+
+    ✓ status is 200
+    ✓ page carries items
+    ✓ the walk served every page
+    ✓ the walk read five pages
+    ✓ the walk read 1,000 cards
+    ✓ the walk used every cursor
+
+    CUSTOM
+    five_page_ms...................: avg=73.34ms min=68.82ms med=73.57ms max=76.7ms  p(90)=76.55ms p(95)=76.62ms
+
+    HTTP
+    http_req_duration..............: avg=13.37ms min=6.8ms   med=12.91ms max=54.97ms p(90)=17.56ms p(95)=19.82ms
+      { expected_response:true }...: avg=13.37ms min=6.8ms   med=12.91ms max=54.97ms p(90)=17.56ms p(95)=19.82ms
+      { name:board_cards }.........: avg=13.34ms min=6.8ms   med=12.93ms max=54.97ms p(90)=17.55ms p(95)=19.53ms
+    http_req_failed................: 0.00%  0 out of 1225
+      { name:board_cards }.........: 0.00%  0 out of 1200
+    http_reqs......................: 1225   20.41568/s
+
+    EXECUTION
+    iteration_duration.............: avg=15.8ms  min=7.6ms   med=14.88ms max=81.66ms p(90)=22.1ms  p(95)=23.84ms
+    iterations.....................: 1205   20.082362/s
+    vus............................: 0      min=0         max=0 
+    vus_max........................: 25     min=25        max=25
+
+    NETWORK
+    data_received..................: 126 MB 2.1 MB/s
+    data_sent......................: 237 kB 3.9 kB/s
+
+
+
+
+running (01m00.0s), 00/25 VUs, 1205 complete and 0 interrupted iterations
+board_cards ✓ [ 100% ] 00/20 VUs  1m0s            20.00 iters/s
+five_pages  ✓ [ 100% ] 5 VUs      00m00.1s/10m0s  5/5 iters, 1 per VU

@@ -10,6 +10,7 @@
 #[path = "support/mod.rs"]
 mod support;
 
+use chrono::{DateTime, Utc};
 use conveyor_domain::TenantId;
 use conveyor_domain::spine::PlanError;
 use conveyor_store::begin_scoped;
@@ -25,14 +26,16 @@ struct Fixture {
     project: Uuid,
     reviewer: Uuid,
     baseline: Uuid,
+    benefit: Uuid,
+    risk: Uuid,
     change: Uuid,
 }
 
-fn evidence() -> serde_json::Value {
+fn evidence(f: &Fixture) -> serde_json::Value {
     json!({
-        "baselines": { "B0": "the accepted definition set" },
-        "benefit_status": { "B1": "unmeasured" },
-        "risk_register": { "open": [] },
+        "baselines": [f.baseline],
+        "benefit_status": [f.benefit],
+        "risk_register": [f.risk],
     })
 }
 
@@ -83,15 +86,16 @@ async fn fixture(db: &support::TestDb) -> Fixture {
     .await
     .expect("insert the project");
     let baseline: Uuid = sqlx::query_scalar(
-        "INSERT INTO programme_baseline (tenant_id, programme_id, kind, snapshot, taken_by)
-         VALUES ($1, $2, 'management', '{}'::jsonb, $3) RETURNING id",
+        "INSERT INTO programme_baseline
+             (tenant_id, programme_id, kind, snapshot, taken_by, approved_by)
+         VALUES ($1, $2, 'management', '{}'::jsonb, $3, $3) RETURNING id",
     )
     .bind(tenant_id)
     .bind(programme)
     .bind(reviewer)
     .fetch_one(&db.super_pool)
     .await
-    .expect("insert the baseline");
+    .expect("insert the approved baseline");
     let project_baseline: Uuid = sqlx::query_scalar(
         "INSERT INTO project_baseline (tenant_id, project_id, kind, snapshot, taken_by)
          VALUES ($1, $2, 'scope', '{}'::jsonb, $3) RETURNING id",
@@ -115,6 +119,25 @@ async fn fixture(db: &support::TestDb) -> Fixture {
     .fetch_one(&db.super_pool)
     .await
     .expect("insert the approved change");
+    let benefit: Uuid = sqlx::query_scalar(
+        "INSERT INTO benefit_profile (tenant_id, programme_id, reference, description, status)
+         VALUES ($1, $2, $3, 'A measured benefit', 'active') RETURNING id",
+    )
+    .bind(tenant_id)
+    .bind(programme)
+    .bind(format!("B-{}", Uuid::now_v7().simple()))
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert the benefit profile");
+    let risk: Uuid = sqlx::query_scalar(
+        "INSERT INTO project_register_item (tenant_id, project_id, kind, title, status)
+         VALUES ($1, $2, 'risk', 'A delivery risk', 'open') RETURNING id",
+    )
+    .bind(tenant_id)
+    .bind(project)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert the risk register item");
     // #797 (v1-w2c-3): the rebaseline guard reads the change gate's approved row, not the
     // register row's status. The row above is written `approved` on purpose — that status is
     // not the authority — so this gate is what authorises the new baseline.
@@ -136,6 +159,8 @@ async fn fixture(db: &support::TestDb) -> Fixture {
         project,
         reviewer,
         baseline,
+        benefit,
+        risk,
         change,
     }
 }
@@ -152,7 +177,7 @@ async fn review(
         f.tenant,
         tranche,
         decision,
-        &evidence(),
+        &evidence(f),
         f.reviewer,
     )
     .await
@@ -190,6 +215,25 @@ async fn a_review_records_continue_pause_or_stop() {
         review_id.is_none(),
         "the reviewed tranche is not 'authorised'"
     );
+    // The audit reads the closed tranche's `review_at`; it must be the review's own date, not
+    // NULL (the T4 spot-audit defect: tranches 3 and 4 closed with a null date) and not the
+    // wall clock.
+    let (review_at, reviewed_at): (Option<DateTime<Utc>>, DateTime<Utc>) = sqlx::query_as(
+        "SELECT t.review_at, r.reviewed_at
+           FROM programme_tranche t
+           JOIN programme_tranche_review r
+             ON r.tenant_id = t.tenant_id AND r.tranche_id = t.id
+          WHERE t.id = $1 AND r.decision = 'continue'",
+    )
+    .bind(f.tranche0)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("read the recorded review date");
+    assert_eq!(
+        review_at,
+        Some(reviewed_at),
+        "a continue records the review's own date on the tranche"
+    );
     let (next_state, review_id) = tranche_state(&db, f.tenant, f.tranche1).await;
     assert_eq!(
         next_state, "authorised",
@@ -207,6 +251,13 @@ async fn a_review_records_continue_pause_or_stop() {
         tranche_state(&db, paused.tenant, paused.tranche0).await.0,
         "paused"
     );
+    let paused_at: Option<DateTime<Utc>> =
+        sqlx::query_scalar("SELECT review_at FROM programme_tranche WHERE id = $1")
+            .bind(paused.tranche0)
+            .fetch_one(&db.super_pool)
+            .await
+            .expect("read the paused tranche");
+    assert!(paused_at.is_some(), "a pause records its review date too");
     let stopped = fixture(&db).await;
     review(&db, &stopped, stopped.tranche0, "stop")
         .await
@@ -543,4 +594,355 @@ async fn pause_and_stop_do_not_need_a_next_tranche() {
         tranche_state(&db, stopped.tenant, stopped.tranche1).await.0,
         "stopped"
     );
+}
+
+/// A well-formed UUID is a citation only when it names a row of the reviewed programme. The
+/// seed's old trick — a state with no row behind it — is exactly what this refuses.
+#[tokio::test]
+async fn a_review_refuses_evidence_ids_that_do_not_resolve() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db).await;
+
+    for class in ["baselines", "benefit_status", "risk_register"] {
+        let mut cited = evidence(&f);
+        cited[class] = json!([Uuid::now_v7()]);
+        let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
+        let refused = spine::review_tranche_tx(
+            &mut tx, f.tenant, f.tranche0, "continue", &cited, f.reviewer,
+        )
+        .await;
+        tx.rollback().await.expect("rollback");
+        match refused {
+            Err(PlanStoreError::Illegal(PlanError::TrancheReviewEvidenceUnresolved {
+                class: named,
+            })) => assert_eq!(named, class),
+            other => panic!("an unresolvable {class} id is refused: {other:?}"),
+        }
+    }
+    assert_eq!(
+        review_count(&db, f.tenant, f.tranche0).await,
+        0,
+        "the refusal writes no review row"
+    );
+}
+
+/// A baseline cited by a review is the approval, not just a row: it must carry `approved_by`
+/// and be one of the three managed kinds. A baseline of another programme is not this
+/// tranche's evidence at all.
+#[tokio::test]
+async fn a_review_refuses_an_unapproved_or_wrong_kind_baseline() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db).await;
+
+    let unapproved: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_baseline (tenant_id, programme_id, kind, snapshot, taken_by)
+         VALUES ($1, $2, 'management', '{}'::jsonb, $3) RETURNING id",
+    )
+    .bind(f.tenant.as_uuid())
+    .bind(f.programme)
+    .bind(f.reviewer)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert an unapproved baseline");
+    let mut cited = evidence(&f);
+    cited["baselines"] = json!([unapproved]);
+    let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
+    let refused = spine::review_tranche_tx(
+        &mut tx, f.tenant, f.tranche0, "continue", &cited, f.reviewer,
+    )
+    .await;
+    tx.rollback().await.expect("rollback");
+    match refused {
+        Err(PlanStoreError::Illegal(PlanError::TrancheBaselineNotApproved { kind })) => {
+            assert_eq!(kind, "management")
+        }
+        other => panic!("an unapproved baseline is refused: {other:?}"),
+    }
+
+    // The schema admits only the three managed kinds, so the reachable "wrong baseline" is one
+    // approved in a different programme.
+    let other: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme (tenant_id, name) VALUES ($1, 'Other') RETURNING id",
+    )
+    .bind(f.tenant.as_uuid())
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert a second programme");
+    let foreign: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_baseline
+             (tenant_id, programme_id, kind, snapshot, taken_by, approved_by)
+         VALUES ($1, $2, 'governance', '{}'::jsonb, $3, $3) RETURNING id",
+    )
+    .bind(f.tenant.as_uuid())
+    .bind(other)
+    .bind(f.reviewer)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert a foreign-programme baseline");
+    let mut cited = evidence(&f);
+    cited["baselines"] = json!([foreign]);
+    let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
+    let refused = spine::review_tranche_tx(
+        &mut tx, f.tenant, f.tranche0, "continue", &cited, f.reviewer,
+    )
+    .await;
+    tx.rollback().await.expect("rollback");
+    assert!(
+        matches!(
+            refused,
+            Err(PlanStoreError::Illegal(
+                PlanError::TrancheReviewEvidenceUnresolved { class: "baselines" }
+            ))
+        ),
+        "a baseline of another programme is not evidence: {refused:?}"
+    );
+}
+
+/// A closed tranche is terminal: the engine reaches it only through a `continue` review of the
+/// tranche itself, and the programme's genesis tranche is seeded closed with no review at all.
+/// A project in it must therefore close and start — the retrospective rework re-closes tranche
+/// 0's projects, and requiring a link refused every one of those closes (2026-11-26).
+#[tokio::test]
+async fn a_closed_tranche_admits_its_projects_without_an_authorisation_review() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db).await;
+    sqlx::query("UPDATE programme_tranche SET state = 'closed' WHERE id = $1")
+        .bind(f.tranche1)
+        .execute(&db.super_pool)
+        .await
+        .expect("close the tranche with no review");
+
+    let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
+    let allowed = spine::assert_project_tranche_authorised_tx(&mut tx, f.tenant, f.project).await;
+    tx.commit().await.expect("commit");
+    assert!(
+        allowed.is_ok(),
+        "a closed tranche admits its projects: {allowed:?}"
+    );
+}
+
+/// The state alone is not an authorisation: an `authorised` row with no review, or a review of
+/// the previous tranche that did not continue, cannot start a project. The previous tranche's
+/// `continue` review is the authorisation the engine writes.
+#[tokio::test]
+async fn a_project_cannot_start_on_a_tranche_without_an_authorisation_review() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db).await;
+    sqlx::query("UPDATE programme_tranche SET state = 'authorised' WHERE id = $1")
+        .bind(f.tranche1)
+        .execute(&db.super_pool)
+        .await
+        .expect("authorise the tranche with no review");
+
+    let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
+    let refused = spine::assert_project_tranche_authorised_tx(&mut tx, f.tenant, f.project).await;
+    tx.rollback().await.expect("rollback");
+    assert!(
+        matches!(
+            refused,
+            Err(PlanStoreError::Illegal(PlanError::TrancheNotAuthorised))
+        ),
+        "an authorisation with no review is refused: {refused:?}"
+    );
+
+    // A review of the previous tranche that did NOT continue authorises nothing.
+    let paused: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_tranche_review
+             (tenant_id, tranche_id, decision, evidence, reviewed_by)
+         VALUES ($1, $2, 'pause', $3, $4) RETURNING id",
+    )
+    .bind(f.tenant.as_uuid())
+    .bind(f.tranche0)
+    .bind(evidence(&f))
+    .bind(f.reviewer)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert a pause review of the previous tranche");
+    sqlx::query("UPDATE programme_tranche SET authorisation_review_id = $2 WHERE id = $1")
+        .bind(f.tranche1)
+        .bind(paused)
+        .execute(&db.super_pool)
+        .await
+        .expect("point the tranche at the pause review");
+    let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
+    let refused = spine::assert_project_tranche_authorised_tx(&mut tx, f.tenant, f.project).await;
+    tx.rollback().await.expect("rollback");
+    assert!(
+        matches!(
+            refused,
+            Err(PlanStoreError::Illegal(PlanError::TrancheNotAuthorised))
+        ),
+        "a pause review is not an authorisation: {refused:?}"
+    );
+
+    // The continue review of the previous tranche is the authorisation the engine writes.
+    let previous: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_tranche_review
+             (tenant_id, tranche_id, decision, evidence, reviewed_by)
+         VALUES ($1, $2, 'continue', $3, $4) RETURNING id",
+    )
+    .bind(f.tenant.as_uuid())
+    .bind(f.tranche0)
+    .bind(evidence(&f))
+    .bind(f.reviewer)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert the previous tranche's continue review");
+    sqlx::query("UPDATE programme_tranche SET authorisation_review_id = $2 WHERE id = $1")
+        .bind(f.tranche1)
+        .bind(previous)
+        .execute(&db.super_pool)
+        .await
+        .expect("link the authorisation to the previous review");
+    let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
+    let allowed = spine::assert_project_tranche_authorised_tx(&mut tx, f.tenant, f.project).await;
+    tx.commit().await.expect("commit");
+    assert!(
+        allowed.is_ok(),
+        "the previous tranche's continue review authorises the start: {allowed:?}"
+    );
+}
+
+/// The seed asserts no authorisation of its own: every seeded tranche starts `planned`, and a
+/// non-planned row would have to name a review of itself.
+#[tokio::test]
+async fn seeded_non_planned_tranches_carry_a_review() {
+    let db = support::TestDb::fresh().await;
+    let seeded = support::seed_tenant(&db.super_pool, "msp-review").await;
+    conveyor_store::seed_programme::seed_programme(&db.super_pool, Some("msp-review"))
+        .await
+        .expect("seed the definition");
+
+    let total: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM programme_tranche WHERE tenant_id = $1")
+            .bind(seeded.tenant)
+            .fetch_one(&db.super_pool)
+            .await
+            .expect("count the seeded tranches");
+    assert_eq!(total, 14, "the seed inserts the fourteen tranches");
+    let unbacked: i64 = sqlx::query_scalar(
+        "SELECT count(*)
+           FROM programme_tranche t
+          WHERE t.tenant_id = $1 AND t.state <> 'planned'
+            AND (t.authorisation_review_id IS NULL
+                 OR NOT EXISTS (
+                     SELECT 1 FROM programme_tranche_review r
+                      WHERE r.tenant_id = t.tenant_id
+                        AND r.id = t.authorisation_review_id
+                        AND r.tranche_id = t.id))",
+    )
+    .bind(seeded.tenant)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("count tranches whose state has no review");
+    assert_eq!(
+        unbacked, 0,
+        "a seeded non-planned tranche carries a review of itself"
+    );
+    let non_planned: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM programme_tranche
+          WHERE tenant_id = $1 AND state <> 'planned'",
+    )
+    .bind(seeded.tenant)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("count the non-planned tranches");
+    assert_eq!(
+        non_planned, 0,
+        "the seed does not assert an authorisation without a review"
+    );
+}
+
+/// SPEC_V2 §8.3 / T10 — the tranche's own baseline pointer is a citation only when the
+/// baseline is this programme's, approved, and one of the three MSP kinds. An unapproved row
+/// and another programme's row are both refused; an approved management baseline is accepted.
+#[tokio::test]
+async fn a_tranche_baseline_must_be_approved_and_in_its_programme() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db).await;
+    let unapproved: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_baseline
+             (tenant_id, programme_id, kind, snapshot, taken_by)
+         VALUES ($1, $2, 'governance', '{}'::jsonb, $3) RETURNING id",
+    )
+    .bind(f.tenant.as_uuid())
+    .bind(f.programme)
+    .bind(f.reviewer)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert an unapproved baseline");
+    let foreign_programme: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme (tenant_id, name) VALUES ($1, 'Other') RETURNING id",
+    )
+    .bind(f.tenant.as_uuid())
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert the other programme");
+    let foreign: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_baseline
+             (tenant_id, programme_id, kind, snapshot, taken_by, approved_by)
+         VALUES ($1, $2, 'management', '{}'::jsonb, $3, $3) RETURNING id",
+    )
+    .bind(f.tenant.as_uuid())
+    .bind(foreign_programme)
+    .bind(f.reviewer)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert a foreign approved baseline");
+
+    let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
+    let tranche = spine::get_tranche_tx(&mut tx, f.tenant, f.tranche0)
+        .await
+        .expect("read the tranche")
+        .expect("tranche exists");
+    let patch = |baseline: Uuid| TranchePatch {
+        entry_criteria: None,
+        exit_criteria: None,
+        baseline_ref: Some(baseline),
+        review_at: None,
+        change_ref: Some(f.change),
+    };
+
+    let refused = spine::update_tranche_tx(
+        &mut tx,
+        f.tenant,
+        f.tranche0,
+        tranche.version,
+        &patch(unapproved),
+    )
+    .await;
+    assert!(
+        matches!(
+            refused,
+            Err(PlanStoreError::Illegal(
+                PlanError::TrancheBaselineNotApproved { .. }
+            ))
+        ),
+        "an unapproved baseline must be refused"
+    );
+
+    let refused = spine::update_tranche_tx(
+        &mut tx,
+        f.tenant,
+        f.tranche0,
+        tranche.version,
+        &patch(foreign),
+    )
+    .await;
+    assert!(
+        matches!(refused, Err(PlanStoreError::NotFound { .. })),
+        "another programme's baseline must be refused"
+    );
+
+    let accepted = spine::update_tranche_tx(
+        &mut tx,
+        f.tenant,
+        f.tranche0,
+        tranche.version,
+        &patch(f.baseline),
+    )
+    .await
+    .expect("an approved management baseline of this programme is accepted");
+    assert_eq!(accepted.baseline_ref, Some(f.baseline));
+    tx.commit().await.expect("commit");
 }

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Brief — T18 (retrospective, 2026-11-26) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-brief" data-provenance-version="1" data-provenance-hash="be08c6d51b0e66e7135d8b4d3e3141bc25a0d5b985e0a9f5465846c3121b5186" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-brief</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>be08c6d51b0e66e7135d8b4d3e3141bc25a0d5b985e0a9f5465846c3121b5186</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project brief — T18 The real V2 UI (retrospective, 2026-11-24)</h1>
+<h2>Outcome</h2>
+<p>After T18 a signed-in tenant drives every V2 destination from the conveyor's own application — portfolio, programme, project and work package; organisation, release and binding; procedures intake and publish; tools call and ledger; improve, kata and adoption; operations incident and postmortem; and the ADM phase rail — while the programme measures those screens from the app's real route table and Playwright specs instead of the static design mock. At the snapshot the construction is partial: eight of the ten V2 destination routes render real screens, tools and architecture remain honest gates, and the SPEC_V2 §12 gate is not yet met.</p>
+<h2>Boundary</h2>
+<p>In scope: the application shell and navigation, the route registry, the V2 destinations of SPEC_V2 §10.5 plus the execution room, the L1–L4 delivery view, one Playwright spec per destination, and the V2 coverage instrument measured from real routes. Out of scope: new tables, actions, events or ports; SSR, a mobile app or a second router; retiring or redesigning the design pack, which stays the public programme site at <code>/design/</code> and the reviewed reference (D64); the V1 routes, which are linked and not re-implemented; and any live tenant write or production fixture inside a pull request.</p>
+<h2>Reuse sources</h2>
+<p>Reuse <code>apps/web/src/app.rs</code> (router, sidebar and top bar), <code>api.rs</code> (If-Match, Idempotency-Key and approval-id request shapes), <code>auth.rs</code> (OIDC PKCE with an in-memory token), <code>state.rs</code> (tenant, me and manifest signals), <code>sse.rs</code>, <code>components.rs</code> and <code>palette.rs</code>; the existing screen modules and V1 specs; the e2e harness (<code>fixture.ts</code>, <code>dev-server.mjs</code>, <code>playwright.config.ts</code>) and <code>web.yml</code>; the compiled action registry of SPEC_V2 §10.4; <code>docs/design/v2.js</code> and <code>STUDIO-SPEC.md</code> as the reviewed design reference; and the programme, work and measure read models exposed by the owning slices.</p>
+<h2>Inception units</h2>
+<p>The project starts from the inception analysis at <code>docs/plans/T18/inception-analysis.md</code> and the architecture design at <code>docs/plans/T18/architecture-design.md</code>. The analysis measures the starting state at <code>main@490ad555</code>: 31 routes, 25 screen modules and 31 specs, all V1, and no <code>/portfolio</code>, <code>/programme</code>, <code>/organisation</code>, <code>/procedures</code>, <code>/authoring</code>, <code>/plan</code>, <code>/improve</code>, <code>/operations</code>, <code>/tools</code> or <code>/design/adm</code> route. The design fixes the destination read and write contracts, the D64/D65 decisions, the single-writer router constraint and the rule that a missing backend capability is a typed dependency, not a local fetch.</p>
+<h2>Dependencies</h2>
+<p>Construction is blocked-by T0, T1, T2, T3 and P0 — the model and contracts, the plan spine, the decision ladder, the PM job and the programme definition. Acceptance is blocked-by T4, T5, T7, T9, T10, T11, T13, T16 and T17, because each destination's live scenarios wait on its owning slice, and by T12, whose organisation loop is driven from the UI as the final spec. Issue #526 is related: its generated record is rebased and regenerated, never hand-merged. While a slice is absent the destination renders not yet live and names the owner rather than inventing a fetch.</p>
+<h2>Acceptance</h2>
+<p>The SPEC_V2 §12 T18 gate requires that every destination route exists with its Playwright spec; that a signed-in tenant drives the portfolio → programme → project → work-package, organisation → release → binding, procedures intake → publish, tools call → ledger, improve → kata → adoption, operations incident → postmortem and ADM phase-rail paths from the app; that every destination spec asserts empty, error, happy and one refusal; that the V2 coverage record reports exists only from a real route and its spec; and that no production screen renders a fixture. <code>acceptance/programme/T18.toml</code> carries the fifteen gate checks, including project, baseline, contract, review, WSJF, demo credits, coverage, artefact-standard and rework resolution.</p>
+<h2>Capabilities</h2>
+<p>The tenant operator who runs the portfolio, programme, plan, organisation, procedures, authoring, tools, improve, operations and architecture surfaces owns the outcome, with the PM, kanban-coach, kata, development and operations jobs those destinations serve. The UI is their surface, not a new job: it exposes the action families that T0–T17 own, and the seven nav groups are trimmed to destinations that exist and gated by <code>has_action</code>. The delivery view gives the sponsoring group and the SRO one L1–L4 line from portfolio to work package, with spend read from the ledger rather than fabricated.</p>
+<h2>Plan</h2>
+<p>The project is held to <code>docs/plans/T18-real-v2-ui.md</code>, SPEC_V2 §10.5 (the real-UI route table) and §12 T18 (the gate), with ADR 0013 recording that the real UI is the app and not the design pack. The five sequenced units are issues #562 (shell, route registry, portfolio, programme and the delivery view), #563 (organisation, jobs, agents, decisions, project types, plan and validation), #564 (procedures, capabilities, authoring, execution and run history), #565 (tools, metering, operations and improve) and #566 (architecture, system architecture, knowledge, measure and the T12 acceptance). #565 and #566 remain open at this snapshot.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>The real V2 UI · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

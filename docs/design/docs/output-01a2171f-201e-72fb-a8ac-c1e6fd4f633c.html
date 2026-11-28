@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Conformance baseline — re-acceptance (2026-11-26) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="decision" data-provenance-version="1" data-provenance-hash="e261eb615907c8be1cb4cfd7f4558739748e3ca82ea9c312ccd9cd75c12ead4f" data-provenance-status="active" data-provenance-owner="FR Test" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>decision</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>e261eb615907c8be1cb4cfd7f4558739748e3ca82ea9c312ccd9cd75c12ead4f</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>FR Test</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Conformance baseline — re-acceptance (2026-11-26)</h1>
+<h2>Context</h2>
+<p>The conformance baseline is the accepted ledger of P0/P1/P2 findings that
+<code>docs/design/scripts/publish-data.sh</code> compares against the live record before it mirrors anything.
+The strict gate refuses a ledger whose entries name no live gap, and it refuses a ledger that
+carries no acceptance header.</p>
+<p>At lane head <code>afe96408</code> the checked-in <code>docs/evidence/conformance-baseline.json</code> carried 168 entries
+and no header: no <code>accepted_at</code>, <code>accepted_by</code>, <code>approver</code>, <code>acceptance_ref</code>, <code>delegation_ref</code> or
+<code>snapshot</code> block. The strict audit on the fresh snapshot taken for this decision named 37 entries
+whose gap the live record no longer carries, and it measured 170 live gaps the file did not reflect:
+16 P0, 138 P1 and 16 P2.</p>
+<p>The owner's directive on #526 (2026-11-21) makes the rework one continuous exercise and requires the
+ledger to be re-accepted from the measured live gaps, with each batch's entries deleted as they are
+fixed, never re-dated (issue P1a and P9). This decision performs that re-acceptance for the record
+as it stands at the 2026-11-26 snapshot, before the U5a rework continues.</p>
+<h2>Decision</h2>
+<p>Re-accept the conformance baseline from the fresh snapshot taken 2026-11-26: <code>git_sha</code> <code>afe96408</code>,
+record <code>generated_at</code> <code>2026-11-26T08:21:56Z</code>, tenant <code>nonagentic</code>. The accepted ledger carries the
+170 live gaps the audit measured — 16 P0, 138 P1, 16 P2 — with the severity, disposition, owner and
+expiry the standard gives each one. It is accepted by <code>conveyor-e2e</code> under the standing delegation
+<code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code>, approved by <code>conveyor-approver</code>, an actor distinct from the
+accepter.</p>
+<p>The 37 entries whose gap no longer exists are deleted, not re-dated:</p>
+<ul>
+<li><code>closed_without_closure_review</code>: S18, S21, T16, T3, T7.</li>
+<li><code>closure_outputs_undeclared</code>: S18, S21, SPEC-V2.</li>
+<li><code>compliance_review_missing</code>: T10, T2, T4, T9.</li>
+<li><code>mandatory_artefacts</code>: T16.</li>
+<li><code>project_in_unauthorised_tranche</code>: S05, S07, S09, T10, T14, T16, T18, T19, T4, T9.</li>
+<li><code>seed_live_drift</code>: T5, T6, T8.</li>
+<li><code>unpublished_declared_output</code>: S04, T16, T3, T7, T8.</li>
+<li><code>benefit_baseline_placeholder</code>: B1, B2, B4, B5, B6; <code>benefit_profile_incomplete</code>: B1.</li>
+</ul>
+<p>The live gaps the previous file did not carry are admitted at the severity the audit measured: the
+SAFe cadence rules for the PIs that carry projects but no cadence (<code>pi_cadence_missing</code>,
+<code>backlog_refinement_missing</code> for tranches 6–13), the seed/live drifts (T10, T16, T19F, T3, T4, T7,
+T9), the unauthorised-tranche closures now at P0 (T15, T17, T5, T6, T8) and the tranche-6 project
+T19F.</p>
+<h2>Consequences</h2>
+<p>Every remaining P0/P1 stays in the ledger; this decision waives none of them. The U5a batch and the
+later batches delete their own entries as they rework each member, and each batch re-accepts the
+shrunk ledger in the same way. The publish gate can now run against the accepted ledger; a strict
+refusal after this decision is a finding about the record, not a stale ledger. The v1 findings file
+(<code>docs/evidence/v1-conformance-findings.json</code>) is a separate ledger and is not touched: its entries
+clear only on a named commit, test or evidence, never by re-acceptance.</p>
+<h2>Evidence</h2>
+<ul>
+<li><code>docs/evidence/conformance-baseline.json</code> — the accepted ledger this decision produces.</li>
+<li><code>docs/evidence/conformance-gap-register.json</code> — the audit's register on the 2026-11-26 snapshot,
+with the 170 gaps and their counts.</li>
+<li>The strict audit on the same snapshot named the 37 stale entries and the 9 missing header fields.</li>
+<li>The snapshot manifest at <code>/tmp/conv526-snap-1126f/data/manifest.json</code>, <code>git_sha</code> <code>afe96408</code>.</li>
+<li>Standing delegation <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code>.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

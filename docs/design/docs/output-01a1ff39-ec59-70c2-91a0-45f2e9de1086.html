@@ -23,26 +23,26 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1>Project brief — S00 usage inventory</h1>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-brief" data-provenance-version="2" data-provenance-hash="94ad3a15466b44562de1e15723ad0d52513b07daa77ee471cec0a37f591adc53" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-brief</dd></div><div><dt>Version</dt><dd>2</dd></div><div><dt>SHA-256</dt><dd>94ad3a15466b44562de1e15723ad0d52513b07daa77ee471cec0a37f591adc53</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project brief — S00 usage inventory (retrospective, 2026-11-26)</h1>
 <h2>Outcome</h2>
-<p>A signed inventory of 1,300 surfaces (<code>parity/parity.yaml</code>) with per-row evidence, so the port drops zero-usage surface instead of porting it.</p>
+<p>S00 produced one signed contract for what the rebuild owes: parity/parity.yaml holds 1,300 surfaces classified as 218 used, 295 rare, 543 unused and 244 dropped, sampled on 2026-11-07 and 2026-11-08. Every later slice consumes the ids from that list, and S14 gates on 100 % of used. Zero-usage surface is dropped rather than ported (D2/R5), so the rebuild starts from measured use rather than from the full surface of fr, RM, Planka and n8n.</p>
 <h2>Boundary</h2>
-<p>fr, RM, Planka and n8n surfaces only; coding-*, artifacts, worker_management, inference-router, licenses, billing_service, procedure_management's 54 endpoints, UI screens, performance and data migration are out.</p>
+<p>Out of scope: coding-*, artifacts, worker_management, inference-router, licenses and billing_service (D12/D14); n8n flows as features, which S13 re-authors from the same evidence; procedure_management's 54 endpoints, carried as one SUMMARY line (D10); UI screens (S12); performance; and data migration (D7). The project must not fork a second inventory: parity.yaml is the only list, and a consuming slice may not restate or re-classify a surface of its own. A re-measurement is also out of scope, because the samples are dated and the live sources have moved on.</p>
 <h2>Reuse sources</h2>
-<p><code>parity/parity.yaml</code>, <code>parity/evidence/</code>, the served-spec lock, the Loki samples and the n8n workflow export.</p>
+<p>The measurement reuses existing sources rather than a new instrument: fr backend/src/capabilities/served-spec.lock.json at fr@4a579e91d355 for 785 served operations over 616 paths; RM src/routers at rm@191086942ce5 for 314 decorators; Planka docs/openapi.json at kanban@aafb771cea4c for 67 paths; n8n workflow_entity for the active operation tuples; the istio-proxy logs for the two Loki samples; execution_entity for the execution census; pg_stat_user_tables for the fr table counts; and the keycloak client table for the client evidence.</p>
 <h2>Inception units</h2>
-<p>None — a measurement project.</p>
+<p>The project is its own inception unit: the plan records 'Programme project: S00 · issues none yet', and the slice plan docs/plans/slices/S00-usage-inventory.md is the analysis the work starts from, against SPEC sections §4, §8 S0, §9 and §11 R5. The retrospective reconstitutes the governance record over the completed measurement — charter, Statement of Architecture Work, the seven A–D artefacts approved by the board, the delivery contract, the WBS deliverable, the Phase-G review, the project brief, the evidence and the closure review — with the 38 acts recorded in transcript.jsonl.</p>
 <h2>Dependencies</h2>
-<p>None.</p>
+<p>The plan records depends_on as empty, so S00 blocks rather than waits. Its dependants are every later slice that consumes parity_ids and S14, which gates on 100 % of used. Operationally the measurement depended on read-only access to the master Postgres, never through PgBouncer, and on Loki retaining both 24-hour windows. In governance it depends on the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, the approved scope baseline 01a1ff39-8d6e-7270-b2ba-9d235eb28b83 and the delivery contract 01a1ff39-4ee0-7ecc-93cc-eeaf21fb9738.</p>
 <h2>Acceptance</h2>
-<p>The feature list is signed and zero-usage features are dropped, not ported.</p>
+<p>The plan's §7 gate exits 0 only when the ids are unique and shaped P-NNNN, every used row carries a test:, e2e: or probe: acceptance string, every surface appears exactly once against the manifest union, the count reconciles at 1,300, two Loki samples support the B-class used rows, every dropped row starts with decision: or replacement:, and check-jsonschema validates parity.yaml against parity/schema.json. The rework note records scripts/verify-project.py --project S00 --snapshot &lt;fresh&gt; green with 11 checks and 0 failures at d7293f96 and no P0/P1 entry on the strict audit.</p>
 <h2>Capabilities</h2>
-<p>The four source applications and their surfaces: fr 798, RM 314, Planka 96, n8n 92.</p>
+<p>The inventory exercises surface enumeration across four applications, call-site attribution through n8n and the reachable channels, traffic measurement over two 24-hour windows with a positive control each, identity allocation under P-NNNN, classification under the precedence decision-drop then A then B then C then D, and gate-and-sign-off binding the result to a hash and a reviewer. Each capability leaves a named artefact: the four manifests, matched.tsv, the two samples, inventory.tsv, parity.yaml and the signed SUMMARY.</p>
 <h2>Plan</h2>
-<p>Delivered 2026-11-07/08; reworked retrospectively 2026-11-21.</p>
+<p>The plan is docs/plans/slices/S00-usage-inventory.md, run as steps 0–14, each at most one day and read-only. The production run sampled on 2026-11-07 and 2026-11-08, signed parity.yaml on 2026-11-08 and updated the programme ledger. This brief is retrospective and dated 2026-11-26: it records that run and the governance reconstituted over it, and it does not claim a fresh measurement or a wider window than the two samples support.</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Usage inventory → parity/parity.yaml · conveyor output · published 2026-11-26T21:15:00Z · conveyor-e2e</code> at publish time.</span>
+      <span>Rendered from <code>Usage inventory → parity/parity.yaml · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

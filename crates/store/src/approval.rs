@@ -110,9 +110,13 @@ pub enum ApprovalStoreError {
     /// The run transition that opens the gate was refused (absent, or not `running`).
     #[error(transparent)]
     Run(#[from] RunStoreError),
-    /// An eval gate was offered a machine decision (S06d / W1). A sign-off is a person's act.
-    #[error("an eval sign-off must be decided by a human, not a machine")]
-    HumanOnlyGate,
+    /// A gate was offered a non-human decision it did not declare (SPEC_V2 §5.4). Human is
+    /// the default; a tenant must name the approver kind in its gate-policy row.
+    #[error("gate {gate:?} must be decided by a human, not a machine")]
+    HumanOnlyGate {
+        /// The gate that refused the decision, named for the caller.
+        gate: String,
+    },
     /// An `executor` gate was offered a machine decision (S21 step 5, ADR 0011). It is L3.
     #[error("an executor gate must be decided by a human, not a machine")]
     ExecutorGateHumanOnly,
@@ -124,6 +128,9 @@ pub enum ApprovalStoreError {
     /// its work (SPEC_V2 §5.4, §9.3; T6). The gate stays pending for a different principal.
     #[error("the implementer cannot decide the gate that judges its own work")]
     ImplementerCannotDecide,
+    /// A gate marked `requires_answer` was decided with no note: an empty answer is no answer.
+    #[error("this gate requires an answer; a decision with no note answers nothing")]
+    AnswerMissing,
     /// The database refused the statement.
     #[error(transparent)]
     Database(#[from] sqlx::Error),
@@ -816,6 +823,29 @@ pub async fn approval_meta_tx(
     Ok(row.map(|(meta,)| meta))
 }
 
+/// The `meta` of the latest approved gate named `gate` on `card`, if one exists.
+///
+/// `cards.move` reads the Definition-of-Done gate through this. The gate is approved only by its
+/// decision, so this read is what lets the move refuse before the card row changes.
+pub async fn approved_card_gate_meta_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    card_id: Uuid,
+    gate: &str,
+) -> Result<Option<Value>, sqlx::Error> {
+    sqlx::query_scalar(
+        "SELECT meta FROM approval
+          WHERE tenant_id = $1 AND card_id = $2 AND gate = $3 AND status = 'approved'
+          ORDER BY created_at DESC, id DESC
+          LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(card_id)
+    .bind(gate)
+    .fetch_optional(&mut *conn)
+    .await
+}
+
 /// Whether an approval resolved `approved` with at least one approving decision, and the card it
 /// gates. `None` when the row is absent in the tenant.
 ///
@@ -876,9 +906,13 @@ pub async fn record_decision_tx(
     {
         return Err(ApprovalStoreError::ImplementerCannotDecide);
     }
-    // T1 P1.3 / SPEC_V2 §5.4: the requester cannot decide the gate that judges their own work.
-    // This is the one writer every decision path traverses, so the exclusion lives here rather
-    // than in a UI or in `approvals.decide` alone.
+    // T1 P1.3 / SPEC_V2 §5.4 / P4: the requester cannot decide the gate that judges their own
+    // work. This is the one writer every decision path traverses, so the exclusion lives here
+    // rather than in a UI or in `approvals.decide` alone.
+    //
+    // ⛔ Unconditional (ledger v1-w4b-4): no policy row can relax it. A historical
+    // `self_approval='allowed'` row is inert — it still reads, but this writer never consults it,
+    // so the value can neither authorize a decision nor break a read of old data.
     let requested_by: Option<Uuid> =
         sqlx::query_scalar("SELECT requested_by FROM approval WHERE tenant_id = $1 AND id = $2")
             .bind(tenant.as_uuid())
@@ -886,51 +920,37 @@ pub async fn record_decision_tx(
             .fetch_one(&mut *conn)
             .await?;
     if requested_by == Some(decision.approver_id) {
-        // #282: §5.4 is the DEFAULT, not a hardcode. A tenant may allow the requester to decide
-        // its own gate for this action, and that decision is a row — never a caller's claim.
-        // Everything else fails closed: a missing row, an unreadable row and a corrupt value all
-        // keep the refusal, because the alternative is granting a permission nobody recorded.
-        // The gate name IS the action name for a destructive gate, which is what makes this read
-        // need no second lookup.
-        let allowed =
-            match approval_policy::allows_self_approval(&mut *conn, tenant, &row.gate).await {
-                Ok(allowed) => allowed,
-                Err(approval_policy::ApprovalPolicyStoreError::Database(error)) => {
-                    return Err(error.into());
-                }
-                Err(_) => false,
-            };
-        if !allowed {
-            return Err(ApprovalStoreError::Illegal(
-                ApprovalError::RequesterCannotDecide,
-            ));
-        }
+        return Err(ApprovalStoreError::Illegal(
+            ApprovalError::RequesterCannotDecide,
+        ));
     }
-    // W1 (S06d): an eval gate is a person's act, and only a person holding `evals:approve` may
-    // decide it. This check lives HERE — the one writer every decision path traverses — so
-    // `approvals.decide`, `eval_signoffs.decide`, MCP `tasks/update` and a connector reply
-    // cannot disagree. `eval_id` is not in `COLUMNS`; it is read under the same row lock.
-    let eval_gate: Option<Uuid> =
-        sqlx::query_scalar("SELECT eval_id FROM approval WHERE tenant_id = $1 AND id = $2")
-            .bind(tenant.as_uuid())
-            .bind(approval_id)
-            .fetch_one(&mut *conn)
-            .await?;
-    if eval_gate.is_some() {
-        if decision.decided_by_kind != DeciderKind::Human {
-            return Err(ApprovalStoreError::HumanOnlyGate);
-        }
-        if !eval_authorized {
-            return Err(ApprovalStoreError::EvalScopeRequired);
-        }
+    // A free-text question must be answered. `approvals.request` marks one with
+    // `meta.requires_answer`; a decision that records no note answers nothing. This is the one
+    // writer every decision path traverses, so no channel can lose the answer. A yes/no gate
+    // does not set the marker and is unchanged.
+    let requires_answer: bool = sqlx::query_scalar(
+        "SELECT COALESCE(meta->>'requires_answer' = 'true', false)
+           FROM approval WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(approval_id)
+    .fetch_one(&mut *conn)
+    .await?;
+    if requires_answer && decision.note.trim().is_empty() {
+        return Err(ApprovalStoreError::AnswerMissing);
     }
     // S21 step 5: an `executor` gate is a person's act (SPEC_V2 §7.1). Like the eval gate, the
     // refusal lives in the one writer every decision path traverses, so `approvals.decide`, MCP
-    // and a connector reply cannot disagree.
+    // and a connector reply cannot disagree. Unconditional: an L3 gate is not a tenant's to
+    // declare non-governance.
     if row.kind == "executor" && decision.decided_by_kind != DeciderKind::Human {
         return Err(ApprovalStoreError::ExecutorGateHumanOnly);
     }
-
+    // The gate's own state is the primary conflict. A decision on a non-pending gate is
+    // `NotPending` — for a human or a machine — before the approver-kind policy is consulted: a
+    // caller told "already decided" has nothing to fix, while a policy refusal would send it to
+    // a gate that cannot accept any decision. Validated before the insert, so a refused attempt
+    // leaves no `approval_decision` row.
     let prior: i64 = sqlx::query_scalar(
         "SELECT count(*) FROM approval_decision
           WHERE tenant_id = $1 AND approval_id = $2 AND decision = 'approve'",
@@ -940,11 +960,77 @@ pub async fn record_decision_tx(
     .fetch_one(&mut *conn)
     .await?;
     let prior = u16::try_from(prior).unwrap_or(u16::MAX);
+    let gate = row.gate.clone();
     let approval = row.into_approval(prior)?;
     let required = approval.required_decisions;
-    // Validate BEFORE the insert. A gate that is not pending (or a zero quorum) is refused
-    // here, so a refused decision leaves no `approval_decision` row for the caller to undo.
     let next = approval.decide(decision.clone(), required)?;
+    // SPEC_V2 §5.4: a human approver is the DEFAULT for every gate, not only an eval gate. A
+    // tenant may authorise a non-human approver (job/agent/service/rule) only for a gate it
+    // explicitly declares non-governance — by naming that approver kind in its gate-policy row.
+    // This check lives HERE, the one writer every decision path traverses, so `approvals.decide`,
+    // `eval_signoffs.decide`, MCP `tasks/update` and a connector reply cannot disagree. An
+    // absent, unreadable or corrupt policy row all keep the refusal.
+    //
+    // A decision that NAMES a published owner delegation is the tenant's explicit authorisation
+    // for a `rule` act (§5.4: "a gate that requires a person accepts it only by naming its
+    // delegation"). The actions layer validates the reference before recording it in `via`; the
+    // one writer re-checks the document here, so no other path can forge the reference. This is
+    // the operating model the programme records under: `approval_policies.set` is a destructive
+    // action's policy, and a charter/baseline/change/closure gate has no such action to declare.
+    if decision.decided_by_kind != DeciderKind::Human {
+        let delegated = match decision
+            .via
+            .as_ref()
+            .and_then(|via| via.get("delegation_ref"))
+            .and_then(Value::as_str)
+        {
+            Some(text) => match Uuid::parse_str(text) {
+                Ok(reference) => sqlx::query_scalar::<_, i32>(
+                    "SELECT 1 FROM document
+                          WHERE tenant_id = $1 AND id = $2
+                            AND status = 'active' AND published_at IS NOT NULL
+                            AND category = 'decision'",
+                )
+                .bind(tenant.as_uuid())
+                .bind(reference)
+                .fetch_optional(&mut *conn)
+                .await?
+                .is_some(),
+                Err(_) => false,
+            },
+            None => false,
+        };
+        let allowed = delegated
+            || match approval_policy::allows_approver_kind(
+                &mut *conn,
+                tenant,
+                &gate,
+                decision.decided_by_kind,
+            )
+            .await
+            {
+                Ok(allowed) => allowed,
+                Err(approval_policy::ApprovalPolicyStoreError::Database(error)) => {
+                    return Err(error.into());
+                }
+                Err(_) => false,
+            };
+        if !allowed {
+            return Err(ApprovalStoreError::HumanOnlyGate { gate: gate.clone() });
+        }
+    }
+    // An eval sign-off additionally needs the caller to hold `evals:approve` (S06d / W1). The
+    // eval gate's human-only rule is the general rule above, not a special case. `eval_id` is
+    // not in `COLUMNS`; it is read under the same row lock.
+    let eval_gate: Option<Uuid> =
+        sqlx::query_scalar("SELECT eval_id FROM approval WHERE tenant_id = $1 AND id = $2")
+            .bind(tenant.as_uuid())
+            .bind(approval_id)
+            .fetch_one(&mut *conn)
+            .await?;
+    if eval_gate.is_some() && !eval_authorized {
+        return Err(ApprovalStoreError::EvalScopeRequired);
+    }
 
     sqlx::query(
         "INSERT INTO approval_decision (tenant_id, approval_id, approver_id, decision, note,
@@ -1149,17 +1235,18 @@ pub async fn expire_due_tx(conn: &mut PgConnection, tenant: TenantId) -> Result<
 /// `run.cancelled` after it. Both are the same status-guarded write, so this is the
 /// id-returning twin rather than a second sweep with a subtly different predicate.
 ///
-/// `run_id` is `None` for a card-level gate; the caller must not invent a run for it.
+/// `run_id` is `None` for a card-level gate; the caller must not invent a run for it. `card_id`
+/// is `None` for a project-scoped gate, which has no card a coach interruption could attach to.
 pub async fn expire_due_ids_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
-) -> Result<Vec<(Uuid, Option<Uuid>)>, sqlx::Error> {
+) -> Result<Vec<(Uuid, Option<Uuid>, Option<Uuid>)>, sqlx::Error> {
     sqlx::query_as(
         "UPDATE approval
             SET status = 'expired', version = version + 1, updated_at = now()
           WHERE tenant_id = $1 AND status = 'pending'
             AND expires_at IS NOT NULL AND expires_at <= now()
-        RETURNING id, run_id",
+        RETURNING id, run_id, card_id",
     )
     .bind(tenant.as_uuid())
     .fetch_all(&mut *conn)

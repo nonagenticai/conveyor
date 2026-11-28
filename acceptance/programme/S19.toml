@@ -1,0 +1,106 @@
+[project]
+key = "S19"
+name = "Eval builder"
+gate = "S19 is accepted when its twelve-step gate is green: ten tables RLS-forced and `0026` in the ledger, the second pending sign-off refused, no run without both sign-offs, the answer key unreachable from the subject input, the held-out wall enforced by access, a failed attempt unable to occupy its `(case,rep)` slot, cost derived with no cost column, the oracle ≈100% and null ≈0% controls, the variant grammar and grade shape enforced as database invariants, no answer-key or sign-off action machine-reachable, the served surface matching the lock, and `rbuild --gate`."
+gate_checks = ["S19-project", "S19-baseline", "S19-charter", "S19-contract", "S19-review", "S19-waivers", "S19-pi-cadence", "S19-pi-plan", "S19-pi-objectives", "S19-lessons", "S19-wsjf", "S19-demo-credits", "S19-product", "S19-artefact-standard", "S19-rework"]
+[[check]]
+id = "S19-project"
+check = "project"
+status = "active"
+severity = "P0"
+description = "S19 is active"
+
+[[check]]
+id = "S19-baseline"
+check = "project_baseline"
+require_approved = true
+severity = "P0"
+description = "the scope baseline is approved; the close gate reads the approved row"
+
+[[check]]
+id = "S19-charter"
+kind = "command"
+severity = "P0"
+description = "the charter asset exists and the charter gate is approved"
+command = '''python3 scripts/programme-record.py --check --action pm.get --input '{"project_id":"01a1d039-0d31-77b6-80e2-1c7205d63f99"}' | python3 -c '
+import json,sys
+s=sys.stdin.read()
+d=json.loads(s[s.find("{"):])
+o=d.get("output",d)
+assert o.get("charter_asset_id"), "no charter asset"
+gates={g.get("gate"):g.get("status") for g in o.get("gates",[])}
+assert gates.get("charter")=="approved", gates
+'
+'''
+
+[[check]]
+id = "S19-contract"
+check = "contract"
+severity = "P0"
+description = "a live board-approved delivery contract exists"
+
+[[check]]
+id = "S19-review"
+check = "review"
+severity = "P0"
+description = "the Phase-G review cites a published standing delegation"
+
+[[check]]
+id = "S19-waivers"
+check = "waivers"
+severity = "P0"
+description = "no active waiver is expired or owned by its reviewer"
+
+[[check]]
+id = "S19-pi-cadence"
+check = "pi_cadence"
+severity = "P0"
+description = "the project's PI has a cadence row and a backlog-refinement row"
+
+[[check]]
+id = "S19-pi-plan"
+check = "pi_plan"
+severity = "P0"
+description = "the project tranche's PI plan is published"
+
+[[check]]
+id = "S19-pi-objectives"
+check = "pi_objectives"
+severity = "P0"
+description = "the project tranche's PI objectives are published"
+
+[[check]]
+id = "S19-lessons"
+check = "lessons"
+severity = "P1"
+description = "the tranche retro produced at least one lesson"
+
+[[check]]
+id = "S19-wsjf"
+check = "wsjf"
+severity = "P0"
+description = "every WBS deliverable of the project carries the four typed WSJF inputs"
+
+[[check]]
+id = "S19-demo-credits"
+check = "demo_credits"
+severity = "P0"
+description = "every accepted deliverable has a demo credit carrying its evidence"
+
+[[check]]
+id = "S19-product"
+check = "product_findings"
+severity = "P0"
+description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "S19-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "S19-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"

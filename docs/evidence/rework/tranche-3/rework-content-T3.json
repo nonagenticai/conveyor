@@ -1,0 +1,1028 @@
+{
+  "charter": "# Charter — T3 PM job (retrospective, 2026-11-26)\n\n- **Project:** T3 'PM job', track v2, ADM phase G, tranche 3, project `01a1d039-0d33-7915-8833-75f4dc31cc07`, plan `docs/SPEC_V2.md#12`. The record carries `meta.measured_status: built`, `meta.expected_outputs: [project-brief, evidence]`, `meta.closure_outputs: [closure-review]`, closed issue #74 and a reopen dated 2026-11-26T07:44:41Z. The scope baseline `01a216d0-9c9b-7c8c-a6ef-0d9365632efa` was taken on 2026-11-26 and approved by `01a1e8a7-8b23-76a9-9114-aafb95f7a545`; the rework runs under delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`.\n- **Mandate:** deliver the PM job of SPEC_V2 §12 — charter, WBS, baseline, staffing, gate routing and closure — so that a PM runs a request end to end, cannot approve its own gate, and a baseline change requires a change request. The tranche-3 review recorded T3 as closed without its live delivery contract and its Phase-G review; the project was reopened on 2026-11-26 to complete the record, not to add scope. This retrospective reconstitutes the MSP/TOGAF lifecycle record for the PM job: charter, Statement of Architecture Work, the seven mandatory Phase A–D artefacts, the delivery contract, the WBS deliverable, the Phase-G review, the project-brief and evidence outputs and the closure review.\n- **Scope:** the governance of a single project request from charter to closure — the chartered scope, the WBS and its four WSJF inputs 8, 8, 5, 3, the scope baseline and its change control, the staffing plan, the gate router that keeps the approver distinct from the requester, the closure record and its declared outputs. Out of scope is the decision ladder's policy engine (T2), the kanban coach (T4), the kata (T5), the tool platform (T13) and a re-implementation of the T1 plan spine; the rework adds no feature and re-opens no V1 slice.\n- **Date:** this charter is retrospective and was authored on 2026-11-26; it records the lifecycle of the PM job recorded as built under issue #74 and reviewed by the tranche-3 review `01a216d0-d634-738e-985a-00a85cfd48d9`, it does not authorise new work.\n",
+  "soaw": {
+    "title": "Statement of Architecture Work — T3 PM job (retrospective, 2026-11-26)",
+    "body": {
+      "assignment": "Rework T3 by the reconstituted TOGAF/MSP lifecycle: author the charter, this Statement of Architecture Work, the seven mandatory Phase A–D artefacts, the delivery contract, the WBS deliverable and the Phase-G review, and re-publish the project-brief and evidence outputs. The architecture work is the PM job itself — one project run from charter through WBS, scope baseline, staffing, gate routing and closure, with the approver kept distinct from the requester and every baseline change carried by a change request — recorded retrospectively and dated 2026-11-26.",
+      "scope": "In scope: the charter and its approved gate; the WBS with the four typed WSJF inputs 8, 8, 5, 3; the scope baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa taken on 2026-11-26 and approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545; the staffing plan; the gate router that refuses self-approval and records every decision; the change request that must precede a baseline change; the closure record with its closure-review output; the seven A–D artefacts and the project registers. Out of scope: the T2 decision ladder's policy engine, the T4 coach, the T5 kata, the T13 tool platform, the T1 plan spine's implementation and every V1 slice; the rework completes the record and adds no scope.",
+      "responsibilities": "The programme architect authors the pack under the #526 rework delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews the seven A–D artefacts, which this pack records as approved. The programme owner is the approver of the delivery contract and of the closure: the scope baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa is approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, and the closure gate recorded for T3 was decided by an approver distinct from its requester, which is the gate's own rule. The PM runs the request and may not approve a gate it raised.",
+      "acceptance_criteria": "The gate in SPEC_V2 §12 is executable: a PM runs a request end to end; the PM cannot approve its own gate; a baseline change requires a change request. The close gate reads the project's declared outputs — project-brief and evidence — plus the closure-review output, a live board-approved delivery contract, a Phase-G review citing the standing delegation, the approved scope baseline, the seven mandatory A–D artefacts with their registers, WBS inputs 8, 8, 5, 3, a demo credit per accepted deliverable and at least one tranche lesson. This content pack is checked offline by scripts/rework-content-check.py --project T3 before the factory reads it, and the factory then records the contract, review, artefacts and closure against the snapshot.",
+      "contract": "This statement is authored retrospectively under the delegation and is approved through the same board gate it describes; its approval is recorded by the factory from this pack, not asserted here. It is complemented by the delivery contract whose commitments, compliance and approval fields this pack authors, on the approved scope baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa (kind scope, taken 2026-11-26, approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545), and by the Phase-G review the factory records from this pack. The tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9 decided continue on 2026-11-26 and authorised tranche 4; the reopen this pack answers is dated 2026-11-26T07:44:41Z and its reason is the missing contract, review and baseline record.",
+      "retrospective": true
+    }
+  },
+  "artifacts": [
+    {
+      "title": "Stakeholder map — PM job",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "purpose": "Name the actors the PM job serves and the engagement each needs, from the request that opens the project through to the closure that ends it.",
+      "scope": "The stakeholders of the PM job, its gate record and its approved scope baseline.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "the delivery team",
+          "the downstream slices T4, T9 and T10"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the programme owner",
+          "axis_b": "approves the delivery contract and the closure; owns the approved scope baseline",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "approve"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the PM",
+          "axis_b": "runs the request end to end and may not approve a gate it raised",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "responsible"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "the Architecture Board",
+          "axis_b": "reviews the seven A–D artefacts and the Phase-G record",
+          "value": {
+            "influence": "high",
+            "interest": "medium",
+            "engagement": "review"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "the programme office",
+          "axis_b": "keeps the WBS, the baseline and the registers current and runs the tranche review",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "the delivery team",
+          "axis_b": "staffs the WBS deliverables and supplies the acceptance evidence",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "keep informed"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "the downstream slices T4, T9 and T10",
+          "axis_b": "consume the routed approvals and the closed project record",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "keep informed"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements catalog — PM job",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Stakeholder map — PM job\n\n## Metadata\n\nRetrospective matrix for T3, authored 2026-11-26 from the snapshot facts, the SPEC_V2 §12 row at docs/SPEC_V2.md and the existing receipt docs/evidence/rework/T3.json. Phase a, plateau psa, kind matrix; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d33-7915-8833-75f4dc31cc07.\n\n## Entries\n\nSix actors. The programme owner approves the delivery contract and the closure and owns the approved scope baseline. The PM runs the request end to end and may not approve a gate it raised. The Architecture Board reviews the seven A–D artefacts and the Phase-G record. The programme office keeps the WBS, the baseline and the registers current and runs the tranche review. The delivery team staffs the WBS deliverables and supplies the acceptance evidence. The downstream slices T4, T9 and T10 consume the routed approvals and the closed project record.\n\n## Links\n\nThis artefact carries one typed edge: Requirements catalog — PM job as dependency, because the requirements fix what each actor receives from the PM job. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: place the actors of the PM job so each concern has a named owner and a stated engagement. Scope: the stakeholders of the PM job, its gate record and its approved scope baseline. It was reconstructed retrospectively on 2026-11-26 from the snapshot facts and the existing receipt rather than from a live elicitation, and it does not claim that any actor re-accepted the project after the tranche-3 review."
+    },
+    {
+      "title": "Driver/goal/objective — PM job",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "Trace why the PM job exists and what each of its six mechanisms is meant to achieve for the programme.",
+      "scope": "The drivers and goals behind charter, WBS, baseline, staffing, gate routing and closure.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "the delivery team",
+          "the Architecture Board"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "D1 a PM can mark its own gate complete",
+          "axis_b": "G1 route every gate to an approver other than the requester",
+          "value": {
+            "objective": "a gate decision taken by the requester is refused, so the PM cannot certify its own work",
+            "measure": "the closure gate recorded for T3 was decided by an approver distinct from its requester"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "D2 a baseline edited in place erases what was agreed",
+          "axis_b": "G2 freeze the scope baseline and admit a change only through a change request",
+          "value": {
+            "objective": "the scope baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa is immutable once approved and a change supersedes it rather than editing it",
+            "measure": "one approved scope baseline exists and the change-control record carries any later change"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "D3 a request without a charter has no boundary",
+          "axis_b": "G3 charter first, with scope and acceptance fixed before execution",
+          "value": {
+            "objective": "every project run starts from an approved charter that names its scope, mandate and date",
+            "measure": "the charter asset exists and the charter gate reads approved for T3"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "D4 work without a WBS cannot be sized or sequenced",
+          "axis_b": "G4 decompose into WBS deliverables and carry the four WSJF inputs",
+          "value": {
+            "objective": "every deliverable carries business value, time criticality, risk reduction and job size as typed inputs",
+            "measure": "the WBS deliverable carries 8, 8, 5, 3 as the tranche-3 PI plan records"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "D5 an unstaffed plan has no owner",
+          "axis_b": "G5 staff the deliverables before a gate is routed",
+          "value": {
+            "objective": "each deliverable has a named owner and the gate record shows who executed the work",
+            "measure": "staffing is recorded before the closure gate is raised"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "D6 closure without a contract and a review leaves a record gap",
+          "axis_b": "G6 close only on a live contract, a Phase-G review and the declared outputs",
+          "value": {
+            "objective": "the tranche-3 gap is closed by this rework: the contract, the review, the artefacts and the closure review are all supplied",
+            "measure": "the pre-rework receipt docs/evidence/rework/T3.json records the contract and review failures; this pack supplies the record"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Stakeholder map — PM job",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Driver/goal/objective — PM job\n\n## Metadata\n\nRetrospective catalogue for T3, authored 2026-11-26 from the snapshot facts, the SPEC_V2 §12 row and the existing receipt. Phase a, plateau psa, kind catalog; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d33-7915-8833-75f4dc31cc07.\n\n## Entries\n\nSix drivers, each with a goal and a measurable objective. D1 records the self-approval hazard; G1 makes the approver distinct from the requester. D2 records the in-place baseline edit; G2 freezes the baseline and routes a change through a change request. D3 records the unbounded request; G3 requires a charter first. D4 records the unsized work; G4 carries the four WSJF inputs. D5 records the ownerless plan; G5 staffs before routing a gate. D6 records the record gap the tranche-3 review found; G6 closes only on a live contract, a review and the declared outputs.\n\n## Links\n\nThis artefact carries one typed edge: Stakeholder map — PM job as derivation, because the drivers are held by the actors named there. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: trace why the PM job exists and what each of its six mechanisms is meant to achieve. Scope: the drivers and goals behind charter, WBS, baseline, staffing, gate routing and closure. It was authored retrospectively on 2026-11-26 from the snapshot facts and the SPEC_V2 row, and it records the objective the programme set rather than claiming that a later reader can replay each PM run."
+    },
+    {
+      "title": "Requirements catalog — PM job",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "State the requirements the PM job must satisfy, each with the check that carries it.",
+      "scope": "Charter, WBS, baseline, staffing, gate routing, change control, closure, issue linkage, rework boundary and register codes.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "the delivery team",
+          "the closure reviewer"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "R1",
+          "axis_b": "start the project from an approved charter naming scope, mandate and date",
+          "value": {
+            "requirement": "the charter asset exists before execution and fixes the project boundary in writing",
+            "acceptance": "the charter gate reads approved and the charter asset is present in the record"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "R2",
+          "axis_b": "decompose the chartered scope into WBS deliverables",
+          "value": {
+            "requirement": "every deliverable is a WBS node with a title and the four typed WSJF inputs",
+            "acceptance": "the deliverable carries business value 8, time criticality 8, risk reduction 5 and job size 3"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "R3",
+          "axis_b": "approve and freeze one scope baseline",
+          "value": {
+            "requirement": "the scope baseline is approved before the project closes and is frozen against in-place edits",
+            "acceptance": "baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa is of kind scope and approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "R4",
+          "axis_b": "assign a named owner to every deliverable",
+          "value": {
+            "requirement": "the staffing plan names the owner of each deliverable before a gate is routed",
+            "acceptance": "the staffing record and the gate record agree on who executed and who decided"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "R5",
+          "axis_b": "route every gate to an approver other than the requester",
+          "value": {
+            "requirement": "the PM may raise a gate but may not decide it, and the decision names its approver",
+            "acceptance": "the closure gate recorded for T3 was decided by an approver distinct from its requester"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "R6",
+          "axis_b": "carry every baseline change as a change request",
+          "value": {
+            "requirement": "a change to the frozen baseline is requested, approved and recorded; no field is edited in place",
+            "acceptance": "the change-control record exists and the baseline is superseded rather than rewritten"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "R7",
+          "axis_b": "declare and publish the closure outputs",
+          "value": {
+            "requirement": "the project declares project-brief and evidence as expected outputs and closure-review as its closure output, and publishes each",
+            "acceptance": "the closure-review output 01a216d0-6635-720e-84e9-005ba604d06f and the declared outputs are published"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "R8",
+          "axis_b": "claim the unit of work by a GitHub issue",
+          "value": {
+            "requirement": "the project names its issue and closes it with the delivered work rather than with a branch or a conversation",
+            "acceptance": "issue #74 is closed and named in the project meta"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "R9",
+          "axis_b": "keep the retrospective rework inside the record",
+          "value": {
+            "requirement": "the rework completes the missing contract, review and baseline record and adds no feature",
+            "acceptance": "the reopen reason names the missing contract, review and baseline, not new scope"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "R10",
+          "axis_b": "give every register row a code",
+          "value": {
+            "requirement": "each risk, issue, assumption, dependency and benefit row carries a non-empty code so the project-registers document can resolve it",
+            "acceptance": "the project-registers document resolves every row and no empty register code remains"
+          },
+          "position": 10
+        }
+      ],
+      "links": [
+        {
+          "to": "Driver/goal/objective — PM job",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Requirements catalog — PM job\n\n## Metadata\n\nRetrospective catalogue for T3, authored 2026-11-26 from the snapshot facts, the SPEC_V2 §12 row and the existing receipt. Phase a, plateau psa, kind catalog; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d33-7915-8833-75f4dc31cc07.\n\n## Entries\n\nTen requirements. R1 to R3 fix the project's opening: an approved charter, a sized WBS and one frozen scope baseline. R4 and R5 fix who executes and who decides, with the approver distinct from the requester. R6 makes every baseline change a change request. R7 and R8 bind closure to the declared outputs and the GitHub issue. R9 keeps the retrospective rework inside the record. R10 gives every register row a code so the project-registers document can resolve each one.\n\n## Links\n\nThis artefact carries one typed edge: Driver/goal/objective — PM job as derivation, because each requirement serves a stated goal. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: state the requirements the PM job must satisfy. Scope: charter, WBS, baseline, staffing, gate routing, change control, closure, issue linkage, rework boundary and register codes. It was reconstructed retrospectively on 2026-11-26 from the snapshot facts and the receipt, so each acceptance line names a record the close gate reads rather than a check the pack hopes will run."
+    },
+    {
+      "title": "Solution concept — PM job",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "purpose": "Show the components and edges that turn one project request into a chartered, sized, baselined, staffed, gated and closed record.",
+      "scope": "The request row, charter, WBS, baseline, staffing, gate router, change request, review, closure record and register.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "the delivery team",
+          "the downstream slices T4, T9 and T10"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the project request row",
+          "axis_b": "project 01a1d039-0d33-7915-8833-75f4dc31cc07, track v2, tranche 3, issue #74",
+          "value": {
+            "kind": "component",
+            "note": "the record that names the unit, its dependencies T2 and P0, and its declared outputs project-brief and evidence"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the charter",
+          "axis_b": "the approved asset and its gate",
+          "value": {
+            "kind": "component",
+            "note": "fixes the scope, mandate and date before execution; the gate reads approved rather than assumed"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "the WBS and its WSJF inputs",
+          "axis_b": "one deliverable with the four typed inputs 8, 8, 5, 3",
+          "value": {
+            "kind": "component",
+            "note": "the deliverable is the unit the demo credit and the acceptance evidence attach to"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "the scope baseline",
+          "axis_b": "01a216d0-9c9b-7c8c-a6ef-0d9365632efa, kind scope, taken 2026-11-26",
+          "value": {
+            "kind": "component",
+            "note": "one approved baseline frozen for the life of the scope; it is read by the gate and superseded only by a change"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "the staffing plan",
+          "axis_b": "a named owner per deliverable",
+          "value": {
+            "kind": "component",
+            "note": "the record that makes the executor accountable before the gate is routed"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "the gate router",
+          "axis_b": "the approval record with requester and approver",
+          "value": {
+            "kind": "component",
+            "note": "refuses a decision by the requester and names the approver on every gate"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "the change request",
+          "axis_b": "the only path to a baseline change",
+          "value": {
+            "kind": "component",
+            "note": "a requested and approved change supersedes the baseline; it never edits the frozen row"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "the Phase-G review",
+          "axis_b": "one compliance level against the live contract",
+          "value": {
+            "kind": "component",
+            "note": "kept distinct from the closure gate, so a level and a closure decision are two records rather than one claim"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "the closure record and its outputs",
+          "axis_b": "project-brief, evidence and closure-review",
+          "value": {
+            "kind": "component",
+            "note": "the declared outputs are published before the project is closed"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "charter to WBS",
+          "axis_b": "the decomposition edge",
+          "value": {
+            "kind": "edge",
+            "note": "the chartered scope is decomposed and sized; the decomposition may not enlarge the boundary"
+          },
+          "position": 10
+        },
+        {
+          "axis_a": "WBS to baseline",
+          "axis_b": "the freeze edge",
+          "value": {
+            "kind": "edge",
+            "note": "the accepted WBS and its WSJF inputs are frozen as the scope baseline"
+          },
+          "position": 11
+        },
+        {
+          "axis_a": "baseline to gate",
+          "axis_b": "the routing edge",
+          "value": {
+            "kind": "edge",
+            "note": "the gate reads the frozen baseline and the staffing record and routes the decision to a distinct approver"
+          },
+          "position": 12
+        },
+        {
+          "axis_a": "gate to closure",
+          "axis_b": "the decision edge",
+          "value": {
+            "kind": "edge",
+            "note": "closure is taken by an approver other than the requester on the record the gate just read"
+          },
+          "position": 13
+        },
+        {
+          "axis_a": "change request to baseline",
+          "axis_b": "the supersession edge",
+          "value": {
+            "kind": "edge",
+            "note": "an approved change replaces the baseline; the frozen row is not rewritten"
+          },
+          "position": 14
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements catalog — PM job",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Solution concept — PM job\n\n## Metadata\n\nRetrospective diagram for T3, authored 2026-11-26 from the snapshot facts, the SPEC_V2 §12 row and the existing receipt. Phase a, plateau psa, kind diagram; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d33-7915-8833-75f4dc31cc07.\n\n## Entries\n\nFourteen rows: nine components and five edges. The request row names the unit and its outputs; the charter fixes the boundary; the WBS and its four inputs size the work; the scope baseline freezes it; staffing names the executor; the gate router keeps the approver distinct from the requester; the change request is the only path to a baseline change; the Phase-G review records a level; and the closure record publishes the declared outputs. The five edges run from charter to WBS, WBS to baseline, baseline to gate, gate to closure, and change request to baseline supersession.\n\n## Links\n\nThis artefact carries one typed edge: Requirements catalog — PM job as realization, because the components exist to satisfy those requirements. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: show the components and edges that turn one project request into a closed record. Scope: the request row, charter, WBS, baseline, staffing, gate router, change request, review, closure record and register. It was drawn retrospectively on 2026-11-26 from the SPEC_V2 row and the snapshot facts, not from a design session held before the work."
+    },
+    {
+      "title": "Business capability map — PM job",
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "purpose": "Name the capabilities the PM job exercises and the evidence each one leaves behind.",
+      "scope": "Chartered execution, sized decomposition, frozen baseline, staffed delivery, independent gates, controlled change and complete closure.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme owner",
+          "the programme office",
+          "the downstream slices T4, T9 and T10"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Chartered execution",
+          "axis_b": "a request becomes a project with a written boundary",
+          "value": {
+            "maturity": "delivered; issue #74 is closed and the charter gate approved",
+            "evidence": "the charter asset and the approved charter gate recorded for T3"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Sized decomposition",
+          "axis_b": "the scope becomes WBS deliverables with typed WSJF inputs",
+          "value": {
+            "maturity": "delivered",
+            "evidence": "the WBS deliverable carries business value 8, time criticality 8, risk reduction 5 and job size 3"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Frozen scope baseline",
+          "axis_b": "the agreed scope is approved once and guarded",
+          "value": {
+            "maturity": "delivered",
+            "evidence": "baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa, kind scope, taken 2026-11-26 and approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Staffed delivery",
+          "axis_b": "every deliverable has a named owner",
+          "value": {
+            "maturity": "delivered",
+            "evidence": "the staffing record names the executor of each deliverable before the gate is routed"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Independent gate routing",
+          "axis_b": "the approver is never the requester",
+          "value": {
+            "maturity": "delivered",
+            "evidence": "the closure gate recorded for T3 was decided by a distinct approver, and the PM may not decide a gate it raised"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Controlled change",
+          "axis_b": "a baseline change is a request, not an edit",
+          "value": {
+            "maturity": "delivered",
+            "evidence": "the change-control output 01a216d0-7899-75c3-9a53-c98057188635 is published and the baseline is superseded rather than rewritten"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Complete closure",
+          "axis_b": "the project closes on a contract, a review and its declared outputs",
+          "value": {
+            "maturity": "delivered by the 2026-11-26 rework, which supplies the missing contract, review and artefact record",
+            "evidence": "the closure-review output 01a216d0-6635-720e-84e9-005ba604d06f, the project brief 01a216d0-68e5-764d-92af-9864ddae5127 and the evidence 01a1ee73-db2e-76b5-8c92-076f14dc94ec are published"
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Solution concept — PM job",
+          "kind": "derivation"
+        },
+        {
+          "to": "Requirements catalog — PM job",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Business capability map — PM job\n\n## Metadata\n\nRetrospective diagram for T3, authored 2026-11-26 from the snapshot facts, the SPEC_V2 §12 row and the existing receipt. Phase b, plateau hld, kind diagram; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d33-7915-8833-75f4dc31cc07.\n\n## Entries\n\nSeven capabilities. Chartered execution turns a request into a bounded project. Sized decomposition gives every deliverable its four WSJF inputs. Frozen scope baseline fixes the agreed scope at 01a216d0-9c9b-7c8c-a6ef-0d9365632efa. Staffed delivery names the executor. Independent gate routing keeps the approver distinct from the requester. Controlled change makes a baseline change a request. Complete closure publishes the contract, the review and the declared outputs before the project closes; the 2026-11-26 rework is what supplies that last capability's record.\n\n## Links\n\nThis artefact carries two typed edges: Solution concept — PM job and Requirements catalog — PM job, both as derivation. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: name the capabilities the PM job exercises and the evidence each leaves behind. Scope: chartered execution, sized decomposition, frozen baseline, staffed delivery, independent gates, controlled change and complete closure. It is retrospective and dated 2026-11-26; it records the capabilities as built and reclosed, and it does not claim a fresh run of the PM job in this session."
+    },
+    {
+      "title": "Data entity catalog — PM job",
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Name the stored entities the PM job is built from and proved with, and the key each one carries.",
+      "scope": "The project row, charter, WBS node, baseline, change request, staffing, gate decision, register item, compliance review and published output.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "auditors",
+          "the delivery team"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "project row",
+          "axis_b": "the unit of work",
+          "value": {
+            "kind": "entity",
+            "definition": "id, key, name, track, tranche, project type and the meta fields that carry the gate, the outputs and the reopen reason",
+            "key": "project id 01a1d039-0d33-7915-8833-75f4dc31cc07"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "charter record",
+          "axis_b": "the project boundary",
+          "value": {
+            "kind": "entity",
+            "definition": "the authored charter asset and its approved gate, dated and versioned",
+            "key": "project id plus charter version"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "WBS node",
+          "axis_b": "one deliverable",
+          "value": {
+            "kind": "entity",
+            "definition": "title, the four WSJF inputs, status, acceptance and evidence",
+            "key": "WBS node id, with the project id as its parent"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "project baseline",
+          "axis_b": "the frozen scope",
+          "value": {
+            "kind": "entity",
+            "definition": "id, kind scope, taken_at, approved_by and the version that a change request supersedes",
+            "key": "baseline id 01a216d0-9c9b-7c8c-a6ef-0d9365632efa"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "change request",
+          "axis_b": "the controlled change",
+          "value": {
+            "kind": "entity",
+            "definition": "the request that names the baseline it supersedes, its reason and its approval",
+            "key": "change row id, with baseline_ref as its foreign key"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "staffing assignment",
+          "axis_b": "who executes",
+          "value": {
+            "kind": "entity",
+            "definition": "the deliverable, the named owner and the period of the assignment",
+            "key": "deliverable id plus owner job id"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "gate decision",
+          "axis_b": "who decides",
+          "value": {
+            "kind": "entity",
+            "definition": "the gate name, the requester, the approver, the decision and the record it read",
+            "key": "approval id, with project id and gate as its lookup"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "register item",
+          "axis_b": "the managed risk, issue, assumption, dependency or benefit",
+          "value": {
+            "kind": "entity",
+            "definition": "kind, code, title, body, owner, probability and impact where the kind is risk, and the review date",
+            "key": "register row id, with the code unique per project"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "compliance review",
+          "axis_b": "the Phase-G level",
+          "value": {
+            "kind": "entity",
+            "definition": "project id, contract id, level, findings, evidence and the standing delegation it cites",
+            "key": "review id, with contract id as its foreign key"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "published output",
+          "axis_b": "the declared record",
+          "value": {
+            "kind": "entity",
+            "definition": "category, title, body and published_at for project-brief, evidence and closure-review",
+            "key": "output id, with project id and category as its lookup"
+          },
+          "position": 10
+        }
+      ],
+      "links": [
+        {
+          "to": "Business capability map — PM job",
+          "kind": "derivation"
+        },
+        {
+          "to": "Solution concept — PM job",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Data entity catalog — PM job\n\n## Metadata\n\nRetrospective catalogue for T3, authored 2026-11-26 from the snapshot facts, the SPEC_V2 §12 row and the existing receipt. Phase c, plateau hld, kind catalog; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d33-7915-8833-75f4dc31cc07.\n\n## Entries\n\nTen entities. The project row names the unit and its meta. The charter record fixes the boundary. The WBS node carries the four WSJF inputs. The project baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa is the frozen scope. The change request is its supersession path. The staffing assignment names the executor, and the gate decision names the approver. The register item carries a code per kind. The compliance review records one level against the live contract. The published output carries the project-brief, evidence and closure-review records.\n\n## Links\n\nThis artefact carries two typed edges: Business capability map — PM job and Solution concept — PM job, both as derivation. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: name the stored entities the PM job is built from and proved with. Scope: the project row, charter, WBS node, baseline, change request, staffing, gate decision, register item, compliance review and published output. It was authored retrospectively on 2026-11-26 from the snapshot schema and the existing receipt, so the catalogue does not invent a table or a key the record does not carry."
+    },
+    {
+      "title": "Technology standards — PM job",
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Name the formats, disciplines and instruments the PM job relies on, and where each one is enforced.",
+      "scope": "WSJF inputs, baseline immutability, change requests, approval distinctness, register codes, declared outputs, retrospective discipline and the offline check.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "auditors",
+          "the delivery team"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "WSJF input standard",
+          "axis_b": "four typed integers recomputed from inputs",
+          "value": {
+            "usage": "business value, time criticality, risk reduction and job size are stored as inputs, and the score is recomputed rather than asserted; T3 carries 8, 8, 5, 3"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Baseline immutability",
+          "axis_b": "one approved scope baseline",
+          "value": {
+            "usage": "the baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa is approved and frozen; no later run edits its fields in place"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Change-request standard",
+          "axis_b": "a request before a baseline change",
+          "value": {
+            "usage": "a change names the baseline it supersedes and the approval that admits it; the change-control record is the only lawful path"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Approval distinctness",
+          "axis_b": "requester is not approver",
+          "value": {
+            "usage": "every gate records both identities, and a decision by the requester is refused; the closure gate for T3 was decided by a distinct approver"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Register code standard",
+          "axis_b": "a non-empty code on every row",
+          "value": {
+            "usage": "risk, issue, assumption, dependency and benefit rows carry codes such as R-T3-01; the project-registers document refuses an empty code"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Declared output standard",
+          "axis_b": "expected outputs and closure outputs",
+          "value": {
+            "usage": "project-brief and evidence are declared expected outputs, closure-review is the declared closure output, and the close gate requires each to be published"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Retrospective record standard",
+          "axis_b": "dated, additive and honest",
+          "value": {
+            "usage": "the rework is dated 2026-11-26, names the pre-rework receipt as red and adds no scope; it does not claim to replay the original PM runs"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "Offline content check",
+          "axis_b": "scripts/rework-content-check.py before live writes",
+          "value": {
+            "usage": "the pack is checked for its typed structure, authored prose, allowed fields and cited ids before the factory performs any governance write"
+          },
+          "position": 8
+        }
+      ],
+      "links": [
+        {
+          "to": "Data entity catalog — PM job",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Technology standards — PM job\n\n## Metadata\n\nRetrospective catalogue for T3, authored 2026-11-26 from the snapshot facts, the SPEC_V2 §12 row and the existing receipt. Phase d, plateau hld, kind catalog; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d33-7915-8833-75f4dc31cc07.\n\n## Entries\n\nEight standards. WSJF stores four typed integers and recomputes the score; T3 carries 8, 8, 5, 3. The baseline is approved and frozen, and a change request supersedes it rather than editing it. Approval distinctness records both the requester and the approver at every gate. Register codes are non-empty so the project-registers document can resolve each row. The declared outputs are project-brief and evidence, with closure-review as the closure output. The retrospective record is dated and additive. The offline content check runs before any live write.\n\n## Links\n\nThis artefact carries one typed edge: Data entity catalog — PM job as derivation, because each entity is held in one of these formats. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: name the formats, disciplines and instruments the PM job relies on. Scope: WSJF inputs, baseline immutability, change requests, approval distinctness, register codes, declared outputs, retrospective discipline and the offline check. It was authored retrospectively on 2026-11-26 and names only standards that the SPEC_V2 row, the snapshot facts and the receipt actually apply."
+    }
+  ],
+  "documents": [
+    {
+      "category": "architecture-artifact",
+      "title": "Architecture Artefact Index — T3 (retrospective, 2026-11-26)",
+      "body": "# Architecture Artefact Index — T3 (retrospective, 2026-11-26)\n\n## Metadata\n\nThe artefact set for T3 is the seven mandatory Phase A–D artefacts on the delivery track (track v2): the Stakeholder map, the Driver/goal/objective, the Requirements catalog and the Solution concept at phase a, plateau psa, and the Business capability map, the Data entity catalog and the Technology standards at phases b, c and d, plateau hld. Each carries an authored body dated 2026-11-26; the owner is the programme architect under the #526 rework delegation, the reviewer is the Architecture Board, and the subject is project 01a1d039-0d33-7915-8833-75f4dc31cc07.\n\n## Entries\n\nThe set is seven rows in the order the standard seeds them: Stakeholder map — PM job (matrix), Driver/goal/objective — PM job (catalog), Requirements catalog — PM job (catalog), Solution concept — PM job (diagram), Business capability map — PM job (diagram), Data entity catalog — PM job (catalog) and Technology standards — PM job (catalog). Each carries its own entries: six stakeholders, six drivers, ten requirements, fourteen components and edges, seven capabilities, ten entities and eight standards.\n\n## Links\n\nThe typed edges are: the driver catalogue derives from the stakeholder map; the requirements catalogue derives from the driver catalogue; the solution concept realizes the requirements catalogue; the capability map derives from the solution concept and the requirements catalogue; the data entity catalogue derives from the capability map and the solution concept; and the technology standards derive from the data entity catalogue. Every edge names another artefact of this pack, so no artefact is an orphan.\n\n## Document\n\nThe index is the architecture-artifact page the artefact standard reads. The published architecture artefact index output 01a216d0-69ec-7512-85db-3a22b7b00241, the project baseline output 01a216d0-5ef9-727f-b871-7299002d59dc, the Statement of Architecture Work output 01a216d0-6426-71c2-8b3d-7d6e6e590ef5, the project registers output 01a216d0-715a-739c-b8eb-f647e10a6d49, the project WBS output 01a216d0-7472-7303-864c-ebdb2741eb98, the change-control output 01a216d0-7899-75c3-9a53-c98057188635, the compliance review output 01a216d0-79a2-77cb-b032-d8860bd8c1d1 and the delivery contract output 01a216d0-7ac1-73af-b2e3-2cd4987654dc were published on 2026-11-26; this index is the retrospective page authored over the record the factory writes from this pack."
+    }
+  ],
+  "registers": {
+    "risk": [
+      {
+        "title": "A gate can still be self-approved if the approver identity is reused",
+        "code": "R-T3-01",
+        "body": "The T3 gate says a PM cannot approve its own gate, and the closure gate recorded for the project was decided by a distinct approver. The risk is that a later run assigns the requester's identity to the approver slot or treats a requester-authored decision as an approval. The control is the approval record itself: both identities are stored and compared, and a self-decision is refused rather than repaired. This retrospective row keeps the control live after the 2026-11-26 rework.",
+        "status": "open",
+        "severity": "high",
+        "probability": "low",
+        "impact": 5,
+        "review_at": "2026-12-17",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/SPEC_V2.md#12 — the T3 gate",
+            "docs/evidence/rework/T3.json — the closure_gate check"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "An in-place baseline edit would erase the agreed scope",
+        "code": "R-T3-02",
+        "body": "The scope baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa is approved and frozen. The risk is that a later change edits the frozen row or a downstream run treats the baseline as a working draft. The control is the change request: a change is requested, approved and recorded as a supersession, so the old baseline remains readable and the new one carries its own approval. This row records the risk and the control as of 2026-11-26.",
+        "status": "open",
+        "severity": "high",
+        "probability": "low",
+        "impact": 4,
+        "review_at": "2026-12-17",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/SPEC_V2.md#12 — a baseline change requires a change request",
+            "the approved scope baseline, kind scope, taken 2026-11-26"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "The rework could drift into new scope",
+        "code": "R-T3-03",
+        "body": "The tranche-3 review reopened T3 to complete the record, not to add scope, and the project meta carries that reason. The risk is that a retrospective pack grows into a feature request, a redesign of the PM job or a second delivery of the T1 plan spine. The control is the boundary this pack states and the change-control record: the pack authors the governance record and the seven A–D artefacts, and it adds no feature. This row records the risk on 2026-11-26.",
+        "status": "open",
+        "severity": "medium",
+        "probability": "medium",
+        "impact": 3,
+        "review_at": "2026-12-17",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/evidence/rework/T3.json — the reopen reason",
+            "docs/SPEC_V2.md#12 — the T3 row"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "The retrospective record cannot replay each PM run",
+        "code": "R-T3-04",
+        "body": "This pack reconstructs the governance record from the snapshot facts, the SPEC_V2 row and the existing receipt; it does not carry a transcript of every PM run that preceded the rework. The risk is that a later reader treats the reconstructed record as a replay of each execution. The control is the honest gap stated in the evidence output and the closure review, and the dated receipt that remains beside the pack. This row records the residual on 2026-11-26.",
+        "status": "open",
+        "severity": "medium",
+        "probability": "high",
+        "impact": 2,
+        "review_at": "2026-12-17",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/evidence/rework/T3.json — the existing receipt",
+            "docs/SPEC_V2.md#12 — the T3 row"
+          ],
+          "decisions": []
+        }
+      }
+    ],
+    "issue": [
+      {
+        "title": "The tranche-3 review closed T3 without a live delivery contract or a Phase-G review",
+        "code": "I-T3-01",
+        "body": "The receipt docs/evidence/rework/T3.json failed T3-contract with no live board-approved delivery contract and T3-review with no Phase-G compliance review for a live contract. The project had a published delivery-contract document and a published compliance-review document, but the live contract row and the review attached to it were absent. The 2026-11-26 rework closes the gap: the factory requests and approves the delivery contract from this pack and records the Phase-G review against it.",
+        "status": "closed",
+        "severity": "high",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/evidence/rework/T3.json — T3-contract and T3-review",
+            "docs/SPEC_V2.md#12 — the T3 row"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "A published delivery-contract document was mistaken for the live contract row",
+        "code": "I-T3-02",
+        "body": "The snapshot lists a delivery-contract output 01a216d0-7ac1-73af-b2e3-2cd4987654dc among the published outputs while the live contracts list was empty and the receipt's contract check failed. A document of the delivery-contract category and a live board-approved contract are two records, and the first does not satisfy the close gate. The 2026-11-26 rework creates the live row; this issue records the distinction so a later reader does not read the published page as the contract.",
+        "status": "closed",
+        "severity": "medium",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/evidence/rework/T3.json — T3-contract",
+            "the published delivery contract output of 2026-11-26"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "The mandatory artefact packages and the seed-live drift kept the project red",
+        "code": "I-T3-03",
+        "body": "The receipt also failed T3-artefact-standard on the mandatory artefact packages and T3-rework on unresolved P0/P1 packages including seed_live_drift:T3. The packages are record work rather than missing code: this pack authors the artefacts, the registers, the contract, the review and the outputs the standard reads. The seed-live drift is closed by the factory's live publish of this record, not by the pack alone, so the issue stays open until that publish is recorded.",
+        "status": "open",
+        "severity": "medium",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/evidence/rework/T3.json — T3-artefact-standard and T3-rework",
+            "docs/SPEC_V2.md#12 — the T3 row"
+          ],
+          "decisions": []
+        }
+      }
+    ],
+    "assumption": [
+      {
+        "title": "The approver recorded on the baseline remains distinct from the PM requester",
+        "code": "A-T3-01",
+        "body": "The scope baseline is approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, and the closure gate recorded for T3 was decided by an approver distinct from its requester. The assumption is that this separation continues to hold for the delivery contract and the Phase-G review the factory records from this pack. If the same identity were used on both sides, the gate's own rule would be violated even if the decision were otherwise sound. Recorded retrospectively on 2026-11-26.",
+        "status": "open"
+      },
+      {
+        "title": "The scope baseline taken on 2026-11-26 is the agreed scope and the rework adds none",
+        "code": "A-T3-02",
+        "body": "The baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa was taken on 2026-11-26 after the project was reopened the same day. The assumption is that it records the scope already agreed for T3, not a new scope authored to make the rework pass. The reopen reason names the missing contract, review and baseline record rather than new features, and this pack repeats that boundary without enlarging it. Recorded retrospectively on 2026-11-26.",
+        "status": "open"
+      },
+      {
+        "title": "The PM job's build is what closed issue #74, and the rework reconstructs its record",
+        "code": "A-T3-03",
+        "body": "The project meta records measured_status built and issue #74 is closed, while the receipt is red on record checks. The assumption is that the build itself is complete and the red checks describe a governance record that was never written, not a feature that never shipped. This pack therefore authors the lifecycle record over the built capability. If the build itself were incomplete, the rework's level would be wrong; the distinction is recorded rather than hidden. Recorded retrospectively on 2026-11-26.",
+        "status": "open"
+      }
+    ],
+    "dependency": [
+      {
+        "title": "T3 needs T2's decision ladder and the P0 platform before a request can run end to end",
+        "code": "D-T3-01",
+        "body": "The project meta records depends_on as T2 with kind needs and P0 with kind needs. The PM job routes approvals and records decisions, so it reads the decision ladder rather than re-implementing a second policy engine, and it runs on the platform P0 establishes. The dependency is one way: T3 consumes those records and does not modify their scope. Recorded retrospectively on 2026-11-26.",
+        "status": "open"
+      },
+      {
+        "title": "The PM job reads the T1 plan spine",
+        "code": "D-T3-02",
+        "body": "The SPEC_V2 delivery plan orders T0 to T1 to T2 to T3, and T1 supplies the plan spine the PM job writes through: wbs_node, project_baseline, project_register_item and project_dependency. The meta's dependency list names T2 and P0 directly, while the plan sequence places T1 beneath them. This row records the plan-level dependency so the relation is not lost because it is implicit in the sequence. Recorded retrospectively on 2026-11-26.",
+        "status": "open"
+      },
+      {
+        "title": "T4, T9/T10 and T18 depend on the closed PM job",
+        "code": "D-T3-03",
+        "body": "The SPEC_V2 dependency line places T4 after T3, T9 and T10 after T1 and T3, and T18 after T0, T1, T2 and T3. Those slices consume the project, gate and closure records the PM job produces. The dependency runs from T3 outward: a change to the PM job's gate vocabulary or closure outputs is felt by every consumer, so the record is frozen before those slices build on it. Recorded retrospectively on 2026-11-26.",
+        "status": "open"
+      }
+    ],
+    "benefit": [
+      {
+        "title": "Every gate decision is taken by someone other than the requester",
+        "code": "B-T3-01",
+        "body": "The PM job stores both the requester and the approver on every gate and refuses a decision by the requester. The benefit is structural: a PM cannot certify its own work, and a reviewer can see from one record who asked and who decided. The closure gate recorded for T3 already shows the separation, and the delivery contract and Phase-G review the factory records from this pack inherit the same rule. Recorded retrospectively on 2026-11-26.",
+        "status": "open",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/SPEC_V2.md#12 — the T3 gate",
+            "docs/evidence/rework/T3.json — the closure_gate check"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "A baseline change is auditable as a change request rather than an edit",
+        "code": "B-T3-02",
+        "body": "The scope baseline is approved once and frozen, and any later change is requested, approved and recorded as a supersession. The benefit is that the agreed scope remains readable after it changes: an auditor can compare the old baseline with the new one and see the approval between them, instead of finding a row whose fields were quietly rewritten. The change-control output is part of the published record for the project. Recorded retrospectively on 2026-11-26.",
+        "status": "open",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/SPEC_V2.md#12 — a baseline change requires a change request",
+            "docs/evidence/rework/T3.json — the project checks"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "A project closes only with a contract, a review and its declared outputs",
+        "code": "B-T3-03",
+        "body": "The tranche-3 review exposed a project closed without its live contract and Phase-G review, and the receipt kept the gap visible instead of waiving it. The benefit of the rework is that closure now reads a complete record: the contract, the review, the seven A–D artefacts, the registers, the baseline, the project-brief, the evidence and the closure review. A future closure that lacks one of them fails a named check rather than disappearing into a green summary. Recorded retrospectively on 2026-11-26.",
+        "status": "open",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/evidence/rework/T3.json — the failed checks",
+            "docs/SPEC_V2.md#12 — the T3 row"
+          ],
+          "decisions": []
+        }
+      }
+    ]
+  },
+  "delivery_contract": {
+    "title": "Delivery contract — T3 PM job (retrospective, 2026-11-26)",
+    "body": {
+      "commitments": "Deliver the PM job of SPEC_V2 §12 as one governed project: a charter that fixes the scope, a WBS whose deliverable carries the four WSJF inputs 8, 8, 5, 3, the approved scope baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa, a staffing plan with a named owner per deliverable, a gate router that records every decision against an approver distinct from the requester, a change request for every baseline change, and a closure that publishes the project-brief, the evidence and the closure-review. The contract also commits the seven Phase A–D artefacts and the five-kind project register this pack authors.",
+      "compliance": "The Phase-G review recorded from this pack carries the level compliant against this contract: the baseline is approved, the closure gate is recorded by a distinct approver, issue #74 is closed and the declared outputs are published. No waiver is recorded. The pre-rework receipt docs/evidence/rework/T3.json is red on contract, review, artefact standard and rework resolution; this pack is the record that closes those gaps, and the review states that history rather than hiding it.",
+      "approval": "The scope baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa (kind scope, taken 2026-11-26) is approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545. This delivery contract is requested and approved through the same board gate by the approver identity the factory records, and the gate rule keeps that approver distinct from the requester: the closure gate recorded for T3 was decided by a distinct approver. The rework runs under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.",
+      "capacity": "The unit is one WBS deliverable, The PM job and its gate record, with WSJF inputs business value 8, time criticality 8, risk reduction 5 and job size 3, as the tranche-3 PI plan records. The work spans the charter, the WBS, the baseline, staffing, gate routing, change control and closure, all inside one tranche-3 unit.",
+      "acceptance": "Acceptance is executable: a PM runs a request end to end; the PM cannot approve its own gate; a baseline change requires a change request. The close gate additionally reads the declared outputs project-brief and evidence, the closure-review output, the seven A–D artefacts, the five register kinds, the approved baseline, the WSJF inputs 8, 8, 5, 3, a demo credit per accepted deliverable and a tranche lesson. This content pack is checked offline by scripts/rework-content-check.py --project T3 --wsjf 8,8,5,3 --closes true before the factory writes anything.",
+      "evidence": "The evidence route is the published outputs recorded in the snapshot: the evidence 01a1ee73-db2e-76b5-8c92-076f14dc94ec, the project brief 01a216d0-68e5-764d-92af-9864ddae5127, the closure review 01a216d0-6635-720e-84e9-005ba604d06f, the architecture artefact index 01a216d0-69ec-7512-85db-3a22b7b00241, the project registers 01a216d0-715a-739c-b8eb-f647e10a6d49, the project WBS 01a216d0-7472-7303-864c-ebdb2741eb98 and the delivery contract output 01a216d0-7ac1-73af-b2e3-2cd4987654dc; the governance record is the scope baseline, the Phase-G review the factory records and the rework receipt docs/evidence/rework/T3.json.",
+      "manifest": "acceptance/programme/T3.toml",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "retrospective": true
+    }
+  },
+  "wbs_deliverable": {
+    "title": "The PM job and its gate record",
+    "business_value": 8,
+    "time_criticality": 8,
+    "risk_reduction": 5,
+    "job_size": 3
+  },
+  "review": {
+    "level": "compliant",
+    "findings": "This retrospective Phase-G review, dated 2026-11-26, records the level compliant against the delivery contract created from this pack. The PM job is recorded as built under closed issue #74: the scope baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa is approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545 on 2026-11-26, the closure gate recorded for T3 was decided by an approver distinct from its requester, the charter gate is approved, the closure-review output 01a216d0-6635-720e-84e9-005ba604d06f is published, the WBS deliverable carries WSJF 8, 8, 5, 3, the accepted deliverables carry demo credits, the tranche-3 retro carries a lesson, and no open P0 product finding remains. The pre-rework receipt docs/evidence/rework/T3.json was red: no live board-approved delivery contract, no Phase-G compliance review for a live contract, the mandatory artefact packages open and unresolved P0/P1 rework packages including seed_live_drift:T3. This pack supplies the authored record — charter, Statement of Architecture Work, the seven A–D artefacts, the five register kinds, the delivery contract, the WBS deliverable, the project-brief, the evidence, the closure and this review — and the factory writes it as live rows. The review therefore records compliant on the completed record while naming the pre-rework gap and the one residual: the seed-live drift is closed by the factory's live publish, not by the pack alone.",
+    "evidence": {
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "scope_baseline": "01a216d0-9c9b-7c8c-a6ef-0d9365632efa",
+      "baseline_approver": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "project": "01a1d039-0d33-7915-8833-75f4dc31cc07",
+      "acceptance_manifest": "acceptance/programme/T3.toml",
+      "rework_receipt": "docs/evidence/rework/T3.json",
+      "tranche_review": "01a216d0-d634-738e-985a-00a85cfd48d9",
+      "issue": "https://github.com/nonagenticai/conveyor/issues/74"
+    }
+  },
+  "project_brief_output": "# Project brief — T3 PM job (retrospective, 2026-11-26)\n\n## Outcome\n\nT3 delivered the PM job of SPEC_V2 §12: a PM runs a project request end to end through charter, WBS, baseline, staffing, gate routing and closure; the PM cannot approve a gate it raised; and a baseline change requires a change request. The build is recorded as measured_status built under closed issue #74, and the 2026-11-26 rework completes the governance record around it — the seven A–D artefacts, the delivery contract, the WBS deliverable, the five register kinds, the Phase-G review, the project-brief, the evidence and the closure review.\n\n## Boundary\n\nOut of scope: the T2 decision ladder's policy engine, which the PM job reads rather than re-implements; the T4 kanban coach, the T5 kata and the T13 tool platform; the T1 plan spine's implementation, which T1 owns; and every V1 slice, which the V2 plan does not re-open. The rework adds no feature: the tranche-3 review reopened the project to complete the contract, review and baseline record, and this pack stays inside that reason. A second PM job, a second baseline or a second policy engine would be a scope breach, not a rework.\n\n## Reuse sources\n\nThe PM job reuses the plan spine T1 establishes — wbs_node, project_baseline, project_register_item and project_dependency — and the decision records T2 produces rather than inventing a second approval store. It reuses the existing approved scope baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa and the published outputs the snapshot already carries: the evidence 01a1ee73-db2e-76b5-8c92-076f14dc94ec, the project brief 01a216d0-68e5-764d-92af-9864ddae5127, the closure review 01a216d0-6635-720e-84e9-005ba604d06f and the architecture artefact index 01a216d0-69ec-7512-85db-3a22b7b00241. The retrospective record also reuses the existing receipt docs/evidence/rework/T3.json as its honest statement of what was missing.\n\n## Inception units\n\nThe project is its own inception unit: the plan is docs/SPEC_V2.md#12, the T3 row is the analysis the work starts from, and issue #74 is the claim that closed with the build. The tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9 decided continue on 2026-11-26, and the project was reopened the same day because the record lacked its live contract, its Phase-G review and its baseline. The retrospective reconstitutes the MSP/TOGAF lifecycle over that build — charter, Statement of Architecture Work, seven A–D artefacts, delivery contract, WBS deliverable, review, outputs and closure — rather than re-running the build itself.\n\n## Dependencies\n\nThe project meta records depends_on as T2 with kind needs and P0 with kind needs; the SPEC_V2 delivery sequence also places T1 beneath T3, because the PM job writes through the plan spine. Downstream, T4 depends on T3, T9 and T10 depend on T1 and T3, and T18 depends on T0, T1, T2 and T3, so a change to the PM job's gate vocabulary or closure outputs is felt by every consumer. In governance the project depends on the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 and on the approved scope baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa.\n\n## Acceptance\n\nThe gate in SPEC_V2 §12 is executable: a PM runs a request end to end; the PM cannot approve its own gate; a baseline change requires a change request. The close gate reads the declared outputs project-brief and evidence, the closure-review output, a live board-approved delivery contract, a Phase-G review citing the standing delegation, the approved baseline, the seven A–D artefacts, the five register kinds, WBS inputs 8, 8, 5, 3, a demo credit per accepted deliverable and a tranche lesson. The pre-rework receipt was red on contract, review, artefact standard and rework resolution; this pack is the authored record the factory writes to close those checks, and scripts/rework-content-check.py --project T3 checks it offline first.\n\n## Capabilities\n\nThe PM job exercises seven capabilities: chartered execution, sized decomposition with four WSJF inputs, a frozen scope baseline, staffed delivery with a named owner per deliverable, independent gate routing that keeps the approver distinct from the requester, controlled change through a change request, and complete closure on a live contract, a Phase-G review and the declared outputs. Each capability leaves a named record: the charter asset, the WBS node, the baseline, the staffing assignment, the gate decision, the change-control row and the published outputs.\n\n## Plan\nThe plan is docs/SPEC_V2.md#12. The build closed issue #74 with measured_status built; the tranche-3 review on 2026-11-26 reopened the project because the governance record lacked its contract, review and baseline; the 2026-11-26 retrospective rework authors this pack, and the factory writes the artefacts, registers, contract, review, baseline acceptance and closure from it. The brief records that sequence and does not claim a fresh implementation of the PM job or a re-measurement of its original runs.\n",
+  "evidence_output": "# Evidence — T3 PM job (retrospective, 2026-11-26)\n\n## Claim\n\nT3 delivered the PM job of SPEC_V2 §12: a PM runs a project request end to end; the PM cannot approve its own gate; a baseline change requires a change request. The project is recorded as built under closed issue #74, and the 2026-11-26 rework completes the governance record around it — the charter, the seven A–D artefacts, the scope baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa, the delivery contract, the five register kinds, the WBS deliverable, the Phase-G review, the project-brief, the evidence and the closure review.\n\n## Evidence\nThe snapshot carries the approved scope baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa, of kind scope, taken on 2026-11-26 and approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545. The published outputs are the evidence 01a1ee73-db2e-76b5-8c92-076f14dc94ec, the project brief 01a216d0-68e5-764d-92af-9864ddae5127, the closure review 01a216d0-6635-720e-84e9-005ba604d06f, the architecture artefact index 01a216d0-69ec-7512-85db-3a22b7b00241, the project registers 01a216d0-715a-739c-b8eb-f647e10a6d49, the project WBS 01a216d0-7472-7303-864c-ebdb2741eb98, the change-control record 01a216d0-7899-75c3-9a53-c98057188635 and the delivery-contract page 01a216d0-7ac1-73af-b2e3-2cd4987654dc. Issue #74 is closed, and the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9 decided continue on 2026-11-26.\n\n## Verification\nThe T3 gate is checked by the record: the closure gate was decided by an approver distinct from its requester, the baseline is approved, the charter gate is approved, the WBS deliverable carries 8, 8, 5, 3, the accepted deliverables carry demo credits, the tranche retro carries a lesson, and no open P0 product finding remains. The pre-rework receipt docs/evidence/rework/T3.json, generated 2026-11-25, was red on T3-contract, T3-review, T3-artefact-standard and T3-rework, and this pack is the authored record that supplies those rows. The pack itself is checked offline by scripts/rework-content-check.py --project T3 --wsjf 8,8,5,3 --closes true before the factory performs any live write; the live checks are read back after the factory run, not asserted here.\n\n## Links\nThe governance record is the delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, the project 01a1d039-0d33-7915-8833-75f4dc31cc07, the approved scope baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa, the tranche-3 row 01a1e9e0-eb54-74d8-a2b5-44fb2b87eb52 and the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9. The plan is docs/SPEC_V2.md#12 and the issue is nonagenticai/conveyor#74. The existing receipt docs/evidence/rework/T3.json remains beside this pack as the statement of what the rework had to close.\n\n## Gap\n\nTwo limits are recorded and neither is closed by the pack alone. First, the record is reconstructed from the snapshot facts, the SPEC_V2 row and the existing receipt; it does not replay each PM run that preceded the rework, so it evidences the lifecycle record rather than every execution step. Second, the pre-rework receipt also carried seed_live_drift:T3, which is closed by the factory's live publish of this record rather than by the authored pack; until that publish is recorded, the drift stays visible instead of being declared green.\n",
+  "closure": "# Closure — T3 PM job (retrospective, 2026-11-26)\n\nT3 re-closes through the one gate on the record the snapshot carries: the approved scope baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa, the closure gate decided by an approver distinct from its requester, closed issue #74, and the published evidence, project brief, closure review, architecture artefact index, project registers and project WBS outputs of 2026-11-26. The 2026-11-26 rework adds the record the tranche-3 review found missing — the live delivery contract, the Phase-G review, the seven A–D artefacts and the five register kinds — and re-records the closure on them. It keeps one item visible rather than closed: the pre-rework receipt was red, and the seed-live drift it named is cleared by the factory's live publish, not by this pack.\n",
+  "closure_review": "# Closure review — T3 PM job (retrospective, 2026-11-26)\n\n## Outcome vs acceptance\n\nThe outcome the charter records is the PM job of SPEC_V2 §12: a PM runs a request end to end, cannot approve its own gate, and a baseline change requires a change request. The record supports it: the build is recorded as measured_status built under closed issue #74, the scope baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa is approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, the closure gate was decided by an approver distinct from its requester, the charter gate is approved, and the declared outputs project-brief, evidence and closure-review are published. Against that, the pre-rework receipt docs/evidence/rework/T3.json was red on contract, review, artefact standard and rework resolution; this pack supplies the rows those checks read, so the acceptance is met on the completed record rather than on the earlier red one.\n\n## Evidence\nThe evidence is the snapshot record: the project 01a1d039-0d33-7915-8833-75f4dc31cc07, the approved scope baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa with its approver, closed issue #74, the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9 and the published outputs of 2026-11-26 — evidence 01a1ee73-db2e-76b5-8c92-076f14dc94ec, project brief 01a216d0-68e5-764d-92af-9864ddae5127, closure review 01a216d0-6635-720e-84e9-005ba604d06f and architecture artefact index 01a216d0-69ec-7512-85db-3a22b7b00241. The seven A–D artefacts, the five register kinds, the delivery contract and the WBS deliverable are the records this pack authors and the factory writes; the rework receipt remains the statement of what was missing before them.\n\n## Open items\n\nTwo items remain visible. First, the record is reconstructed from the snapshot facts, the SPEC_V2 row and the existing receipt; it does not replay each PM run that preceded the rework, so it evidences the lifecycle and its gate decisions rather than every execution step. Second, the pre-rework receipt named seed_live_drift:T3 among its unresolved P0/P1 packages; the factory's live publish of this record clears it, and this review does not claim that publish has already happened. Neither item is a scope gap, and neither is waived: both are stated as limits of the retrospective record.\n\n## Decision\nThe retrospective decision is to close T3 on the record the rework completes, at the level compliant that the Phase-G review records against the delivery contract this pack authors, with the pre-rework red receipt and the seed-live drift named rather than hidden. The decision is dated 2026-11-26 and rests on the approved baseline, the distinct closure approver, closed issue #74 and the published outputs; it does not add scope, does not reclassify any earlier row, and does not assert a re-measurement of the PM job's original runs. The project closes with the record it now carries, and the durable correction is that a closure without a contract, a Phase-G review and its declared outputs is refused before it can read green.\n"
+}

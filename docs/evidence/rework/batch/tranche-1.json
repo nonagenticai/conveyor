@@ -1,0 +1,34 @@
+{
+  "blocked": 0,
+  "generated_at": "2026-11-26T13:07:07+00:00",
+  "green": 3,
+  "members": [
+    {
+      "factory_exit": 0,
+      "gaps": [],
+      "key": "S02",
+      "log": "docs/evidence/rework/batch/tranche-1/S02.log",
+      "publish_exit": 1,
+      "state": "RECEIPT_GREEN"
+    },
+    {
+      "factory_exit": 0,
+      "gaps": [],
+      "key": "T1",
+      "log": "docs/evidence/rework/batch/tranche-1/T1.log",
+      "publish_exit": 1,
+      "state": "RECEIPT_GREEN"
+    },
+    {
+      "factory_exit": 0,
+      "gaps": [],
+      "key": "T11",
+      "log": "docs/evidence/rework/batch/tranche-1/T11.log",
+      "publish_exit": 1,
+      "state": "RECEIPT_GREEN"
+    }
+  ],
+  "red": 0,
+  "snapshot_sha": "7796da7f0b839f31fe1c331ee3f2c21d089fc8f0",
+  "tranche": 1
+}

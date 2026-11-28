@@ -1,0 +1,49 @@
+{
+ "artifact_kind": "catalog",
+ "artifact_type_id": "01a1f2c1-1406-747c-a7e8-b30353a58eaf",
+ "contract_id": "01a20a8b-b32c-7185-808f-8ea0b4c5ec46",
+ "entries": [
+  {
+   "axis_a": "D1 Procedure knowledge is free text",
+   "axis_b": "G1 Ingested, typed procedure drafts",
+   "value": {
+    "objective": "A real SOP, OWL file or BPMN diagram becomes a draft procedure through procedures.ingest_*."
+   }
+  },
+  {
+   "axis_a": "D2 A drafting job could publish its own output",
+   "axis_b": "G2 Human publication gate",
+   "value": {
+    "objective": "Publishing requires a human decision; the drafting job cannot publish its own procedure."
+   }
+  },
+  {
+   "axis_a": "D3 Re-ingest forked the published row",
+   "axis_b": "G3 Versioned re-ingest",
+   "value": {
+    "objective": "A re-ingest creates the next draft version; the published row keeps its source and pack."
+   }
+  },
+  {
+   "axis_a": "D4 An unreviewed source could bind a job",
+   "axis_b": "G4 Reviewed sources only",
+   "value": {
+    "objective": "A bound job runs the PDDL steps; an unreviewed source never binds."
+   }
+  }
+ ],
+ "meta": {
+  "author": "conveyor-e2e",
+  "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+  "recorded_on": "2026-11-23",
+  "retrospective": true,
+  "reviewer": "conveyor-approver",
+  "unit": "526"
+ },
+ "phase_code": "a",
+ "plateau": "psa",
+ "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+ "purpose": "Why the capability exists, in the programme's own terms.",
+ "scope": "T16",
+ "title": "Driver, goal and objective catalogue \u2014 T16 procedure ingestion (retrospective, 2026-11-23)"
+}

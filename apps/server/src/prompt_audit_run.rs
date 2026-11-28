@@ -149,6 +149,7 @@ pub async fn run(
         correlation_id: Some(format!("prompt_audit:{audit_id}")),
     });
     let request = InvokeRequest {
+        credential_alias: None,
         action: "completions.create".to_owned(),
         input: json!({
             "model": audit.target_model,

@@ -8,7 +8,9 @@
 //! `$ref`-resolved operation and from the MCP tool, so the claim is checkable and not a
 //! comment.
 
+use std::borrow::Cow;
 use std::collections::BTreeMap;
+use std::sync::Arc;
 
 use conveyor_auth::{Role, Session};
 
@@ -18,6 +20,38 @@ use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 
 pub use schemars::Schema;
+
+/// A schema projection: `schema_for!` in the `#[action]` expansion, or the stored document an
+/// imported action carries.
+///
+/// The compiled variant stays a function pointer so the 600 compiled actions allocate nothing
+/// until a schema is projected; the imported variant is the tenant's approved stored document.
+#[derive(Clone)]
+pub enum SchemaRef {
+    /// A compiled action's `schema_for!` projection.
+    Compiled(SchemaFn),
+    /// An imported action's stored JSON schema.
+    Imported(Arc<Value>),
+}
+
+impl SchemaRef {
+    /// The schema as JSON, the value every surface embeds.
+    pub fn json(&self) -> Value {
+        match self {
+            Self::Compiled(project) => schema_json(project()),
+            Self::Imported(document) => (**document).clone(),
+        }
+    }
+}
+
+impl std::fmt::Debug for SchemaRef {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Compiled(_) => write!(f, "SchemaRef::Compiled"),
+            Self::Imported(_) => write!(f, "SchemaRef::Imported"),
+        }
+    }
+}
 
 /// A schema projection: `schema_for!` in the `#[action]` expansion.
 pub type SchemaFn = fn() -> Schema;
@@ -668,7 +702,7 @@ pub type HandlerFuture<'a> = std::pin::Pin<
 pub type HandlerFn = for<'a> fn(&'a mut sqlx::PgConnection, HandlerCtx, Value) -> HandlerFuture<'a>;
 
 /// Where the work happens.
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub enum HandlerRef {
     /// A compiled handler in this binary.
     Internal(HandlerFn),
@@ -676,16 +710,16 @@ pub enum HandlerRef {
     /// the base URL is configuration (`<SERVICE>_URL`), never compiled in.
     External {
         /// The service key (`fixtures`).
-        service: &'static str,
+        service: Cow<'static, str>,
         /// The HTTP method the operation uses.
-        method: &'static str,
+        method: Cow<'static, str>,
         /// The operation path.
-        path: &'static str,
+        path: Cow<'static, str>,
         /// The name of a per-tenant sealed secret whose value is sent as the bearer. `None`
         /// for an unauthenticated service. The engine opens it under the caller's tenant; a
         /// missing secret is a typed `503`, never an unauthenticated call — unless
         /// `auth_optional` is set.
-        auth: Option<&'static str>,
+        auth: Option<Cow<'static, str>>,
         /// When true, an absent secret sends **no** bearer instead of refusing with a `503`.
         /// It is for services with a tenant-BYO credential: the tenant may have registered one
         /// (`secrets.create`/`rotate`), and the service itself is the one that decides whether
@@ -835,18 +869,20 @@ pub type ApprovalTarget = fn(&serde_json::Value) -> Result<String, String>;
 /// One invocable operation. Exactly §5.1's fields.
 #[derive(Clone, Debug)]
 pub struct ActionSpec {
-    /// `<plural resource>.<verb>`, exactly one dot (CONTRACT §6).
-    pub name: &'static str,
+    /// `<plural resource>.<verb>`, exactly one dot (CONTRACT §6). Borrowed for a compiled
+    /// action, owned for an imported one.
+    pub name: Cow<'static, str>,
     /// The integer version; not part of the name.
     pub version: u32,
     /// Internal, external or workflow.
     pub kind: ActionKind,
-    /// The request schema (schemars).
-    pub input: SchemaFn,
-    /// The response schema (schemars).
-    pub output: SchemaFn,
-    /// The scopes a caller must hold (all of them).
-    pub scopes: &'static [Scope],
+    /// The request schema (schemars, or the imported document).
+    pub input: SchemaRef,
+    /// The response schema (schemars, or the imported document).
+    pub output: SchemaRef,
+    /// The scopes a caller must hold (all of them). Empty for an imported action: the tenant's
+    /// approve gate is its control.
+    pub scopes: Cow<'static, [Scope]>,
     /// Whether replaying the same key is safe.
     pub idempotent: bool,
     /// The caller's deadline, in milliseconds.
@@ -885,17 +921,26 @@ impl ActionSpec {
     /// The input schema as JSON (the same value the OpenAPI operation and the MCP tool
     /// carry).
     pub fn input_schema(&self) -> Value {
-        schema_json((self.input)())
+        self.input.json()
     }
 
     /// The output schema as JSON.
     pub fn output_schema(&self) -> Value {
-        schema_json((self.output)())
+        self.output.json()
     }
 
     /// `[<scope>, …]` in declaration order.
-    pub fn scope_names(&self) -> Vec<&'static str> {
+    pub fn scope_names(&self) -> Vec<&str> {
         self.scopes.iter().map(|s| s.as_str()).collect()
+    }
+
+    /// The name as a `&'static str`: a compiled action borrows it; an imported name is interned
+    /// once per distinct value (bounded by the tenant's approved registry).
+    pub fn static_name(&self) -> &'static str {
+        match &self.name {
+            Cow::Borrowed(name) => name,
+            Cow::Owned(_) => crate::resolve::intern_name(&self.name),
+        }
     }
 
     /// The MCP tool name: `.` → `_` (CONTRACT §6). Not injective; the registry asserts it.
@@ -952,7 +997,7 @@ impl ActionSpec {
     /// floor is computed from this spec's own declaration, never from the role table, so a
     /// channel's `kata_executor` membership cannot widen a grant.
     pub fn permits_channel(&self, authority: &conveyor_auth::ChannelAuthority) -> bool {
-        !self.machine_forbidden() && crate::channel::allows(authority, self.name)
+        !self.machine_forbidden() && crate::channel::allows(authority, &self.name)
     }
 
     /// Whether this action is closed to **every** machine channel, whatever a tenant stores.
@@ -965,8 +1010,8 @@ impl ActionSpec {
         self.scopes
             .iter()
             .any(|scope| crate::channel::is_denied_scope(scope.as_str()))
-            || crate::channel::is_denied_action(self.name)
-            || crate::channel::is_denied_resource(crate::channel::resource_of(self.name))
+            || crate::channel::is_denied_action(&self.name)
+            || crate::channel::is_denied_resource(crate::channel::resource_of(&self.name))
     }
 
     /// The literal route path `POST /api/actions/<name>/invocations`.
@@ -1062,6 +1107,38 @@ pub fn mcp_collisions<'a>(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// A `serde_json::Value` field is ANY JSON: an object, an array, a scalar. The served
+    /// schema must admit all of them — a typeless schema with only a `default` must not be
+    /// read as "object or nothing" (v1-value-1: `architecture.reviews_record` refused a
+    /// findings array, the designed payload shape).
+    #[test]
+    fn a_value_typed_field_accepts_any_json() {
+        let spec = crate::registry::registry()
+            .get("architecture.reviews_record")
+            .expect("the review action is registered");
+        let schema = spec.input_schema();
+        let base = serde_json::json!({
+            "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+            "contract_id": "01a20271-2a37-7329-b159-28031ddcb966",
+            "level": "compliant",
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        });
+        for findings in [
+            serde_json::json!([]),
+            serde_json::json!([{"finding": "a", "evidence": ["x"]}]),
+            serde_json::json!({"a": 1}),
+            serde_json::json!("a string"),
+        ] {
+            let mut input = base.clone();
+            input["findings"] = findings.clone();
+            let errors = validate_input(&schema, &input);
+            assert!(
+                errors.is_empty(),
+                "findings {findings} must validate: {errors:?}"
+            );
+        }
+    }
 
     #[test]
     fn vocabularies_are_the_contract_spelling() {

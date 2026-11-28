@@ -1,0 +1,30 @@
+{
+ "cards": [
+  {
+   "archived_at": "2026-11-24T17:34:31.533771+00:00",
+   "id": "01a1ffeb-311e-708e-a994-83eb40fd3a69",
+   "lane": "archive",
+   "rework_key": "v1-w4a-1:T13"
+  },
+  {
+   "archived_at": "2026-11-24T17:30:33.764476+00:00",
+   "id": "01a1ffeb-3da6-7093-a936-be6c79576976",
+   "lane": "archive",
+   "rework_key": "v1-w4a-2:T13"
+  }
+ ],
+ "disposition": "already-applied",
+ "journal_entries": [
+  "card-move:01a1ffeb-311e-708e-a994-83eb40fd3a69:active",
+  "card-move:01a1ffeb-311e-708e-a994-83eb40fd3a69:done",
+  "card-move:01a1ffeb-3da6-7093-a936-be6c79576976:active",
+  "card-move:01a1ffeb-3da6-7093-a936-be6c79576976:done"
+ ],
+ "measured_at": "2026-11-25",
+ "note": "T13's live close gate reads the NON-archived intake pair 01a20e94-a9b1-78e3-b9d3-5774904ef9b0 / 01a20e94-c4bb-78de-a8ea-b733228371b7; those are moved to done with the resolved_by evidence before the close replays.",
+ "reason": "Each card reached the moves' done lane before it was stamped; the archive is the later, terminal truth. Re-invoking the moves asks an archived card to move and earns a correct 409 for a wrong request. The cards were not resurrected.",
+ "rule": "scripts/promote-record.py existing_for(cards.move): a stamped card supersedes any move whose target kind is not 'archive'.",
+ "schema": "conveyor-promotion-disposition/v1",
+ "self_test": "python3 scripts/promote-record.py --self-test -> 122 checks passed",
+ "subject": "the four cards.move replay refusals on the archived T13 pair"
+}

@@ -61,6 +61,54 @@ async fn create_project(running: &support::Running, title: &str) -> String {
     id_of(output(&body), "id")
 }
 
+/// A project inside a programme: only such a project's WBS nodes are the programme's outputs.
+async fn create_programme_project(
+    running: &support::Running,
+    programme: &str,
+    title: &str,
+) -> String {
+    let (status, body) = running
+        .invoke(
+            "projects.create",
+            "dev:alice",
+            json!({
+                "title": title,
+                "project_type_code": "delivery",
+                "programme_id": programme
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    id_of(output(&body), "id")
+}
+
+/// The output a benefits-map edge names: a `wbs_node` of the programme.
+async fn create_output(running: &support::Running, project: &str, title: &str) -> String {
+    let (status, body) = running
+        .invoke(
+            "wbs.create",
+            "dev:alice",
+            json!({
+                "project_id": project,
+                "kind": "deliverable",
+                "title": title,
+                "business_value": 3,
+                "time_criticality": 2,
+                "risk_reduction": 1,
+                "job_size": 2
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    id_of(output(&body), "id")
+}
+
 /// A job the benefit profile can name as its BCM owner (the completeness rule requires one).
 async fn create_owner_job(pg: &support::Pg, seeded: &support::Seeded) -> uuid::Uuid {
     let industry: uuid::Uuid = sqlx::query_scalar(
@@ -98,7 +146,9 @@ async fn create_benefit(
                 "baseline": {"value": 14},
                 "target": {"value": 8},
                 "measurement_method": "weekly timestamps",
-                "benefit_owner_job_id": job
+                "benefit_owner_job_id": job,
+                "capabilities": ["delivery"],
+                "operational_area": "delivery"
             }),
             None,
             None,
@@ -203,6 +253,8 @@ async fn benefit_update_requires_current_version() {
 async fn delete_benefit_cascades_links_and_transition() {
     let (pg, running, seeded) = fixture().await;
     let programme = create_programme(&running, "Cascade programme").await;
+    let project = create_programme_project(&running, &programme, "Cascade project").await;
+    let node = create_output(&running, &project, "T1 plan spine").await;
     let job = create_owner_job(&pg, &seeded).await;
     let (benefit, etag) = create_benefit(&running, &programme, job).await;
 
@@ -213,7 +265,7 @@ async fn delete_benefit_cascades_links_and_transition() {
             json!({
                 "programme_id": programme,
                 "benefit_id": benefit,
-                "output_ref": "T1 plan spine",
+                "output_ref": node,
                 "capability_ref": "WBS and baseline",
                 "operational_outcome": "the plan is managed",
                 "strategic_objective": "faster IT delivery"
@@ -281,6 +333,8 @@ async fn delete_benefit_cascades_links_and_transition() {
 async fn benefit_links_are_listable_and_removable() {
     let (pg, running, seeded) = fixture().await;
     let programme = create_programme(&running, "Map read programme").await;
+    let project = create_programme_project(&running, &programme, "Map read project").await;
+    let node = create_output(&running, &project, "T1 plan spine").await;
     let job = create_owner_job(&pg, &seeded).await;
     let (benefit, _etag) = create_benefit(&running, &programme, job).await;
 
@@ -291,7 +345,7 @@ async fn benefit_links_are_listable_and_removable() {
             json!({
                 "programme_id": programme,
                 "benefit_id": benefit,
-                "output_ref": "T1 plan spine",
+                "output_ref": node,
                 "capability_ref": "WBS and baseline",
                 "operational_outcome": "the plan is managed",
                 "strategic_objective": "faster IT delivery"
@@ -302,6 +356,7 @@ async fn benefit_links_are_listable_and_removable() {
         )
         .await;
     assert_eq!(status, 201, "{linked}");
+    assert_eq!(output(&linked)["output_ref"], node);
     let link = id_of(output(&linked), "id");
     let etag = headers
         .get("etag")
@@ -356,7 +411,7 @@ async fn benefit_links_are_listable_and_removable() {
 /// reviewed tranche cannot be deleted.
 #[tokio::test(flavor = "multi_thread")]
 async fn tranche_review_persists_decision_and_evidence() {
-    let (_pg, running, _seeded) = fixture().await;
+    let (pg, running, seeded) = fixture().await;
     let programme = create_programme(&running, "Review programme").await;
     let (tranche, etag) = create_tranche(&running, &programme, 0).await;
     // U4: a `continue` authorises the next tranche, so the plan needs one to authorise.
@@ -384,15 +439,20 @@ async fn tranche_review_persists_decision_and_evidence() {
         "{updated}"
     );
     let delegation = support::delegation_ref(&running, "dev:alice").await;
+    let mut evidence = support::tranche_review_evidence(
+        &pg,
+        &seeded,
+        uuid::Uuid::parse_str(&tranche).expect("tranche id"),
+    )
+    .await;
+    // v1-tr2-2: the review names the snapshot it judged.
+    evidence["snapshot_sha"] = json!("0123456789abcdef0123456789abcdef01234567");
+    let baseline = evidence["baselines"][0].clone();
     let input = json!({
         "id": tranche,
         "decision": "continue",
         "delegation_ref": delegation,
-        "evidence": {
-            "baselines": ["B0"],
-            "benefit_status": {"BEN-T": "tracking"},
-            "risk_register": ["risk-1"]
-        }
+        "evidence": evidence
     });
     let gate = support::review_gate(&running, "dev:alice", &input).await;
     let (status, reviewed) = running
@@ -417,14 +477,14 @@ async fn tranche_review_persists_decision_and_evidence() {
     assert_eq!(rows.len(), 1, "{reviews}");
     assert_eq!(rows[0]["tranche_id"], tranche);
     assert_eq!(rows[0]["decision"], "continue");
-    assert_eq!(rows[0]["evidence"]["baselines"][0], "B0");
+    assert_eq!(rows[0]["evidence"]["baselines"][0], baseline);
 
     let tranche_etag = format!("\"{review_version}\"");
     // #283: the gate fires before the handler, so the refusal under test is reached through one.
     let (status, refused) = running
         .invoke_gated(
-            &_pg,
-            _seeded.tenant,
+            &pg,
+            seeded.tenant,
             "tranches.delete",
             "dev:alice",
             json!({"id": tranche}),
@@ -513,7 +573,9 @@ async fn msp_deletes_and_refusals() {
             "wbs.create",
             "dev:alice",
             json!({
-                "project_id": project, "parent_id": parent_id, "kind": "work_package",
+                "project_id": project, "parent_id": parent_id, "kind": "deliverable",
+                // The test is the parent/child delete rule; the child's kind is incidental, and
+                // a `work_package` would owe a card (v1-p5-5).
                 "title": "Child", "business_value": 1, "time_criticality": 1,
                 "risk_reduction": 1, "job_size": 1
             }),
@@ -555,7 +617,20 @@ async fn msp_deletes_and_refusals() {
         .invoke_full(
             "registers.create",
             "dev:alice",
-            json!({"project_id": project, "kind": "risk", "title": "Indexed risk"}),
+            json!({
+                "project_id": project,
+                "kind": "risk",
+                "title": "Indexed risk",
+                "probability": "medium",
+                "impact": 3,
+                "owner_job_id": job,
+                "review_at": "2026-12-01",
+                "links": {
+                    "cards": [],
+                    "requirements": [{"kind": "objective", "ref": "reduce cycle time"}],
+                    "decisions": []
+                }
+            }),
             None,
             None,
             None,
@@ -575,7 +650,9 @@ async fn msp_deletes_and_refusals() {
                 "baseline": {"value": 1},
                 "target": {"value": 2},
                 "measurement_method": "weekly",
-                "benefit_owner_job_id": job
+                "benefit_owner_job_id": job,
+                "capabilities": ["delivery"],
+                "operational_area": "delivery"
             }),
             None,
             None,
@@ -670,7 +747,7 @@ async fn msp_deletes_and_refusals() {
 }
 
 /// P1.6 — a realization record cannot claim a post-transition measurement without a measured
-/// baseline.
+/// baseline, and the timestamp alone is not the reading: the `post` measurement must exist.
 #[tokio::test(flavor = "multi_thread")]
 async fn transition_requires_baseline_before_post() {
     let (pg, running, seeded) = fixture().await;
@@ -705,6 +782,7 @@ async fn transition_requires_baseline_before_post() {
             json!({
                 "benefit_id": benefit,
                 "baseline_measured_at": "2026-11-01T00:00:00Z",
+                "enacted_at": "2026-11-20T00:00:00Z",
                 "readiness": {"state": "ready"}
             }),
             None,
@@ -714,6 +792,50 @@ async fn transition_requires_baseline_before_post() {
         .await;
     assert_eq!(status, 200, "{created}");
     let etag = headers.get("etag").cloned().expect("transition etag");
+
+    // A post timestamp no reading backs is refused: the evaluation cannot reproduce it.
+    let (status, refused) = running
+        .invoke(
+            "benefits.transition_upsert",
+            "dev:alice",
+            json!({
+                "benefit_id": benefit,
+                "post_measured_at": "2026-12-01T00:00:00Z",
+                "evidence": ["weekly measure"]
+            }),
+            Some(etag.as_str()),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{refused}");
+    assert!(
+        refused
+            .to_string()
+            .contains("benefit_post_measurement_missing"),
+        "{refused}"
+    );
+
+    let (status, measured) = running
+        .invoke(
+            "benefits.measure",
+            "dev:alice",
+            json!({
+                "benefit_id": benefit,
+                "kind": "post",
+                "target_value": 8.0,
+                "actual_value": 9.0,
+                "unit": "hours",
+                "method": "weekly measure",
+                "measured_at": "2026-11-25T00:00:00Z"
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{measured}");
+
     let (status, updated) = running
         .invoke(
             "benefits.transition_upsert",

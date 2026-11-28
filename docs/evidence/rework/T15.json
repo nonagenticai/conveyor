@@ -1,0 +1,193 @@
+{
+  "checks": [
+    {
+      "check": "project",
+      "description": "T15 is active",
+      "detail": "status is 'closed', expected 'active'",
+      "id": "T15-project",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "project_baseline",
+      "description": "the scope baseline is approved; the close gate reads the approved row",
+      "detail": "no project baseline",
+      "id": "T15-baseline",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d37-7f20-9959-979c31daeb5e\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
+      "description": "the charter asset exists and the charter gate is approved",
+      "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
+      "exit": 1,
+      "id": "T15-charter",
+      "kind": "command",
+      "result": "fail",
+      "severity": "P0",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset\n",
+      "stdout": ""
+    },
+    {
+      "check": "contract",
+      "description": "a live board-approved delivery contract exists",
+      "detail": "no live board-approved delivery contract",
+      "id": "T15-contract",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "review",
+      "description": "the Phase-G review cites a published standing delegation",
+      "detail": "no Phase-G compliance review for the project's live contract",
+      "id": "T15-review",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "waivers",
+      "description": "no active waiver is expired or owned by its reviewer",
+      "detail": "0 active waiver(s), all dated and distinct from the reviewer",
+      "id": "T15-waivers",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_cadence",
+      "description": "the project's PI has a cadence row and a backlog-refinement row",
+      "detail": "no PI cadence row for tranche-12",
+      "id": "T15-pi-cadence",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_plan",
+      "description": "the project tranche's PI plan is published",
+      "detail": "no published pi-plan output for tranche-12",
+      "id": "T15-pi-plan",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_objectives",
+      "description": "the project tranche's PI objectives are published",
+      "detail": "no published pi-objectives output for tranche-12",
+      "id": "T15-pi-objectives",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "wsjf",
+      "description": "every WBS deliverable of the project carries the four typed WSJF inputs",
+      "detail": "no WBS deliverable carries the plan",
+      "id": "T15-wsjf",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "demo_credits",
+      "description": "every accepted deliverable has a demo credit carrying its evidence",
+      "detail": "no accepted deliverable to demo",
+      "id": "T15-demo-credits",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "lessons",
+      "description": "the tranche retro produced at least one lesson",
+      "detail": "no retro cadence row for tranche-12",
+      "id": "T15-lessons",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P1"
+    },
+    {
+      "check": "product_findings",
+      "description": "no open P0 product finding remains for the project",
+      "detail": "1 open P0 package(s): closed_without_closure_review:T15",
+      "id": "T15-product",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "artefact_standard",
+      "description": "every mandatory standard artefact this project owns is evidenced",
+      "detail": "10 mandatory artefact package(s) open: closed_without_closure_review:T15, project_in_unauthorised_tranche:T15, unpublished_declared_output:T15, contract_missing:T15, mandatory_artefacts:T15, std-pmp-change-control-t15:T15, std-pmp-project-baseline-t15:T15, std-pmp-project-registers-t15:T15, +2 more",
+      "id": "T15-artefact-standard",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P1"
+    },
+    {
+      "check": "rework_resolution",
+      "description": "no unresolved P0/P1 rework package remains for the project",
+      "detail": "5 unresolved P0/P1 package(s): closed_without_closure_review:T15 (P0), project_in_unauthorised_tranche:T15 (P0), unpublished_declared_output:T15 (P1), contract_missing:T15 (P1), mandatory_artefacts:T15 (P1)",
+      "id": "T15-rework",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "description": "the declared gate is discharged by executable checks",
+      "detail": "the gate check 'T15-project' did not pass; the gate check 'T15-baseline' did not pass; the gate check 'T15-charter' did not pass; the gate check 'T15-contract' did not pass; the gate check 'T15-review' did not pass; the gate check 'T15-pi-cadence' did not pass; the gate check 'T15-pi-plan' did not pass; the gate check 'T15-pi-objectives' did not pass; the gate check 'T15-wsjf' did not pass; the gate check 'T15-demo-credits' did not pass; the gate check 'T15-lessons' did not pass; the gate check 'T15-product' did not pass; the gate check 'T15-artefact-standard' did not pass; the gate check 'T15-rework' did not pass",
+      "id": "gate",
+      "kind": "manifest",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "description": "a closed project must not carry a red acceptance manifest",
+      "detail": "the project is closed while its manifest is red",
+      "id": "closed-on-red",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    }
+  ],
+  "failures": [
+    "T15-project (P0): status is 'closed', expected 'active'",
+    "T15-baseline (P0): no project baseline",
+    "T15-charter (P0): exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
+    "T15-contract (P0): no live board-approved delivery contract",
+    "T15-review (P0): no Phase-G compliance review for the project's live contract",
+    "T15-pi-cadence (P0): no PI cadence row for tranche-12",
+    "T15-pi-plan (P0): no published pi-plan output for tranche-12",
+    "T15-pi-objectives (P0): no published pi-objectives output for tranche-12",
+    "T15-wsjf (P0): no WBS deliverable carries the plan",
+    "T15-demo-credits (P0): no accepted deliverable to demo",
+    "T15-lessons (P1): no retro cadence row for tranche-12",
+    "T15-product (P0): 1 open P0 package(s): closed_without_closure_review:T15",
+    "T15-artefact-standard (P1): 10 mandatory artefact package(s) open: closed_without_closure_review:T15, project_in_unauthorised_tranche:T15, unpublished_declared_output:T15, contract_missing:T15, mandatory_artefacts:T15, std-pmp-change-control-t15:T15, std-pmp-project-baseline-t15:T15, std-pmp-project-registers-t15:T15, +2 more",
+    "T15-rework (P0): 5 unresolved P0/P1 package(s): closed_without_closure_review:T15 (P0), project_in_unauthorised_tranche:T15 (P0), unpublished_declared_output:T15 (P1), contract_missing:T15 (P1), mandatory_artefacts:T15 (P1)",
+    "gate (P0): the gate check 'T15-project' did not pass; the gate check 'T15-baseline' did not pass; the gate check 'T15-charter' did not pass; the gate check 'T15-contract' did not pass; the gate check 'T15-review' did not pass; the gate check 'T15-pi-cadence' did not pass; the gate check 'T15-pi-plan' did not pass; the gate check 'T15-pi-objectives' did not pass; the gate check 'T15-wsjf' did not pass; the gate check 'T15-demo-credits' did not pass; the gate check 'T15-lessons' did not pass; the gate check 'T15-product' did not pass; the gate check 'T15-artefact-standard' did not pass; the gate check 'T15-rework' did not pass",
+    "closed-on-red (P0): the project is closed on a red manifest"
+  ],
+  "gate": "T15 is NOT built, and its acceptance \u2014 `SPEC_V2` \u00a712: 'a tool generated from a spec is published and called by a job; publication approval defaults to a human and is tenant-configurable; a BYO MCP server is bound, narrowed and audited; a tenant cannot exceed its effect ceiling' \u2014 is the condition on which it may be closed, not a claim that it is met.",
+  "generated_at": "2026-11-25T10:37:53.794905+00:00",
+  "kind": "all",
+  "manifest": "acceptance/programme/T15.toml",
+  "name": "Tool authoring and BYO",
+  "project": "T15",
+  "schema": "project-acceptance/v1",
+  "snapshot": {
+    "generated_at": "2026-11-25T10:31:33Z",
+    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
+    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
+  },
+  "verdict": "red",
+  "warnings": []
+}

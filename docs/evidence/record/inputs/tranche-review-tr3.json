@@ -1,0 +1,96 @@
+{
+ "id": "01a1e9e0-eb54-74d8-a2b5-44fb2b87eb52",
+ "decision": "continue",
+ "evidence": {
+  "snapshot_sha": "9d5404d19a3fee52c34ab48e94bcd6596edcf66e",
+  "snapshot_manifest_sha256": "60bb08690c15e216cd3387c4ff389d33e14ef1a52545e2690025ec379cac6d82",
+  "lane_head": "9ac63b41",
+  "baselines": {
+   "S04": [
+    {
+     "id": "01a20256-44d0-731d-b345-fffc5f3ac9e8",
+     "kind": "scope",
+     "approved": true
+    }
+   ],
+   "T13": [
+    {
+     "id": "01a20277-9131-7ee2-acad-7e40ffa8f947",
+     "kind": "scope",
+     "approved": true
+    },
+    {
+     "id": "01a20279-854d-79f6-a751-a34d51be7589",
+     "kind": "scope",
+     "approved": true
+    }
+   ],
+   "T3": []
+  },
+  "benefit_status": {
+   "profiles": 7,
+   "active": [
+    "B1",
+    "B2",
+    "B4",
+    "B5",
+    "B6",
+    "B7"
+   ],
+   "draft": [
+    "B3"
+   ],
+   "measurements": 7,
+   "note": "B3's profile update waits on T6's approved baseline; its baseline measurement is recorded"
+  },
+  "risk_register": {
+   "rows": 17,
+   "programme_rows": 14,
+   "overdue": 0,
+   "next_review": "tranche 4"
+  },
+  "project_acceptance": {
+   "verdict": {
+    "implemented": 1,
+    "partial": 7,
+    "absent": 36,
+    "broken": 0
+   },
+   "audited_sha": "5d7d5439e0f41c1bbf122f8dfa69951366ae0e4c",
+   "document": "docs/evidence/v1-slice-verdict.json"
+  },
+  "cadences": {
+   "pi": "01a20280-a739-7bb9-823f-232f34b32aaa",
+   "pi_gate_approval": "01a2051a-2908-7464-9b8e-5b9fa7b0b29f",
+   "retro": "01a20281-09ba-709a-b61e-51a22f2ed172",
+   "lessons": [
+    "k1",
+    "k2",
+    "k3",
+    "k4",
+    "k5"
+   ],
+   "demo_credit": "01a202c3-3e75-7861-94f3-d4773631bc04",
+   "refinement": "01a20280-d52b-7791-a9b1-ebc2a10b5c3d",
+   "documents": {
+    "pi-plan": "01a2051b-cbe7-7599-a22b-ed68508b3008",
+    "pi-objectives": "01a2051b-ccd6-714a-a2ca-f06a3d876e56",
+    "system-demo": "01a2051b-cdb4-7391-9c0f-ffb7ac36f561",
+    "inspect-adapt": "01a2051b-ce96-73eb-ae1b-e04e54b01bf4"
+   }
+  },
+  "adr_register": {
+   "rows": 58,
+   "seed_change": "01a20516-6d53-7acf-afb6-6067283c91e1",
+   "approval": "01a20516-6d5b-784b-9f16-708b9293cfb9"
+  },
+  "conditions": [
+   "T13: rework complete; closure blocked on v1-w4a-5 and this review, closed through projects.close with a distinct approver",
+   "T3: scope baseline not yet recorded; change path, compliance review and closure remain",
+   "S04: two open deliverables (ActionSpec derive crate; registry and spec vocabularies)",
+   "B3 waits on T6's approved baseline; the other six benefits are active and measured",
+   "The v1 verdict is mostly absent (1 implemented / 7 partial / 36 absent): the tranche reports it, it does not hide it"
+  ]
+ },
+ "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+}

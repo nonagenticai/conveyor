@@ -235,11 +235,11 @@ async fn insert_version(
             tracing::error!(action = %tool.action, "publish: the manifest names an absent action");
             ActionError::internal()
         })?;
-        let schema = serde_json::to_value((spec.input)()).map_err(|error| {
+        let schema = serde_json::to_value(spec.input_schema()).map_err(|error| {
             tracing::error!(%error, action = %tool.action, "publish: project the input schema");
             ActionError::internal()
         })?;
-        let output_schema = serde_json::to_value((spec.output)()).map_err(|error| {
+        let output_schema = serde_json::to_value(spec.output_schema()).map_err(|error| {
             tracing::error!(%error, action = %tool.action, "publish: project the output schema");
             ActionError::internal()
         })?;
@@ -251,6 +251,12 @@ async fn insert_version(
         let timeout_secs = i32::try_from(spec.timeout_ms.div_ceil(1000))
             .unwrap_or(300)
             .clamp(1, 300);
+        // The declared verification path travels with the tool version (§11.3); a read tool's
+        // absent declaration is stored as `{}`, never as JSON null.
+        let verify = serde_json::to_value(tool.verify.as_ref())
+            .ok()
+            .filter(|value| !value.is_null())
+            .unwrap_or_else(|| json!({}));
         store::tool::insert_tool(
             &mut *tx,
             ctx.tenant,
@@ -260,6 +266,7 @@ async fn insert_version(
                 handler_action: &tool.action,
                 input_schema: &schema,
                 output_schema: &output_schema,
+                verify: &verify,
                 effect: spec.effect.as_str(),
                 idempotency: tool.idempotency.as_deref().unwrap_or("optional"),
                 timeout_secs,

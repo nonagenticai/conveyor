@@ -1,0 +1,18 @@
+{
+ "_version": 1,
+ "change_id": "01a20ae2-1d0a-7eb7-8302-e7a5850919e2",
+ "evidence": [
+  {
+   "kind": "test",
+   "path": "crates/actions/tests/ops.rs",
+   "ref": "ops::an_approved_mitigation_sets_mitigated_at_with_a_read_back"
+  },
+  {
+   "kind": "document",
+   "path": "/tmp/u5a-r9/evidence/T7-acceptance.md",
+   "ref": "T7 acceptance transcript"
+  }
+ ],
+ "id": "01a20ae2-1b59-7d20-9873-110bf38b05d8",
+ "status": "accepted"
+}

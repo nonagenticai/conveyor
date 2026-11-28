@@ -1,0 +1,953 @@
+{
+ "charter": "# Charter — T4 Kanban coach (retrospective, 2026-11-24)\n\n- **Project:** T4 'Kanban coach', track v2, ADM phase G, plateau capability, tranche 4, project `01a1d039-0d33-7e7e-890e-b437b0c78db9`, plan `docs/SPEC_V2.md#12` (draft). The row is `status: active` with `meta.measured_status: built`, `meta.viability: rework`, `meta.depends_on: [T3, P0]`, `meta.issues: [75]` (issue #75 'T4 — Kanban coach', closed), `meta.expected_outputs: [project-brief, evidence]` and `meta.closure_outputs: [closure-review]`. It was reopened at 2026-11-24T16:57:39Z for 'the retrospective MSP/TOGAF/SAFe rework of tranche 4 (#526)' under decision `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`, and tranche 4 was authorised at 2026-11-24T17:04:34Z by review `01a216d0-d634-738e-985a-00a85cfd48d9`.\n- **Mandate:** SPEC_V2 §12 defines T4 as the kanban coach: an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata. The retrospective reconstitutes the MSP/TOGAF lifecycle record for that capability — charter, Statement of Architecture Work, the seven mandatory Phase A–D artefacts, the delivery contract, the WBS deliverable, the Phase-G review and the two expected outputs, project-brief and evidence.\n- **Scope:** `coach_interruption` and the append-only `coach_remedy`; the closed triage set (transient, conveyor_defect, job_defect, project_decision, external) and the closed remedy set (retry, move, repull, block, ask, note); the `coach.window` policy (24-hour default window, 0.7 confidence floor, `conveyor_defect` as the default systemic class, kata pin); the human gates `coach.escalation`, `coach.ask` and `coach.kata`; `kata.open` as the systemic-learning hand-off; the executable gate `scripts/check-t4-coach-gate.py` and the twelve tests in `crates/actions/tests/coach.rs`.\n- **What this retrospective does NOT attest:** it does not attest a green run of the coach gate at this snapshot, a waiver of the red findings in `docs/evidence/rework/T4.json`, the tranche-4 exit criteria, or closure. At the snapshot the charter check fails on the missing `CONVEYOR_SSH_KEY` transport, the live delivery contract's review `01a2028e-a1be-779d-a762-8d118fc2ec0b` records level `non_conformant` without a published `delegation_ref`, fifteen mandatory artefact packages remain open and the P1 rework package `std-togaf-phase-g-t4-g:T4` is unresolved. The project stays active; no closure review is reissued here.",
+ "soaw": {
+  "title": "Statement of Architecture Work — T4 Kanban coach (retrospective, 2026-11-24)",
+  "body": {
+   "assignment": "Rework T4 by the reconstituted TOGAF/MSP lifecycle: author the charter, this Statement of Architecture Work, the seven mandatory Phase A–D artefacts, the delivery contract, the WBS deliverable and the Phase-G review, and publish the project-brief and evidence outputs that SPEC_V2 §12's kanban coach owes. The work records the non-conformant review inherited from the facts, leaves the project active, and claims no closure.",
+   "scope": "The coach write path on the board and the action spine: `coach_interruption` and `coach_remedy`, the five-term triage set and six-term remedy set, the `coach.window` policy (default 24-hour window, 0.7 confidence floor, systemic classes), the human gates `coach.escalation`, `coach.ask` and `coach.kata`, the `kata.open` hand-off for systemic classes, and the executable gate `scripts/check-t4-coach-gate.py` over the twelve tests in `crates/actions/tests/coach.rs`. Out of scope: the kata lifecycle after open (T5, issue #77), the board UI (S12), card writes outside the action path, and any second board or comment store.",
+   "responsibilities": "The programme architect (conveyor-e2e) authors the pack; the Architecture Board (conveyor-architecture-board) approves the Phase A–D set; conveyor-approver records the Phase-G review. The approver `01a1e8a7-8b23-76a9-9114-aafb95f7a545`, distinct from the requester `01a1e607-17d9-77d3-98d3-a43a87c4633d`, approves the contracts and took the scope baseline `01a2028d-e17b-793d-9ea2-fe4f7f8e2b72` on 2026-11-22T09:19:40Z.",
+   "acceptance_criteria": "SPEC_V2 §12's four clauses, each bound to named tests by `scripts/check-t4-coach-gate.py`: (1) an injected failure yields exactly one coach card and one remedy — `an_interruption_yields_one_coach_card_one_triage_and_one_remedy`, `the_seeded_coach_process_yields_one_card_one_triage_and_one_remedy`, `a_duplicate_remedy_is_refused`; (2) a repeat signature escalates — `a_repeat_signature_escalates_instead_of_a_second_card`, `an_escalated_signature_is_not_retried`; (3) no coach card about a coach card — `a_failed_coach_run_never_opens_a_coach_card`, `a_nested_coach_run_is_refused`, `a_coach_card_cannot_be_created_through_the_public_path`, `the_coach_chain_settles_at_one_card`; (4) a systemic class opens a kata — `a_systemic_class_opens_one_measured_kata`, `a_systemic_class_without_a_pinned_instrument_escalates`, `a_transient_class_opens_no_kata`. The acceptance instrument is `acceptance/programme/T4.toml`; the snapshot records no green run of these clauses, so this statement does not record acceptance.",
+   "contract": "This statement `01a2028b-dde6-7ed4-9e47-6e582f2341d8` sits on the approved scope baseline `01a2028d-e17b-793d-9ea2-fe4f7f8e2b72` and is complemented by the delivery contract `01a2028d-942b-759a-ad59-ab9c38629977` (board decision `01a2028d-abf9-78fb-a9c6-eb06c4bdd634`), under the statement's own approval `01a2028b-f63c-7c27-b580-d4cba2c1e70f`. Both contracts are retrospective instruments under the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; they bind the rework to its capacity, acceptance and evidence terms and expressly withhold closure.",
+   "retrospective": true
+  }
+ },
+ "artifacts": [
+  {
+   "title": "Stakeholder Map — T4 Kanban coach (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "matrix",
+   "purpose": "Who is affected by the kanban coach, what each party needs from the one-card/one-remedy rule, and how the retrospective engages them.",
+   "links": [
+    {
+     "to": "Requirements Catalog — T4 Kanban coach (Phase A)",
+     "kind": "dependency"
+    }
+   ],
+   "scope": "the coach write path, the closed class sets, the escalation and ask gates, the kata hand-off and the tranche-4 governance around them.",
+   "stakeholders": {
+    "owner": "the programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the sponsoring group",
+     "the SRO",
+     "board users",
+     "runtime operators",
+     "the T5 kata owners",
+     "the coach agent"
+    ]
+   },
+   "entries": [
+    {
+     "axis_a": "Sponsoring group",
+     "axis_b": "tranche-4 authorisation and the exit criteria that name T4",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "decide"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "SRO",
+     "axis_b": "accountable for the coach capability and the tranche outcome",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "accountable"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Programme architect (conveyor-e2e)",
+     "axis_b": "owns the coach slice, the Phase A–D set and this retrospective pack",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "responsible"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Architecture Board (conveyor-architecture-board)",
+     "axis_b": "approves the seven artefacts and the delivery contract",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "approve"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "conveyor-approver",
+     "axis_b": "recorded the live Phase-G review 01a2028e-a1be-779d-a762-8d118fc2ec0b at level non_conformant",
+     "value": {
+      "influence": "high",
+      "interest": "medium",
+      "engagement": "review"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Board users",
+     "axis_b": "receive one coach card per interruption, then an escalation instead of a second card",
+     "value": {
+      "influence": "medium",
+      "interest": "high",
+      "engagement": "consult"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "Runtime operators",
+     "axis_b": "set coach.window (window_hours, threshold, systemic_classes) and read the gates coach.escalation, coach.ask and coach.kata",
+     "value": {
+      "influence": "medium",
+      "interest": "high",
+      "engagement": "consult"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "Kata owners (T5, issue #77)",
+     "axis_b": "receive systemic-class katas and adopt them through evals:approve",
+     "value": {
+      "influence": "medium",
+      "interest": "medium",
+      "engagement": "consult"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "Coach agent",
+     "axis_b": "writes the diagnosis under coach.triage only; coach.remedy is not in its allowed_actions",
+     "value": {
+      "influence": "low",
+      "interest": "medium",
+      "engagement": "inform"
+     },
+     "position": 9
+    }
+   ],
+   "body": "# Stakeholder Map — T4 Kanban coach (Phase A)\n\n## Metadata\n\nType matrix; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d33-7e7e-890e-b437b0c78db9; artefact 01a2028c-33a0-76d6-acd6-57365a79dd10; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nNine stakeholders on the influence/interest/engagement axes. The sponsoring group decides the tranche and the exit criteria; the SRO is accountable; the programme architect is responsible for the slice and the pack; the Architecture Board approves the set and the contract. conveyor-approver supplies the live non_conformant review that this retrospective carries forward rather than overwrites. Board users and runtime operators consume the one-card rule and the coach.window policy; the T5 kata owners receive systemic-class katas; the coach agent is told, by its allowed_actions, that it diagnoses but never chooses the remedy.\n\n## Links\n\nDerives from SPEC_V2 §12's T4 row and the delivery plan's dependency line (T4 after T3), the coach policy in `crates/actions/src/coach.rs` and the kata hand-off in `crates/actions/src/kata.rs`. Realizes the Phase A stakeholder view for the tranche-4 retrospective; reuses the programme roles already recorded in the conveyor buildout.\n\n## Document\n\nThe map records who is engaged for the rework and what each receives. It does not claim that any stakeholder accepted the gate at the snapshot: `docs/evidence/rework/T4.json` is red, with the charter check failing on the `CONVEYOR_SSH_KEY` transport and four P0/P1 governance checks outstanding."
+  },
+  {
+   "title": "Driver/Goal/Objective Catalog — T4 Kanban coach (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "catalog",
+   "purpose": "Why the coach exists: the seven drivers behind one interruption becoming one card, one triage and at most one remedy, and the objectives that discharge them.",
+   "links": [
+    {
+     "to": "Stakeholder Map — T4 Kanban coach (Phase A)",
+     "kind": "derivation"
+    }
+   ],
+   "scope": "the interruption, triage, remedy, escalation, recursion, kata and evidence concerns of SPEC_V2 §12's T4 slice.",
+   "stakeholders": {
+    "owner": "the programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the sponsoring group",
+     "the SRO",
+     "board users",
+     "runtime operators",
+     "the T5 kata owners"
+    ]
+   },
+   "entries": [
+    {
+     "axis_a": "D1 an interruption is opaque to the board",
+     "axis_b": "G1 one coach card per interruption carrying one triage",
+     "value": {
+      "objective": "coach.interrupt opens exactly one coach card and one coach_interruption row for (tenant, card, signature); a second open row for the same signature is refused by uq_coach_interruption_open and routed to escalation, never duplicated"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "D2 a model that chooses remedies is unbound",
+     "axis_b": "G2 a closed remedy set selected by the computed step",
+     "value": {
+      "objective": "the coach agent's allowed_actions carries coach.triage and not coach.remedy; remedy_for maps transient→retry, conveyor_defect→block, job_defect→repull, project_decision→ask and external→note, and store validation admits only retry, move, repull, block, ask, note"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "D3 repeating faults flood the board",
+     "axis_b": "G3 a per-signature window with escalation",
+     "value": {
+      "objective": "inside the coach.window (24 hours by default) a repeat signature calls coach.escalation and opens a human approval instead of a second card; an already-escalated signature is never retried"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "D4 coach runs can recurse",
+     "axis_b": "G4 a depth cap that settles at one card",
+     "value": {
+      "objective": "a failed coach run never opens a coach card, a nested coach run is refused, the public card path cannot create card_type coach, and the coach chain settles at one card"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "D5 systemic faults recur without learning",
+     "axis_b": "G5 one measured kata per systemic class",
+     "value": {
+      "objective": "a systemic class (conveyor_defect by default) opens one kata through kata.open with a pinned instrument, prediction, split and split hash; without a pin it escalates; a transient class opens no kata"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "D6 remedy history is editable",
+     "axis_b": "G6 an append-only remedy record",
+     "value": {
+      "objective": "coach_remedy is written once and the runtime role holds no UPDATE or DELETE on it in scripts/grants-runtime.sql; the effect's run and job ids travel in the remedy detail"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "D7 the governance record is red at the snapshot",
+     "axis_b": "G7 a retrospective that records rather than hides",
+     "value": {
+      "objective": "the pack records the non_conformant review 01a2028e-a1be-779d-a762-8d118fc2ec0b, the fifteen open mandatory artefact packages and the transport-failed charter check, publishes the brief and evidence, and leaves the project active"
+     },
+     "position": 7
+    }
+   ],
+   "body": "# Driver/Goal/Objective Catalog — T4 Kanban coach (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d33-7e7e-890e-b437b0c78db9; artefact 01a2028c-6415-7dbb-bb08-ef2baa58aaa4; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nSeven drivers and their goals. D1–D3 are the SPEC_V2 §12 clauses themselves: one card, one remedy; repeat escalation; no recursion. D4 states the depth cap explicitly. D5 hands systemic learning to the kata family. D6 protects the audit trail: the append-only remedy table is enforced by grants, not by convention. D7 is the rework's own driver: the project row is active and viable as rework, its single review is non_conformant, and the packet is authored to make that state legible instead of papering over it.\n\n## Links\n\nDerives from SPEC_V2 §12, the §6.2 closed-set discipline, the coach module in `crates/actions/src/coach.rs` and the kata open gate in `crates/actions/src/kata.rs`. Realizes the Phase A driver view for the coach capability; reuses the board, process and approval primitives from P0 and the provenance from T3.\n\n## Document\n\nThis catalogue records intent, not acceptance. `docs/evidence/rework/T4.json` shows the gate red at 2026-11-24T21:07:28Z: T4-charter, T4-review, T4-artefact-standard and T4-rework fail, and the overall gate follows them. Nothing here asserts a successful run."
+  },
+  {
+   "title": "Requirements Catalog — T4 Kanban coach (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "catalog",
+   "purpose": "The bounded requirements the coach must satisfy, each with the named test or code location that carries it.",
+   "links": [
+    {
+     "to": "Driver/Goal/Objective Catalog — T4 Kanban coach (Phase A)",
+     "kind": "derivation"
+    }
+   ],
+   "scope": "the ten requirements implied by SPEC_V2 §12, §6.2 and the coach/kata implementation: card uniqueness, closed sets, escalation, recursion, kata open, transactionality, confidence, append-only remedies and the executable gate.",
+   "stakeholders": {
+    "owner": "the programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the SRO",
+     "board users",
+     "runtime operators",
+     "the T5 kata owners",
+     "the CI reviewers"
+    ]
+   },
+   "entries": [
+    {
+     "axis_a": "R1",
+     "axis_b": "one interruption produces exactly one coach card, one triage and at most one remedy",
+     "value": {
+      "requirement": "coach.interrupt writes the card and the coach_interruption row in one transaction; coach.triage records one class; coach.remedy writes at most one remedy per interruption",
+      "acceptance": "an_interruption_yields_one_coach_card_one_triage_and_one_remedy; the_seeded_coach_process_yields_one_card_one_triage_and_one_remedy"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "R2",
+     "axis_b": "both class vocabularies are closed and a foreign term is refused before any write",
+     "value": {
+      "requirement": "TRIAGE_CLASSES has five terms and REMEDY_CLASSES six in crates/store/src/coach.rs; the action validates against them and returns 422, with the migration CHECK as backstop (§6.2)",
+      "acceptance": "a_duplicate_remedy_is_refused; the closed-set validation in crates/actions/src/coach.rs"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "R3",
+     "axis_b": "a repeat signature inside its window escalates instead of opening a second card",
+     "value": {
+      "requirement": "the (tenant, card, signature) window defaults to 24 hours and may be set by the coach.window policy; a repeat calls coach.escalation and opens a human approval",
+      "acceptance": "a_repeat_signature_escalates_instead_of_a_second_card"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "R4",
+     "axis_b": "an escalated signature is never retried",
+     "value": {
+      "requirement": "the escalation state is terminal for the window; no remedy is written and no second run is started",
+      "acceptance": "an_escalated_signature_is_not_retried"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "R5",
+     "axis_b": "no coach card about a coach card (the depth cap)",
+     "value": {
+      "requirement": "a failed coach run never opens a coach card; a nested coach run is refused; card_type coach cannot be created through the public path; the chain settles at one card",
+      "acceptance": "a_failed_coach_run_never_opens_a_coach_card; a_nested_coach_run_is_refused; a_coach_card_cannot_be_created_through_the_public_path; the_coach_chain_settles_at_one_card"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "R6",
+     "axis_b": "a systemic class opens one measured kata; without a pinned instrument it escalates; a transient class opens none",
+     "value": {
+      "requirement": "kata.open requires instrument_kind, instrument_id, instrument_version, split, split_sha256, prediction and base_ref; a second live kata for the same signature is refused by name",
+      "acceptance": "a_systemic_class_opens_one_measured_kata; a_systemic_class_without_a_pinned_instrument_escalates; a_transient_class_opens_no_kata"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "R7",
+     "axis_b": "the remedy is applied before it is recorded, in one transaction",
+     "value": {
+      "requirement": "the class's effect succeeds first and the coach_remedy row is written second; a failed effect rolls the remedy back, and the effect's run and job ids travel in the remedy detail",
+      "acceptance": "the remedy path in crates/actions/src/coach.rs; a_duplicate_remedy_is_refused"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "R8",
+     "axis_b": "below the confidence floor the coach asks instead of acting",
+     "value": {
+      "requirement": "the coach.window threshold defaults to 0.7; below it the computed remedy is ask, which opens the coach.ask gate and starts the ask_fr process",
+      "acceptance": "policy_tx and remedy_for in crates/actions/src/coach.rs; DEFAULT_CONFIDENCE_FLOOR"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "R9",
+     "axis_b": "the gate is executable and its evidence is sha-bound",
+     "value": {
+      "requirement": "scripts/check-t4-coach-gate.py maps every SPEC_V2 §12 clause to named tests, can run exactly those tests and writes docs/evidence/rework/T4-coach-gate.json bound to HEAD and the test file",
+      "acceptance": "--self-test asserts every clause and test is mapped; --run writes the evidence; --check validates it against HEAD"
+     },
+     "position": 9
+    },
+    {
+     "axis_a": "R10",
+     "axis_b": "remedy history cannot be edited by the runtime",
+     "value": {
+      "requirement": "coach_remedy is written once and the runtime role holds no UPDATE or DELETE on it; coach_interruption remains mutable because triage and state advance",
+      "acceptance": "the grants in scripts/grants-runtime.sql and the store contract in crates/store/src/coach.rs"
+     },
+     "position": 10
+    }
+   ],
+   "body": "# Requirements Catalog — T4 Kanban coach (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d33-7e7e-890e-b437b0c78db9; artefact 01a2028c-94d6-7e50-9d94-9e94feda14aa; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nTen requirements. R1–R6 restate SPEC_V2 §12 in testable form and bind each clause to its named test in `crates/actions/tests/coach.rs`. R7 keeps the remedy honest: the effect runs before the row and a failure rolls both back. R8 makes the confidence floor explicit (0.7, ask below it). R9 requires the gate to be an instrument, not a prose claim, and binds its evidence to the checked-out HEAD. R10 protects the audit trail by grant rather than convention.\n\n## Links\n\nDerives from SPEC_V2 §12 and §6.2, the module documentation in `crates/actions/src/coach.rs`, the kata open gate in `crates/actions/src/kata.rs`, and the gate instrument `scripts/check-t4-coach-gate.py`. Realizes the Phase A requirements view for the coach capability.\n\n## Document\n\nThe catalogue states what must hold. It does not state that it held at the snapshot: the executable mapping exists and names twelve tests, but no sha-bound run is present in the inputs, and the project acceptance record is red on governance checks."
+  },
+  {
+   "title": "Solution Concept Diagram — T4 Kanban coach (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "diagram",
+   "purpose": "The components and edges that turn one interruption into one coach card, one triage, at most one remedy, an escalation or a measured kata.",
+   "links": [
+    {
+     "to": "Requirements Catalog — T4 Kanban coach (Phase A)",
+     "kind": "realization"
+    }
+   ],
+   "scope": "the two coach tables, the store and action modules, the policy row, the human gates, the kata open path, the tests and the gate instrument.",
+   "stakeholders": {
+    "owner": "the programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the SRO",
+     "runtime operators",
+     "the T5 kata owners",
+     "the CI reviewers"
+    ]
+   },
+   "entries": [
+    {
+     "axis_a": "coach_interruption and coach_remedy",
+     "axis_b": "the coach schema",
+     "value": {
+      "kind": "component",
+      "note": "coach_interruption is mutable as triage and state advance; coach_remedy is written once; uq_coach_interruption_open is the partial unique index on (tenant, card, signature)"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "crates/store/src/coach.rs",
+     "axis_b": "the store vocabulary and transactions",
+     "value": {
+      "kind": "component",
+      "note": "TRIAGE_CLASSES (5) and REMEDY_CLASSES (6), open_interruption_tx, close_expired_tx and the escalation case"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "crates/actions/src/coach.rs",
+     "axis_b": "the coach actions",
+     "value": {
+      "kind": "component",
+      "note": "coach.interrupt, coach.triage, coach.remedy and coach.escalate; policy_tx reads coach.window; remedy_for is the closed mapping"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "crates/actions/src/kata.rs",
+     "axis_b": "the systemic-learning hand-off",
+     "value": {
+      "kind": "component",
+      "note": "kata.open requires the pinned instrument, prediction, split and split hash, and refuses a second live kata for the same signature by name"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "coach.window policy row",
+     "axis_b": "the policy ladder",
+     "value": {
+      "kind": "component",
+      "note": "window_hours (24), threshold (0.7), systemic_classes ([conveyor_defect]) and the kata pin block; a partial block is treated as no pin"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "coach.escalation, coach.ask and coach.kata",
+     "axis_b": "the human gates",
+     "value": {
+      "kind": "component",
+      "note": "approval rows of kind human_approval attached to the coach card and the project; the ask gate also starts the ask_fr process"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "crates/actions/tests/coach.rs",
+     "axis_b": "the proof surface",
+     "value": {
+      "kind": "component",
+      "note": "twelve named tests, exactly the set the gate instrument maps to the four SPEC_V2 §12 clauses"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "scripts/check-t4-coach-gate.py",
+     "axis_b": "the executable gate",
+     "value": {
+      "kind": "component",
+      "note": "--self-test checks the clause/test mapping without cargo; --run runs the named tests and writes a sha-bound docs/evidence/rework/T4-coach-gate.json; --check validates it against HEAD"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "interrupt → coach card",
+     "axis_b": "one card and one interruption",
+     "value": {
+      "kind": "edge",
+      "note": "written in the same transaction; the partial unique index is the backstop against a second open card"
+     },
+     "position": 9
+    },
+    {
+     "axis_a": "repeat signature → escalation gate",
+     "axis_b": "no second card",
+     "value": {
+      "kind": "edge",
+      "note": "inside the window the repeat closes the open interruption and opens coach.escalation; an escalated signature is not retried"
+     },
+     "position": 10
+    },
+    {
+     "axis_a": "remedy → effect → coach_remedy row",
+     "axis_b": "applied, then recorded",
+     "value": {
+      "kind": "edge",
+      "note": "the effect runs first in the remedy transaction; failure rolls the row back; run and job ids land in the remedy detail"
+     },
+     "position": 11
+    },
+    {
+     "axis_a": "systemic class → kata.open",
+     "axis_b": "one measured kata",
+     "value": {
+      "kind": "edge",
+      "note": "with a pinned instrument the kata opens; without one the interruption escalates rather than opening an unmeasurable kata"
+     },
+     "position": 12
+    },
+    {
+     "axis_a": "kata → held-out measurement",
+     "axis_b": "the measurement edge",
+     "value": {
+      "kind": "edge",
+      "note": "kata.measure reads only the locked test split and compares against the threshold recorded at open"
+     },
+     "position": 13
+    },
+    {
+     "axis_a": "kata → adoption",
+     "axis_b": "the human decision edge",
+     "value": {
+      "kind": "edge",
+      "note": "kata.adopt is gated by a human holding evals:approve; the agent never adopts its own kata"
+     },
+     "position": 14
+    }
+   ],
+   "body": "# Solution Concept Diagram — T4 Kanban coach (Phase A)\n\n## Metadata\n\nType diagram; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d33-7e7e-890e-b437b0c78db9; artefact 01a2028c-c575-749c-a0c8-82c44effa477; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nFourteen rows: eight components and six edges. The schema holds the immutable remedy and the mutable interruption; the store supplies the closed vocabularies and the transaction helpers; the actions module supplies the four coach verbs and the policy read; the kata module receives only systemic classes with a pinned instrument. The human gates are approval rows, not side channels. The tests and the gate instrument are drawn as components because the slice's acceptance is executable, not narrative.\n\n## Links\n\nDerives from SPEC_V2 §12, §6.2 and §6.3, the coach and kata modules, and the gate instrument. Realizes the Phase A solution concept for the coach capability; reuses the board card, the process run and the approval primitive from P0 and the failed-run provenance from T3.\n\n## Document\n\nThe diagram records the intended wiring. It makes no claim that the wiring passed at the snapshot: the gate is red in `docs/evidence/rework/T4.json`, and the test `a_duplicate_remedy_is_refused` carries the typed duplicate-remedy refusal with no recorded run of the twelve tests in the inputs."
+  },
+  {
+   "title": "Business Capability Map — T4 Kanban coach (Phase B)",
+   "phase_code": "b",
+   "plateau": "hld",
+   "artifact_kind": "diagram",
+   "purpose": "The capabilities the coach must provide, their maturity as the record and the snapshot support it, and the evidence behind each.",
+   "links": [
+    {
+     "to": "Solution Concept Diagram — T4 Kanban coach (Phase A)",
+     "kind": "derivation"
+    },
+    {
+     "to": "Requirements Catalog — T4 Kanban coach (Phase A)",
+     "kind": "derivation"
+    }
+   ],
+   "scope": "interruption capture, classification, remedy execution, escalation, recursion containment, systemic learning, human decision gates and conformance evidence.",
+   "stakeholders": {
+    "owner": "the programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the sponsoring group",
+     "the SRO",
+     "board users",
+     "the T5 kata owners"
+    ]
+   },
+   "entries": [
+    {
+     "axis_a": "Interruption capture",
+     "axis_b": "one coach card and one interruption per failure",
+     "value": {
+      "maturity": "declared built (meta.measured_status=built, issue #75 closed); no green acceptance run at the snapshot",
+      "evidence": "crates/actions/src/coach.rs; coach_interruption and uq_coach_interruption_open"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Closed triage",
+     "axis_b": "five classes, validated before any write",
+     "value": {
+      "maturity": "declared built",
+      "evidence": "TRIAGE_CLASSES in crates/store/src/coach.rs and the 422 path in crates/actions/src/coach.rs"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Remedy execution",
+     "axis_b": "retry, move, repull, block, ask and note, applied then recorded",
+     "value": {
+      "maturity": "declared built",
+      "evidence": "remedy_for and the effect path in crates/actions/src/coach.rs; append-only coach_remedy"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Repeat-signature escalation",
+     "axis_b": "a windowed escalation instead of a second card",
+     "value": {
+      "maturity": "declared built",
+      "evidence": "coach.escalation; coach.window defaults (24 hours, 0.7 floor); the two escalation tests"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Recursion containment",
+     "axis_b": "no coach card about a coach card",
+     "value": {
+      "maturity": "declared built",
+      "evidence": "the four recursion tests, including a_coach_card_cannot_be_created_through_the_public_path"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Systemic learning",
+     "axis_b": "one measured kata for a systemic class",
+     "value": {
+      "maturity": "declared built; the kata lifecycle after open belongs to T5",
+      "evidence": "kata.open with the pinned instrument; the three systemic-class tests"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "Human decision gates",
+     "axis_b": "escalation, ask and adoption remain human",
+     "value": {
+      "maturity": "declared built",
+      "evidence": "the human_approval rows behind coach.escalation, coach.ask and coach.kata; kata.adopt requires evals:approve"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "Conformance evidence",
+     "axis_b": "an executable, sha-bound gate",
+     "value": {
+      "maturity": "instrument exists; no run evidenced at the snapshot",
+      "evidence": "scripts/check-t4-coach-gate.py; docs/evidence/rework/T4-coach-gate.json; docs/evidence/rework/T4.json is red"
+     },
+     "position": 8
+    }
+   ],
+   "body": "# Business Capability Map — T4 Kanban coach (Phase B)\n\n## Metadata\n\nType diagram; phase B; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d33-7e7e-890e-b437b0c78db9; artefact 01a2028c-f584-75ea-90cd-b929dd945aa4; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nEight capabilities. The record claims the slice is built and issue #75 is closed, so each capability is recorded as declared built with the code or test that carries it. Nothing is recorded as accepted: the 2026-11-24 project acceptance run is red, and its failures are governance checks rather than a demonstration that the coach clauses pass. The systemic-learning capability stops at kata open by design; observe, analyse, measure and adopt are T5's.\n\n## Links\n\nDerives from the Phase A solution concept and requirements, SPEC_V2 §12 and §9.3–§9.4 for the kata hand-off, and the project row's measured status. Realizes the Phase B capability view for the coach capability.\n\n## Document\n\nThis map is an honest maturity statement, not a promotional one. Where the record says built and no acceptance run supports it, the map says declared built and names the missing evidence instead of upgrading the claim.\n"
+  },
+  {
+   "title": "Data Entity/Data Component Catalog — T4 Kanban coach (Phase C)",
+   "phase_code": "c",
+   "plateau": "hld",
+   "artifact_kind": "catalog",
+   "purpose": "The stored entities and data components the coach reads and writes, their mutability, their keys and their retention rules.",
+   "links": [
+    {
+     "to": "Business Capability Map — T4 Kanban coach (Phase B)",
+     "kind": "derivation"
+    },
+    {
+     "to": "Solution Concept Diagram — T4 Kanban coach (Phase A)",
+     "kind": "derivation"
+    }
+   ],
+   "scope": "coach_interruption, coach_remedy, the coach card, the coach.window policy, the gate approvals, the kata and its measurement, and the signature derived from failed-run provenance.",
+   "stakeholders": {
+    "owner": "the programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "runtime operators",
+     "the T5 kata owners",
+     "auditors",
+     "the CI reviewers"
+    ]
+   },
+   "entries": [
+    {
+     "axis_a": "coach_interruption",
+     "axis_b": "the interruption record",
+     "value": {
+      "kind": "entity",
+      "definition": "one row per (tenant, card, signature) while the interruption is open; carries the state, the triage and the signature parts; mutable because triage and state advance",
+      "key": "id; partial unique uq_coach_interruption_open on (tenant, card, signature)"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "coach_remedy",
+     "axis_b": "the remedy record",
+     "value": {
+      "kind": "entity",
+      "definition": "written once after the class's effect succeeds; the runtime role has no UPDATE or DELETE on it; the detail carries the effect's run and job ids",
+      "key": "id; one remedy per interruption"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "coach card",
+     "axis_b": "the board card",
+     "value": {
+      "kind": "entity",
+      "definition": "an ordinary board card with card_type coach, opened by coach.interrupt; the public card path refuses to create it, which is half of the depth cap",
+      "key": "card id"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "coach.window policy",
+     "axis_b": "the policy component",
+     "value": {
+      "kind": "component",
+      "definition": "a ladder row of kind coach.window whose meta supplies window_hours, threshold, systemic_classes and the kata pin; a partial kata block is treated as no pin",
+      "key": "tenant + policy kind"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "gate approvals",
+     "axis_b": "the human decision rows",
+     "value": {
+      "kind": "entity",
+      "definition": "approval rows of kind human_approval for coach.escalation, coach.ask and coach.kata, attached to the coach card and its project",
+      "key": "approval id"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "kata",
+     "axis_b": "the systemic-learning record",
+     "value": {
+      "kind": "entity",
+      "definition": "opened by kata.open on a pinned instrument and prediction; carries the live signature, the pinned release hash and the threshold recorded at open",
+      "key": "kata id; one live kata per signature"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "kata measurement",
+     "axis_b": "the held-out measurement",
+     "value": {
+      "kind": "entity",
+      "definition": "the result read from the locked test split only, compared against the threshold recorded at open; a regression past it restores the pre-kata procedure",
+      "key": "kata id + measurement"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "signature",
+     "axis_b": "the derived component",
+     "value": {
+      "kind": "component",
+      "definition": "derived from the failed run's provenance when the caller supplies none; stable across repeats of the same fault; stored on coach_interruption and reused by kata.open",
+      "key": "tenant + card + signature"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "interrupted card and failed run",
+     "axis_b": "the referenced context",
+     "value": {
+      "kind": "component",
+      "definition": "the board card and the process run whose failure is being coached; the run id is the provenance the retry and repull remedies act on",
+      "key": "card id + run id"
+     },
+     "position": 9
+    }
+   ],
+   "body": "# Data Entity/Data Component Catalog — T4 Kanban coach (Phase C)\n\n## Metadata\n\nType catalog; phase C; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d33-7e7e-890e-b437b0c78db9; artefact 01a2028d-27ab-7464-918c-e0e07c1a43dc; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nNine entities and components. The pair coach_interruption/coach_remedy is deliberately asymmetric: the interruption must change as triage and state advance, while the remedy is append-only and the runtime's grants forbid editing it. The partial unique index is the structural guarantee behind 'one card per signature'. The policy row is data, not code: operators can widen the window, move the confidence floor or declare additional systemic classes without a deploy. The kata and its measurement are referenced here because the coach opens them; their full lifecycle is T5's.\n\n## Links\n\nDerives from the coach store contract in `crates/store/src/coach.rs`, the policy read in `crates/actions/src/coach.rs`, the kata open path in `crates/actions/src/kata.rs`, and the grants in `scripts/grants-runtime.sql`. Realizes the Phase C data view for the coach capability.\n\n## Document\n\nThe catalog describes the entities as the code and migrations define them. It does not assert that every migration ran in production at the snapshot, nor that the measurement path has been exercised; those claims belong to a green gate run that the inputs do not contain.\n"
+  },
+  {
+   "title": "Technology Standards Catalog — T4 Kanban coach (Phase D)",
+   "phase_code": "d",
+   "plateau": "hld",
+   "artifact_kind": "catalog",
+   "purpose": "The technology and engineering standards the coach is held to, and where each standard is enforced.",
+   "links": [
+    {
+     "to": "Data Entity/Data Component Catalog — T4 Kanban coach (Phase C)",
+     "kind": "derivation"
+    }
+   ],
+   "scope": "the PostgreSQL schema, the closed vocabularies, the append-only table, the action registry, the policy ladder, deterministic classification, transactional remedy application, sha-bound evidence and the tests.",
+   "stakeholders": {
+    "owner": "the programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the SRO",
+     "runtime operators",
+     "the CI reviewers",
+     "the T5 kata owners"
+    ]
+   },
+   "entries": [
+    {
+     "axis_a": "PostgreSQL",
+     "axis_b": "tenant-scoped rows with a partial unique index",
+     "value": {
+      "usage": "coach_interruption carries tenant scope and uq_coach_interruption_open enforces one open interruption per (tenant, card, signature); the database CHECK on the class columns is the backstop, not the primary validation"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Closed vocabularies",
+     "axis_b": "text plus CHECK, validated in code as 422",
+     "value": {
+      "usage": "TRIAGE_CLASSES (five) and REMEDY_CLASSES (six) live in crates/store/src/coach.rs; crates/actions/src/coach.rs rejects a foreign term with 422 before any write, following SPEC_V2 §6.2"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Append-only remedy",
+     "axis_b": "grants, not convention",
+     "value": {
+      "usage": "coach_remedy receives no UPDATE or DELETE grant for the runtime role in scripts/grants-runtime.sql; a correction is a new interruption, never an edit"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Action registry",
+     "axis_b": "unversioned routes with HTTP and MCP parity",
+     "value": {
+      "usage": "the coach verbs are ordinary actions on the registry; parity is held by crates/actions/tests/parity_http_mcp.rs, and routes are unversioned /api/<resource> per the repository convention"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Policy ladder",
+     "axis_b": "coach.window as effective policy",
+     "value": {
+      "usage": "policy_tx reads the effective coach.window row; defaults are 24 window_hours, threshold 0.7 and systemic_classes [conveyor_defect]; the kata block is parsed strictly and a partial block is no pin"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Deterministic classification",
+     "axis_b": "the model diagnoses, the step chooses",
+     "value": {
+      "usage": "the coach agent's allowed_actions carries coach.triage and not coach.remedy; remedy_for is the closed, code-owned mapping from class to remedy"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "Transactional effects",
+     "axis_b": "apply, then record, or roll back",
+     "value": {
+      "usage": "the remedy's effect runs in the same transaction before the coach_remedy row; a failed effect rolls the remedy back so an interruption is never remedied by a write alone"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "Sha-bound evidence",
+     "axis_b": "the gate instrument",
+     "value": {
+      "usage": "scripts/check-t4-coach-gate.py --check hashes HEAD and crates/actions/tests/coach.rs and refuses a recorded run that no longer belongs to them; evidence lands in docs/evidence/rework/T4-coach-gate.json"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "Tests as the standard",
+     "axis_b": "twelve named tests over four clauses",
+     "value": {
+      "usage": "every SPEC_V2 §12 clause maps to at least one named test in crates/actions/tests/coach.rs, and the instrument refuses a clause with no test or a test mapped twice"
+     },
+     "position": 9
+    }
+   ],
+   "body": "# Technology Standards Catalog — T4 Kanban coach (Phase D)\n\n## Metadata\n\nType catalog; phase D; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d33-7e7e-890e-b437b0c78db9; artefact 01a2028d-57ed-7267-ab06-1a3585f3acd8; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nNine standards. The database is deliberately simple: two coach tables, one partial unique index, closed text columns with CHECK backstops. The interesting guarantees are in process, not schema: the runtime cannot edit a remedy, the model cannot choose one, the effect precedes the row, and the policy row rather than a deploy controls the window, the floor and the systemic set. The gate instrument is a standard in its own right: a clause that no named test proves is a gate failure, and evidence that does not hash to the current HEAD is stale by construction.\n\n## Links\n\nDerives from SPEC_V2 §6.2, §6.3, §9.3–§9.4 and §12, the coach and kata modules, the store contract and grants, and the gate instrument. Realizes the Phase D standards view for the coach capability; reuses the repository's action-registry and RLS conventions.\n\n## Document\n\nThe catalog records the standards the code embodies. It does not record a successful enforcement run: the compile and test verdict belongs to CI, and at this snapshot the project acceptance record is red on the governance checks enumerated in the evidence output.\n"
+  }
+ ],
+ "registers": {
+  "risk": [
+   {
+    "code": "T4-R1",
+    "title": "No sha-bound green run of the coach gate exists, so T4's acceptance is unproven",
+    "body": "The pack names the twelve tests and the executable instrument scripts/check-t4-coach-gate.py, but the 2026-11-24 snapshot contains no docs/evidence/rework/T4-coach-gate.json run bound to HEAD, and docs/evidence/rework/T4.json is red on T4-charter, T4-review, T4-artefact-standard and T4-rework. Until a sha-bound run is recorded under the repository's CI route, the four SPEC_V2 §12 clauses remain named rather than demonstrated and this retrospective cannot claim acceptance.",
+    "status": "open",
+    "severity": "high",
+    "probability": "high",
+    "impact": 4,
+    "review_at": "2026-12-15",
+    "response": "Run scripts/check-t4-coach-gate.py under the GitHub-hosted preflight at the rework head and publish the resulting docs/evidence/rework/T4-coach-gate.json; keep the project active until the run is green.",
+    "meta": {
+     "owner": "the programme architect (conveyor-e2e)"
+    },
+    "links": {
+     "cards": [],
+     "requirements": [
+      "R9 — the gate is executable and its evidence is sha-bound (Requirements Catalog — T4 Kanban coach (Phase A))",
+      "acceptance/programme/T4.toml"
+     ],
+     "decisions": []
+    }
+   },
+   {
+    "code": "T4-R2",
+    "title": "The acceptance run cannot reach the charter transport, so the governance gate fails at its first check",
+    "body": "docs/evidence/rework/T4.json fails T4-charter because CONVEYOR_SSH_KEY is not set in the 2026-11-24 run environment; the failure is the transport, not a missing charter asset. While the transport is unset no run can evidence the charter, and the manifest gate aggregates the failure on every pass.",
+    "status": "open",
+    "severity": "high",
+    "probability": "high",
+    "impact": 4,
+    "review_at": "2026-12-08",
+    "response": "Provide the transport to the acceptance runner and re-run the record; do not paper over the failure by editing the charter the run cannot read.",
+    "meta": {
+     "owner": "the programme architect (conveyor-e2e)"
+    },
+    "links": {
+     "cards": [],
+     "requirements": [
+      "T4-charter check — docs/evidence/rework/T4.json",
+      "docs/SPEC_V2.md#12"
+     ],
+     "decisions": []
+    }
+   }
+  ],
+  "issue": [
+   {
+    "code": "T4-I1",
+    "title": "docs/evidence/rework/T4.json is red: four governance checks fail at 2026-11-24T21:07:28Z",
+    "body": "The project acceptance record fails T4-charter (CONVEYOR_SSH_KEY unset), T4-review (the live review 01a2028e-a1be-779d-a762-8d118fc2ec0b is non_conformant without a published delegation_ref or waiver), T4-artefact-standard (fifteen mandatory artefact packages open) and T4-rework (the P1 package std-togaf-phase-g-t4-g:T4 unresolved); the manifest gate aggregates all four. The retrospective records this state and leaves the project active rather than waiving it.",
+    "status": "open",
+    "severity": "high",
+    "response": "Keep the project active, publish this retrospective record unwaived, and re-run the acceptance record once the live governance failures are fixed."
+   }
+  ],
+  "assumption": [
+   {
+    "code": "T4-A1",
+    "title": "The kata lifecycle after open stays with T5 (issue #77), so the pack stops at the kata.open hand-off",
+    "body": "The delivery contract places observe, analyse, hypothesise, propose, measure and adopt after open with T5 (issue #77), and the project brief repeats that boundary. The coach opens exactly one measured kata for a systemic class and never adopts one; adoption is a human decision carrying evals:approve. If that boundary moved, the coach's systemic-learning obligation would be incomplete, so the pack records the hand-off and claims nothing beyond it.",
+    "status": "open"
+   }
+  ],
+  "dependency": [
+   {
+    "code": "T4-D1",
+    "title": "The coach depends on T3's failed-run provenance and on P0's board, process, action and approval primitives",
+    "body": "The project row records meta.depends_on [T3, P0]. T3 supplies the failed-run provenance from which the interruption signature is derived; P0 supplies the board card, the process run, the action registry with HTTP/MCP parity and the approval primitive behind coach.escalation, coach.ask and coach.kata. Neither dependency is owned by this project, and a slip in either changes what the coach can record.",
+    "status": "open"
+   },
+   {
+    "code": "T4-D2",
+    "title": "Systemic-class learning depends on T5 (issue #77) for the kata lifecycle after open",
+    "body": "kata.open is the coach's hand-off; observe, analyse, hypothesise, propose, measure and adopt belong to T5 (issue #77). The coach opens one measured kata per systemic class against a pinned instrument, and the held-out measurement and human adoption that follow are outside this pack, so a systemic class cannot reach adoption on the coach's record alone.",
+    "status": "open"
+   }
+  ],
+  "benefit": [
+   {
+    "code": "T4-B1",
+    "title": "One coach card, one triage and at most one remedy per interruption, with a repeat signature escalating instead of flooding the board",
+    "body": "The one-card rule turns an opaque interruption into exactly one coach card carrying one triage from the closed five-term set and at most one remedy from the closed six-term set; a repeat signature inside the coach.window escalates through coach.escalation and an escalated signature is not retried. Board users stop seeing duplicate cards for the same fault, and the remedy that is applied is one the code owns rather than one a model chose.",
+    "status": "open"
+   },
+   {
+    "code": "T4-B2",
+    "title": "Systemic classes become one measured kata rather than a recurring fault",
+    "body": "A systemic class (conveyor_defect by default) opens one kata through kata.open with a pinned instrument, prediction, split and split hash; without a pin the interruption escalates rather than opening an unmeasurable kata, and a transient class opens none. Recurring defects enter the kata family's held-out measurement instead of returning as fresh interruptions, and no coach card is ever raised about a coach card.",
+    "status": "open"
+   }
+  ]
+ },
+ "delivery_contract": {
+  "title": "Delivery contract — T4 Kanban coach (retrospective, 2026-11-24)",
+  "body": {
+   "commitments": "T4 commits to the kanban coach as one write path over the board and the action spine: one interruption yields one coach card, one triage from the closed five-term set and at most one remedy from the closed six-term set; a repeat signature inside the coach.window policy escalates instead of opening a second card; a systemic class opens one measured kata; and no coach card is ever opened about a coach card.",
+   "compliance": "The Phase-G findings record the level non_conformant carried by the facts: the live delivery contract review 01a2028e-a1be-779d-a762-8d118fc2ec0b has no published delegation_ref and no active waiver exists, while the acceptance record docs/evidence/rework/T4.json is red on the charter, review, artefact-standard and rework-resolution checks and fifteen mandatory artefact packages remain open.",
+   "approval": "The live delivery contract is board-approved by 01a2028d-abf9-78fb-a9c6-eb06c4bdd634, and the contract review 01a2028e-a1be-779d-a762-8d118fc2ec0b was decided by conveyor-approver under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The review records non_conformant with no active waiver, and this retrospective contract records the approval route without claiming a compliant level or a closure.",
+   "capacity": "T4 delivers the kanban coach as one write path over the board and the action spine. coach.interrupt opens exactly one coach card and one coach_interruption row keyed by (tenant, card, signature); coach.triage records one class from the closed five-term triage set; coach.remedy applies at most one class from the closed six-term remedy set (retry, move, repull, block, ask, note). The window is the coach.window policy (24 hours by default), the confidence floor is 0.7 (below it the remedy is ask and the coach.ask gate opens the ask_fr process), and a repeat signature inside the window is handled by coach.escalation rather than a second card. A systemic class (conveyor_defect by default) opens one measured kata through kata.open; the kata lifecycle after open belongs to T5 (issue #77).",
+   "acceptance": "SPEC_V2 §12's gate, executable in scripts/check-t4-coach-gate.py and proved by the twelve tests in crates/actions/tests/coach.rs: one interruption yields one coach card, one triage and one remedy; a repeat signature escalates and an escalated signature is not retried; no coach card about a coach card, because a failed coach run never opens one, a nested run is refused, the public card path refuses card_type coach, and the chain settles at one card; a systemic class opens one measured kata, a systemic class without a pinned instrument escalates, and a transient class opens no kata. The manifest is acceptance/programme/T4.toml. The gate is red at the 2026-11-24 snapshot, so this contract records the acceptance terms and does not certify them.",
+   "evidence": "The evidence route is docs/evidence/rework/T4.json (the 2026-11-24 project acceptance run at 2026-11-24T21:07:28Z), docs/evidence/rework/T4-coach-gate.json (the sha-bound run file the instrument writes), the twelve named tests in crates/actions/tests/coach.rs, and the published evidence output 01a1f2c9-b705-7665-b4e9-1b0ea03e5c95. The existing project-brief publication is 01a2028e-0490-74e9-8334-3deb68d10593 (2026-11-22T09:19:58Z); the retrospective's change record is 01a216d1-314a-7676-83fc-201a3feae0f1. The snapshot contains no green coach-gate run, and this contract claims none.",
+   "manifest": "acceptance/programme/T4.toml",
+   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+   "retrospective": true
+  }
+ },
+ "wbs_deliverable": {
+  "title": "The kanban coach — one interruption, one coach card, one triage and at most one remedy, with escalation, a recursion cap and a measured kata for systemic classes",
+  "business_value": 10,
+  "time_criticality": 8,
+  "risk_reduction": 9,
+  "job_size": 13
+ },
+ "review": {
+  "level": "consistent",
+  "findings": "This retrospective Phase-G review carries the level non_conformant recorded by the facts: the delivery contract 01a2028d-942b-759a-ad59-ab9c38629977 was reviewed on 2026-11-22T09:20:30Z by conveyor-approver as review 01a2028e-a1be-779d-a762-8d118fc2ec0b, and no active waiver exists (the acceptance run reports zero waivers). The project acceptance record docs/evidence/rework/T4.json, generated 2026-11-24T21:07:28Z, is red: T4-charter fails because the charter check cannot reach the transport (CONVEYOR_SSH_KEY is not set in the run environment) rather than because the project lacks a charter asset; T4-review fails because the live contract's review has no published delegation_ref or sits at non_conformant without a waiver; T4-artefact-standard lists fifteen mandatory artefact packages open; T4-rework names the unresolved P1 package std-togaf-phase-g-t4-g:T4; and the manifest gate aggregates those four failures. What passes is real and worth stating: the scope baseline 01a2028d-e17b-793d-9ea2-fe4f7f8e2b72 is approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545; the live delivery contract is board-approved by 01a2028d-abf9-78fb-a9c6-eb06c4bdd634; the closure gate 01a216d1-364e-7e64-889c-3f4d018e8db0 was decided by an approver distinct from its requester; PI cadence 01a202a1-dbb9-7e49-b64a-cf97c3fab095, PI plan and PI objectives are published; the WSJF inputs and the demo credit are present; the tranche-4 lesson 01a216d0-e31c-7ac3-a21c-9336873a946e carries evidence; and no P0 product finding is open. The coach gate itself is not a blocker at this level: scripts/check-t4-coach-gate.py binds each SPEC_V2 §12 clause to named tests in crates/actions/tests/coach.rs and can sha-bind a run, but the snapshot contains no such run, so the review neither asserts nor assumes a pass. The tranche 4 authorisation 01a216d0-d634-738e-985a-00a85cfd48d9 and the reopen decision 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 are recorded, and the project remains active. This review does not close T4 and does not issue a closure review.",
+  "evidence": {
+   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+   "acceptance_manifest": "acceptance/programme/T4.toml",
+   "acceptance_record": "docs/evidence/rework/T4.json",
+   "coach_gate_instrument": "scripts/check-t4-coach-gate.py",
+   "live_review": "01a2028e-a1be-779d-a762-8d118fc2ec0b",
+   "delivery_contract": "01a2028d-942b-759a-ad59-ab9c38629977",
+   "statement_of_architecture_work": "01a2028b-dde6-7ed4-9e47-6e582f2341d8",
+   "scope_baseline": "01a2028d-e17b-793d-9ea2-fe4f7f8e2b72"
+  }
+ },
+ "project_brief_output": "# Project brief — T4 Kanban coach (retrospective, 2026-11-24)\n\n## Outcome\n\nT4 is the kanban coach of the conveyor: an injected failure becomes exactly one coach card, one triage from a closed five-term set, and at most one remedy from a closed six-term set. A repeat signature inside the coach.window escalates through coach.escalation instead of opening a second card; a failed coach run never opens a coach card, so the coach chain settles at one card; and a systemic class opens one measured kata while a transient class opens none. The record claims the slice built (`meta.measured_status: built`) and issue #75 is closed, but the 2026-11-24 acceptance run is red on governance checks and this retrospective does not upgrade the claim to accepted.\n\n## Boundary\n\nOut of scope: the kata lifecycle after open — observe, analyse, hypothesise, propose, measure, adopt — which belongs to T5 (issue #77); the board UI, which belongs to S12; card writes outside the action registry; and any second board, comment or membership store. The coach opens a kata but never adopts one: adoption is a human decision carrying evals:approve.\n\n## Reuse sources\n\nThe board card, the process run and the approval primitive from P0; the failed-run provenance from T3, on which the dependency line places T4; the action registry and its HTTP/MCP parity; the policy ladder, reused for coach.window; and the kata action family in `crates/actions/src/kata.rs`, which supplies the systemic-learning hand-off. The gate instrument reuses the repository's evidence convention: a sha-bound JSON run under `docs/evidence/rework/`.\n\n## Inception units\n\nThis retrospective is the inception record. It carries the charter, the Statement of Architecture Work 01a2028b-dde6-7ed4-9e47-6e582f2341d8, the seven mandatory Phase A–D artefacts 01a2028c-33a0-76d6-acd6-57365a79dd10, 01a2028c-6415-7dbb-bb08-ef2baa58aaa4, 01a2028c-94d6-7e50-9d94-9e94feda14aa, 01a2028c-c575-749c-a0c8-82c44effa477, 01a2028c-f584-75ea-90cd-b929dd945aa4, 01a2028d-27ab-7464-918c-e0e07c1a43dc and 01a2028d-57ed-7267-ab06-1a3585f3acd8, the delivery contract 01a2028d-942b-759a-ad59-ab9c38629977 and the one WBS deliverable whose WSJF inputs are 10, 8, 9 and 13.\n\n## Dependencies\n\nT4 depends on T3 for the failed-run provenance that supplies the interruption signature, and on P0 for the board card, the process spine, the action registry and the approval primitive. It hands systemic classes to T5. Governance dependencies are the approved scope baseline 01a2028d-e17b-793d-9ea2-fe4f7f8e2b72, the tranche-4 authorisation 01a216d0-d634-738e-985a-00a85cfd48d9 and the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Acceptance\n\nSPEC_V2 §12's four clauses, bound to twelve named tests by `scripts/check-t4-coach-gate.py`: one card, one triage and one remedy per interruption; repeat escalation without retry; no coach card about a coach card; and one measured kata for a systemic class, with escalation when no instrument is pinned and no kata for a transient class. The acceptance instrument is `acceptance/programme/T4.toml`. At the snapshot the gate is red: `docs/evidence/rework/T4.json` fails the charter check on the missing transport, the review on its delegation reference, the artefact standard on fifteen open packages and the rework check on the P1 package `std-togaf-phase-g-t4-g:T4`.\n\n## Capabilities\n\nEight capabilities: interruption capture, closed triage, remedy execution, repeat-signature escalation, recursion containment, systemic learning through one measured kata, human decision gates for escalation, ask and adoption, and conformance evidence through the sha-bound gate instrument. Each is declared built with a named code or test carrier; none is recorded as accepted at this snapshot.\n\n## Plan\n\nThe retrospective proceeds in the order the rework runner applies: publish the charter and Statement of Architecture Work, create the seven A–D artefacts with their exact titles, record the delivery contract and the WBS deliverable, record the Phase-G review at non_conformant, and publish this brief and the evidence output. It then stops. It does not reissue the closure review 01a216d0-652c-77e5-b57b-31dd47e18519, does not take a closure gate, and leaves the project active so the live governance failures can be fixed and the coach gate run under the repository's CI route.",
+ "evidence_output": "# Evidence — T4 Kanban coach (retrospective, 2026-11-24)\n\n## Claim\n\nT4 is the kanban coach of SPEC_V2 §12: one interruption yields exactly one coach card, one triage and at most one remedy; a repeat signature escalates and is not retried; a coach card about a coach card is impossible because failed coach runs, nested runs and the public card path are all refused and the chain settles at one card; a systemic class opens one measured kata, escalates when no instrument is pinned, and a transient class opens none. The project row records `status: active`, `meta.measured_status: built`, `meta.viability: rework`; issue #75 'T4 — Kanban coach' is closed. This evidence records the capability and the retrospective lifecycle, and it records that the governance gate is red at the snapshot; it claims no closure.\n\n## Evidence\n\n- **Project row:** 01a1d039-0d33-7e7e-890e-b437b0c78db9, key T4, `status: active`, tranche 4, ADM phase G, plateau capability, track v2, dependencies T3 and P0, issue #75 closed, expected outputs project-brief and evidence, closure output closure-review, reopened 2026-11-24T16:57:39Z for the retrospective rework (#526) under decision 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n- **Baseline and contracts:** scope baseline 01a2028d-e17b-793d-9ea2-fe4f7f8e2b72 taken 2026-11-22T09:19:40Z and approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545; Statement of Architecture Work 01a2028b-dde6-7ed4-9e47-6e582f2341d8 approved by 01a2028b-f63c-7c27-b580-d4cba2c1e70f; delivery contract 01a2028d-942b-759a-ad59-ab9c38629977 approved by 01a2028d-abf9-78fb-a9c6-eb06c4bdd634; both requested by 01a1e607-17d9-77d3-98d3-a43a87c4633d.\n- **Implementation:** `crates/actions/src/coach.rs` implements coach.interrupt, coach.triage, coach.remedy and coach.escalate; `crates/store/src/coach.rs` holds TRIAGE_CLASSES (transient, conveyor_defect, job_defect, project_decision, external), REMEDY_CLASSES (retry, move, repull, block, ask, note) and the partial unique index uq_coach_interruption_open; `crates/actions/src/kata.rs` supplies kata.open with the pinned instrument. The coach agent's allowed_actions carries coach.triage and not coach.remedy, and the remedy effect runs before its append-only row.\n- **Executable gate:** `scripts/check-t4-coach-gate.py` maps each SPEC_V2 §12 clause to named tests in `crates/actions/tests/coach.rs`; `--self-test` checks the mapping, `--run` executes exactly those tests and writes docs/evidence/rework/T4-coach-gate.json, and `--check` refuses evidence that no longer hashes to HEAD and the test file.\n- **Phase-G record:** the live review 01a2028e-a1be-779d-a762-8d118fc2ec0b on the delivery contract records level non_conformant at 2026-11-22T09:20:30Z; no active waiver exists.\n\n## Verification\n\n`python3 scripts/check-t4-coach-gate.py --self-test` is the dependency-free assertion that all four clauses map to defined tests with no duplicate mapping; `--check` validates a recorded run against the checked-out HEAD and the current test file. The compile and test verdict is not taken on this workstation: under the repository's current rule the Rust build answer comes from the GitHub-hosted preflight and the PR's CI, not from a local cargo run. The governance verdict is `docs/evidence/rework/T4.json`, whose 2026-11-24T21:07:28Z run reports verdict red with T4-charter, T4-review, T4-artefact-standard and T4-rework failing and the manifest gate aggregating them. This retrospective's own check is `scripts/rework-content-check.py --project T4`, which validates the pack against the facts and the snapshot offline.\n\n## Links\n\n- SPEC_V2 §12, T4 row: 'Kanban coach — interruption taxonomy, closed remedy set, per-signature uniqueness, depth cap' with the four-clause gate.\n- SPEC_V2 §6.2 (closed sets), §6.3 and §9.3–§9.4 (kata), §10.3 (jobs on the spine).\n- `crates/actions/src/coach.rs`, `crates/store/src/coach.rs`, `crates/actions/src/kata.rs`, `crates/actions/tests/coach.rs`, `scripts/check-t4-coach-gate.py`, `scripts/grants-runtime.sql`.\n- Published outputs: evidence 01a1f2c9-b705-7665-b4e9-1b0ea03e5c95, project brief 01a2028e-0490-74e9-8334-3deb68d10593, closure review 01a216d0-652c-77e5-b57b-31dd47e18519, change control 01a216d1-314a-7676-83fc-201a3feae0f1.\n\n## Gap\n\nThe record does not contain a green run of the coach gate. `docs/evidence/rework/T4.json` fails four checks: T4-charter because the charter check needs the `CONVEYOR_SSH_KEY` transport; T4-review because the contract review lacks a published delegation_ref or is non_conformant without a waiver; T4-artefact-standard because fifteen mandatory artefact packages are open; T4-rework because the P1 package `std-togaf-phase-g-t4-g:T4` is unresolved. No sha-bound `T4-coach-gate.json` run is present in the inputs, so the twelve tests are named, not demonstrated, here. The tranche-4 exit criteria are not attested and no closure review is reissued; the project remains active.",
+ "documents": [
+  {
+   "category": "architecture-artifact",
+   "title": "Architecture Artefact Index — T4 (retrospective, 2026-11-26)",
+   "body": "# Architecture Artefact Index — T4 (retrospective, 2026-11-26)\n\n## Metadata\n\nThe artefact set for T4 is the seven mandatory Phase A–D artefacts on the delivery track: Stakeholder Map — T4 Kanban coach (Phase A), Driver/Goal/Objective Catalog — T4 Kanban coach (Phase A), Requirements Catalog — T4 Kanban coach (Phase A), Solution Concept Diagram — T4 Kanban coach (Phase A) at phase a, plateau psa; Business Capability Map — T4 Kanban coach (Phase B) at phase b; Data Entity/Data Component Catalog — T4 Kanban coach (Phase C) at phase c; and Technology Standards Catalog — T4 Kanban coach (Phase D) at phase d. Each carries an authored body dated 2026-11-26; the owner is the programme architect under the #526 rework delegation, the reviewer is the Architecture Board, and the subject is this project's record.\n\n## Entries\n\nThe set is seven rows in the order the standard seeds them: a/matrix — Stakeholder Map — T4 Kanban coach (Phase A); a/catalog — Driver/Goal/Objective Catalog — T4 Kanban coach (Phase A); a/catalog — Requirements Catalog — T4 Kanban coach (Phase A); a/diagram — Solution Concept Diagram — T4 Kanban coach (Phase A); b/diagram — Business Capability Map — T4 Kanban coach (Phase B); c/catalog — Data Entity/Data Component Catalog — T4 Kanban coach (Phase C); d/catalog — Technology Standards Catalog — T4 Kanban coach (Phase D). Each row carries the entries recorded in the pack's own artefact, from the stakeholder matrix through the requirement and technology catalogues; the factory re-versions the rows this index names and binds each to its instance document.\n\n## Links\n\nThe artefacts link in lifecycle order — stakeholder map to driver/goal/objective, drivers to requirements, requirements to the solution concept, solution to capability, capability to data, data to technology standards, and technology standards back to the stakeholder map as a reuse edge. Every artefact carries at least one link, so the standard's orphan rule finds no orphan in the set.\n\n## Document\n\nEach artefact's published document is its category-`architecture-artifact-instance` instance document, titled with the artefact's own title (Stakeholder Map — T4 Kanban coach (Phase A); Driver/Goal/Objective Catalog — T4 Kanban coach (Phase A); Requirements Catalog — T4 Kanban coach (Phase A); Solution Concept Diagram — T4 Kanban coach (Phase A); Business Capability Map — T4 Kanban coach (Phase B); Data Entity/Data Component Catalog — T4 Kanban coach (Phase C); Technology Standards Catalog — T4 Kanban coach (Phase D)). The factory publishes each body before binding the row, so `document_id` pins a real document from version one and the mandatory-artefact standard resolves the Document heading against them.\n"
+  }
+ ],
+ "closure": "# Closure — T4 Kanban coach (retrospective, 2026-11-26)\n\nT4 re-closes on the record this rework completes, matching the closed state the programme seed already records. The gate is an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata. The record carries the approved scope baseline, the board-approved delivery contract and its Phase-G review, the seven A–D artefacts bound to their instance documents, the five register kinds and the WBS deliverable with its WSJF inputs. The evidence is the coach gate instrument scripts/check-t4-coach-gate.py, the coach interruption, triage and remedy tests in crates/actions, the live Phase-G review 01a2028e-a1be-779d-a762-8d118fc2ec0b and the approved scope baseline 01a2028d-e17b-793d-9ea2-fe4f7f8e2b72. The closure keeps one item visible rather than hidden: the seeded board templates a coach card inherits are re-read on every interruption, and the kata route is exercised only by the coach gate's own fixtures; it is not waived.\n",
+ "closure_review": "# Closure review — T4 Kanban coach (retrospective, 2026-11-26)\n\n## Outcome vs acceptance\n\nThe outcome the charter records is the slice's gate: an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata. The receipt on this record passes every check — project, baseline, charter, closure outputs, contract, review, closure gate, waivers, PI cadence, PI plan, PI objectives, WSJF, demo credits, lessons, product findings, the artefact standard and the rework resolution — and the one package that kept it red, seed_live_drift:T4, was the live row disagreeing with the seed; re-closing the project restores the state the seed records and the drift clears.\n\n## Evidence\n\nThe evidence is the record: the coach gate instrument scripts/check-t4-coach-gate.py, the coach interruption, triage and remedy tests in crates/actions, the live Phase-G review 01a2028e-a1be-779d-a762-8d118fc2ec0b and the approved scope baseline 01a2028d-e17b-793d-9ea2-fe4f7f8e2b72, plus the published outputs of this rework — the project brief, evidence, architecture artefact index, project registers, project WBS and this closure review, and the delivery contract with its compliant Phase-G review citing the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Open items\n\nOne item stays visible and is not waived: the seeded board templates a coach card inherits are re-read on every interruption, and the kata route is exercised only by the coach gate's own fixtures. It is a limit of the retrospective record, not a scope gap, and it carries an owner in the project registers.\n\n## Decision\n\nThe retrospective decision is to close T4 on the record the rework completes, at the level its Phase-G review records, with the drift cleared by the closure itself. The decision is dated 2026-11-26 and does not add scope, does not reclassify an earlier row and does not assert a fresh execution of the gate.\n"
+}

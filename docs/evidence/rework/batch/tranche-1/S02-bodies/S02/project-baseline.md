@@ -1,0 +1,399 @@
+# Project Baseline — Skeleton — workspace, tenancy, auth, jobs, SSE
+
+## Scope
+
+The record the section derives from, or an explicit absence.
+
+```json
+{
+  "category": "project-baseline",
+  "count": 1,
+  "rows": [
+    {
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approved_by_name": "conveyor-approver",
+      "created_at": "2026-11-21T19:12:12.47338+00:00",
+      "id": "01a1ff85-faae-7c2e-b897-fe957985ca78",
+      "kind": "scope",
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "snapshot": {
+        "frozen": true,
+        "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+        "register": [],
+        "wbs": [
+          {
+            "business_value": 8,
+            "id": "01a1ff85-f9d6-75b3-93cf-65b5df192376",
+            "job_size": 13,
+            "kind": "deliverable",
+            "parent_id": null,
+            "position": 1.0,
+            "risk_reduction": 8,
+            "status": "open",
+            "time_criticality": 8,
+            "title": "S02 \u2014 Skeleton: tenancy, auth, jobs and SSE on Postgres 18"
+          }
+        ]
+      },
+      "taken_at": "2026-11-21T19:12:12.47338+00:00",
+      "taken_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "taken_by_name": "conveyor-e2e",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/project_baselines"
+}
+```
+
+## Schedule
+
+The record the section derives from, or an explicit absence.
+
+```json
+{
+  "category": "project-baseline",
+  "count": 1,
+  "rows": [
+    {
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approved_by_name": "conveyor-approver",
+      "created_at": "2026-11-26T12:50:29.80815+00:00",
+      "id": "01a217e8-4d37-7164-8980-5b06a1d23c14",
+      "kind": "schedule",
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "snapshot": {
+        "frozen": true,
+        "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+        "register": [
+          {
+            "code": "",
+            "id": "01a217e8-4ca6-7926-9329-9fae825190d8",
+            "impact": 4,
+            "kind": "benefit",
+            "severity": "low",
+            "status": "open",
+            "title": "The two-worker proof turns the lease policy from a declaration into evidence"
+          },
+          {
+            "code": "",
+            "id": "01a217e8-4c17-79e9-b360-904c1348f30d",
+            "impact": 4,
+            "kind": "benefit",
+            "severity": "low",
+            "status": "open",
+            "title": "The skeleton makes every later slice inherit isolation instead of re-implementing it"
+          },
+          {
+            "code": "",
+            "id": "01a217e8-4b86-790c-897b-e9ca5483da48",
+            "impact": 3,
+            "kind": "dependency",
+            "severity": "medium",
+            "status": "open",
+            "title": "S00's signed parity inventory fixes the surfaces S02 must expose"
+          },
+          {
+            "code": "",
+            "id": "01a217e8-4ad8-71ba-983c-f2753c475a9d",
+            "impact": 2,
+            "kind": "assumption",
+            "severity": "low",
+            "status": "open",
+            "title": "The scope baseline taken on 2026-11-21 still describes S02's boundary"
+          },
+          {
+            "code": "",
+            "id": "01a217e8-4a3d-753c-8eaf-224b6673bf8f",
+            "impact": 2,
+            "kind": "issue",
+            "severity": "medium",
+            "status": "open",
+            "title": "The closure outputs were declared in the 2026-11-21 transcript but are absent from the replay row"
+          },
+          {
+            "code": "",
+            "id": "01a217e8-499c-7d4f-89f5-5b169a5ae506",
+            "impact": 3,
+            "kind": "issue",
+            "severity": "high",
+            "status": "open",
+            "title": "Issue #2 was open at the start of the rework although its P2 test was already written"
+          },
+          {
+            "code": "",
+            "id": "01a217e8-48e8-78b9-b262-178c9120880b",
+            "impact": 4,
+            "kind": "risk",
+            "severity": "high",
+            "status": "open",
+            "title": "The rework could close S02 while issue #2 still reads open"
+          },
+          {
+            "code": "",
+            "id": "01a217e8-483d-7858-a47d-cfa2a5d547bf",
+            "impact": 2,
+            "kind": "risk",
+            "severity": "medium",
+            "status": "open",
+            "title": "The two-worker lease proof is timing-sensitive and could flake under load"
+          },
+          {
+            "code": "",
+            "id": "01a217e8-47b9-792b-a55f-dc7eba8cb02c",
+            "impact": 3,
+            "kind": "risk",
+            "severity": "medium",
+            "status": "open",
+            "title": "The replay record lost the artefact rows, so a re-creation could duplicate a surviving row"
+          },
+          {
+            "code": "U5-CHG-S02",
+            "id": "01a20200-d8b6-77fc-a176-76d4ea3f4567",
+            "impact": null,
+            "kind": "change",
+            "severity": null,
+            "status": "accepted",
+            "title": "Retrospective MSP/TOGAF/SAFe rework of S02 under the #526 scope change"
+          }
+        ],
+        "wbs": [
+          {
+            "business_value": 8,
+            "id": "01a1ff85-f9d6-75b3-93cf-65b5df192376",
+            "job_size": 13,
+            "kind": "deliverable",
+            "parent_id": null,
+            "position": 1.0,
+            "risk_reduction": 8,
+            "status": "accepted",
+            "time_criticality": 8,
+            "title": "S02 \u2014 Skeleton: tenancy, auth, jobs and SSE on Postgres 18"
+          }
+        ]
+      },
+      "taken_at": "2026-11-26T12:50:29.80815+00:00",
+      "taken_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "taken_by_name": "conveyor-e2e",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/project_baselines"
+}
+```
+
+## Cost
+
+The record the section derives from, or an explicit absence.
+
+```json
+{
+  "category": "project-baseline",
+  "count": 1,
+  "rows": [
+    {
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approved_by_name": "conveyor-approver",
+      "created_at": "2026-11-26T12:50:30.109182+00:00",
+      "id": "01a217e8-4e63-7ce4-8a6b-a6621def1957",
+      "kind": "cost",
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "snapshot": {
+        "frozen": true,
+        "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+        "register": [
+          {
+            "code": "",
+            "id": "01a217e8-4ca6-7926-9329-9fae825190d8",
+            "impact": 4,
+            "kind": "benefit",
+            "severity": "low",
+            "status": "open",
+            "title": "The two-worker proof turns the lease policy from a declaration into evidence"
+          },
+          {
+            "code": "",
+            "id": "01a217e8-4c17-79e9-b360-904c1348f30d",
+            "impact": 4,
+            "kind": "benefit",
+            "severity": "low",
+            "status": "open",
+            "title": "The skeleton makes every later slice inherit isolation instead of re-implementing it"
+          },
+          {
+            "code": "",
+            "id": "01a217e8-4b86-790c-897b-e9ca5483da48",
+            "impact": 3,
+            "kind": "dependency",
+            "severity": "medium",
+            "status": "open",
+            "title": "S00's signed parity inventory fixes the surfaces S02 must expose"
+          },
+          {
+            "code": "",
+            "id": "01a217e8-4ad8-71ba-983c-f2753c475a9d",
+            "impact": 2,
+            "kind": "assumption",
+            "severity": "low",
+            "status": "open",
+            "title": "The scope baseline taken on 2026-11-21 still describes S02's boundary"
+          },
+          {
+            "code": "",
+            "id": "01a217e8-4a3d-753c-8eaf-224b6673bf8f",
+            "impact": 2,
+            "kind": "issue",
+            "severity": "medium",
+            "status": "open",
+            "title": "The closure outputs were declared in the 2026-11-21 transcript but are absent from the replay row"
+          },
+          {
+            "code": "",
+            "id": "01a217e8-499c-7d4f-89f5-5b169a5ae506",
+            "impact": 3,
+            "kind": "issue",
+            "severity": "high",
+            "status": "open",
+            "title": "Issue #2 was open at the start of the rework although its P2 test was already written"
+          },
+          {
+            "code": "",
+            "id": "01a217e8-48e8-78b9-b262-178c9120880b",
+            "impact": 4,
+            "kind": "risk",
+            "severity": "high",
+            "status": "open",
+            "title": "The rework could close S02 while issue #2 still reads open"
+          },
+          {
+            "code": "",
+            "id": "01a217e8-483d-7858-a47d-cfa2a5d547bf",
+            "impact": 2,
+            "kind": "risk",
+            "severity": "medium",
+            "status": "open",
+            "title": "The two-worker lease proof is timing-sensitive and could flake under load"
+          },
+          {
+            "code": "",
+            "id": "01a217e8-47b9-792b-a55f-dc7eba8cb02c",
+            "impact": 3,
+            "kind": "risk",
+            "severity": "medium",
+            "status": "open",
+            "title": "The replay record lost the artefact rows, so a re-creation could duplicate a surviving row"
+          },
+          {
+            "code": "U5-CHG-S02",
+            "id": "01a20200-d8b6-77fc-a176-76d4ea3f4567",
+            "impact": null,
+            "kind": "change",
+            "severity": null,
+            "status": "accepted",
+            "title": "Retrospective MSP/TOGAF/SAFe rework of S02 under the #526 scope change"
+          }
+        ],
+        "wbs": [
+          {
+            "business_value": 8,
+            "id": "01a1ff85-f9d6-75b3-93cf-65b5df192376",
+            "job_size": 13,
+            "kind": "deliverable",
+            "parent_id": null,
+            "position": 1.0,
+            "risk_reduction": 8,
+            "status": "accepted",
+            "time_criticality": 8,
+            "title": "S02 \u2014 Skeleton: tenancy, auth, jobs and SSE on Postgres 18"
+          }
+        ]
+      },
+      "taken_at": "2026-11-26T12:50:30.109182+00:00",
+      "taken_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "taken_by_name": "conveyor-e2e",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/project_baselines"
+}
+```
+
+## Approval
+
+The record the section derives from, or an explicit absence.
+
+```json
+{
+  "category": "project-baseline",
+  "count": 3,
+  "rows": [
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T19:12:12.47338+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a1ff85-fb0a-7e74-b5c5-cf27a530f0a8",
+      "kind": "pm",
+      "meta": {
+        "baseline_id": "01a1ff85-faae-7c2e-b897-fe957985ca78",
+        "description": "Approve the scope baseline"
+      },
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T19:12:18.393901+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-26T12:50:29.80815+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a217e8-4d39-7342-82b0-322f082e3804",
+      "kind": "pm",
+      "meta": {
+        "approver_kind": "human",
+        "baseline_id": "01a217e8-4d37-7164-8980-5b06a1d23c14",
+        "description": "Approve the schedule baseline",
+        "gate_policy": {
+          "floor": 1,
+          "source": "default"
+        }
+      },
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-26T12:50:29.960551+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-26T12:50:30.109182+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a217e8-4e65-7daa-9408-af7ef881bbf6",
+      "kind": "pm",
+      "meta": {
+        "approver_kind": "human",
+        "baseline_id": "01a217e8-4e63-7ce4-8a6b-a6621def1957",
+        "description": "Approve the cost baseline",
+        "gate_policy": {
+          "floor": 1,
+          "source": "default"
+        }
+      },
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-26T12:50:30.24845+00:00",
+      "version": 2
+    }
+  ],
+  "source": "work.json#/approvals"
+}
+```

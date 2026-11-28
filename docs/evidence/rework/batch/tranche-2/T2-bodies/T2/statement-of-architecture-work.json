@@ -1,0 +1,87 @@
+{
+  "body_sha256": "f825f904902ecd7429fa85be86deab0fd8b3ae67887eed4678d1d84e9c96150a",
+  "category": "statement-of-architecture-work",
+  "headings": [
+    {
+      "heading": "Assignment",
+      "required": true,
+      "sources": [
+        {
+          "category": "statement-of-architecture-work",
+          "count": 2,
+          "file": "architecture.json",
+          "kind": "rows",
+          "pointer": "/contracts"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Scope",
+      "required": true,
+      "sources": [
+        {
+          "category": "statement-of-architecture-work",
+          "count": 2,
+          "file": "architecture.json",
+          "kind": "rows",
+          "pointer": "/contracts"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Responsibilities",
+      "required": true,
+      "sources": [
+        {
+          "category": "statement-of-architecture-work",
+          "count": 2,
+          "file": "architecture.json",
+          "kind": "rows",
+          "pointer": "/contracts"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Acceptance criteria",
+      "required": true,
+      "sources": [
+        {
+          "category": "statement-of-architecture-work",
+          "count": 2,
+          "file": "architecture.json",
+          "kind": "rows",
+          "pointer": "/contracts"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Contract",
+      "required": true,
+      "sources": [
+        {
+          "category": "statement-of-architecture-work",
+          "count": 2,
+          "file": "architecture.json",
+          "kind": "rows",
+          "pointer": "/contracts"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "bc2322766512ad69b1a58740b0cffceccfbf2c0ccb3dfd305b652cf2e61ae79b",
+  "spec": "\u00a78.1",
+  "standard": "TOGAF",
+  "subject": {
+    "id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+    "key": "T2",
+    "kind": "project",
+    "title": "Decision ladder"
+  },
+  "title": "Statement Of Architecture Work \u2014 Decision ladder"
+}

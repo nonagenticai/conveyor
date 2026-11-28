@@ -1,0 +1,122 @@
+[project]
+key = "S01"
+name = "UI spike — Leptos CSR vs Leptos SSR"
+gate = "The decision record states what is observable and marks the rest not recoverable; the project re-closes through the one gate."
+gate_checks = ["S01-project", "S01-baseline", "S01-charter", "S01-closure-outputs", "S01-contract", "S01-review", "S01-closure-gate", "S01-waivers", "S01-decision-record", "S01-pi-cadence", "S01-wsjf", "S01-demo-credits", "S01-product", "S01-artefact-standard", "S01-rework"]
+[[check]]
+id = "S01-project"
+check = "project"
+severity = "P0"
+description = "S01 is closed"
+
+[[check]]
+id = "S01-baseline"
+check = "project_baseline"
+require_approved = true
+severity = "P0"
+description = "the scope baseline is approved; the close gate reads the approved row"
+
+[[check]]
+id = "S01-charter"
+kind = "command"
+severity = "P0"
+description = "the charter asset exists and the charter gate is approved"
+command = '''python3 scripts/programme-record.py --check --action pm.get --input '{"project_id":"01a1d039-0d27-724c-9bae-af96b2d926b1"}' | python3 -c '
+import json,sys
+s=sys.stdin.read()
+d=json.loads(s[s.find("{"):])
+o=d.get("output",d)
+assert o.get("charter_asset_id"), "no charter asset"
+gates={g.get("gate"):g.get("status") for g in o.get("gates",[])}
+assert gates.get("charter")=="approved", gates
+'
+'''
+
+[[check]]
+id = "S01-closure-outputs"
+check = "closure_outputs"
+severity = "P0"
+description = "the declared closure outputs are declared and published"
+
+[[check]]
+id = "S01-contract"
+check = "contract"
+severity = "P0"
+description = "a live board-approved delivery contract exists"
+
+[[check]]
+id = "S01-review"
+check = "review"
+severity = "P0"
+description = "the Phase-G review cites a published standing delegation"
+
+[[check]]
+id = "S01-closure-gate"
+check = "closure_gate"
+severity = "P0"
+description = "the closure gate was decided by an approver other than its requester"
+
+[[check]]
+id = "S01-waivers"
+check = "waivers"
+severity = "P0"
+description = "no active waiver is expired or owned by its reviewer"
+
+[[check]]
+id = "S01-decision-record"
+kind = "command"
+severity = "P0"
+description = "the decision record marks the values nobody can now establish as not recoverable"
+command = '''python3 -c '
+import json, os, pathlib
+s = os.environ["VERIFY_SNAPSHOT"]
+programme = json.load(open(s + "/programme.json"))
+row = next(p for p in programme["projects"] if p["key"] == "S01")
+text = open(s + "/../docs/outputs.js").read()
+index = json.loads(text[text.find("{"):text.rfind("}") + 1])
+outputs = [o for o in index["outputs"] if o.get("project_id") == row["id"]]
+assert outputs, "S01 publishes no output"
+pages = []
+for o in outputs:
+    if o.get("path"):
+        pages.append(pathlib.Path(s).parent.joinpath("docs", pathlib.Path(o["path"]).name).read_text())
+body = "\n".join(pages).lower()
+assert "not recoverable" in body, "the decision record does not mark an unrecoverable value"
+'
+'''
+
+[[check]]
+id = "S01-pi-cadence"
+check = "pi_cadence"
+severity = "P0"
+description = "the project's PI has a cadence row and a backlog-refinement row"
+
+[[check]]
+id = "S01-wsjf"
+check = "wsjf"
+severity = "P0"
+description = "every WBS deliverable of the project carries the four typed WSJF inputs"
+
+[[check]]
+id = "S01-demo-credits"
+check = "demo_credits"
+severity = "P0"
+description = "every accepted deliverable has a demo credit carrying its evidence"
+
+[[check]]
+id = "S01-product"
+check = "product_findings"
+severity = "P0"
+description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "S01-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "S01-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"

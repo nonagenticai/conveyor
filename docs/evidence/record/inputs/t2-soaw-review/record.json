@@ -1,0 +1,16 @@
+{
+  "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+  "contract_id": "01a2005a-7886-7f2d-9b49-53d174544ee9",
+  "level": "compliant",
+  "findings": [
+    {
+      "verdict": "pass",
+      "statement": "The T2 Statement of Architecture Work is delivered as written: its scope is the decision ladder and the generation split of SPEC_V2 section 7, its acceptance criterion is the section 12 T2 gate, the contract is live and approved by a distinct approver, and its only recorded deviation (v1-t2-1) is fixed at 920a1dcbfa6427b59aada92a63b6c29eb6bdcde6 with crates/actions/tests/documents_compose_gate.rs."
+    }
+  ],
+  "evidence": {
+    "manifest": "acceptance/programme/T2.toml",
+    "closure_review": "01a2005c-8c03-716a-b6c1-a6389e3a337c"
+  },
+  "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+}

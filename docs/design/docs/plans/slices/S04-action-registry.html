@@ -361,6 +361,9 @@ kill %1 2&gt;/dev/null || true</code></pre>
 </tr>
 </tbody>
 </table>
+<p><strong>Delivery evidence (2026-11-22).</strong> The registry this slice declares is live: the compiled <code>Registry</code> and <code>assert_registry_consistent</code> in <code>crates/actions</code>, the served manifest at <code>docs/design/data/actions.json</code> (527 actions), and <code>served-spec.lock.json</code> under <code>--check-lock</code>. The gate is proved in <code>crates/actions/tests/parity_http_mcp.rs</code>, which invokes the actions over HTTP and MCP and compares the bodies; the four <code>fixtures.*</code> actions, the idempotency replay, the RFC 9457 refusals, the timeout/breaker paths and the OpenAPI ingest diff are covered by the same workspace tests. This corrects the frontmatter's stale <code>planned</code>: the code and the proof existed; the status did not follow them.</p>
+<p><code>parity_ids</code> stays <code>PENDING-S0</code>: the S00 parity contract (<code>parity/parity.yaml</code>, <code>parity/native.tsv</code>) does not yet name this slice's actions. That is an S00 trace obligation, not a missing S04 deliverable; the S04 gate (HTTP/MCP identity) does not depend on it.</p>
+<p>The three open questions in §10 remain open as recorded design defaults; the closure review carries them as open items.</p>
 <h2 id="8-traps">8. Traps</h2>
 <ol type="1">
 <li><strong>Four artifacts drifting is the fr lesson.</strong> Any projection reading a <em>second</em> source is the bug.</li>

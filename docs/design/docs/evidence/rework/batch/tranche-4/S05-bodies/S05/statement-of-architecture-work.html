@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Statement Of Architecture Work — Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S05-bodies/S05/statement-of-architecture-work.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="statement-of-architecture-work--board--projects-boards-lists-cards-labels-comments-tasks-custom-fields-webhooks-sse">Statement Of Architecture Work — Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE</h1>
+<h2 id="assignment">Assignment</h2>
+<p>What the architecture work is asked to deliver and for whom.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a219d8-8c6d-715e-ad85-da38d5f3351c&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-26T21:52:31.994413+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The slice gate in `acceptance/programme/S05.toml` and plan \u00a77: (a) replay fidelity \u2014 1,000 cards/10 lists, `admin diff` prints zero deltas; (b) one winner \u2014 two clients with the same `If-Match` get one 200 and one 412 carrying the current representation, `version` +1; (c) 1k load \u2014 `GET /api/boards/{id}/cards?limit=200` p95 \u2264 120 ms at 20 rps, 1,000 cards in five pages \u2264 500 ms; (d) webhook shape \u2014 `{event,data,prevData,user}` exactly, `event` the internal register type and `data.list_id`/`prevData.list_id` the lanes; (e) SSE \u2014 a second client on `board:{id}` gets `card.moved` \u2264 200 ms live and on replay; (f) no second store \u2014 one `comment`, one `board_membership`, no `card_membership`, no `attachment`. The instrument is `acceptance/programme/S05.toml`; the closure gate is decided by an approver other than its requester. The snapshot records no Phase-G review of these properties; this rework records that gap rather than claiming a pass.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V1 slice S05 (SPEC \u00a78 S5) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter and the delivery contract, take the scope baseline with the one WBS deliverable, record the Phase-G compliance review, publish the expected outputs (`project-brief`, `evidence`) and the closure review, and re-close through the acceptance instrument.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the board slice of the plan: the nine tables (board_membership, label, card_label, comment, task_list, task, custom_field, custom_field_value, webhook_subscription), the 39 actions, the read projections and cursors, the SSE topics `board:{id}` and the resolved `card:{id}`, the webhook emitter and its `webhook.deliver` job, and the key-referenced `board-export/v1` CLI. Out of scope: attachments and card-level memberships, claims/assignee/stopwatch writes (S06), webhook delivery rows as actions, and the UI (S12).&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-26T21:52:31.682863+00:00&quot;,
+      &quot;id&quot;: &quot;01a219d8-8bc7-71a2-8dbe-33702699eac1&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d29-796d-967b-1e819a4dd40a&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 S05 Board (retrospective, 2026-11-24)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:52:31.994413+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="scope">Scope</h2>
+<p>The boundaries, the artefacts expected and the phase set.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a219d8-8c6d-715e-ad85-da38d5f3351c&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-26T21:52:31.994413+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The slice gate in `acceptance/programme/S05.toml` and plan \u00a77: (a) replay fidelity \u2014 1,000 cards/10 lists, `admin diff` prints zero deltas; (b) one winner \u2014 two clients with the same `If-Match` get one 200 and one 412 carrying the current representation, `version` +1; (c) 1k load \u2014 `GET /api/boards/{id}/cards?limit=200` p95 \u2264 120 ms at 20 rps, 1,000 cards in five pages \u2264 500 ms; (d) webhook shape \u2014 `{event,data,prevData,user}` exactly, `event` the internal register type and `data.list_id`/`prevData.list_id` the lanes; (e) SSE \u2014 a second client on `board:{id}` gets `card.moved` \u2264 200 ms live and on replay; (f) no second store \u2014 one `comment`, one `board_membership`, no `card_membership`, no `attachment`. The instrument is `acceptance/programme/S05.toml`; the closure gate is decided by an approver other than its requester. The snapshot records no Phase-G review of these properties; this rework records that gap rather than claiming a pass.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V1 slice S05 (SPEC \u00a78 S5) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter and the delivery contract, take the scope baseline with the one WBS deliverable, record the Phase-G compliance review, publish the expected outputs (`project-brief`, `evidence`) and the closure review, and re-close through the acceptance instrument.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the board slice of the plan: the nine tables (board_membership, label, card_label, comment, task_list, task, custom_field, custom_field_value, webhook_subscription), the 39 actions, the read projections and cursors, the SSE topics `board:{id}` and the resolved `card:{id}`, the webhook emitter and its `webhook.deliver` job, and the key-referenced `board-export/v1` CLI. Out of scope: attachments and card-level memberships, claims/assignee/stopwatch writes (S06), webhook delivery rows as actions, and the UI (S12).&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-26T21:52:31.682863+00:00&quot;,
+      &quot;id&quot;: &quot;01a219d8-8bc7-71a2-8dbe-33702699eac1&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d29-796d-967b-1e819a4dd40a&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 S05 Board (retrospective, 2026-11-24)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:52:31.994413+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="responsibilities">Responsibilities</h2>
+<p>Who does the work and who accepts it.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a219d8-8c6d-715e-ad85-da38d5f3351c&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-26T21:52:31.994413+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The slice gate in `acceptance/programme/S05.toml` and plan \u00a77: (a) replay fidelity \u2014 1,000 cards/10 lists, `admin diff` prints zero deltas; (b) one winner \u2014 two clients with the same `If-Match` get one 200 and one 412 carrying the current representation, `version` +1; (c) 1k load \u2014 `GET /api/boards/{id}/cards?limit=200` p95 \u2264 120 ms at 20 rps, 1,000 cards in five pages \u2264 500 ms; (d) webhook shape \u2014 `{event,data,prevData,user}` exactly, `event` the internal register type and `data.list_id`/`prevData.list_id` the lanes; (e) SSE \u2014 a second client on `board:{id}` gets `card.moved` \u2264 200 ms live and on replay; (f) no second store \u2014 one `comment`, one `board_membership`, no `card_membership`, no `attachment`. The instrument is `acceptance/programme/S05.toml`; the closure gate is decided by an approver other than its requester. The snapshot records no Phase-G review of these properties; this rework records that gap rather than claiming a pass.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V1 slice S05 (SPEC \u00a78 S5) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter and the delivery contract, take the scope baseline with the one WBS deliverable, record the Phase-G compliance review, publish the expected outputs (`project-brief`, `evidence`) and the closure review, and re-close through the acceptance instrument.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the board slice of the plan: the nine tables (board_membership, label, card_label, comment, task_list, task, custom_field, custom_field_value, webhook_subscription), the 39 actions, the read projections and cursors, the SSE topics `board:{id}` and the resolved `card:{id}`, the webhook emitter and its `webhook.deliver` job, and the key-referenced `board-export/v1` CLI. Out of scope: attachments and card-level memberships, claims/assignee/stopwatch writes (S06), webhook delivery rows as actions, and the UI (S12).&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-26T21:52:31.682863+00:00&quot;,
+      &quot;id&quot;: &quot;01a219d8-8bc7-71a2-8dbe-33702699eac1&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d29-796d-967b-1e819a4dd40a&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 S05 Board (retrospective, 2026-11-24)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:52:31.994413+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="acceptance-criteria">Acceptance criteria</h2>
+<p>The conditions the architecture must meet to close Phase A.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a219d8-8c6d-715e-ad85-da38d5f3351c&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-26T21:52:31.994413+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The slice gate in `acceptance/programme/S05.toml` and plan \u00a77: (a) replay fidelity \u2014 1,000 cards/10 lists, `admin diff` prints zero deltas; (b) one winner \u2014 two clients with the same `If-Match` get one 200 and one 412 carrying the current representation, `version` +1; (c) 1k load \u2014 `GET /api/boards/{id}/cards?limit=200` p95 \u2264 120 ms at 20 rps, 1,000 cards in five pages \u2264 500 ms; (d) webhook shape \u2014 `{event,data,prevData,user}` exactly, `event` the internal register type and `data.list_id`/`prevData.list_id` the lanes; (e) SSE \u2014 a second client on `board:{id}` gets `card.moved` \u2264 200 ms live and on replay; (f) no second store \u2014 one `comment`, one `board_membership`, no `card_membership`, no `attachment`. The instrument is `acceptance/programme/S05.toml`; the closure gate is decided by an approver other than its requester. The snapshot records no Phase-G review of these properties; this rework records that gap rather than claiming a pass.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V1 slice S05 (SPEC \u00a78 S5) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter and the delivery contract, take the scope baseline with the one WBS deliverable, record the Phase-G compliance review, publish the expected outputs (`project-brief`, `evidence`) and the closure review, and re-close through the acceptance instrument.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the board slice of the plan: the nine tables (board_membership, label, card_label, comment, task_list, task, custom_field, custom_field_value, webhook_subscription), the 39 actions, the read projections and cursors, the SSE topics `board:{id}` and the resolved `card:{id}`, the webhook emitter and its `webhook.deliver` job, and the key-referenced `board-export/v1` CLI. Out of scope: attachments and card-level memberships, claims/assignee/stopwatch writes (S06), webhook delivery rows as actions, and the UI (S12).&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-26T21:52:31.682863+00:00&quot;,
+      &quot;id&quot;: &quot;01a219d8-8bc7-71a2-8dbe-33702699eac1&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d29-796d-967b-1e819a4dd40a&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 S05 Board (retrospective, 2026-11-24)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:52:31.994413+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="contract">Contract</h2>
+<p>The contract record, its version and its approval.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a219d8-8c6d-715e-ad85-da38d5f3351c&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-26T21:52:31.994413+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The slice gate in `acceptance/programme/S05.toml` and plan \u00a77: (a) replay fidelity \u2014 1,000 cards/10 lists, `admin diff` prints zero deltas; (b) one winner \u2014 two clients with the same `If-Match` get one 200 and one 412 carrying the current representation, `version` +1; (c) 1k load \u2014 `GET /api/boards/{id}/cards?limit=200` p95 \u2264 120 ms at 20 rps, 1,000 cards in five pages \u2264 500 ms; (d) webhook shape \u2014 `{event,data,prevData,user}` exactly, `event` the internal register type and `data.list_id`/`prevData.list_id` the lanes; (e) SSE \u2014 a second client on `board:{id}` gets `card.moved` \u2264 200 ms live and on replay; (f) no second store \u2014 one `comment`, one `board_membership`, no `card_membership`, no `attachment`. The instrument is `acceptance/programme/S05.toml`; the closure gate is decided by an approver other than its requester. The snapshot records no Phase-G review of these properties; this rework records that gap rather than claiming a pass.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V1 slice S05 (SPEC \u00a78 S5) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter and the delivery contract, take the scope baseline with the one WBS deliverable, record the Phase-G compliance review, publish the expected outputs (`project-brief`, `evidence`) and the closure review, and re-close through the acceptance instrument.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the board slice of the plan: the nine tables (board_membership, label, card_label, comment, task_list, task, custom_field, custom_field_value, webhook_subscription), the 39 actions, the read projections and cursors, the SSE topics `board:{id}` and the resolved `card:{id}`, the webhook emitter and its `webhook.deliver` job, and the key-referenced `board-export/v1` CLI. Out of scope: attachments and card-level memberships, claims/assignee/stopwatch writes (S06), webhook delivery rows as actions, and the UI (S12).&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-26T21:52:31.682863+00:00&quot;,
+      &quot;id&quot;: &quot;01a219d8-8bc7-71a2-8dbe-33702699eac1&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d29-796d-967b-1e819a4dd40a&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 S05 Board (retrospective, 2026-11-24)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:52:31.994413+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-4/S05-bodies/S05/statement-of-architecture-work.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Closure review — S07 (retrospective, 2026-11-26) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="closure-review" data-provenance-version="1" data-provenance-hash="b84fd99dee401a1e9d62bc52a30c9bbe7eee462e19f64412194aaa150cc6dc3d" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>closure-review</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>b84fd99dee401a1e9d62bc52a30c9bbe7eee462e19f64412194aaa150cc6dc3d</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Closure review — S07 Requirements and search (retrospective, 2026-11-24)</h1>
+<h2>Outcome vs acceptance</h2>
+<p>Judged against SPEC §8 S7 and plan §7, the seven properties are: (a) three revisions with max(seq)=3 and a compare that shows the status change; (b) an idempotent seed returning {0,0,N}; (c) both GIN indexes used under <code>enable_seqscan=off</code> with <code>idx_scan</code> rising on a 50k-row load; (d) relevance where B meets §5.6's recall@5 ≥ 0.75, MRR ≥ 0.60 and B ≥ C; (e) traceability in both directions with zero cross-tenant rows; (f) quality scoring read-only with version and status untouched; (g) no orphan over RM's 28 modules. The snapshot records no run of any of them, so none is marked pass; the outcome this review can evidence is the record-level outcome, that the project is closed, its meta claims built, and its governance record is now complete. The instrument <code>acceptance/programme/S07.toml</code> carries 17 checks, 15 P0 and two P1 (<code>lessons</code>, <code>artefact-standard</code>), and the re-close is judged on the record checks this rework supplies.</p>
+<h2>Evidence</h2>
+<p>The project row 01a1d039-0d2c-7322-b2f9-4dd041153894 is closed at version 7 (last updated 2026-11-21T01:06:16Z) with meta <code>measured_status: built</code>, <code>plan_status: planned</code>, <code>viability: rework</code>, <code>issues: []</code>, <code>expected_outputs: [project-brief, evidence]</code> and <code>closure_outputs: []</code>. Tranche 4 (01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce) was authorised 2026-11-24T17:04:34Z by review 01a216d0-d634-738e-985a-00a85cfd48d9. The only publication is the active evidence page 01a1e687-4d95-70a0-8cf9-a624a30dcb36, published 2026-11-16T22:43:11Z, and the repository carries the build's files: migration 0007, the domain and store modules, the six gate test targets, <code>seed/catalogue.json</code>, <code>tests/eval/search_queries.json</code> and <code>acceptance/programme/S07.toml</code>. The snapshot carries no baseline row, no linked issue, no contract, no Phase-G review and no gate run; those absences are the basis for the level consistent rather than higher.</p>
+<h2>Open items</h2>
+<ul>
+<li><strong>Functional gate:</strong> plan §7 properties (a)–(g) have no recorded run. Owner: the programme architect. Next step: run the six targets and the EXPLAIN block in the lane and attach the output to the project's evidence page.</li>
+<li><strong>Relevance eval:</strong> no A/B/C/D numbers and no completion record exist. Owner: the programme architect. Next step: run <code>search_eval</code> with <code>BASELINE=ab</code>, <code>BASELINE=c</code> and <code>GRID=1</code>, then record the §5.6 decision on pgvector.</li>
+<li><strong>Artefact standard (P1):</strong> the seven A–D artefacts are supplied by this pack; <code>S07-artefact-standard</code> must be re-run after publication.</li>
+<li><strong>Lessons (P1):</strong> the tranche retro holds no S07 lesson; the unrecorded gate is the candidate lesson.</li>
+<li><strong>Stale plan question:</strong> §10.3 assumes <code>outline</code>/<code>outline_node</code> still exist, but 0011 dropped them; S08 must not recreate them by assumption.</li>
+<li><strong>No linked issues:</strong> any defect found on the gate run needs a new issue, not a silent fix.</li>
+</ul>
+<h2>Decision</h2>
+<p>Close, retrospectively. The project was already closed before the authorised record existed, and this rework supplies the charter, the Statement of Architecture Work, the seven artefacts, the delivery contract, the Phase-G review, the project brief, the evidence statement and this closure review under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the record checks of <code>acceptance/programme/S07.toml</code> are the re-close criteria, and the close gate is decided by an approver other than the requester. The review verdict is consistent: the pack matches the snapshot, and the historical record carries no artefact, contract, review, baseline or gate run. The unrecorded functional gate and relevance eval are open verification items, not a waiver and not a claim of pass; if the gate run fails, the project returns to the tranche queue for a defect issue. Decision date 2026-11-24.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Requirements, catalogues, revisions, quality scoring, search · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

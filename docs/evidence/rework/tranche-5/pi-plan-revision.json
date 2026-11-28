@@ -1,0 +1,14 @@
+{
+  "schema": "conveyor-pi-plan-revision/v1",
+  "tranche": 5,
+  "cadence_id": "01a216d1-1913-70dd-8f69-c8ad230f2364",
+  "head": "d7c0c7168",
+  "recorded_at": "2026-11-27",
+  "recorded_version": 4,
+  "old_scope": ["S08", "T7", "S06", "S17", "T17"],
+  "new_scope": ["S06", "S08", "S17", "T17", "T7"],
+  "why": "the published plan's narrative ordered S08, T7, S06, S17, T17 while the approval records S06 first: S06 is the only active member and the control plane every other member's checks read, and it carries the workspace-gate blocker. The scope is the same five members; the order and O5 are aligned to the operative sequence.",
+  "refinement": "01a216d1-1a40-7246-ba5e-254b8c0986fe",
+  "wsjf_evidence": "docs/evidence/rework/tranche-5/refinement-wsjf.json",
+  "revision_input": "docs/evidence/rework/tranche-5/pi-plan-revision-input.json"
+}

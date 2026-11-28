@@ -192,6 +192,192 @@ async fn counts(pg: &support::Pg, seeded: &support::Seeded) -> (i64, i64) {
     (runs, steps)
 }
 
+/// A `strata_rag` endpoint that answers every pack read `404`: the bound pack is unpublished.
+async fn unpublished_strata_stub() -> String {
+    let app = axum::Router::new();
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+        .await
+        .expect("bind strata stub");
+    let base = format!("http://{}", listener.local_addr().expect("addr"));
+    tokio::spawn(async move {
+        let _ = axum::serve(listener, app).await;
+    });
+    base
+}
+
+/// Bind a capability to a card's type, the resolution `runs.create` now performs.
+async fn bind_card_type(pg: &support::Pg, seeded: &support::Seeded, card: &str, capability: Uuid) {
+    sqlx::query(
+        "UPDATE card_type SET capability_id = $3
+          WHERE tenant_id = $1
+            AND id = (SELECT card_type_id FROM card WHERE tenant_id = $1 AND id = $2)",
+    )
+    .bind(seeded.tenant_id)
+    .bind(Uuid::parse_str(card).expect("card id"))
+    .bind(capability)
+    .execute(&pg.super_pool)
+    .await
+    .expect("bind the card type");
+}
+
+/// A generic `runs.create` resolves the capability its card's type binds and carries it onto the
+/// run; when that capability has a REQUIRED pack nobody published, it refuses before any new run
+/// row (and therefore before any model call).
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_generic_run_resolves_its_capability_or_refuses() {
+    let (pg, running, seeded) = fixture().await;
+    let (board, lane) = board_and_lane(&running).await;
+    let first = create_card(&running, &board, &lane).await;
+
+    let capability: Uuid = sqlx::query_scalar(
+        "INSERT INTO capability (tenant_id, code, label, status)
+         VALUES ($1, $2, 'Generic', 'active') RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(format!("generic-{}", Uuid::now_v7().simple()))
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("seed capability");
+    let agent: Uuid = sqlx::query_scalar(
+        "INSERT INTO capability_agent
+             (tenant_id, capability_id, key, role, status, model_ref, prompt_ref, allowed_actions)
+         VALUES ($1, $2, $3, 'tool_agent', 'active', 'local-llm', 'agent@1',
+                 ARRAY['cards.claim'])
+         RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(capability)
+    .bind(format!("agent-{}", Uuid::now_v7().simple()))
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("seed agent");
+    bind_card_type(&pg, &seeded, &first, capability).await;
+
+    let (status, body) = running
+        .invoke(
+            "runs.create",
+            TOKEN,
+            json!({"card_id": first}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    let run_id = text(output(&body), "id");
+    let (recorded_capability, recorded_agent): (Option<Uuid>, Option<Uuid>) = sqlx::query_as(
+        "SELECT capability_id, capability_agent_id FROM run WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(seeded.tenant_id)
+    .bind(Uuid::parse_str(&run_id).expect("run id"))
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the run row");
+    assert_eq!(
+        (recorded_capability, recorded_agent),
+        (Some(capability), Some(agent)),
+        "a generic run carries the capability its card type binds"
+    );
+
+    sqlx::query(
+        "INSERT INTO capability_knowledge
+             (tenant_id, capability_id, pack_key, pack_version, required)
+         VALUES ($1, $2, 'missing-pack', 1, true)",
+    )
+    .bind(seeded.tenant_id)
+    .bind(capability)
+    .execute(&pg.super_pool)
+    .await
+    .expect("bind the required pack");
+    let (status, body) = running
+        .invoke(
+            "secrets.create",
+            TOKEN,
+            json!({"name": "strata_rag.token", "value": "test-token-not-a-credential"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    support::set_env("CONVEYOR_STRATA_RAG_URL", &unpublished_strata_stub().await);
+
+    let second = create_card(&running, &board, &lane).await;
+    let (status, _headers, body) = running
+        .invoke_full(
+            "runs.create",
+            TOKEN,
+            json!({"card_id": second}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 409, "{body}");
+    let codes: Vec<&str> = body["errors"]
+        .as_array()
+        .map(|rows| rows.iter().filter_map(|row| row["code"].as_str()).collect())
+        .unwrap_or_default();
+    assert!(codes.contains(&"pack_not_published"), "{body}");
+    let (runs, steps) = counts(&pg, &seeded).await;
+    assert_eq!((runs, steps), (1, 0), "the refusal wrote run state");
+}
+
+/// The process seam was the first caller of the shared guard; extracting it must not relax it.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn the_process_path_still_refuses_an_unpublished_required_pack() {
+    let (pg, running, seeded) = fixture().await;
+    let sop = support::publish_sop(&running, "run-capability-sop").await;
+    let (board, lane) = board_and_lane(&running).await;
+    let card = create_card(&running, &board, &lane).await;
+    let process = published_process(&running, &sop).await;
+    let (capability, _agent) = bind(&pg, &seeded, &process, "active", &["cards.claim"]).await;
+    sqlx::query(
+        "INSERT INTO capability_knowledge
+             (tenant_id, capability_id, pack_key, pack_version, required)
+         VALUES ($1, $2, 'missing-pack', 1, true)",
+    )
+    .bind(seeded.tenant_id)
+    .bind(capability)
+    .execute(&pg.super_pool)
+    .await
+    .expect("bind the required pack");
+    let (status, body) = running
+        .invoke(
+            "secrets.create",
+            TOKEN,
+            json!({"name": "strata_rag.token", "value": "test-token-not-a-credential"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    support::set_env("CONVEYOR_STRATA_RAG_URL", &unpublished_strata_stub().await);
+
+    let (status, _headers, body) = running
+        .invoke_full(
+            "process_runs.start",
+            TOKEN,
+            json!({"card_id": card, "process_id": process}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 409, "{body}");
+    let codes: Vec<&str> = body["errors"]
+        .as_array()
+        .map(|rows| rows.iter().filter_map(|row| row["code"].as_str()).collect())
+        .unwrap_or_default();
+    assert!(codes.contains(&"pack_not_published"), "{body}");
+    assert_eq!(
+        counts(&pg, &seeded).await,
+        (0, 0),
+        "the refusal wrote run state"
+    );
+}
+
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn no_active_agent_refuses_before_any_run_row() {
     let (pg, running, seeded) = fixture().await;

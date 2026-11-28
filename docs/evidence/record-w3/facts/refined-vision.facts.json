@@ -1,0 +1,1043 @@
+{
+  "category": "refined-vision",
+  "standard": "MSP",
+  "spec": "\u00a78.3",
+  "subject": {
+    "kind": "programme",
+    "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+    "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+    "title": "conveyor buildout",
+    "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+    "project_key": ""
+  },
+  "template_skeleton": "# Refined Vision\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Refined vision\n\nThe record the section derives from, or an explicit absence.\n\n## Changes from the mandate\n\nThe record the section derives from, or an explicit absence.\n",
+  "headings": [
+    {
+      "heading": "Refined vision",
+      "status": "evidenced",
+      "sources": [
+        {
+          "kind": "rows",
+          "file": "msp.json",
+          "pointer": "/tranche_reviews",
+          "category": null,
+          "count": 4
+        }
+      ],
+      "items": [
+        {
+          "decision": "continue",
+          "evidence": {
+            "authorised_by": "the programme owner (2026-11-17)",
+            "baselines": {
+              "B0": "the accepted definition set (this review)",
+              "benefit_profiles": "six profiles, each 'not measured' with a method, owner and kata"
+            },
+            "benefit_status": {
+              "B1": "unmeasured",
+              "B2": "unmeasured",
+              "B3": "unmeasured",
+              "B4": "unmeasured",
+              "B5": "unmeasured",
+              "B6": "unmeasured"
+            },
+            "document_id": "01a1eb18-6752-72ff-9c28-cd4a94217de7",
+            "document_url": "https://conveyor.nonagentic.ai/design/docs/output-01a1eb18-6752-72ff-9c28-cd4a94217de7.html",
+            "risk_register": {
+              "open": [
+                "#97 the live engine proof",
+                "the 43 due-now outputs",
+                "the BCM is unstaffed"
+              ],
+              "programme_rows": 0
+            }
+          },
+          "id": "01a1ed84-e111-7082-9fa8-7fe77ccc9024",
+          "reviewed_at": "2026-11-18T07:17:50.738714+00:00",
+          "reviewed_by": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+          "reviewer_name": "FR Test",
+          "tranche_id": "01a1e9e0-ced2-7769-b12f-f6fba0997914",
+          "version": 1
+        },
+        {
+          "decision": "continue",
+          "evidence": {
+            "baselines": [
+              {
+                "id": "01a1fba9-308c-7cde-9d00-edb7f483f3af",
+                "kind": "management"
+              },
+              {
+                "id": "01a1fba9-9afd-72e3-b41b-dc4287153c35",
+                "kind": "governance"
+              },
+              {
+                "id": "01a1fba9-d095-757c-91ed-afd21ecfa960",
+                "kind": "boundary"
+              },
+              {
+                "id": "01a1ff85-faae-7c2e-b897-fe957985ca78",
+                "kind": "scope",
+                "project": "S02"
+              },
+              {
+                "id": "01a1ff8a-b4f0-7e6e-9cc7-4231076e1039",
+                "kind": "scope",
+                "project": "T1"
+              },
+              {
+                "id": "01a1ff8f-47cb-78cf-9db8-d98d863e7dd0",
+                "kind": "scope",
+                "project": "T11"
+              }
+            ],
+            "benefit_status": [
+              {
+                "baseline": "placeholder",
+                "profile": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+                "reference": "B1",
+                "status": "draft"
+              },
+              {
+                "baseline": "placeholder",
+                "profile": "01a1e9df-0308-7fdc-8492-32db1e582a2d",
+                "reference": "B2",
+                "status": "draft"
+              },
+              {
+                "baseline": "placeholder",
+                "profile": "01a1e9df-0c4b-7807-b35c-5810ec418d45",
+                "reference": "B3",
+                "status": "draft"
+              },
+              {
+                "baseline": "placeholder",
+                "profile": "01a1e9df-1592-79a5-839e-037d8fe4251b",
+                "reference": "B4",
+                "status": "draft"
+              },
+              {
+                "baseline": "placeholder",
+                "profile": "01a1e9df-1e42-7199-87e1-23c577c62f8e",
+                "reference": "B5",
+                "status": "draft"
+              },
+              {
+                "baseline": "placeholder",
+                "profile": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+                "reference": "B6",
+                "status": "draft"
+              }
+            ],
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "project_acceptance": [
+              {
+                "manifest": "acceptance/programme/S02.toml",
+                "note": "P2 long-job proof landed; issue #2 closes with the lane PR",
+                "project": "S02",
+                "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6",
+                "verdict": "green"
+              },
+              {
+                "manifest": "acceptance/programme/T1.toml",
+                "note": "no contemporaneous governance record; retrospective reconstruction",
+                "project": "T1",
+                "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6",
+                "verdict": "green"
+              },
+              {
+                "manifest": "acceptance/programme/T11.toml",
+                "note": "mechanism and tests claimed; no calibrated C0-C5 threshold row",
+                "project": "T11",
+                "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6",
+                "verdict": "green"
+              }
+            ],
+            "risk_register": [
+              "01a1ffa9-032a-7792-98c3-a85aa9bad193",
+              "01a1ffa9-1b48-7f8b-974a-c8d8e5366922",
+              "01a1ffa9-3907-7c8d-a6c0-819281d6c050"
+            ]
+          },
+          "id": "01a1ffa9-c06f-7921-9d6b-611d871ce6cc",
+          "reviewed_at": "2026-11-21T19:51:16.779077+00:00",
+          "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "reviewer_name": "conveyor-approver",
+          "tranche_id": "01a1e9e0-d787-7f5c-b5ed-15b05f3dc531",
+          "version": 1
+        },
+        {
+          "decision": "pause",
+          "evidence": {
+            "authorised_by": "the programme owner's standing delegation 01a1ff1f (U5 extension)",
+            "baselines": {
+              "B0": "the accepted programme definition set",
+              "programme": "the three programme baselines recorded at tranche 0",
+              "scope": {
+                "S03": "scope baseline taken in this tranche",
+                "T2": "scope baseline taken in this tranche"
+              }
+            },
+            "benefit_status": {
+              "B1": "unmeasured",
+              "B2": "unmeasured",
+              "B3": "unmeasured",
+              "B4": "unmeasured",
+              "B5": "unmeasured",
+              "B6": "unmeasured"
+            },
+            "conditions": [
+              "both manifests green at the closing snapshot",
+              "both projects closed on a conformant review or a real waiver",
+              "one retro lesson per finding"
+            ],
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "document_id": "01a2006a-8db7-764e-9b21-fee33e71e815",
+            "document_url": "https://conveyor.nonagentic.ai/design/docs/output-01a2006a-8db7-764e-9b21-fee33e71e815.html",
+            "manifests": {
+              "S03": "red (5 checks)",
+              "T2": "red (4 checks)"
+            },
+            "reviewed_at": "2026-11-21",
+            "risk_register": {
+              "open": [
+                "no human accepting owner exists in the tenant for a non-conformant waiver",
+                "branch migrations 0062/0063 unapplied on the live primary",
+                "five open P0 code findings programme-wide",
+                "v1-t2-3, v1-t2-6, v1-t2-5, v1-s03-2 open and owned"
+              ]
+            },
+            "snapshot_sha": "7ff27efd65146630e62d9c235458be789fb68c14"
+          },
+          "id": "01a2006c-8f71-733d-a562-103c144882ce",
+          "reviewed_at": "2026-11-21T23:24:03.804007+00:00",
+          "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "reviewer_name": "conveyor-approver",
+          "tranche_id": "01a1e9e0-e2ac-786b-ac48-3b8bcdf12188",
+          "version": 1
+        },
+        {
+          "decision": "continue",
+          "evidence": {
+            "baselines": {
+              "programme": [
+                {
+                  "id": "01a1fba9-308c-7cde-9d00-edb7f483f3af",
+                  "kind": "management"
+                },
+                {
+                  "id": "01a1fba9-9afd-72e3-b41b-dc4287153c35",
+                  "kind": "governance"
+                },
+                {
+                  "id": "01a1fba9-d095-757c-91ed-afd21ecfa960",
+                  "kind": "boundary"
+                }
+              ],
+              "scope": {
+                "S03": "01a20063-7af8-727b-b092-24de3821d204",
+                "T2": "01a2005c-5a4f-7eb5-a004-ccb5545eb6fb"
+              }
+            },
+            "benefit_status": [
+              {
+                "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
+                "profile": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+                "status": "draft",
+                "target": "every choice has a decision row"
+              },
+              {
+                "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
+                "profile": "01a1e9df-0308-7fdc-8492-32db1e582a2d",
+                "status": "draft",
+                "target": "every service a job uses is a toolkit; a toolkit with no calls in a cycle is retired or justified"
+              },
+              {
+                "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
+                "profile": "01a1e9df-0c4b-7807-b35c-5810ec418d45",
+                "status": "draft",
+                "target": "one self-development run reaches live verification on evidence; a second is repeatable"
+              },
+              {
+                "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
+                "profile": "01a1e9df-1592-79a5-839e-037d8fe4251b",
+                "status": "draft",
+                "target": "at least one outside contribution changes a published output; every output is reachable"
+              },
+              {
+                "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
+                "profile": "01a1e9df-1e42-7199-87e1-23c577c62f8e",
+                "status": "draft",
+                "target": "the T0 gate exists and refuses a second store; the registry has one home"
+              },
+              {
+                "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
+                "profile": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+                "status": "draft",
+                "target": "the seed, coverage and published checklist agree at every tranche review"
+              }
+            ],
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "risk_register": {
+              "notes": "no risk is waived except the owner-accepted S14 residual",
+              "open": [
+                "the four closure reviews for T14, T16, T3 and T7 are not yet published; they belong to their tranches",
+                "tranches 4, 5, 6, 7, 8 and 10 await authorisation in sequence after tranche 3",
+                "code P0 v1-s06-2 (S06) remains open; v1-s14-1 is owner-waived with its receipts NOT PROVEN",
+                "the TOGAF artefact record's Links/Document/Entries gaps are being repaired across the 80 approved artefacts",
+                "S06b's external agent app is absent; it remains an environment gap",
+                "the live pack lags the committed pack until the next publish"
+              ]
+            }
+          },
+          "id": "01a20227-ca12-708d-b844-8ad4c08076bb",
+          "reviewed_at": "2026-11-22T07:28:08.375579+00:00",
+          "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "reviewer_name": "conveyor-approver",
+          "tranche_id": "01a1e9e0-e2ac-786b-ac48-3b8bcdf12188",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "heading": "Changes from the mandate",
+      "status": "evidenced",
+      "sources": [
+        {
+          "kind": "rows",
+          "file": "msp.json",
+          "pointer": "/register_items",
+          "category": null,
+          "count": 17
+        }
+      ],
+      "items": [
+        {
+          "baseline_ref": "01a1ff39-8d6e-7270-b2ba-9d235eb28b83",
+          "body": "Change request: rebuild S00's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+          "code": "U5-CHG-S00",
+          "created_at": "2026-11-22T06:45:14.798596+00:00",
+          "id": "01a20200-7fca-7da3-8f84-be7af377c451",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "kind": "delegation"
+            }
+          ],
+          "meta": {
+            "change_request": "the retrospective rework of S00 under #526",
+            "decision": {
+              "decided_at": "2026-11-21",
+              "decided_by": "the programme owner's standing delegation",
+              "decision": "accepted",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "record": "#526"
+            },
+            "impact": {
+              "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+              "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+              "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+              "scope": "the record and declared outputs are rebuilt and republished"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "accepted",
+          "title": "Retrospective MSP/TOGAF/SAFe rework of S00 under the #526 scope change",
+          "updated_at": "2026-11-22T06:45:14.798596+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a1ff31-72ec-766e-8ad3-227d927f64ab",
+          "body": "Change request: rebuild S01's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+          "code": "U5-CHG-S01",
+          "created_at": "2026-11-22T06:45:26.116886+00:00",
+          "id": "01a20200-a6d2-70b7-92aa-f1eca565b293",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "kind": "delegation"
+            }
+          ],
+          "meta": {
+            "change_request": "the retrospective rework of S01 under #526",
+            "decision": {
+              "decided_at": "2026-11-21",
+              "decided_by": "the programme owner's standing delegation",
+              "decision": "accepted",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "record": "#526"
+            },
+            "impact": {
+              "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+              "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+              "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+              "scope": "the record and declared outputs are rebuilt and republished"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d27-724c-9bae-af96b2d926b1",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "accepted",
+          "title": "Retrospective MSP/TOGAF/SAFe rework of S01 under the #526 scope change",
+          "updated_at": "2026-11-22T06:45:26.116886+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a1ff85-faae-7c2e-b897-fe957985ca78",
+          "body": "Change request: rebuild S02's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+          "code": "U5-CHG-S02",
+          "created_at": "2026-11-22T06:45:38.446695+00:00",
+          "id": "01a20200-d8b6-77fc-a176-76d4ea3f4567",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "kind": "delegation"
+            }
+          ],
+          "meta": {
+            "change_request": "the retrospective rework of S02 under #526",
+            "decision": {
+              "decided_at": "2026-11-21",
+              "decided_by": "the programme owner's standing delegation",
+              "decision": "accepted",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "record": "#526"
+            },
+            "impact": {
+              "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+              "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+              "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+              "scope": "the record and declared outputs are rebuilt and republished"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "accepted",
+          "title": "Retrospective MSP/TOGAF/SAFe rework of S02 under the #526 scope change",
+          "updated_at": "2026-11-22T06:45:38.446695+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a20063-7af8-727b-b092-24de3821d204",
+          "body": "Change request: rebuild S03's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+          "code": "U5-CHG-S03",
+          "created_at": "2026-11-22T07:34:36.878165+00:00",
+          "id": "01a2022d-b82e-723c-ac03-07afb43890dc",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "kind": "delegation"
+            }
+          ],
+          "meta": {
+            "change_request": "the retrospective rework of S03 under #526",
+            "decision": {
+              "decided_at": "2026-11-21",
+              "decided_by": "the programme owner's standing delegation",
+              "decision": "accepted",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "record": "#526"
+            },
+            "impact": {
+              "cost": "no separate cost baseline; inside the existing tranche",
+              "quality": "every owned finding executed or waived; manifest re-run at the closing head",
+              "schedule": "no change to the delivery tranche",
+              "scope": "the record and declared outputs are rebuilt and republished"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "accepted",
+          "title": "Retrospective MSP/TOGAF/SAFe rework of S03 under the #526 scope change",
+          "updated_at": "2026-11-22T07:34:36.878165+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a20256-44d0-731d-b345-fffc5f3ac9e8",
+          "body": "Change request: rebuild S04's record under the owner's 2026-11-21 scope change (#526). The delivered action registry is recorded with its charter, SoAW, scope baseline, A-D artefacts, Phase-G review, closure and SAFe rows. Impact: scope - the record and declared outputs are rebuilt and republished; schedule - no change to the delivery tranche; cost - no separate cost baseline; quality - every owned finding is executed or waived and the acceptance manifest is re-run at the closing head. Decision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+          "code": "U5-CHG-S04",
+          "created_at": "2026-11-22T08:19:55.959914+00:00",
+          "id": "01a20257-2b24-748f-81b2-0f3edd40e95b",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "kind": "delegation"
+            }
+          ],
+          "meta": {
+            "change_request": "the retrospective rework of S04 under #526",
+            "decision": {
+              "decided_at": "2026-11-21",
+              "decided_by": "the programme owner's standing delegation",
+              "decision": "accepted",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "record": "#526"
+            },
+            "impact": {
+              "cost": "no separate cost baseline",
+              "quality": "every owned finding executed or waived; manifest re-run at the closing head",
+              "schedule": "no change to the delivery tranche",
+              "scope": "the record and declared outputs are rebuilt and republished"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "accepted",
+          "title": "Retrospective MSP/TOGAF/SAFe rework of S04 under the #526 scope change",
+          "updated_at": "2026-11-22T08:19:55.959914+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a1ff47-5043-73f7-b18d-2fc03832c96a",
+          "body": "Change request: rebuild T0's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+          "code": "U5-CHG-T0",
+          "created_at": "2026-11-22T06:45:56.395202+00:00",
+          "id": "01a20201-1d76-7169-871c-ff02d6f012fc",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "kind": "delegation"
+            }
+          ],
+          "meta": {
+            "change_request": "the retrospective rework of T0 under #526",
+            "decision": {
+              "decided_at": "2026-11-21",
+              "decided_by": "the programme owner's standing delegation",
+              "decision": "accepted",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "record": "#526"
+            },
+            "impact": {
+              "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+              "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+              "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+              "scope": "the record and declared outputs are rebuilt and republished"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "accepted",
+          "title": "Retrospective MSP/TOGAF/SAFe rework of T0 under the #526 scope change",
+          "updated_at": "2026-11-22T06:45:56.395202+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a1ff8a-b4f0-7e6e-9cc7-4231076e1039",
+          "body": "Change request: rebuild T1's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+          "code": "U5-CHG-T1",
+          "created_at": "2026-11-22T06:46:05.099021+00:00",
+          "id": "01a20201-41bd-7c64-899e-03d76d99b737",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "kind": "delegation"
+            }
+          ],
+          "meta": {
+            "change_request": "the retrospective rework of T1 under #526",
+            "decision": {
+              "decided_at": "2026-11-21",
+              "decided_by": "the programme owner's standing delegation",
+              "decision": "accepted",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "record": "#526"
+            },
+            "impact": {
+              "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+              "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+              "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+              "scope": "the record and declared outputs are rebuilt and republished"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "accepted",
+          "title": "Retrospective MSP/TOGAF/SAFe rework of T1 under the #526 scope change",
+          "updated_at": "2026-11-22T06:46:05.099021+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a2005c-5a4f-7eb5-a004-ccb5545eb6fb",
+          "body": "Change request: rebuild T2's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+          "code": "U5-CHG-T2",
+          "created_at": "2026-11-22T07:34:55.786488+00:00",
+          "id": "01a2022d-f9a0-785a-be03-30a658a59468",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "kind": "delegation"
+            }
+          ],
+          "meta": {
+            "change_request": "the retrospective rework of T2 under #526",
+            "decision": {
+              "decided_at": "2026-11-21",
+              "decided_by": "the programme owner's standing delegation",
+              "decision": "accepted",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "record": "#526"
+            },
+            "impact": {
+              "cost": "no separate cost baseline; inside the existing tranche",
+              "quality": "every owned finding executed or waived; manifest re-run at the closing head",
+              "schedule": "no change to the delivery tranche",
+              "scope": "the record and declared outputs are rebuilt and republished"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "accepted",
+          "title": "Retrospective MSP/TOGAF/SAFe rework of T2 under the #526 scope change",
+          "updated_at": "2026-11-22T07:34:55.786488+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a1ff8f-47cb-78cf-9db8-d98d863e7dd0",
+          "body": "Change request: rebuild T11's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+          "code": "U5-CHG-T11",
+          "created_at": "2026-11-22T06:46:12.810732+00:00",
+          "id": "01a20201-5f8c-7e50-aae8-1f3e8544bd72",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "kind": "delegation"
+            }
+          ],
+          "meta": {
+            "change_request": "the retrospective rework of T11 under #526",
+            "decision": {
+              "decided_at": "2026-11-21",
+              "decided_by": "the programme owner's standing delegation",
+              "decision": "accepted",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "record": "#526"
+            },
+            "impact": {
+              "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+              "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+              "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+              "scope": "the record and declared outputs are rebuilt and republished"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "accepted",
+          "title": "Retrospective MSP/TOGAF/SAFe rework of T11 under the #526 scope change",
+          "updated_at": "2026-11-22T06:46:12.810732+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a20279-854d-79f6-a751-a34d51be7589",
+          "body": "The scope baseline freezes the plan; recording the deliverable's acceptance with its evidence is the one change this record makes to it.",
+          "code": "",
+          "created_at": "2026-11-22T10:17:36.77133+00:00",
+          "id": "01a202c2-e964-7130-8d6e-cb922e2667cb",
+          "impact": null,
+          "kind": "change",
+          "links": [],
+          "meta": {
+            "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+            "impact": {
+              "scope": "the WBS deliverable's acceptance evidence"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "approved",
+          "title": "Accept the retrospective WBS deliverable for T13",
+          "updated_at": "2026-11-22T10:17:43.67327+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a20279-854d-79f6-a751-a34d51be7589",
+          "body": "Measure B2 (less bespoke tooling) against the live record at the 2026-11-22 snapshot so its benefit profile carries a pre-transition baseline. B2's measured target is: every service a job uses is a toolkit; a toolkit with no calls in a cycle is retired or justified. This change authorises the profile measurement; the profile update follows under this change id.",
+          "code": "",
+          "created_at": "2026-11-22T19:59:24.272062+00:00",
+          "id": "01a204d7-8a84-789a-b02f-c8df27246bc0",
+          "impact": null,
+          "kind": "change",
+          "links": [],
+          "meta": {
+            "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+            "impact": {
+              "scope": "B2's benefit profile gains its measured baseline; no project scope, schedule or cost changes."
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "approved",
+          "title": "Record the B2 benefit baseline",
+          "updated_at": "2026-11-22T19:59:41.752181+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a1ff3e-51c4-75b1-9db1-a2f729dd10b8",
+          "body": "Change request: rebuild DESIGN-PUBLISH's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+          "code": "U5-CHG-DESIGN-PUBLISH",
+          "created_at": "2026-11-22T06:44:53.339123+00:00",
+          "id": "01a20200-26e0-71ea-b81a-e5da0e806aea",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "kind": "delegation"
+            }
+          ],
+          "meta": {
+            "change_request": "the retrospective rework of DESIGN-PUBLISH under #526",
+            "decision": {
+              "decided_at": "2026-11-21",
+              "decided_by": "the programme owner's standing delegation",
+              "decision": "accepted",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "record": "#526"
+            },
+            "impact": {
+              "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+              "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+              "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+              "scope": "the record and declared outputs are rebuilt and republished"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "accepted",
+          "title": "Retrospective MSP/TOGAF/SAFe rework of DESIGN-PUBLISH under the #526 scope change",
+          "updated_at": "2026-11-22T06:44:53.339123+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a1fdd8-cff3-7cd9-9535-26fed3d5836b",
+          "body": "Change request: rebuild PLATFORM's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+          "code": "U5-CHG-PLATFORM",
+          "created_at": "2026-11-22T06:45:04.5686+00:00",
+          "id": "01a20200-562e-7a53-9fcd-e136048a00fb",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "kind": "delegation"
+            }
+          ],
+          "meta": {
+            "change_request": "the retrospective rework of PLATFORM under #526",
+            "decision": {
+              "decided_at": "2026-11-21",
+              "decided_by": "the programme owner's standing delegation",
+              "decision": "accepted",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "record": "#526"
+            },
+            "impact": {
+              "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+              "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+              "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+              "scope": "the record and declared outputs are rebuilt and republished"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "accepted",
+          "title": "Retrospective MSP/TOGAF/SAFe rework of PLATFORM under the #526 scope change",
+          "updated_at": "2026-11-22T06:45:04.5686+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a1fdd8-cff3-7cd9-9535-26fed3d5836b",
+          "body": "The programme's acceptance standard changes. A project is done only when (a) every gate clause is discharged by executable checks with an explicit kind (record/probe/code); (b) every mandatory artefact is evidenced with a published document; (c) every P0/P1 package is resolved; (d) every gate records a rule decision with a resolving delegation_ref; (e) outputs are published at the head; (f) the SAFe rows exist; (g) a Phase-G review with snapshot_sha triages findings; (h) the risk, ADR and benefit registers are operated; (i) no finding and no waiver is open; (j) the published pack is current at the head. No deferral is a disposition. Impact analysis and the affected verdicts are in meta.impact and the #526 work table (comment 7077202144). This change row stays open until its `change` gate can be approved: the guard reads meta.change_id, which no action writes today (v1-change-1, fix in flight). Approving it before that fix would be a false record, so it is not approved here.",
+          "code": "U5-ACCEPTANCE-STANDARD",
+          "created_at": "2026-11-22T09:39:00.040076+00:00",
+          "id": "01a2029f-8e2e-78de-bc99-119da42fdfbf",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a2029c-9254-7605-8a7c-3013b28ee794",
+              "kind": "document"
+            },
+            {
+              "id": "01a2029f-5a5f-70aa-be13-029435893a40",
+              "kind": "register_item"
+            }
+          ],
+          "meta": {
+            "blocked_by": "v1-change-1: the change gate's approval reads meta.change_id, which approvals.request does not write",
+            "change": {
+              "board": "issue #526 comment 7077202144",
+              "snapshot_sha": "58645942341648d61628029e4e46c5c367c022f6",
+              "standard": "v5 \u00a75 clauses (a)-(j)"
+            },
+            "decision": {
+              "decided_at": "2026-11-22",
+              "decided_by_kind": "rule",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "document": "01a2029c-9254-7605-8a7c-3013b28ee794",
+              "record": "#526"
+            },
+            "impact": {
+              "risk": "Red-first landing: 98 open findings and 539 packages become visible; no green is claimed until they clear.",
+              "schedule": "Applies retroactively to tranche 3 and every later tranche review.",
+              "scope": "All 47 project manifests and four instruments change verdict semantics; the 12 green projects are re-rendered under the executed-gate rule and the count is expected to fall."
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+          "response": null,
+          "review_at": null,
+          "severity": "P1",
+          "status": "open",
+          "title": "Change: the enhanced acceptance standard (gates executed, no deferrals)",
+          "updated_at": "2026-11-22T09:39:00.040076+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a1ff42-ba64-7670-b694-99bb4b1354e5",
+          "body": "Change request: rebuild SPEC-V2's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+          "code": "U5-CHG-SPEC-V2",
+          "created_at": "2026-11-22T06:45:47.129531+00:00",
+          "id": "01a20200-f9a9-7e37-af71-c4cf15ca9b71",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "kind": "delegation"
+            }
+          ],
+          "meta": {
+            "change_request": "the retrospective rework of SPEC-V2 under #526",
+            "decision": {
+              "decided_at": "2026-11-21",
+              "decided_by": "the programme owner's standing delegation",
+              "decision": "accepted",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "record": "#526"
+            },
+            "impact": {
+              "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+              "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+              "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+              "scope": "the record and declared outputs are rebuilt and republished"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "accepted",
+          "title": "Retrospective MSP/TOGAF/SAFe rework of SPEC-V2 under the #526 scope change",
+          "updated_at": "2026-11-22T06:45:47.129531+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+          "body": "Approved under the standing delegation; cites the baseline-v2 acceptance output.",
+          "code": "U3-REBASELINE",
+          "created_at": "2026-11-21T01:21:50.581194+00:00",
+          "id": "01a1fbb2-06fd-71ac-9503-6696c218549c",
+          "impact": 0,
+          "kind": "change",
+          "links": [],
+          "meta": {
+            "impact": {
+              "cost": 0,
+              "schedule": 0,
+              "scope": "record correction"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "approved",
+          "title": "Re-baseline tranches 9\u201313 to the accepted management baseline v2",
+          "updated_at": "2026-11-21T01:21:55.82619+00:00",
+          "version": 2
+        },
+        {
+          "baseline_ref": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+          "body": "B1-B6 carry a placeholder baseline and incomplete groups; the measurements are in benefit_measurement. This change authorises the profile fields to cite the measured baselines.",
+          "code": "",
+          "created_at": "2026-11-22T19:56:04.763551+00:00",
+          "id": "01a204d4-7f2e-7a73-bf79-4b8767d52db8",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+              "kind": "benefit"
+            },
+            {
+              "id": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+              "kind": "benefit"
+            }
+          ],
+          "meta": {
+            "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+            "impact": {
+              "scope": "benefit profiles B1-B6: baseline, capabilities, operational_area, category, objectives, kpis, cost, preconditions, risks"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "approved",
+          "title": "Record the six benefit profile baselines and six field groups",
+          "updated_at": "2026-11-22T19:56:58.852866+00:00",
+          "version": 3
+        }
+      ]
+    }
+  ],
+  "definition_project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc"
+}

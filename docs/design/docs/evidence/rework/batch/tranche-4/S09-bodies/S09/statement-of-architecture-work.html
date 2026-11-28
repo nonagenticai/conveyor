@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Statement Of Architecture Work — Documents, repositories, secrets, workers UI, reports/metrics, billing display · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S09-bodies/S09/statement-of-architecture-work.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="statement-of-architecture-work--documents-repositories-secrets-workers-ui-reportsmetrics-billing-display">Statement Of Architecture Work — Documents, repositories, secrets, workers UI, reports/metrics, billing display</h1>
+<h2 id="assignment">Assignment</h2>
+<p>What the architecture work is asked to deliver and for whom.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a219d9-f717-73ba-9c86-18adeeecd4ef&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-26T21:54:04.836362+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The plan \u00a77 gate: (a) round-trip \u2014 a 1 MiB upload, list and download with sha256 equal to content_hash, then delete yields GET 404 and object_store::head NotFound, asserted in documents_roundtrip; (b) cap \u2014 10,485,760 bytes accepted and one byte more refused 413 application/problem+json with a stable type in documents_limits; (c) secret \u2014 rotate to version 2 and GET returns no plaintext, value key or ciphertext in secrets_never_revealed; (d) workers \u2014 the page renders live rows and a stopped service yields a banner with the breaker open after five failures; (e) reports \u2014 every number equals its SQL count on the same snapshot in reports_match_sql; (f) externals \u2014 GET /api/actions carries timeout_ms on every external and zero reqwest:: outside the executor in externals_declared; (g) billing \u2014 no write action and no metering event in the manifest. The same instrument also requires migration 0013 applied twice as a no-op, FORCE RLS on all four tables, and the nine declared event types. The snapshot records no run of these properties.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V1 slice S09 (SPEC \u00a78 S9) by the reconstituted TOGAF/MSP lifecycle: author and publish the seven mandatory Phase A\u2013D artefacts, this charter, this Statement of Architecture Work and the delivery contract, take the scope baseline with one WBS deliverable, record a retrospective Phase-G review at level consistent, and publish the expected outputs project-brief and evidence. Because all nine linked issues are recorded closed, this rework re-closes the project at level consistent through the acceptance manifest, with the closure and closure review dated 2026-11-24.&quot;,
+        &quot;contract&quot;: &quot;This Statement establishes the delivery contract against acceptance/programme/S09.toml, whose gate text names the seven properties above. Compliance is assessed clause by clause at the 2026-11-24 retrospective snapshot; the project&#39;s published evidence page is 01a1e687-7682-753d-b60e-1f00243b13a3 and its pre-rework audit pack is docs/evidence/rework/S09.json, which records verdict red on the missing baseline, charter, contract, Phase-G review and closure outputs. The rework supplies the lifecycle record and re-closes the project retrospectively on the P0 checks of the manifest; the remaining verification limits are carried in the closure review, the review and the evidence output rather than converted into a pass.&quot;,
+        &quot;responsibilities&quot;: &quot;The programme architect (conveyor-e2e) owns the slice plan and this retrospective set; the Architecture Board (conveyor-architecture-board) approves the Phase A\u2013D artefacts and the delivery contract; the approver (conveyor-approver) decides the Phase-G level; the S03 team supplies tenancy, trace_link and revision, and the S04 team supplies the action registry with its OpenAPI and MCP projection. Operators own the KEK source in the pod environment and the MinIO bucket policy.&quot;,
+        &quot;scope&quot;: &quot;the four tables document, repository, project_repository and secret in migrations/0013_documents.sql; the integrations module (object_store, external, breaker, ingest); documents.create/get/list/download/update/delete/report, 26 of the front matter&#39;s 27 actions in all; the nine event types; MinIO bucket conveyor-documents with key t/&lt;tenant&gt;/&lt;document&gt;/&lt;version&gt;; the KEK/HKDF/XChaCha20-Poly1305 secret envelope; repositories as references; the read-only workers, billing and observability displays; report queries over local tables; and the strata handoff. Out of scope: billing logic and metering writes, worker scheduling, artifact objects, code analysis, licence issuance, ingestion and embeddings as services, screens (S12) and project_request.repository_url (S07).&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-26T21:54:04.526424+00:00&quot;,
+      &quot;id&quot;: &quot;01a219d9-f671-708a-b28f-063e7e79e6ec&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-71f1-a403-c9abe52c1888&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 S09 Documents and integrations (retrospective, 2026-11-24)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:54:04.836362+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="scope">Scope</h2>
+<p>The boundaries, the artefacts expected and the phase set.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a219d9-f717-73ba-9c86-18adeeecd4ef&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-26T21:54:04.836362+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The plan \u00a77 gate: (a) round-trip \u2014 a 1 MiB upload, list and download with sha256 equal to content_hash, then delete yields GET 404 and object_store::head NotFound, asserted in documents_roundtrip; (b) cap \u2014 10,485,760 bytes accepted and one byte more refused 413 application/problem+json with a stable type in documents_limits; (c) secret \u2014 rotate to version 2 and GET returns no plaintext, value key or ciphertext in secrets_never_revealed; (d) workers \u2014 the page renders live rows and a stopped service yields a banner with the breaker open after five failures; (e) reports \u2014 every number equals its SQL count on the same snapshot in reports_match_sql; (f) externals \u2014 GET /api/actions carries timeout_ms on every external and zero reqwest:: outside the executor in externals_declared; (g) billing \u2014 no write action and no metering event in the manifest. The same instrument also requires migration 0013 applied twice as a no-op, FORCE RLS on all four tables, and the nine declared event types. The snapshot records no run of these properties.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V1 slice S09 (SPEC \u00a78 S9) by the reconstituted TOGAF/MSP lifecycle: author and publish the seven mandatory Phase A\u2013D artefacts, this charter, this Statement of Architecture Work and the delivery contract, take the scope baseline with one WBS deliverable, record a retrospective Phase-G review at level consistent, and publish the expected outputs project-brief and evidence. Because all nine linked issues are recorded closed, this rework re-closes the project at level consistent through the acceptance manifest, with the closure and closure review dated 2026-11-24.&quot;,
+        &quot;contract&quot;: &quot;This Statement establishes the delivery contract against acceptance/programme/S09.toml, whose gate text names the seven properties above. Compliance is assessed clause by clause at the 2026-11-24 retrospective snapshot; the project&#39;s published evidence page is 01a1e687-7682-753d-b60e-1f00243b13a3 and its pre-rework audit pack is docs/evidence/rework/S09.json, which records verdict red on the missing baseline, charter, contract, Phase-G review and closure outputs. The rework supplies the lifecycle record and re-closes the project retrospectively on the P0 checks of the manifest; the remaining verification limits are carried in the closure review, the review and the evidence output rather than converted into a pass.&quot;,
+        &quot;responsibilities&quot;: &quot;The programme architect (conveyor-e2e) owns the slice plan and this retrospective set; the Architecture Board (conveyor-architecture-board) approves the Phase A\u2013D artefacts and the delivery contract; the approver (conveyor-approver) decides the Phase-G level; the S03 team supplies tenancy, trace_link and revision, and the S04 team supplies the action registry with its OpenAPI and MCP projection. Operators own the KEK source in the pod environment and the MinIO bucket policy.&quot;,
+        &quot;scope&quot;: &quot;the four tables document, repository, project_repository and secret in migrations/0013_documents.sql; the integrations module (object_store, external, breaker, ingest); documents.create/get/list/download/update/delete/report, 26 of the front matter&#39;s 27 actions in all; the nine event types; MinIO bucket conveyor-documents with key t/&lt;tenant&gt;/&lt;document&gt;/&lt;version&gt;; the KEK/HKDF/XChaCha20-Poly1305 secret envelope; repositories as references; the read-only workers, billing and observability displays; report queries over local tables; and the strata handoff. Out of scope: billing logic and metering writes, worker scheduling, artifact objects, code analysis, licence issuance, ingestion and embeddings as services, screens (S12) and project_request.repository_url (S07).&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-26T21:54:04.526424+00:00&quot;,
+      &quot;id&quot;: &quot;01a219d9-f671-708a-b28f-063e7e79e6ec&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-71f1-a403-c9abe52c1888&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 S09 Documents and integrations (retrospective, 2026-11-24)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:54:04.836362+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="responsibilities">Responsibilities</h2>
+<p>Who does the work and who accepts it.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a219d9-f717-73ba-9c86-18adeeecd4ef&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-26T21:54:04.836362+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The plan \u00a77 gate: (a) round-trip \u2014 a 1 MiB upload, list and download with sha256 equal to content_hash, then delete yields GET 404 and object_store::head NotFound, asserted in documents_roundtrip; (b) cap \u2014 10,485,760 bytes accepted and one byte more refused 413 application/problem+json with a stable type in documents_limits; (c) secret \u2014 rotate to version 2 and GET returns no plaintext, value key or ciphertext in secrets_never_revealed; (d) workers \u2014 the page renders live rows and a stopped service yields a banner with the breaker open after five failures; (e) reports \u2014 every number equals its SQL count on the same snapshot in reports_match_sql; (f) externals \u2014 GET /api/actions carries timeout_ms on every external and zero reqwest:: outside the executor in externals_declared; (g) billing \u2014 no write action and no metering event in the manifest. The same instrument also requires migration 0013 applied twice as a no-op, FORCE RLS on all four tables, and the nine declared event types. The snapshot records no run of these properties.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V1 slice S09 (SPEC \u00a78 S9) by the reconstituted TOGAF/MSP lifecycle: author and publish the seven mandatory Phase A\u2013D artefacts, this charter, this Statement of Architecture Work and the delivery contract, take the scope baseline with one WBS deliverable, record a retrospective Phase-G review at level consistent, and publish the expected outputs project-brief and evidence. Because all nine linked issues are recorded closed, this rework re-closes the project at level consistent through the acceptance manifest, with the closure and closure review dated 2026-11-24.&quot;,
+        &quot;contract&quot;: &quot;This Statement establishes the delivery contract against acceptance/programme/S09.toml, whose gate text names the seven properties above. Compliance is assessed clause by clause at the 2026-11-24 retrospective snapshot; the project&#39;s published evidence page is 01a1e687-7682-753d-b60e-1f00243b13a3 and its pre-rework audit pack is docs/evidence/rework/S09.json, which records verdict red on the missing baseline, charter, contract, Phase-G review and closure outputs. The rework supplies the lifecycle record and re-closes the project retrospectively on the P0 checks of the manifest; the remaining verification limits are carried in the closure review, the review and the evidence output rather than converted into a pass.&quot;,
+        &quot;responsibilities&quot;: &quot;The programme architect (conveyor-e2e) owns the slice plan and this retrospective set; the Architecture Board (conveyor-architecture-board) approves the Phase A\u2013D artefacts and the delivery contract; the approver (conveyor-approver) decides the Phase-G level; the S03 team supplies tenancy, trace_link and revision, and the S04 team supplies the action registry with its OpenAPI and MCP projection. Operators own the KEK source in the pod environment and the MinIO bucket policy.&quot;,
+        &quot;scope&quot;: &quot;the four tables document, repository, project_repository and secret in migrations/0013_documents.sql; the integrations module (object_store, external, breaker, ingest); documents.create/get/list/download/update/delete/report, 26 of the front matter&#39;s 27 actions in all; the nine event types; MinIO bucket conveyor-documents with key t/&lt;tenant&gt;/&lt;document&gt;/&lt;version&gt;; the KEK/HKDF/XChaCha20-Poly1305 secret envelope; repositories as references; the read-only workers, billing and observability displays; report queries over local tables; and the strata handoff. Out of scope: billing logic and metering writes, worker scheduling, artifact objects, code analysis, licence issuance, ingestion and embeddings as services, screens (S12) and project_request.repository_url (S07).&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-26T21:54:04.526424+00:00&quot;,
+      &quot;id&quot;: &quot;01a219d9-f671-708a-b28f-063e7e79e6ec&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-71f1-a403-c9abe52c1888&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 S09 Documents and integrations (retrospective, 2026-11-24)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:54:04.836362+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="acceptance-criteria">Acceptance criteria</h2>
+<p>The conditions the architecture must meet to close Phase A.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a219d9-f717-73ba-9c86-18adeeecd4ef&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-26T21:54:04.836362+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The plan \u00a77 gate: (a) round-trip \u2014 a 1 MiB upload, list and download with sha256 equal to content_hash, then delete yields GET 404 and object_store::head NotFound, asserted in documents_roundtrip; (b) cap \u2014 10,485,760 bytes accepted and one byte more refused 413 application/problem+json with a stable type in documents_limits; (c) secret \u2014 rotate to version 2 and GET returns no plaintext, value key or ciphertext in secrets_never_revealed; (d) workers \u2014 the page renders live rows and a stopped service yields a banner with the breaker open after five failures; (e) reports \u2014 every number equals its SQL count on the same snapshot in reports_match_sql; (f) externals \u2014 GET /api/actions carries timeout_ms on every external and zero reqwest:: outside the executor in externals_declared; (g) billing \u2014 no write action and no metering event in the manifest. The same instrument also requires migration 0013 applied twice as a no-op, FORCE RLS on all four tables, and the nine declared event types. The snapshot records no run of these properties.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V1 slice S09 (SPEC \u00a78 S9) by the reconstituted TOGAF/MSP lifecycle: author and publish the seven mandatory Phase A\u2013D artefacts, this charter, this Statement of Architecture Work and the delivery contract, take the scope baseline with one WBS deliverable, record a retrospective Phase-G review at level consistent, and publish the expected outputs project-brief and evidence. Because all nine linked issues are recorded closed, this rework re-closes the project at level consistent through the acceptance manifest, with the closure and closure review dated 2026-11-24.&quot;,
+        &quot;contract&quot;: &quot;This Statement establishes the delivery contract against acceptance/programme/S09.toml, whose gate text names the seven properties above. Compliance is assessed clause by clause at the 2026-11-24 retrospective snapshot; the project&#39;s published evidence page is 01a1e687-7682-753d-b60e-1f00243b13a3 and its pre-rework audit pack is docs/evidence/rework/S09.json, which records verdict red on the missing baseline, charter, contract, Phase-G review and closure outputs. The rework supplies the lifecycle record and re-closes the project retrospectively on the P0 checks of the manifest; the remaining verification limits are carried in the closure review, the review and the evidence output rather than converted into a pass.&quot;,
+        &quot;responsibilities&quot;: &quot;The programme architect (conveyor-e2e) owns the slice plan and this retrospective set; the Architecture Board (conveyor-architecture-board) approves the Phase A\u2013D artefacts and the delivery contract; the approver (conveyor-approver) decides the Phase-G level; the S03 team supplies tenancy, trace_link and revision, and the S04 team supplies the action registry with its OpenAPI and MCP projection. Operators own the KEK source in the pod environment and the MinIO bucket policy.&quot;,
+        &quot;scope&quot;: &quot;the four tables document, repository, project_repository and secret in migrations/0013_documents.sql; the integrations module (object_store, external, breaker, ingest); documents.create/get/list/download/update/delete/report, 26 of the front matter&#39;s 27 actions in all; the nine event types; MinIO bucket conveyor-documents with key t/&lt;tenant&gt;/&lt;document&gt;/&lt;version&gt;; the KEK/HKDF/XChaCha20-Poly1305 secret envelope; repositories as references; the read-only workers, billing and observability displays; report queries over local tables; and the strata handoff. Out of scope: billing logic and metering writes, worker scheduling, artifact objects, code analysis, licence issuance, ingestion and embeddings as services, screens (S12) and project_request.repository_url (S07).&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-26T21:54:04.526424+00:00&quot;,
+      &quot;id&quot;: &quot;01a219d9-f671-708a-b28f-063e7e79e6ec&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-71f1-a403-c9abe52c1888&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 S09 Documents and integrations (retrospective, 2026-11-24)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:54:04.836362+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="contract">Contract</h2>
+<p>The contract record, its version and its approval.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a219d9-f717-73ba-9c86-18adeeecd4ef&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-26T21:54:04.836362+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The plan \u00a77 gate: (a) round-trip \u2014 a 1 MiB upload, list and download with sha256 equal to content_hash, then delete yields GET 404 and object_store::head NotFound, asserted in documents_roundtrip; (b) cap \u2014 10,485,760 bytes accepted and one byte more refused 413 application/problem+json with a stable type in documents_limits; (c) secret \u2014 rotate to version 2 and GET returns no plaintext, value key or ciphertext in secrets_never_revealed; (d) workers \u2014 the page renders live rows and a stopped service yields a banner with the breaker open after five failures; (e) reports \u2014 every number equals its SQL count on the same snapshot in reports_match_sql; (f) externals \u2014 GET /api/actions carries timeout_ms on every external and zero reqwest:: outside the executor in externals_declared; (g) billing \u2014 no write action and no metering event in the manifest. The same instrument also requires migration 0013 applied twice as a no-op, FORCE RLS on all four tables, and the nine declared event types. The snapshot records no run of these properties.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V1 slice S09 (SPEC \u00a78 S9) by the reconstituted TOGAF/MSP lifecycle: author and publish the seven mandatory Phase A\u2013D artefacts, this charter, this Statement of Architecture Work and the delivery contract, take the scope baseline with one WBS deliverable, record a retrospective Phase-G review at level consistent, and publish the expected outputs project-brief and evidence. Because all nine linked issues are recorded closed, this rework re-closes the project at level consistent through the acceptance manifest, with the closure and closure review dated 2026-11-24.&quot;,
+        &quot;contract&quot;: &quot;This Statement establishes the delivery contract against acceptance/programme/S09.toml, whose gate text names the seven properties above. Compliance is assessed clause by clause at the 2026-11-24 retrospective snapshot; the project&#39;s published evidence page is 01a1e687-7682-753d-b60e-1f00243b13a3 and its pre-rework audit pack is docs/evidence/rework/S09.json, which records verdict red on the missing baseline, charter, contract, Phase-G review and closure outputs. The rework supplies the lifecycle record and re-closes the project retrospectively on the P0 checks of the manifest; the remaining verification limits are carried in the closure review, the review and the evidence output rather than converted into a pass.&quot;,
+        &quot;responsibilities&quot;: &quot;The programme architect (conveyor-e2e) owns the slice plan and this retrospective set; the Architecture Board (conveyor-architecture-board) approves the Phase A\u2013D artefacts and the delivery contract; the approver (conveyor-approver) decides the Phase-G level; the S03 team supplies tenancy, trace_link and revision, and the S04 team supplies the action registry with its OpenAPI and MCP projection. Operators own the KEK source in the pod environment and the MinIO bucket policy.&quot;,
+        &quot;scope&quot;: &quot;the four tables document, repository, project_repository and secret in migrations/0013_documents.sql; the integrations module (object_store, external, breaker, ingest); documents.create/get/list/download/update/delete/report, 26 of the front matter&#39;s 27 actions in all; the nine event types; MinIO bucket conveyor-documents with key t/&lt;tenant&gt;/&lt;document&gt;/&lt;version&gt;; the KEK/HKDF/XChaCha20-Poly1305 secret envelope; repositories as references; the read-only workers, billing and observability displays; report queries over local tables; and the strata handoff. Out of scope: billing logic and metering writes, worker scheduling, artifact objects, code analysis, licence issuance, ingestion and embeddings as services, screens (S12) and project_request.repository_url (S07).&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-26T21:54:04.526424+00:00&quot;,
+      &quot;id&quot;: &quot;01a219d9-f671-708a-b28f-063e7e79e6ec&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-71f1-a403-c9abe52c1888&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 S09 Documents and integrations (retrospective, 2026-11-24)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:54:04.836362+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-4/S09-bodies/S09/statement-of-architecture-work.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

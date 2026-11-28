@@ -293,13 +293,17 @@ async fn snapshot_is_byte_identical_and_redacts_secrets_and_pii() {
     let issues_path = dir.join("issues.json");
     std::fs::write(
         &issues_path,
-        serde_json::to_string(&json!({"issues": [{
-            "number": 900,
-            "title": "Feedback on the organisation page",
-            "state": "OPEN",
-            "labels": [{"name": "feedback"}],
-            "url": "https://example.test/issues/900"
-        }]}))
+        serde_json::to_string(&json!({
+            "schema": "issue-registry/v1",
+            "provenance": {"tenant": "snap", "source": "github:nonagenticai/conveyor"},
+            "issues": [{
+                "number": 900,
+                "title": "Feedback on the organisation page",
+                "state": "OPEN",
+                "labels": [{"name": "feedback"}],
+                "url": "https://example.test/issues/900"
+            }]
+        }))
         .expect("issues json"),
     )
     .expect("write issues");
@@ -314,6 +318,7 @@ async fn snapshot_is_byte_identical_and_redacts_secrets_and_pii() {
         feedback_url: "https://example.test/feedback".to_owned(),
         database_url: None,
         git_sha: Some("0123456789abcdef0123456789abcdef01234567".to_owned()),
+        manifest_only: false,
         build_time: None,
     };
     let first = run_with_pool(&db.runtime, args.clone())
@@ -508,7 +513,11 @@ async fn the_rework_register_rides_the_conformance_flag() {
     let dir = std::env::temp_dir().join(format!("conveyor-rework-{}", Uuid::now_v7()));
     std::fs::create_dir_all(&dir).expect("snapshot dir");
     let issues_path = dir.join("issues.json");
-    std::fs::write(&issues_path, r#"{"issues": []}"#).expect("write issues");
+    std::fs::write(
+        &issues_path,
+        r#"{"provenance":{"tenant":"rework","source":"github:nonagenticai/conveyor"},"issues": []}"#,
+    )
+    .expect("write issues");
 
     // The register carries an email and a token-shaped string: the same safety net every other
     // public section passes must mask them here too.
@@ -539,6 +548,7 @@ async fn the_rework_register_rides_the_conformance_flag() {
         feedback_url: "https://example.test/feedback".to_owned(),
         database_url: None,
         git_sha: Some("0123456789abcdef0123456789abcdef01234567".to_owned()),
+        manifest_only: false,
         build_time: None,
     };
 
@@ -687,7 +697,11 @@ async fn organisation_is_populated_for_a_seeded_tenant() {
     let dir = std::env::temp_dir().join(format!("conveyor-organisation-{}", Uuid::now_v7()));
     std::fs::create_dir_all(&dir).expect("snapshot dir");
     let issues_path = dir.join("issues.json");
-    std::fs::write(&issues_path, r#"{"issues": []}"#).expect("write issues");
+    std::fs::write(
+        &issues_path,
+        r#"{"provenance":{"tenant":"nonagentic","source":"github:nonagenticai/conveyor"},"issues": []}"#,
+    )
+    .expect("write issues");
     let args = SnapshotArgs {
         tenant: "nonagentic".to_owned(),
         out: dir.clone(),
@@ -698,6 +712,7 @@ async fn organisation_is_populated_for_a_seeded_tenant() {
         feedback_url: "https://example.test/feedback".to_owned(),
         database_url: None,
         git_sha: Some("0123456789abcdef0123456789abcdef01234567".to_owned()),
+        manifest_only: false,
         build_time: None,
     };
     conveyor_server::snapshot::run_with_pool(&db.runtime, args)
@@ -826,8 +841,9 @@ async fn the_live_view_and_the_cli_write_the_same_bytes() {
     let dir = std::env::temp_dir().join(format!("conveyor-live-parity-{}", Uuid::now_v7()));
     std::fs::create_dir_all(&dir).expect("snapshot dir");
     let issues_path = dir.join("issues.json");
-    std::fs::write(&issues_path, r#"{"issues": []}"#).expect("write issues");
-    let issues: Value = serde_json::from_str(r#"{"issues": []}"#).expect("issues json");
+    let issues_json = r#"{"provenance":{"tenant":"snap-live","source":"github:nonagenticai/conveyor"},"issues": []}"#;
+    std::fs::write(&issues_path, issues_json).expect("write issues");
+    let issues: Value = serde_json::from_str(issues_json).expect("issues json");
     // The rework register rides both producers: the wrapper's `rework` section is part of the
     // byte-for-byte parity the live route and the CLI must keep.
     let rework = json!({
@@ -865,18 +881,26 @@ async fn the_live_view_and_the_cli_write_the_same_bytes() {
             tenant: "snap-live".to_owned(),
             out: dir.clone(),
             outputs_dir: Some(dir.join("docs")),
-            generated_at: Some(view.generated_at.clone()),
+            // v1-pack-2: no clock override. The CLI derives `generated_at` from the snapshot data,
+            // the same function `site_view` uses, so both write the same bytes.
+            generated_at: None,
             issues: issues_path,
             conformance: Some(rework_path),
             feedback_url: feedback.to_owned(),
             database_url: None,
             git_sha: Some(git_sha.to_owned()),
+            manifest_only: false,
             build_time: Some(build_time.to_owned()),
         },
     )
     .await
     .expect("the CLI snapshot");
 
+    assert_eq!(
+        std::fs::read(dir.join("programme.json")).expect("programme.json"),
+        view.programme_json.as_bytes(),
+        "the live download is the CLI's programme.json"
+    );
     assert_eq!(
         std::fs::read(dir.join("snapshot.js")).expect("snapshot.js"),
         view.snapshot_js.as_bytes(),

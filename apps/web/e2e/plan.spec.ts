@@ -38,6 +38,12 @@ test("a change needs a rationale", async ({ page, request }) => {
     project_id: project.projectId,
     kind: "risk",
     title: registerTitle,
+    // §8.4: a managed risk is probability, impact, owner, review date and at least one link.
+    probability: "medium",
+    impact: 2,
+    review_at: "2027-01-15",
+    meta: { owner: "delivery lead" },
+    links: { cards: [project.card.id], requirements: [], decisions: [] },
   });
   await invoke(request, "baselines.take", { project_id: project.projectId });
 

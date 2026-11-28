@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "categories": ["fixture-artefact"],
+  "aliases": {},
+  "classes": [],
+  "templates": {
+    "fixture-artefact": {
+      "standard": "FIXTURE",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": true,
+      "spec": "SPEC-fixture",
+      "required": ["Scope", "Evidence"],
+      "optional": [],
+      "sources": {
+        "Scope": [{"kind": "rows", "file": "programme.json", "pointer": "/projects"}]
+      },
+      "skeleton": "# Fixture artefact\n\n## Scope\n\nThe people and systems the work touches.\n\n## Evidence\n\nThe recorded proof for each acceptance claim.\n"
+    }
+  },
+  "on_demand": []
+}

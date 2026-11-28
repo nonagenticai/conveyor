@@ -1,0 +1,7 @@
+{
+ "card_id": "01a1ffea-48b5-7eb2-ab4f-eb59d2670fac",
+ "gate": "card_done",
+ "kind": "card_dod",
+ "require_evidence": true,
+ "evidence_waiver_reason": "the rework package v1-w2b-2:T10 is a materialised view of its finding; the finding is resolved in docs/evidence/v1-conformance-findings.json and that resolution is the card's Definition of Done"
+}

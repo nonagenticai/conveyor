@@ -643,6 +643,7 @@ async fn invoke(
         conveyor_actions::registry::registry(),
         fixture.tenant,
         conveyor_actions::InvokeRequest {
+            credential_alias: None,
             action: action.to_owned(),
             input,
             precondition: None,

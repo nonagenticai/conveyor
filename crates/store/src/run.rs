@@ -16,8 +16,63 @@ use crate::parent::{Parent, ParentError, ensure_optional_parent_tx, ensure_paren
 use crate::version_of;
 
 /// The parent row read `FOR UPDATE` before a child is created:
-/// `(card_id, depth, status, job_binding_id, release_hash)`.
-type ParentRow = (Option<Uuid>, i32, String, Option<Uuid>, Option<String>);
+/// `(card_id, depth, status, job_binding_id, release_hash, kind)`.
+type ParentRow = (
+    Option<Uuid>,
+    i32,
+    String,
+    Option<Uuid>,
+    Option<String>,
+    String,
+);
+
+/// The sort of work a run executes.
+///
+/// The kind is explicit because it decides whether a job binding is owed. A [`RunKind::Job`] run
+/// executes a card's work package and may not exist without its binding and pinned release
+/// (SPEC_V2 §4.4); a project, process or workflow run has its own path and may stay unbound.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum RunKind {
+    /// A card's work-package run; always bound.
+    Job,
+    /// A plain (non-job) project run; it may stay unbound.
+    Project,
+    /// A `process_runs.start` run; bound only when the caller names a binding (T16).
+    Process,
+    /// A workflow run; a child inherits its parent's binding.
+    Workflow,
+}
+
+impl RunKind {
+    /// Every kind, in the stored vocabulary's order.
+    pub const ALL: [RunKind; 4] = [
+        RunKind::Job,
+        RunKind::Project,
+        RunKind::Process,
+        RunKind::Workflow,
+    ];
+
+    /// The stored `run.kind`.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            RunKind::Job => "job",
+            RunKind::Project => "project",
+            RunKind::Process => "process",
+            RunKind::Workflow => "workflow",
+        }
+    }
+}
+
+impl FromStr for RunKind {
+    type Err = String;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        Self::ALL
+            .into_iter()
+            .find(|kind| kind.as_str() == value)
+            .ok_or_else(|| format!("unknown run.kind {value:?}"))
+    }
+}
 
 /// A run to create.
 #[derive(Clone, Debug)]
@@ -50,6 +105,9 @@ pub struct NewRun {
     pub depth: i32,
     /// The process version the run pinned (CONTRACT §21); `1` for a non-process run.
     pub process_version: i64,
+    /// The sort of work this run executes. A [`RunKind::Job`] run must name its binding; the
+    /// other kinds may stay unbound.
+    pub kind: RunKind,
     /// The job binding this run names (T0, §4.4). `None` for a run with no organisation pin.
     pub job_binding_id: Option<Uuid>,
     /// The release the caller claims the binding pins. Must equal the binding's pin; the store
@@ -74,6 +132,9 @@ impl NewRun {
             workflow_step_id: None,
             depth: 0,
             process_version: 1,
+            // The default is the plain project run; only the card and process paths declare a
+            // job/process/workflow kind.
+            kind: RunKind::Project,
             job_binding_id: None,
             release_hash: None,
         }
@@ -140,6 +201,17 @@ pub enum RunStoreError {
     /// A run that names a release must name the binding that pins it.
     #[error("a run that names a release must name its job binding")]
     ReleaseWithoutBinding,
+    /// A job run did not name the binding — and therefore the release pin — it executes under
+    /// (`422 binding_required`, SPEC_V2 §4.4). Refused before the INSERT.
+    #[error("a job run must name its job binding and pinned release")]
+    BindingRequired,
+    /// A job run did not name the card whose work package it executes (`422 card_required`,
+    /// SPEC_V2 §5.1, v1-p5-5). Refused before the INSERT.
+    #[error("a job run must name the card whose work package it executes")]
+    CardRequired,
+    /// A stored `run.kind` the store does not know.
+    #[error("the database holds run.kind = {0:?}, which the store does not know")]
+    UnknownKind(String),
     /// The run already executes under a different capability/agent than the binding names.
     #[error("the run already executes under a different executor configuration")]
     ExecutorMismatch,
@@ -385,12 +457,26 @@ fn constraint_of(error: &sqlx::Error) -> Option<&str> {
 ///
 /// A run that names a `job_binding_id` resolves its pin HERE, before the INSERT: a retired or
 /// draft binding, or a `release_hash` that is not the binding's pin, is
-/// [`RunStoreError::JobBindingStale`] and nothing is written (SPEC_V2 §4.4, T0 P2.2).
+/// [`RunStoreError::JobBindingStale`] and nothing is written (SPEC_V2 §4.4, T0 P2.2). A
+/// [`RunKind::Job`] run with no binding is likewise refused
+/// [`RunStoreError::BindingRequired`] before any write; the database CHECK is the second door.
+/// A [`RunKind::Job`] run with no card is refused [`RunStoreError::CardRequired`] the same way:
+/// the card is the work package the run executes (SPEC_V2 §5.1, v1-p5-5).
 pub async fn insert_run_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     input: &NewRun,
 ) -> Result<Run, RunStoreError> {
+    // The job path owes its binding: a card's work package cannot run without the release its
+    // binding pins, and this refusal runs before the parent lookups and the INSERT.
+    if input.kind == RunKind::Job && input.job_binding_id.is_none() {
+        return Err(RunStoreError::BindingRequired);
+    }
+    // The same path owes its card: a job run executes a work package, so a cardless job run is
+    // no work at all. Refused before the parent lookups, the binding lookup and the INSERT.
+    if input.kind == RunKind::Job && input.card_id.is_none() {
+        return Err(RunStoreError::CardRequired);
+    }
     ensure_parent_tx(conn, tenant, Parent::Project, input.project_id).await?;
     ensure_optional_parent_tx(conn, tenant, Parent::Card, input.card_id).await?;
     let (job_binding_id, release_hash, executor_kind) = match input.job_binding_id {
@@ -411,8 +497,9 @@ pub async fn insert_run_tx(
         "INSERT INTO run (tenant_id, card_id, project_id, status, attempt, correlation_id,
                           process_id, inputs, capability_id, capability_agent_id,
                           parent_run_id, step_id, depth, process_version,
-                          job_binding_id, release_hash, executor_kind)
-         VALUES ($1, $2, $3, 'queued', $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+                          job_binding_id, release_hash, kind, executor_kind)
+         VALUES ($1, $2, $3, 'queued', $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
+                 $16, $17)
          RETURNING {COLUMNS}"
     );
     let row: RunRow = sqlx::query_as(sqlx::AssertSqlSafe(sql))
@@ -431,6 +518,7 @@ pub async fn insert_run_tx(
         .bind(input.process_version)
         .bind(job_binding_id)
         .bind(release_hash.as_deref())
+        .bind(input.kind.as_str())
         .bind(executor_kind.as_deref())
         .fetch_one(&mut *conn)
         .await
@@ -465,15 +553,21 @@ pub async fn insert_child_run_tx(
     // concurrent `runs.cancel` (or the reaper) waits for this transaction, so a child can never
     // commit after its parent was cancelled — the insert then sees `cancelled` and refuses.
     let parent: Option<ParentRow> = sqlx::query_as(
-        "SELECT card_id, depth, status, job_binding_id, release_hash
+        "SELECT card_id, depth, status, job_binding_id, release_hash, kind
            FROM run WHERE tenant_id = $1 AND id = $2 FOR UPDATE",
     )
     .bind(tenant.as_uuid())
     .bind(parent_run_id)
     .fetch_optional(&mut *conn)
     .await?;
-    let Some((parent_card_id, parent_depth, parent_status, parent_binding, parent_release)) =
-        parent
+    let Some((
+        parent_card_id,
+        parent_depth,
+        parent_status,
+        parent_binding,
+        parent_release,
+        parent_kind,
+    )) = parent
     else {
         return Err(RunStoreError::NotFound);
     };
@@ -531,9 +625,9 @@ pub async fn insert_child_run_tx(
         "INSERT INTO run (tenant_id, card_id, project_id, status, attempt, correlation_id,
                           process_id, inputs, capability_id, capability_agent_id,
                           parent_run_id, step_id, workflow_step_id, depth, process_version,
-                          job_binding_id, release_hash)
+                          job_binding_id, release_hash, kind)
          VALUES ($1, $2, $3, 'queued', $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
-                 $16)
+                 $16, $17)
          RETURNING {COLUMNS}"
     );
     let row: RunRow = sqlx::query_as(sqlx::AssertSqlSafe(sql))
@@ -552,9 +646,11 @@ pub async fn insert_child_run_tx(
         .bind(depth)
         .bind(input.process_version)
         // The parent's pin is authoritative: a child cannot change the binding mid-tree, and
-        // `input.job_binding_id`/`release_hash` are ignored exactly like `depth`.
+        // `input.job_binding_id`/`release_hash` are ignored exactly like `depth`. The kind is
+        // copied for the same reason — a child IS the kind of work its parent started.
         .bind(parent_binding)
         .bind(parent_release.as_deref())
+        .bind(parent_kind.as_str())
         .fetch_one(&mut *conn)
         .await
         .map_err(|error| {
@@ -1064,6 +1160,9 @@ pub struct RunContext {
     pub capability_id: Option<Uuid>,
     /// The capability agent configuration this run was resolved against.
     pub capability_agent_id: Option<Uuid>,
+    /// The sort of work this run executes; the executor keys on it to decide whether a job
+    /// binding is owed.
+    pub kind: RunKind,
     /// The job binding this run pins (T0, §4.4); `None` for an unbound run.
     pub job_binding_id: Option<Uuid>,
     /// The release the binding pins, when the run names one.
@@ -1083,6 +1182,7 @@ struct RunContextRow {
     process_id: Option<Uuid>,
     capability_id: Option<Uuid>,
     capability_agent_id: Option<Uuid>,
+    kind: String,
     job_binding_id: Option<Uuid>,
     release_hash: Option<String>,
 }
@@ -1095,7 +1195,7 @@ pub async fn get_run_context_tx(
 ) -> Result<Option<RunContext>, RunStoreError> {
     let row: Option<RunContextRow> = sqlx::query_as(
         "SELECT id, status, attempt, card_id, project_id, correlation_id, inputs, process_id,
-                capability_id, capability_agent_id, job_binding_id, release_hash
+                capability_id, capability_agent_id, kind, job_binding_id, release_hash
                FROM run
               WHERE tenant_id = $1 AND id = $2",
     )
@@ -1108,6 +1208,8 @@ pub async fn get_run_context_tx(
     };
     let status = RunStatus::from_str(&row.status)
         .map_err(|_| RunStoreError::UnknownStatus(row.status.clone()))?;
+    let kind =
+        RunKind::from_str(&row.kind).map_err(|_| RunStoreError::UnknownKind(row.kind.clone()))?;
     Ok(Some(RunContext {
         id: row.id,
         status,
@@ -1119,6 +1221,7 @@ pub async fn get_run_context_tx(
         process_id: row.process_id,
         capability_id: row.capability_id,
         capability_agent_id: row.capability_agent_id,
+        kind,
         job_binding_id: row.job_binding_id,
         release_hash: row.release_hash,
     }))

@@ -1,0 +1,95 @@
+{
+  "dry_run": false,
+  "toolkits": [
+    {
+      "bindings_disabled": 0,
+      "bindings_restored": 0,
+      "http_status": 200,
+      "key": "coding",
+      "latency_ms": 168,
+      "probe": "live",
+      "service": "coding",
+      "toolkit_version": 1
+    },
+    {
+      "bindings_disabled": 0,
+      "bindings_restored": 0,
+      "http_status": 200,
+      "key": "coding",
+      "latency_ms": 96,
+      "probe": "live",
+      "service": "coding",
+      "toolkit_version": 2
+    },
+    {
+      "bindings_disabled": 0,
+      "bindings_restored": 0,
+      "http_status": 200,
+      "key": "image_gen",
+      "latency_ms": 196,
+      "probe": "live",
+      "service": "image_gen",
+      "toolkit_version": 1
+    },
+    {
+      "bindings_disabled": 0,
+      "bindings_restored": 0,
+      "http_status": 200,
+      "key": "image_gen",
+      "latency_ms": 98,
+      "probe": "live",
+      "service": "image_gen",
+      "toolkit_version": 2
+    },
+    {
+      "bindings_disabled": 0,
+      "bindings_restored": 2,
+      "http_status": 200,
+      "key": "scientific",
+      "latency_ms": 182,
+      "probe": "live",
+      "service": "scientific",
+      "toolkit_version": 1
+    },
+    {
+      "bindings_disabled": 0,
+      "bindings_restored": 0,
+      "http_status": 200,
+      "key": "speech",
+      "latency_ms": 196,
+      "probe": "live",
+      "service": "tts",
+      "toolkit_version": 1
+    },
+    {
+      "bindings_disabled": 0,
+      "bindings_restored": 0,
+      "http_status": 200,
+      "key": "speech",
+      "latency_ms": 98,
+      "probe": "live",
+      "service": "tts",
+      "toolkit_version": 2
+    },
+    {
+      "bindings_disabled": 0,
+      "bindings_restored": 0,
+      "http_status": 200,
+      "key": "transcription",
+      "latency_ms": 192,
+      "probe": "live",
+      "service": "asr",
+      "toolkit_version": 1
+    },
+    {
+      "bindings_disabled": 0,
+      "bindings_restored": 0,
+      "http_status": 200,
+      "key": "transcription",
+      "latency_ms": 95,
+      "probe": "live",
+      "service": "asr",
+      "toolkit_version": 2
+    }
+  ]
+}

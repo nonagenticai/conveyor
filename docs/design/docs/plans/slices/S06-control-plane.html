@@ -82,7 +82,10 @@ crates/actions/src/control/{cards,runs,approvals,andong,messages,channels}.rs
 crates/actions/src/channel/{mod,telegram,web,reply}.rs
 crates/api/src/{runs,approvals,events,telegram}.rs   apps/server/src/worker.rs
 crates/store/src/jobs/{runner,schedule,kind}.rs
-crates/api/tests/{golden_path,claim_race,run_retry,approval_dual,approval_expire,andon,delivery_retry,telegram_reply,notifications,sse_control}.rs</code></pre>
+crates/api/tests/{golden_path,claim_race,approval_dual,notifications,sse_control}.rs
+crates/api/tests/channel_inbound.rs                 # the Telegram reply path; the old `telegram_reply` target never existed
+apps/server/tests/{run_retry,approval_expire,andon,delivery_retry}.rs</code></pre>
+<p>⚠️ <strong>Corrected 2026-11-21 (v1-s06-1).</strong> Four of the five worker-level proofs (<code>run_retry</code>, <code>approval_expire</code>, <code>andon</code>, <code>delivery_retry</code>) live in the server package, not <code>conveyor-api</code>; the fifth, the Telegram reply→<code>approvals.decide</code> path, is <code>channel_inbound.rs</code> in <code>conveyor-api</code>. A missing target hard-errors the whole gate, so §7 and the build order name the real files.</p>
 <h3 id="51-tables--26-verbatim-six-only">5.1 Tables — §2.6 verbatim, six only</h3>
 <p><code>channel_binding</code> · <code>channel_preference</code> · <code>message</code> · <code>delivery</code> · <code>audience</code> · <code>audience_member</code> (PENDING-S0).</p>
 <h3 id="52-actions">5.2 Actions</h3>
@@ -302,13 +305,13 @@ RETURNING claim_fence, version;</code></pre>
 <li>Schedule materialiser — one advisory lock. <code>cargo test -p conveyor-store jobs::schedule</code></li>
 <li><code>worker</code> subcommand draining any kind. <code>cargo run -p conveyor-server -- worker &amp; sleep 2; kill %1</code></li>
 <li><code>card.claim</code> waiter + <code>card.lease_sweep</code> + the lease events. <code>cargo test -p conveyor-api --test claim_race</code></li>
-<li>Runs: 5 actions, <code>run.execute</code>, <code>run.reap</code>; one-live-run invariant. <code>cargo test -p conveyor-api --test run_retry</code></li>
+<li>Runs: 5 actions, <code>run.execute</code>, <code>run.reap</code>; one-live-run invariant. <code>cargo test -p conveyor-server --test run_retry</code></li>
 <li>Approvals: 2 actions, dual control, <code>approval.expire</code>. <code>cargo test -p conveyor-api --test approval_dual</code></li>
 <li>Human vs agent: one approval decided twice, <code>decided_by_kind</code> <code>human</code> then <code>agent</code>. <code>cargo test -p conveyor-api --test approval_dual -- decided_by_kind</code></li>
-<li>Approval events + <code>approval.closed.emit</code> (payload only). <code>cargo test -p conveyor-api --test approval_expire</code></li>
-<li>Andon: 2 actions, poller pause, gauge + timeout. <code>cargo test -p conveyor-api --test andon</code></li>
-<li><code>messages.send</code>, fan-out, <code>delivery.send</code> + backoff. <code>cargo test -p conveyor-api --test delivery_retry</code></li>
-<li><code>channel</code>: preferences, web delivery, Telegram webhook + reply→action. <code>cargo test -p conveyor-api --test telegram_reply</code></li>
+<li>Approval events + <code>approval.closed.emit</code> (payload only). <code>cargo test -p conveyor-server --test approval_expire</code></li>
+<li>Andon: 2 actions, poller pause, gauge + timeout. <code>cargo test -p conveyor-server --test andon</code></li>
+<li><code>messages.send</code>, fan-out, <code>delivery.send</code> + backoff. <code>cargo test -p conveyor-server --test delivery_retry</code></li>
+<li><code>channel</code>: preferences, web delivery, Telegram webhook + reply→action. <code>cargo test -p conveyor-api --test channel_inbound</code></li>
 <li><code>notifications.list|update</code>. <code>cargo test -p conveyor-api --test notifications</code></li>
 <li>SSE: 3 topics, replay bound, keepalive. <code>cargo test -p conveyor-api --test sse_control</code></li>
 <li><code>channels.bind</code>/<code>channels.unbind</code> (platform-admin, audited). <code>cargo run -p conveyor-server -- --print-openapi | jq -e '.paths["/api/actions/channels.bind/invocations"]'</code></li>
@@ -317,9 +320,13 @@ RETURNING claim_fence, version;</code></pre>
 <h2 id="7-gate">7. Gate</h2>
 <pre class="bash"><code>set -euo pipefail
 source ~/.cargo/env          # CONTRACT §16 — cargo is not on PATH
-cargo test -p conveyor-api --test golden_path --test claim_race --test run_retry \
-  --test approval_dual --test approval_expire --test andon --test delivery_retry \
-  --test telegram_reply --test notifications --test sse_control
+# v1-s06-1: every target below exists at this head. The four worker-level proofs run in the
+# server package; `channel_inbound` is the Telegram reply→`approvals.decide` path that the
+# old `telegram_reply` target named (there is no such file in either package).
+cargo test -p conveyor-api --test golden_path --test claim_race --test approval_dual \
+  --test notifications --test sse_control --test channel_inbound
+cargo test -p conveyor-server --test run_retry --test approval_expire --test andon \
+  --test delivery_retry
 test -z &quot;$(rg -n &#39;setInterval&#39; crates apps || true)&quot;            # empty</code></pre>
 <table>
 <thead>
@@ -342,17 +349,17 @@ test -z &quot;$(rg -n &#39;setInterval&#39; crates apps || true)&quot;          
 </tr>
 <tr>
 <td>c</td>
-<td>retry</td>
+<td>retry (<code>apps/server/tests/run_retry.rs</code>)</td>
 <td><code>kill -9</code> mid-run: <code>run.reap</code> → <code>failed</code>/<code>crashed</code>, next <code>runs.create</code> is <code>attempt=2</code>; two rows, never two live</td>
 </tr>
 <tr>
 <td>d</td>
-<td>andon</td>
+<td>andon (<code>apps/server/tests/andon.rs</code>)</td>
 <td>engaged: <code>409</code>, a queued <code>run.execute</code> stays pending 60 s; released: runs within one poll</td>
 </tr>
 <tr>
 <td>e</td>
-<td>delivery retry</td>
+<td>delivery retry (<code>apps/server/tests/delivery_retry.rs</code>)</td>
 <td>stub returns 500 → <code>attempts=5</code>, <code>state='failed'</code>, one row</td>
 </tr>
 <tr>

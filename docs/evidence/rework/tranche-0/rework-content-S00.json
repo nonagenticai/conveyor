@@ -1,0 +1,919 @@
+{
+  "charter": "# Charter — S00 usage inventory (retrospective, 2026-11-26)\n\n- **Project:** S00 'Usage inventory → parity/parity.yaml', track v1, ADM phase G, tranche 0, project `01a1d039-0d26-7573-9b0c-e0f60af92003`, plan `docs/plans/slices/S00-usage-inventory.md`. The row records `status: closed`, `meta.expected_outputs: [project-brief, evidence]`, `meta.closure_outputs: []` and no issues. It was reopened for the #526 retrospective rework under delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`.\n- **Mandate:** measure from durable and sampled evidence which fr, RM, Planka and n8n operations are actually used, then publish one signed `parity/parity.yaml` that every later slice consumes as `parity_ids` and that S14 gates on at 100 % of `used`. Zero-usage surface is dropped, not ported (D2/R5). The retrospective reconstitutes the MSP/TOGAF lifecycle record for that measurement: charter, Statement of Architecture Work, the seven mandatory Phase A–D artefacts, the delivery contract, the WBS deliverable, the Phase-G review, the project-brief and evidence outputs and the closure review.\n- **Scope:** the inventory and its evidence — 1,300 rows (218 used, 295 rare, 543 unused, 244 dropped) sampled on 2026-11-07 and 2026-11-08, the four surface manifests, `parity/schema.json`, `parity/SUMMARY.md` and the gate G1–G7. Out of scope is a re-measurement: the samples are dated, the live sources have moved on, and a re-measurement is not recoverable.\n- **Date:** this charter is retrospective and was authored on 2026-11-26; it records the lifecycle of a measurement completed on 2026-11-08, it does not authorise new work.\n",
+  "soaw": {
+    "title": "Statement of Architecture Work — S00 usage inventory (retrospective, 2026-11-26)",
+    "body": {
+      "assignment": "Rework S00 by the reconstituted TOGAF/MSP lifecycle: author the charter, this Statement of Architecture Work, the seven mandatory Phase A–D artefacts, the delivery contract, the WBS deliverable and the Phase-G review, and re-publish the project-brief and evidence outputs. The architecture work is the usage inventory itself — one signed parity/parity.yaml of 1,300 surfaces sampled on 2026-11-07 and 2026-11-08 — recorded retrospectively and dated 2026-11-26.",
+      "scope": "In scope: the fr served operation set (785 operations across 616 paths), all 314 RM route decorators, the 67 Planka openapi paths, the distinct (package, resource, operation) tuples of the active n8n workflows and the four named flows conveyor.start, wip.pull, ask_fr and err.card; the evidence classes A to E and their precedence; the normalisation to P-NNNN; the classification into used, rare, unused and dropped; the schema and the gate G1–G7. Out of scope: coding-*, artifacts, worker_management, inference-router, licenses and billing_service (D12/D14); n8n flows as features, which S13 re-authors; procedure_management's 54 endpoints, carried as one SUMMARY line (D10); UI screens (S12); performance and data migration (D7).",
+      "responsibilities": "The programme architect authors the pack under the #526 rework delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews the seven A–D artefacts, which the rework note records as approved. The programme owner signs the inventory at sign-off: the SUMMARY carries signed_off with the reviewer, the date and the sha256 of parity.yaml, and that signature states that every used id will be built and every dropped id will not. The delivery contract 01a1ff39-4ee0-7ecc-93cc-eeaf21fb9738 is approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, distinct from the requester 01a1e607-17d9-77d3-98d3-a43a87c4633d.",
+      "acceptance_criteria": "The gate in the plan's §7 is executable and exits 0 only when every property holds: G1 no duplicate id; G2 every id matches ^P-[0-9]{4}$; G3 every used row carries an acceptance string beginning test:, e2e: or probe:; G4 every surface appears exactly once against the union of the four manifests; G5 the manifest count reconciles with the row count of 1,300; G6 at least two Loki samples exist for the B-class used rows; G7 every dropped row's evidence begins decision: or replacement:. check-jsonschema validates parity.yaml against parity/schema.json. The rework note records the reconstituted project's own verification green: scripts/verify-project.py --project S00 --snapshot <fresh> with 11 checks and 0 failures at d7293f96, and no P0/P1 entry for the project on the strict audit.",
+      "contract": "This statement 01a1ff37-e240-779b-aab5-74a3fa86ecad sits under its approval 01a1ff37-f693-7336-8c6d-fe98f6f5c7b7, approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545 and requested by 01a1e607-17d9-77d3-98d3-a43a87c4633d. It is complemented by the delivery contract 01a1ff39-4ee0-7ecc-93cc-eeaf21fb9738 on the approved scope baseline 01a1ff39-8d6e-7270-b2ba-9d235eb28b83 (kind scope, taken 2026-11-21, approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545), and by the Phase-G review 01a1ff3a-6a97-7c12-841c-1c4f803cffb6 at level compliant. It is retrospective, dated 2026-11-26, and claims no re-measurement.",
+      "retrospective": true
+    }
+  },
+  "artifacts": [
+    {
+      "title": "Stakeholder map — usage inventory",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "purpose": "Name the actors the usage inventory serves and the engagement each needs, from the sampling sessions through to the slice that gates on the result.",
+      "scope": "The stakeholders of the usage inventory and its signed contract.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the programme office",
+          "later slices that consume parity_ids"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the sponsoring group",
+          "axis_b": "tranche-0 authorisation and the exit criteria that consume the inventory",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the programme owner",
+          "axis_b": "reviews and signs the SUMMARY: every used id will be built, every dropped id will not",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "approve"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "the programme architect",
+          "axis_b": "authors the seven A–D artefacts and the retrospective record under the #526 rework",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "responsible"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "the S0 executor",
+          "axis_b": "performs steps 0–14 read-only as a fresh session running the plan verbatim",
+          "value": {
+            "influence": "high",
+            "interest": "medium",
+            "engagement": "manage closely"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "later slices",
+          "axis_b": "consume parity_ids; S14 gates on 100 % of used",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "keep informed"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "the estate operator",
+          "axis_b": "supplies read-only access to the master Postgres and Loki that the measurement reads",
+          "value": {
+            "influence": "medium",
+            "interest": "medium",
+            "engagement": "consult"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements catalog — usage inventory",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Stakeholder map — usage inventory\n\n## Metadata\n\nRetrospective matrix for S00, authored 2026-11-26 from the slice plan docs/plans/slices/S00-usage-inventory.md and the rework note docs/evidence/rework/S00.md. Phase a, plateau psa, kind matrix; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d26-7573-9b0c-e0f60af92003.\n\n## Entries\n\nSix actors on the influence, interest and engagement axes. The sponsoring group decides the tranche-0 authorisation and the exit criteria that consume the inventory. The programme owner reviews and signs the SUMMARY, and that signature states that every used id will be built and every dropped id will not. The programme architect is responsible for the seven A–D artefacts and the retrospective record. The S0 executor, a fresh session running the plan verbatim, performs steps 0–14 read-only. Later slices consume parity_ids and S14 gates on 100 % of used, while the estate operator supplies the read-only access that makes the measurement possible.\n\n## Links\n\nThis artefact carries one typed edge: Requirements catalog — usage inventory as dependency, because the requirements fix what each actor receives from the inventory. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: place the actors of the measurement so each concern has a named owner and a stated engagement. Scope: the stakeholders of the usage inventory and its signed contract. It was reconstructed retrospectively on 2026-11-26 from the recorded roles rather than from a live elicitation, and it does not claim that any actor re-accepted the inventory after the 2026-11-08 sign-off."
+    },
+    {
+      "title": "Driver/goal/objective — usage inventory",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "Trace why the inventory exists and what the measurement is meant to achieve for the rebuild that follows it.",
+      "scope": "The drivers and goals of measuring usage before any porting begins.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the programme office",
+          "later slices that consume parity_ids"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "D1 the rebuild would carry surface that nobody uses",
+          "axis_b": "G1 measure before porting and drop zero-usage surface",
+          "value": {
+            "objective": "zero-usage features are dropped, not ported (D2/R5); the inventory is the gate that decides what the rebuild owes",
+            "measure": "1,300 surfaces classified on 2026-11-07 and 2026-11-08, with 244 dropped"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "D2 the starting tree holds only docs/ — 25 files, no Cargo.toml, no parity/, no .git",
+          "axis_b": "G2 publish one signed contract instead of an implicit surface",
+          "value": {
+            "objective": "the first artefact of the programme is the inventory, so every later slice reads parity_ids from one signed list rather than from unwritten assumptions",
+            "measure": "parity/parity.yaml, parity/schema.json and the signed SUMMARY exist at sign-off"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "D3 counting declarations overstates fr about sixfold — 88 defineCapability against 548 paths and 1,376 declarations, while the lock holds 785 operations and 616 paths",
+          "axis_b": "G3 measure the served spec plus handlers absent from it",
+          "value": {
+            "objective": "the fr surface is the served operation set union the handlers that the served spec omits, never the declaration count",
+            "measure": "785 served operations across 616 paths form the fr manifest"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "D4 a 24-hour Loki window cannot prove absence",
+          "axis_b": "G4 take two samples and keep a positive control",
+          "value": {
+            "objective": "a zero is read as no traffic in that window, never as disuse; query_failed is carried as a third state beside zero",
+            "measure": "two samples at least 24 hours apart, each with a positive control above zero"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "D5 idle looks like unused — approvals is 0 while conveyor_flow_runs is 693",
+          "axis_b": "G5 rank the evidence and let call sites alone make used",
+          "value": {
+            "objective": "the precedence A > B > C > D > E decides every row; A alone makes used, B needs repetition, and C, D and E never stand alone",
+            "measure": "the classification rules in the plan's §9 were applied row by row"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "D6 n8n would flood the inventory with flows as features — 348 workflows, 332 active, and 280 card-type by list flows are one feature",
+          "axis_b": "G6 measure operation tuples and carry flows as a named set",
+          "value": {
+            "objective": "the n8n unit is (package, resource, operation); flows are not features, and S13 re-authors them from the same evidence",
+            "measure": "the distinct active tuples plus conveyor.start, wip.pull, ask_fr and err.card"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Stakeholder map — usage inventory",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Driver/goal/objective — usage inventory\n\n## Metadata\n\nRetrospective catalogue for S00, authored 2026-11-26 from the slice plan and the rework note. Phase a, plateau psa, kind catalog; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d26-7573-9b0c-e0f60af92003.\n\n## Entries\n\nSix drivers, each with a goal and a measurable objective. D1 records the cost of porting blind; G1 measures first and drops zero-usage surface. D2 records the empty starting tree; G2 makes the inventory the programme's first signed contract. D3 records the declaration-count trap; G3 measures the served operations and the handlers the spec omits. D4 records the 24-hour window; G4 requires two samples and a positive control. D5 separates idle from unused; G5 fixes the evidence precedence. D6 records the n8n flood; G6 measures operation tuples and keeps flows as a named set.\n\n## Links\n\nThis artefact carries one typed edge: Stakeholder map — usage inventory as derivation, because the drivers are held by the actors named there. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: trace why the inventory exists and what the measurement is meant to achieve. Scope: the drivers and goals of measuring usage before any porting begins. It was authored retrospectively on 2026-11-26 from the plan and the rework note, and it records the objective the plan set rather than claiming that a later reader can reproduce the sampling."
+    },
+    {
+      "title": "Requirements catalog — usage inventory",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "State the requirements the inventory and its evidence must satisfy, each with the check that carries it.",
+      "scope": "Surface enumeration, identity, classification, schema, gate, read-only discipline and sign-off.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "later slices that consume parity_ids",
+          "the programme owner who signs"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "R1",
+          "axis_b": "enumerate every fr served operation plus the handlers absent from the served spec",
+          "value": {
+            "requirement": "the fr manifest is served-spec.lock.json (785 operations, 616 paths) union the routes handlers that the lock omits",
+            "acceptance": "parity/surfaces/fr.txt reconciles into parity/parity.yaml under gate G4 and G5"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "R2",
+          "axis_b": "pair all 314 RM route decorators with their mount prefix",
+          "value": {
+            "requirement": "each method is paired with its path plus the mount prefix from src/routers/__init__.py and emitted as rm<TAB>METHOD /path",
+            "acceptance": "the RM manifest carries 314 surfaces and appears exactly once each in parity.yaml"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "R3",
+          "axis_b": "enumerate all 67 Planka openapi paths",
+          "value": {
+            "requirement": "the Planka manifest is the openapi path set at the pinned commit kanban@aafb771cea4c",
+            "acceptance": "the Planka manifest appears exactly once each in parity.yaml"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "R4",
+          "axis_b": "enumerate the active n8n operation tuples and the four named flows",
+          "value": {
+            "requirement": "the n8n unit is the distinct (package, resource, operation) tuple over active workflows (348 workflows, 332 active), plus conveyor.start, wip.pull, ask_fr and err.card",
+            "acceptance": "the n8n manifest appears exactly once each in parity.yaml; the 280 card-type by list flows are one feature and are not rows"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "R5",
+          "axis_b": "hold one row schema with no extra keys",
+          "value": {
+            "requirement": "parity/schema.json sets additionalProperties false and requires the nine keys id, app, area, surface, source, evidence, evidence_class, acceptance and status, with app in fr, rm, planka and n8n, evidence_class in A to E, and status in used, rare, unused and dropped",
+            "acceptance": "check-jsonschema --schemafile parity/schema.json parity/parity.yaml exits 0"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "R6",
+          "axis_b": "pass the executable gate G1 to G7",
+          "value": {
+            "requirement": "ids are unique and match ^P-[0-9]{4}$; every used row carries an acceptance string; every surface appears exactly once; the count reconciles; two samples exist for B-class used; every dropped row starts decision: or replacement:",
+            "acceptance": "the plan's §7 script exits 0 under bash with set -euo pipefail"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "R7",
+          "axis_b": "measure read-only, directly on the master",
+          "value": {
+            "requirement": "SQL runs on master as postgres, never through PgBouncer, never with a session SET; there is no prune and no state deletion; below 10 % disk the run stops and reports",
+            "acceptance": "the preflight in parity/evidence/00-preflight.txt records the disk and tool checks and the run reached the end"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "R8",
+          "axis_b": "sign the contract and update the ledger",
+          "value": {
+            "requirement": "parity/SUMMARY.md carries signed_off with the reviewer, the date and the sha256 of parity.yaml, and the programme ledger row is updated",
+            "acceptance": "the SUMMARY carries the sign block; the rework note records the reconstituted lifecycle read back act by act"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "R9",
+          "axis_b": "give every used id an acceptance string and only used ids",
+          "value": {
+            "requirement": "acceptance is test:<crate>::<name>, e2e:<spec>::<name> or probe:<METHOD> <path>; no rare, unused or dropped row carries one",
+            "acceptance": "gate G3 finds no used row without an acceptance string"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "R10",
+          "axis_b": "record the measurement as dated and not re-measurable",
+          "value": {
+            "requirement": "the samples are dated 2026-11-07 and 2026-11-08; the live sources have moved on and no re-measurement is claimed",
+            "acceptance": "the rework note records the residual and this pack repeats it without softening"
+          },
+          "position": 10
+        }
+      ],
+      "links": [
+        {
+          "to": "Driver/goal/objective — usage inventory",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Requirements catalog — usage inventory\n\n## Metadata\n\nRetrospective catalogue for S00, authored 2026-11-26 from the slice plan and the rework note. Phase a, plateau psa, kind catalog; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d26-7573-9b0c-e0f60af92003.\n\n## Entries\n\nTen requirements. R1 to R4 fix the four surface sets — 785 fr operations over 616 paths, 314 RM decorators, 67 Planka paths, and the active n8n operation tuples with the four named flows. R5 fixes the row schema at nine required keys with no extras. R6 makes the gate executable. R7 keeps the measurement read-only and off PgBouncer. R8 binds the sign-off to a hash. R9 restricts acceptance strings to used rows. R10 records the residual honestly: the samples are dated and a re-measurement is not recoverable.\n\n## Links\n\nThis artefact carries one typed edge: Driver/goal/objective — usage inventory as derivation, because each requirement serves a stated goal. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: state the requirements the inventory and its evidence must satisfy. Scope: surface enumeration, identity, classification, schema, gate, read-only discipline and sign-off. It was reconstructed retrospectively on 2026-11-26 from the verified gate and the signed SUMMARY, so each acceptance line names a check that actually ran rather than a check the pack hopes will run."
+    },
+    {
+      "title": "Solution concept — usage inventory",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "purpose": "Show the components and edges that turn four raw surface lists into one signed, gate-checked inventory.",
+      "scope": "The four manifests, the evidence sources, the normaliser, the classifier, the contract and the gate.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "later slices that consume parity_ids",
+          "the estate operator"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the four surface manifests",
+          "axis_b": "parity/surfaces/{fr,rm,planka,n8n}.txt",
+          "value": {
+            "kind": "component",
+            "note": "one app<TAB>surface line per surface, the union of which the gate reconciles against parity.yaml"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the evidence sources",
+          "axis_b": "S1 and S2 manifests, A1 and A2 call sites, B1 Loki, C1 executions, D1 to D3 counts, E1 Keycloak",
+          "value": {
+            "kind": "component",
+            "note": "ranked A > B > C > D > E; the highest class wins and is stored in evidence_class"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "the normaliser",
+          "axis_b": "step 6 of the plan",
+          "value": {
+            "kind": "component",
+            "note": "UUID and number segments become :id, query strings are stripped, methods are uppercased, rows are deduped and sorted by (app, surface), and P-0001 onward is assigned"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "parity/inventory.tsv",
+          "axis_b": "the normalised working set",
+          "value": {
+            "kind": "component",
+            "note": "the sort-unique output of the awk pipeline that the classifier consumes before the contract is written"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "the classifier",
+          "axis_b": "step 12 and the plan's §9",
+          "value": {
+            "kind": "component",
+            "note": "precedence decision-drop then A then B then C then D; first match wins; a rare row survives only if it folds into a used action or enum"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "parity/parity.yaml",
+          "axis_b": "the contract artefact",
+          "value": {
+            "kind": "component",
+            "note": "1,300 rows carrying id, app, area, surface, source, evidence, evidence_class, acceptance and status"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "parity/schema.json",
+          "axis_b": "the contract's shape",
+          "value": {
+            "kind": "component",
+            "note": "additionalProperties false with nine required keys, so a row with an extra field fails before a reader can rely on it"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "parity/SUMMARY.md",
+          "axis_b": "counts, gate output and the sign block",
+          "value": {
+            "kind": "component",
+            "note": "counts per area and status, the used id list, the evidence classes, the gate G1 to G7 output and signed_off with the sha256 of parity.yaml"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "manifest to normaliser",
+          "axis_b": "the identity edge",
+          "value": {
+            "kind": "edge",
+            "note": "the four manifests are unioned, normalised and deduped so one surface cannot enter twice under two spellings"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "evidence to classifier",
+          "axis_b": "the classification edge",
+          "value": {
+            "kind": "edge",
+            "note": "the ranked evidence decides the status; a Loki zero never downgrades an A used, and a missing second sample caps the row at rare"
+          },
+          "position": 10
+        },
+        {
+          "axis_a": "contract to gate",
+          "axis_b": "the verification edge",
+          "value": {
+            "kind": "edge",
+            "note": "the gate reads parity.yaml against the schema and the manifests; a mismatch is a refusal, not a warning"
+          },
+          "position": 11
+        },
+        {
+          "axis_a": "gate to sign-off",
+          "axis_b": "the authority edge",
+          "value": {
+            "kind": "edge",
+            "note": "the reviewer signs the SUMMARY against the hash, and that signature binds every used and every dropped id"
+          },
+          "position": 12
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements catalog — usage inventory",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Solution concept — usage inventory\n\n## Metadata\n\nRetrospective diagram for S00, authored 2026-11-26 from the slice plan and the rework note. Phase a, plateau psa, kind diagram; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d26-7573-9b0c-e0f60af92003.\n\n## Entries\n\nTwelve rows: eight components and four edges. The four manifests hold the raw surface sets; the evidence sources rank what can make a surface used; the normaliser gives every named thing one identity; the classifier applies the precedence; the contract and its schema make the result machine-checkable; and the SUMMARY carries the gate output and the signature. The four edges record the path from raw list to signed contract, with a refusal at each step rather than a silent repair.\n\n## Links\n\nThis artefact carries one typed edge: Requirements catalog — usage inventory as realization, because the components exist to satisfy those requirements. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: show the components and edges that turn four raw surface lists into one signed inventory. Scope: the manifests, the evidence sources, the normaliser, the classifier, the contract and the gate. It was drawn retrospectively on 2026-11-26 from the plan's build order and the signed record, not from a design session held before the work."
+    },
+    {
+      "title": "Business capability map — usage inventory",
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "purpose": "Name the capabilities the inventory exercises and the evidence each one leaves behind.",
+      "scope": "Enumeration, attribution, traffic measurement, identity, classification, sign-off and residual honesty.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the programme office",
+          "later slices that consume parity_ids"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Surface enumeration",
+          "axis_b": "four application sets become one manifest union",
+          "value": {
+            "maturity": "delivered and signed on 2026-11-08",
+            "evidence": "785 fr operations over 616 paths, 314 RM decorators, 67 Planka paths and the active n8n tuples; parity/surfaces/"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Call-site attribution",
+          "axis_b": "a reachable caller makes a surface used without any traffic",
+          "value": {
+            "maturity": "delivered",
+            "evidence": "A1 active n8n workflows and A2 call sites through the MCP channel, webhooks, workers and cron"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Traffic measurement",
+          "axis_b": "two 24-hour Loki samples with a positive control",
+          "value": {
+            "maturity": "delivered, with the class limit recorded",
+            "evidence": "sample 1 on 2026-11-07 and sample 2 on 2026-11-08, each with a positive control above zero"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Identity and normalisation",
+          "axis_b": "one id per surface, allocated once and never reused",
+          "value": {
+            "maturity": "delivered",
+            "evidence": "UUID and numeric segments become :id, methods are uppercased, rows are deduplicated and P-0001 to P-1300 are assigned once"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Classification",
+          "axis_b": "used, rare, unused and dropped under one precedence",
+          "value": {
+            "maturity": "delivered",
+            "evidence": "218 used, 295 rare, 543 unused and 244 dropped in parity/parity.yaml"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Gate and sign-off",
+          "axis_b": "G1 to G7 plus schema validation, then a signed hash",
+          "value": {
+            "maturity": "delivered",
+            "evidence": "parity/SUMMARY.md records the gate output and the signature over the sha256 of parity.yaml"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Residual honesty",
+          "axis_b": "the dated samples are recorded as not re-measurable",
+          "value": {
+            "maturity": "recorded",
+            "evidence": "the rework note's residuals; this pack repeats them without softening"
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Solution concept — usage inventory",
+          "kind": "derivation"
+        },
+        {
+          "to": "Requirements catalog — usage inventory",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Business capability map — usage inventory\n\n## Metadata\n\nRetrospective diagram for S00, authored 2026-11-26 from the slice plan and the rework note. Phase b, plateau hld, kind diagram; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d26-7573-9b0c-e0f60af92003.\n\n## Entries\n\nSeven capabilities. Surface enumeration turns four application sets into one manifest union. Call-site attribution lets a reachable caller make a surface used without traffic. Traffic measurement reads two adjacent 24-hour Loki windows, each with a positive control. Identity allocates P-NNNN once. Classification applies the precedence to 1,300 rows and yields 218 used, 295 rare, 543 unused and 244 dropped. Gate and sign-off bind the result to a hash and a reviewer. Residual honesty records that the samples are dated and a re-measurement is not recoverable.\n\n## Links\n\nThis artefact carries two typed edges: Solution concept — usage inventory and Requirements catalog — usage inventory, both as derivation. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: name the capabilities the inventory exercises and the evidence each leaves behind. Scope: enumeration, attribution, traffic measurement, identity, classification, sign-off and residual honesty. It is retrospective and dated 2026-11-26; it records the capabilities as delivered at the 2026-11-08 sign-off and does not upgrade the dated samples into a live measurement."
+    },
+    {
+      "title": "Data entity catalog — usage inventory",
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Name the stored entities the inventory is built from and proved with, and the key each one carries.",
+      "scope": "The parity row, the manifests, the matched evidence, the two samples, the execution census, the row counts and the sign-off hash.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the estate operator",
+          "auditors",
+          "the programme office"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "parity row",
+          "axis_b": "one classified surface in the contract",
+          "value": {
+            "kind": "entity",
+            "definition": "nine fields: id, app, area, surface, source, evidence, evidence_class, acceptance and status; no other field is admitted",
+            "key": "id, shaped P-NNNN, allocated once in (app, surface) order"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "surface manifest line",
+          "axis_b": "one raw surface per application",
+          "value": {
+            "kind": "entity",
+            "definition": "app<TAB>surface, produced per application before normalisation and unioned by the gate",
+            "key": "app + surface"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "matched.tsv",
+          "axis_b": "the operation-to-endpoint join",
+          "value": {
+            "kind": "entity",
+            "definition": "the cross-match from an n8n operation to an fr, RM or Planka endpoint; evidence only, never identity",
+            "key": "operation + endpoint"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Loki sample",
+          "axis_b": "the raw traffic record",
+          "value": {
+            "kind": "entity",
+            "definition": "raw JSON from the istio-proxy logs filtered by the quoted host field over a 24-hour window, saved twice",
+            "key": "sample instant plus host"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "execution census",
+          "axis_b": "the n8n execution record",
+          "value": {
+            "kind": "entity",
+            "definition": "execution_entity grouped by workflowId over at most 72 hours and 470 rows, with camelCase columns quoted",
+            "key": "workflowId"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "fr table counts",
+          "axis_b": "the row-count evidence",
+          "value": {
+            "kind": "entity",
+            "definition": "all 88 fr base tables through pg_stat_user_tables plus count(*) on the six conveyor tables; estimates are never quoted",
+            "key": "table name"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "RM and Planka counts",
+          "axis_b": "the catalogue evidence",
+          "value": {
+            "kind": "entity",
+            "definition": "RM count(*) over 57 domain tables, 58 with alembic_version, and the Planka per-table census, 33 domain tables and 35 with migration and migration_lock",
+            "key": "table name"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "Keycloak client row",
+          "axis_b": "the client evidence",
+          "value": {
+            "kind": "entity",
+            "definition": "the client table in the keycloak database with realm_id, client_id and enabled; clients only, never tokens",
+            "key": "realm_id + client_id"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "SUMMARY counts and hash",
+          "axis_b": "the sign-off record",
+          "value": {
+            "kind": "entity",
+            "definition": "counts per area and status, the used id list, the gate output, the sign block and the sha256 of parity.yaml",
+            "key": "sha256 of parity.yaml"
+          },
+          "position": 9
+        }
+      ],
+      "links": [
+        {
+          "to": "Business capability map — usage inventory",
+          "kind": "derivation"
+        },
+        {
+          "to": "Solution concept — usage inventory",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Data entity catalog — usage inventory\n\n## Metadata\n\nRetrospective catalogue for S00, authored 2026-11-26 from the slice plan and the rework note. Phase c, plateau hld, kind catalog; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d26-7573-9b0c-e0f60af92003.\n\n## Entries\n\nNine entities. The parity row is the contract's unit and carries exactly nine fields. The manifests hold the raw surface per application. matched.tsv joins an operation to an endpoint as evidence only, never as identity. Two Loki samples hold the traffic record with a positive control each. The execution census is bounded to 72 hours and 470 rows. The table counts cover 88 fr base tables, 57 RM domain tables and 33 Planka domain tables, with the migration tables named beside them. The Keycloak client row supplies client evidence without tokens. The SUMMARY hash binds the whole record.\n\n## Links\n\nThis artefact carries two typed edges: Business capability map — usage inventory and Solution concept — usage inventory, both as derivation. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: name the stored entities the inventory is built from and proved with. Scope: the parity row, the manifests, the matched evidence, the two samples, the execution census, the row counts and the sign-off hash. It was authored retrospectively on 2026-11-26 from the schemas and the evidence paths the plan names, so the catalogue does not invent a table or a key the record does not carry."
+    },
+    {
+      "title": "Technology standards — usage inventory",
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Name the formats, disciplines and instruments the inventory relies on, and where each one is enforced.",
+      "scope": "The JSON contract, the read-only SQL discipline, LogQL sampling, identity, classification, acceptance strings and the signed hash.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the estate operator",
+          "auditors",
+          "the programme office"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "JSON schema",
+          "axis_b": "parity/schema.json",
+          "value": {
+            "usage": "additionalProperties false with nine required keys, app limited to fr, rm, planka and n8n, evidence_class to A to E and status to used, rare, unused and dropped"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "JSON array contract",
+          "axis_b": "parity/parity.yaml",
+          "value": {
+            "usage": "a JSON array despite the extension; one documented row per surface, machine-checkable against the schema"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Read-only SQL",
+          "axis_b": "master Postgres as postgres",
+          "value": {
+            "usage": "queries run directly on master, never through PgBouncer and never with a session SET, which would poison the next client; no prune and no state deletion"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "LogQL sampling",
+          "axis_b": "istio-proxy logs with a positive control",
+          "value": {
+            "usage": "the host is a quoted field rather than a label; every zero needs a positive control with the host filter removed, and query_failed is carried as a third state"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Identity standard",
+          "axis_b": "P-NNNN and a normalised surface",
+          "value": {
+            "usage": "UUID and numeric segments become :id, query strings are stripped, methods are uppercased, and an id is allocated once in (app, surface) order and never reused"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Classification standard",
+          "axis_b": "precedence decision-drop then A then B then C then D",
+          "value": {
+            "usage": "first match wins; a Loki zero never downgrades an A used; a missing second sample caps at rare; an A hit on a decision-dropped surface is a contradiction that stops the run"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Acceptance-string standard",
+          "axis_b": "test:, e2e: or probe:",
+          "value": {
+            "usage": "only used rows carry an acceptance string, and the gate refuses a used row whose string starts otherwise"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "Evidence standard",
+          "axis_b": "two samples, raw files and a hash",
+          "value": {
+            "usage": "raw Loki JSON is retained per sample, the counts are written per surface, and the SUMMARY binds the signed inventory to its sha256"
+          },
+          "position": 8
+        }
+      ],
+      "links": [
+        {
+          "to": "Data entity catalog — usage inventory",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Technology standards — usage inventory\n\n## Metadata\n\nRetrospective catalogue for S00, authored 2026-11-26 from the slice plan and the rework note. Phase d, plateau hld, kind catalog; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d26-7573-9b0c-e0f60af92003.\n\n## Entries\n\nEight standards. The schema fixes the row shape with nine required keys and closed enums. The contract is a JSON array with one documented row per surface. The SQL discipline is read-only and direct on master, because a session SET through PgBouncer would poison the next client. LogQL needs a quoted host field and a positive control, and it treats query_failed as a third state. Identity is P-NNNN over a normalised surface. Classification fixes the precedence and the contradiction rule. Acceptance strings exist only on used rows. The evidence standard retains two raw samples and binds the result to a hash.\n\n## Links\n\nThis artefact carries one typed edge: Data entity catalog — usage inventory as derivation, because each entity is held in one of these formats. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: name the formats, disciplines and instruments the inventory relies on. Scope: the JSON contract, the read-only SQL discipline, LogQL sampling, identity, classification, acceptance strings and the signed hash. It was authored retrospectively on 2026-11-26 and names only standards that the plan's steps and the signed record actually apply."
+    }
+  ],
+  "documents": [
+    {
+      "category": "architecture-artifact",
+      "title": "Architecture Artefact Index — S00 (retrospective, 2026-11-26)",
+      "body": "# Architecture Artefact Index — S00 (retrospective, 2026-11-26)\n\n## Metadata\n\nThe artefact set for S00 is the seven mandatory Phase A–D artefacts on the delivery track (track v1): the Stakeholder map, the Driver/goal/objective, the Requirements catalog and the Solution concept at phase a, plateau psa, and the Business capability map, the Data entity catalog and the Technology standards at phases b, c and d, plateau hld. Each is an approved row with a published body dated 2026-11-22; the owner is the programme architect under the #526 rework delegation, the reviewer is the Architecture Board, and the subject is project 01a1d039-0d26-7573-9b0c-e0f60af92003.\n\n## Entries\n\nThe set is seven rows in the order the standard seeds them: Stakeholder map — usage inventory (matrix), Driver/goal/objective — usage inventory (catalog), Requirements catalog — usage inventory (catalog), Solution concept — usage inventory (diagram), Business capability map — usage inventory (diagram), Data entity catalog — usage inventory (catalog) and Technology standards — usage inventory (catalog). Each carries its own entries: six stakeholders, six drivers, ten requirements, twelve components and edges, seven capabilities, nine entities and eight standards.\n\n## Links\n\nThe typed edges are: the driver catalogue derives from the stakeholder map; the requirements catalogue derives from the driver catalogue; the solution concept realizes the requirements catalogue; the capability map derives from the solution concept and the requirements catalogue; the data entity catalogue derives from the capability map and the solution concept; and the technology standards derive from the data entity catalogue. Every edge names another artefact of this pack, so no artefact is an orphan.\n\n## Document\n\nThe index is the architecture-artifact page the artefact standard reads. The seven artefact documents were published on 2026-11-22 as rows 01a2020f-667e-7133-a201-fed4d14f3ac0, 01a20217-fba5-721e-980d-4e1e7363e335, 01a20233-5442-725b-8bce-1ead6655c8eb, 01a20239-5846-7654-ab36-84a47d8894f7, 01a20241-0409-76dd-be5f-e849dda60190, 01a20245-e130-703b-bb58-040abe069625 and 01a2024a-699e-723e-ab74-9eeb2af52742; this index is the retrospective page authored on 2026-11-26 over them."
+    }
+  ],
+  "registers": {
+    "risk": [
+      {
+        "title": "The dated samples cannot be re-measured, so a later reader cannot reproduce the counts",
+        "body": "The inventory was sampled on 2026-11-07 and 2026-11-08, and the rework note records that the live sources have moved on and that a re-measurement is not recoverable. This retrospective row, dated 2026-11-26, records the limit instead of hiding it: the 1,300 rows and their four statuses stand as the signed record of those two windows, not as a live measurement.",
+        "status": "open",
+        "severity": "medium",
+        "probability": "high",
+        "impact": 3,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/evidence/rework/S00.md — the dated-sample residual",
+            "docs/plans/slices/S00-usage-inventory.md §10"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "A used id that no later slice builds would break S14's 100 % gate",
+        "body": "The sign-off states that every used id will be built at cutover and every dropped id will not, and S14 gates on 100 % of used. The 218 used rows therefore become obligations for the slices that inherit them. This retrospective row records that a used id left unbuilt is a delivery failure at S14 rather than a defect in the inventory, so the id is not quietly reclassified after the fact.",
+        "status": "open",
+        "severity": "high",
+        "probability": "medium",
+        "impact": 4,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S00-usage-inventory.md §1 and §5"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "A surface dropped by decision may still receive live traffic after sign-off",
+        "body": "The plan treats an A-class hit on a decision-dropped surface as a contradiction that stops the run, and the sign-off on 2026-11-08 recorded none. This retrospective row keeps the rule live: if a caller later reaches a dropped surface, the contradiction is raised rather than absorbed, because a decision-drop outranks usage and a silent reversal would undo the rebuild's boundary.",
+        "status": "open",
+        "severity": "high",
+        "probability": "low",
+        "impact": 4,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S00-usage-inventory.md §9"
+          ],
+          "decisions": []
+        }
+      }
+    ],
+    "issue": [
+      {
+        "title": "Planka's database cannot evidence usage: four boards and five test cards",
+        "body": "The plan records the starting state as five test cards and trap 3 as an empty Planka with four boards. Row counts there are not usage evidence (D3), so Planka surfaces are classified from call sites and from the openapi path set rather than from traffic or from stored rows. Recorded retrospectively on 2026-11-26.",
+        "status": "open",
+        "severity": "medium",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S00-usage-inventory.md §2 and §8"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "The execution census covers three days, so it cannot answer quarterly use",
+        "body": "execution_entity holds three days and 470 rows. The plan records this as trap 2 and class C corroborates only: it can show a recent execution and can never stand alone as a used row. The inventory therefore reports recent execution as corroboration and leaves older use unmeasured, which this retrospective records on 2026-11-26.",
+        "status": "open",
+        "severity": "medium",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S00-usage-inventory.md §2 and §8"
+          ],
+          "decisions": []
+        }
+      }
+    ],
+    "assumption": [
+      {
+        "title": "No active caller reaches a decision-dropped surface, so the sign-off carried no contradiction",
+        "body": "The plan's precedence puts decision-drops ahead of usage and makes an A-class hit on a dropped surface a contradiction that stops the run. The 2026-11-08 sign-off proceeded, which assumes that no reachable caller hit one. This retrospective assumption, recorded 2026-11-26, states the condition under which the sign-off remains valid.",
+        "status": "open"
+      },
+      {
+        "title": "The two adjacent 24-hour windows represent ordinary traffic",
+        "body": "The inventory rests on two Loki samples, on 2026-11-07 and 2026-11-08, each with a positive control above zero. The assumption is that those two days are ordinary rather than exceptional: the control proves the collector was alive, not that the traffic was typical. A rare event inside or outside the windows is outside what the inventory can see, and this retrospective records that on 2026-11-26.",
+        "status": "open"
+      }
+    ],
+    "dependency": [
+      {
+        "title": "Every later slice depends on parity_ids, and S14 gates on 100 % of used",
+        "body": "The plan makes parity/parity.yaml the only list: slices reference parity_ids rather than restating surface, and S14 gates on 100 % of used. The dependency runs one way, from the inventory to the slices, so a change to a used or dropped row after sign-off would require a new signed contract rather than an edit in a consuming slice. Recorded retrospectively on 2026-11-26.",
+        "status": "open"
+      },
+      {
+        "title": "The measurement depends on read-only access to master Postgres and Loki",
+        "body": "The inventory reads the master Postgres directly as postgres, never through PgBouncer, and it reads the Loki samples through the istio-proxy logs. It depends on that access being read-only and on the samples being retained long enough to be captured twice. This retrospective row records the dependency on 2026-11-26 and notes that the run writes nothing to either.",
+        "status": "open"
+      }
+    ],
+    "benefit": [
+      {
+        "title": "Zero-usage surface is dropped rather than ported",
+        "body": "The inventory measures before the rebuild, so the 244 dropped rows are surface the programme does not owe. Dropping them at the inventory rather than after a port keeps the rebuild bounded to what is used or plausibly used, which is the benefit D2/R5 names in the plan. This retrospective row links the benefit to the signed contract on 2026-11-26.",
+        "status": "open",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S00-usage-inventory.md §1 and §9"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "Every planned feature enters the rebuild with a stable id and a named acceptance",
+        "body": "Each used row carries a P-NNNN id and an acceptance string of the form test:, e2e: or probe:, and every later slice consumes those ids from one list. The benefit is that a feature cannot enter the rebuild anonymously or leave it without a named check: S14 gates on 100 % of used, and the id it gates on was allocated once at the inventory. Recorded retrospectively on 2026-11-26.",
+        "status": "open",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S00-usage-inventory.md §1 and §9"
+          ],
+          "decisions": []
+        }
+      }
+    ]
+  },
+  "delivery_contract": {
+    "title": "Delivery contract — S00 usage inventory (retrospective, 2026-11-26)",
+    "body": {
+      "commitments": "Deliver one signed parity/parity.yaml of 1,300 surfaces — 218 used, 295 rare, 543 unused and 244 dropped — sampled on 2026-11-07 and 2026-11-08, so every later slice consumes parity_ids from one list and S14 gates on 100 % of used. Zero-usage surface is dropped rather than ported, the four named n8n flows are carried as a named set, and procedure_management's 54 endpoints are carried as one SUMMARY line.",
+      "compliance": "The Phase-G review 01a1ff3a-6a97-7c12-841c-1c4f803cffb6 records the level compliant against this contract, and the rework note records that the strict audit on the same snapshot carries no P0/P1 entry for the project. The contract's own terms are the plan's §7 gate: G1 to G7 plus check-jsonschema. No waiver is recorded, and the contract does not claim a re-measurement of the dated samples.",
+      "approval": "The delivery contract 01a1ff39-4ee0-7ecc-93cc-eeaf21fb9738 is approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545 under approval 01a1ff39-637a-7a73-b91f-f95a02e804da; the approver is distinct from the requester 01a1e607-17d9-77d3-98d3-a43a87c4633d. The Phase-G review 01a1ff3a-6a97-7c12-841c-1c4f803cffb6 cites this contract, and the scope baseline 01a1ff39-8d6e-7270-b2ba-9d235eb28b83 (kind scope, taken 2026-11-21) was approved by the same approver. The Statement of Architecture Work 01a1ff37-e240-779b-aab5-74a3fa86ecad sits under its own approval 01a1ff37-f693-7336-8c6d-fe98f6f5c7b7.",
+      "capacity": "The unit is one WBS deliverable, 'The usage inventory and its evidence record', accepted with WSJF inputs business value 5, time criticality 5, risk reduction 3 and job size 12. The work runs as steps 0–14 of the plan, each at most one day and read-only, over the four application surface sets, two Loki samples, the execution census, the table counts and the Keycloak clients.",
+      "acceptance": "Acceptance is executable: the plan's §7 gate under bash with set -euo pipefail asserts unique P-NNNN ids, an acceptance string on every used row, each surface exactly once against the manifest union, a reconciled count of 1,300, two Loki samples for B-class used, a decision: or replacement: reason on every dropped row, and a clean check-jsonschema against parity/schema.json. The rework note records scripts/verify-project.py --project S00 --snapshot <fresh> green with 11 checks and 0 failures at d7293f96.",
+      "evidence": "The evidence route is parity/parity.yaml (the contract), parity/schema.json, the four files under parity/surfaces/, the files under parity/evidence/ (the two Loki samples, the execution census, the row counts and matched.tsv), parity/SUMMARY.md with the gate output and the signed sha256, and the rework note docs/evidence/rework/S00.md with the residual. The published outputs are the evidence 01a1e686-9769-7793-93fb-d9fcee2f578d, the project brief 01a1ff39-ec59-70c2-91a0-45f2e9de1086 and the closure review 01a1ff39-b527-7056-a57f-300ed217f58d.",
+      "manifest": "acceptance/programme/S00.toml",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "retrospective": true
+    }
+  },
+  "wbs_deliverable": {
+    "title": "The usage inventory and its evidence record",
+    "business_value": 5,
+    "time_criticality": 5,
+    "risk_reduction": 3,
+    "job_size": 12
+  },
+  "review": {
+    "level": "compliant",
+    "findings": "This retrospective Phase-G review, dated 2026-11-26, carries the level the record supports: the live Phase-G review 01a1ff3a-6a97-7c12-841c-1c4f803cffb6 is compliant against the delivery contract 01a1ff39-4ee0-7ecc-93cc-eeaf21fb9738, the contract is approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545 rather than the requester 01a1e607-17d9-77d3-98d3-a43a87c4633d, and the scope baseline 01a1ff39-8d6e-7270-b2ba-9d235eb28b83 is approved. The project is closed and the rework note records the reconstituted lifecycle completed through the same gate, with the 38 acts in transcript.jsonl read back one write at a time by programme-record.py. The inventory itself is the signed contract: parity/parity.yaml carries 1,300 rows — 218 used, 295 rare, 543 unused and 244 dropped — sampled on 2026-11-07 and 2026-11-08, every used row carries a test:, e2e: or probe: acceptance string, every dropped row carries a decision: or replacement: reason, and the gate G1 to G7 plus check-jsonschema passed at sign-off. scripts/verify-project.py --project S00 --snapshot <fresh> is green with 11 checks and 0 failures at d7293f96, and the strict audit on the same snapshot carries no P0/P1 entry. Against that, one limit is stated rather than waived: the samples are dated and a re-measurement is not recoverable, so the counts describe those two windows and nothing later. That limit is a residual of the measurement, not a non-compliance of the delivery.",
+    "evidence": {
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "live_review": "01a1ff3a-6a97-7c12-841c-1c4f803cffb6",
+      "delivery_contract": "01a1ff39-4ee0-7ecc-93cc-eeaf21fb9738",
+      "scope_baseline": "01a1ff39-8d6e-7270-b2ba-9d235eb28b83",
+      "acceptance_manifest": "acceptance/programme/S00.toml",
+      "rework_note": "docs/evidence/rework/S00.md"
+    }
+  },
+  "project_brief_output": "# Project brief — S00 usage inventory (retrospective, 2026-11-26)\n\n## Outcome\n\nS00 produced one signed contract for what the rebuild owes: parity/parity.yaml holds 1,300 surfaces classified as 218 used, 295 rare, 543 unused and 244 dropped, sampled on 2026-11-07 and 2026-11-08. Every later slice consumes the ids from that list, and S14 gates on 100 % of used. Zero-usage surface is dropped rather than ported (D2/R5), so the rebuild starts from measured use rather than from the full surface of fr, RM, Planka and n8n.\n\n## Boundary\n\nOut of scope: coding-*, artifacts, worker_management, inference-router, licenses and billing_service (D12/D14); n8n flows as features, which S13 re-authors from the same evidence; procedure_management's 54 endpoints, carried as one SUMMARY line (D10); UI screens (S12); performance; and data migration (D7). The project must not fork a second inventory: parity.yaml is the only list, and a consuming slice may not restate or re-classify a surface of its own. A re-measurement is also out of scope, because the samples are dated and the live sources have moved on.\n\n## Reuse sources\n\nThe measurement reuses existing sources rather than a new instrument: fr backend/src/capabilities/served-spec.lock.json at fr@4a579e91d355 for 785 served operations over 616 paths; RM src/routers at rm@191086942ce5 for 314 decorators; Planka docs/openapi.json at kanban@aafb771cea4c for 67 paths; n8n workflow_entity for the active operation tuples; the istio-proxy logs for the two Loki samples; execution_entity for the execution census; pg_stat_user_tables for the fr table counts; and the keycloak client table for the client evidence.\n\n## Inception units\n\nThe project is its own inception unit: the plan records 'Programme project: S00 · issues none yet', and the slice plan docs/plans/slices/S00-usage-inventory.md is the analysis the work starts from, against SPEC sections §4, §8 S0, §9 and §11 R5. The retrospective reconstitutes the governance record over the completed measurement — charter, Statement of Architecture Work, the seven A–D artefacts approved by the board, the delivery contract, the WBS deliverable, the Phase-G review, the project brief, the evidence and the closure review — with the 38 acts recorded in transcript.jsonl.\n\n## Dependencies\n\nThe plan records depends_on as empty, so S00 blocks rather than waits. Its dependants are every later slice that consumes parity_ids and S14, which gates on 100 % of used. Operationally the measurement depended on read-only access to the master Postgres, never through PgBouncer, and on Loki retaining both 24-hour windows. In governance it depends on the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, the approved scope baseline 01a1ff39-8d6e-7270-b2ba-9d235eb28b83 and the delivery contract 01a1ff39-4ee0-7ecc-93cc-eeaf21fb9738.\n\n## Acceptance\n\nThe plan's §7 gate exits 0 only when the ids are unique and shaped P-NNNN, every used row carries a test:, e2e: or probe: acceptance string, every surface appears exactly once against the manifest union, the count reconciles at 1,300, two Loki samples support the B-class used rows, every dropped row starts with decision: or replacement:, and check-jsonschema validates parity.yaml against parity/schema.json. The rework note records scripts/verify-project.py --project S00 --snapshot <fresh> green with 11 checks and 0 failures at d7293f96 and no P0/P1 entry on the strict audit.\n\n## Capabilities\n\nThe inventory exercises surface enumeration across four applications, call-site attribution through n8n and the reachable channels, traffic measurement over two 24-hour windows with a positive control each, identity allocation under P-NNNN, classification under the precedence decision-drop then A then B then C then D, and gate-and-sign-off binding the result to a hash and a reviewer. Each capability leaves a named artefact: the four manifests, matched.tsv, the two samples, inventory.tsv, parity.yaml and the signed SUMMARY.\n\n## Plan\n\nThe plan is docs/plans/slices/S00-usage-inventory.md, run as steps 0–14, each at most one day and read-only. The production run sampled on 2026-11-07 and 2026-11-08, signed parity.yaml on 2026-11-08 and updated the programme ledger. This brief is retrospective and dated 2026-11-26: it records that run and the governance reconstituted over it, and it does not claim a fresh measurement or a wider window than the two samples support.\n",
+  "evidence_output": "# Evidence — S00 usage inventory (retrospective, 2026-11-26)\n\n## Claim\n\nS00 measured which fr, RM, Planka and n8n operations are actually used and published one signed contract for the rebuild: parity/parity.yaml holds 1,300 surfaces classified as 218 used, 295 rare, 543 unused and 244 dropped, sampled on 2026-11-07 and 2026-11-08. Every used row carries an acceptance string, every dropped row carries a named reason, the gate G1 to G7 and the schema check passed at sign-off, and every later slice consumes parity_ids from this one list with S14 gating on 100 % of used.\n\n## Evidence\n\nThe contract is parity/parity.yaml with parity/schema.json, which fixes nine required keys and admits no others. The surface sets are the four manifests under parity/surfaces/: fr from served-spec.lock.json at fr@4a579e91d355, 785 operations over 616 paths; RM from src/routers at rm@191086942ce5, 314 decorators; Planka from docs/openapi.json at kanban@aafb771cea4c, 67 paths; and n8n from the active workflow tuples plus conveyor.start, wip.pull, ask_fr and err.card. The evidence under parity/evidence/ holds the two Loki samples, the execution census, the row counts, matched.tsv and the preflight. parity/SUMMARY.md carries the counts per area and status, the gate output and the sign block.\n\n## Verification\n\nThe gate in the plan's §7 was run under bash with set -euo pipefail: G1 found no duplicate id, G2 every id matched ^P-[0-9]4$, G3 every used row carried a test:, e2e: or probe: string, G4 the manifest union and the contract agreed with no diff, G5 the count reconciled at 1,300, G6 two samples supported the B-class used rows, G7 no dropped row lacked a reason, and check-jsonschema validated the contract against its schema. The rework note records scripts/verify-project.py --project S00 --snapshot <fresh> green with 11 checks and 0 failures at d7293f96 and no P0/P1 entry on the strict audit. This content pack is checked offline by scripts/rework-content-check.py --project S00 before the factory reads it.\n\n## Links\n\nThe plan is docs/plans/slices/S00-usage-inventory.md, against SPEC §4, §8 S0, §9 and §11 R5. The governance record is the Statement of Architecture Work 01a1ff37-e240-779b-aab5-74a3fa86ecad, the delivery contract 01a1ff39-4ee0-7ecc-93cc-eeaf21fb9738 approved by 01a1ff39-637a-7a73-b91f-f95a02e804da, the scope baseline 01a1ff39-8d6e-7270-b2ba-9d235eb28b83, the Phase-G review 01a1ff3a-6a97-7c12-841c-1c4f803cffb6 and the rework note docs/evidence/rework/S00.md. The published outputs are the evidence 01a1e686-9769-7793-93fb-d9fcee2f578d, the project brief 01a1ff39-ec59-70c2-91a0-45f2e9de1086 and the closure review 01a1ff39-b527-7056-a57f-300ed217f58d.\n\n## Gap\n\nTwo limits are recorded and neither is closed by this pack. The samples are dated 2026-11-07 and 2026-11-08 and the live sources have moved on; a re-measurement is not recoverable and is not claimed, so the counts describe those two windows and nothing later. Within those windows the measurement is bounded by its instruments: Loki covers ingress traffic for 24 hours per sample, the execution census covers three days and 470 rows, and Planka holds four boards and five test cards, so its surfaces are classified from call sites rather than from stored rows.\n",
+  "closure": "# Closure — S00 usage inventory (retrospective, 2026-11-26)\n\nS00 re-closes through the one gate on the record the snapshot carries: the approved delivery contract 01a1ff39-4ee0-7ecc-93cc-eeaf21fb9738, the approved scope baseline 01a1ff39-8d6e-7270-b2ba-9d235eb28b83, the compliant Phase-G review 01a1ff3a-6a97-7c12-841c-1c4f803cffb6 and the seven A–D artefacts approved by the board. The closure records the signed inventory of 1,300 surfaces with 218 used, 295 rare, 543 unused and 244 dropped, sampled on 2026-11-07 and 2026-11-08, and the rework note's verification that scripts/verify-project.py is green with 11 checks and 0 failures at d7293f96 with no P0/P1 entry on the strict audit. It keeps one item visible rather than closed: the samples are dated, a re-measurement is not recoverable, and none is claimed.\n",
+  "closure_review": "# Closure review — S00 usage inventory (retrospective, 2026-11-26)\n\n## Outcome vs acceptance\n\nThe outcome the charter records is one signed contract for the rebuild, and the acceptance the record carries matches it: parity/parity.yaml holds 1,300 surfaces classified as 218 used, 295 rare, 543 unused and 244 dropped; the plan's §7 gate passed G1 to G7 and the schema check at sign-off; every used row carries a test:, e2e: or probe: acceptance string; and every dropped row carries a decision: or replacement: reason. Against that, scripts/verify-project.py --project S00 --snapshot <fresh> is green with 11 checks and 0 failures at d7293f96, and the strict audit on the same snapshot carries no P0/P1 entry for the project.\n\n## Evidence\n\nThe evidence is the contract parity/parity.yaml with parity/schema.json, the four manifests under parity/surfaces/, the two Loki samples, the execution census, the row counts and matched.tsv under parity/evidence/, and the signed SUMMARY with the sha256 and the gate output. The governance record is the Statement of Architecture Work 01a1ff37-e240-779b-aab5-74a3fa86ecad, the delivery contract 01a1ff39-4ee0-7ecc-93cc-eeaf21fb9738 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545 rather than the requester 01a1e607-17d9-77d3-98d3-a43a87c4633d, the scope baseline 01a1ff39-8d6e-7270-b2ba-9d235eb28b83, the Phase-G review 01a1ff3a-6a97-7c12-841c-1c4f803cffb6 at level compliant, and the rework note docs/evidence/rework/S00.md with the 38 acts read back one write at a time.\n\n## Open items\n\nOne item remains and it is not closable by this pack: the samples are dated 2026-11-07 and 2026-11-08 and the live sources have moved on, so a re-measurement is not recoverable and is not claimed. The item is recorded as a limit of the evidence rather than as a defect in the delivery, and it carries no owner action beyond leaving the dated record intact. Within the windows, the instruments bound what could be seen: Loki is the ingress log only, the execution census covers three days, and Planka holds test data rather than usage.\n\n## Decision\n\nThe retrospective decision is to close on the record the snapshot carries, at the level compliant that the Phase-G review 01a1ff3a-6a97-7c12-841c-1c4f803cffb6 records, with the dated-sample limit stated rather than waived. The decision is dated 2026-11-26 and rests on the signed contract, the gate output and the green verification; it does not assert that the counts describe any period after 2026-11-08, and it does not reopen the classification of any row.\n"
+}

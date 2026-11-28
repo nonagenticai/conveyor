@@ -145,6 +145,23 @@ pub fn run_error(error: store::RunStoreError, action: &str) -> ActionError {
             "binding_required",
             "a run that names a release must name the job binding that pins it",
         ),
+        // v1-w1a-5 (SPEC_V2 §4.4): job work cannot exist without the binding and release pin
+        // it executes under.
+        store::RunStoreError::BindingRequired => invalid(
+            "job_binding_id",
+            "binding_required",
+            "a job run must name the job binding (and its pinned release) it executes under",
+        ),
+        // v1-p5-5 (SPEC_V2 §5.1): the card is the work package a job run executes.
+        store::RunStoreError::CardRequired => invalid(
+            "card_id",
+            "card_required",
+            "a job run must name the card whose work package it executes",
+        ),
+        store::RunStoreError::UnknownKind(raw) => {
+            tracing::error!(kind = %raw, "a stored run.kind is outside the four the store knows");
+            ActionError::internal()
+        }
         store::RunStoreError::ExecutorMismatch => ActionError::new(
             409,
             "executor_mismatch",
@@ -222,16 +239,23 @@ pub fn approval_error(error: store::ApprovalStoreError, action: &str) -> ActionE
         store::ApprovalStoreError::Illegal(illegal) => {
             ActionError::new(409, "conflict", illegal.to_string())
         }
+        // A gate that requires an answer refuses an empty one as a typed input error: the caller
+        // can fix it by sending the answer, unlike a state conflict.
+        store::ApprovalStoreError::AnswerMissing => invalid(
+            "note",
+            "missing",
+            "this gate requires an answer; a decision with no note answers nothing",
+        ),
         store::ApprovalStoreError::Vocabulary { what, value } => {
             tracing::error!(what, value = %value, "a stored approval value is outside the domain");
             ActionError::internal()
         }
         store::ApprovalStoreError::Parent(parent) => parent_error(parent, action),
         store::ApprovalStoreError::Run(error) => run_error(error, action),
-        store::ApprovalStoreError::HumanOnlyGate => ActionError::new(
+        store::ApprovalStoreError::HumanOnlyGate { gate } => ActionError::new(
             403,
-            "signoff_requires_human",
-            format!("{action:?}: an eval sign-off must be decided by a person"),
+            "human_only_gate",
+            format!("{action:?}: gate {gate:?} must be decided by a human, not a machine"),
         ),
         store::ApprovalStoreError::ExecutorGateHumanOnly => ActionError::new(
             403,

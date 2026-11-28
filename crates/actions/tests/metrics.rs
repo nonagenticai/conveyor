@@ -227,8 +227,15 @@ async fn a_gate_with_no_refusal_is_flagged_and_one_refusal_clears_it() {
     assert_eq!(tranche["with_evidence"], 3);
     assert_eq!(tranche["latency_seconds"], 3600.0);
 
-    // P4.2 — one rejection clears the flag; the other gate is untouched.
-    approval(&pg, &seeded, "tranche_review", true, true).await;
+    // v1-w4b-5 — a recorded refusal clears the flag too, with no rejection at all.
+    sqlx::query(
+        "INSERT INTO gate_refusal (tenant_id, gate, action, reason)
+         VALUES ($1, 'benefit_review', 'pm.route_gate', 'gate_evidence_missing')",
+    )
+    .bind(seeded.tenant_id)
+    .execute(&pg.super_pool)
+    .await
+    .expect("a refusal row");
     let second = programme_metrics(&running, programme).await;
     let never = second["never_refused"]
         .as_array()
@@ -236,8 +243,20 @@ async fn a_gate_with_no_refusal_is_flagged_and_one_refusal_clears_it() {
         .iter()
         .filter_map(Value::as_str)
         .collect::<Vec<_>>();
-    assert!(!never.contains(&"tranche_review"), "{second}");
-    assert!(never.contains(&"benefit_review"), "{second}");
+    assert!(!never.contains(&"benefit_review"), "{second}");
+    assert!(never.contains(&"tranche_review"), "{second}");
+
+    // P4.2 — one rejection clears the flag; the gate cleared by its refusal stays clear.
+    approval(&pg, &seeded, "tranche_review", true, true).await;
+    let third = programme_metrics(&running, programme).await;
+    let never = third["never_refused"]
+        .as_array()
+        .expect("never_refused")
+        .iter()
+        .filter_map(Value::as_str)
+        .collect::<Vec<_>>();
+    assert!(!never.contains(&"tranche_review"), "{third}");
+    assert!(!never.contains(&"benefit_review"), "{third}");
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
@@ -619,7 +638,7 @@ async fn the_run_drilldown_sums_to_the_call_rows() {
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn flow_recomputes_and_a_missing_ledger_is_unavailable() {
+async fn flow_recomputes_and_knowledge_rates_are_null_without_rows() {
     let (pg, running, seeded) = fixture().await;
     let (status, body) = running
         .invoke(
@@ -731,21 +750,262 @@ async fn flow_recomputes_and_a_missing_ledger_is_unavailable() {
     assert!((block - 540.0).abs() < 60.0, "block {block}");
     let efficiency = flow["flow_efficiency"].as_f64().expect("efficiency");
     assert!((efficiency - 0.35).abs() < 0.05, "efficiency {efficiency}");
-    // P1.4 — the knowledge figures have no ledger and are unavailable with a reason, not zero.
-    let unavailable = flow["unavailable"].as_array().expect("unavailable");
+    // P1.4/v1-w1c-6 — both knowledge ledgers exist: without rows the rates are null (never
+    // zero), and nothing is "unavailable" any more.
+    assert!(flow["knowledge_pack_hit_rate"].is_null(), "{flow}");
+    assert!(flow["knowledge_lesson_promotion_rate"].is_null(), "{flow}");
     assert!(
-        unavailable
-            .iter()
-            .any(|row| row["metric"] == "knowledge.lesson_promotion_rate"),
+        flow["unavailable"]
+            .as_array()
+            .expect("unavailable")
+            .is_empty(),
         "{flow}"
     );
     assert!(
         flow["wip"].as_i64().is_some(),
         "the other figures are not affected"
     );
+
+    // Two of three retrievals hit; the one decided lesson was rejected (a real 0.0, not null).
+    for hits in [2i64, 0, 3] {
+        sqlx::query(
+            "INSERT INTO knowledge_retrieval (tenant_id, capability_id, packs, hits, degraded)
+             VALUES ($1, $2, 1, $3, false)",
+        )
+        .bind(seeded.tenant_id)
+        .bind(Uuid::new_v4())
+        .bind(hits)
+        .execute(&pg.super_pool)
+        .await
+        .expect("a retrieval row");
+    }
+    let (status, programme) = running
+        .invoke(
+            "programmes.create",
+            TOKEN,
+            json!({"name": "Flow knowledge programme"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{programme}");
+    let programme_id: Uuid = output(&programme)["id"]
+        .as_str()
+        .expect("programme id")
+        .parse()
+        .expect("uuid");
+    // A rejection names its reviewer (0069's durable-decision rule); a promotion would need its
+    // governed-asset draft, which is T8's own test surface.
+    sqlx::query(
+        "INSERT INTO lesson (tenant_id, programme_id, statement, state, reviewed_by, reviewed_at)
+         VALUES ($1, $2, 'a rejected lesson', 'rejected', $3, now())",
+    )
+    .bind(seeded.tenant_id)
+    .bind(programme_id)
+    .bind(seeded.user_id)
+    .execute(&pg.super_pool)
+    .await
+    .expect("a rejected lesson row");
+    let (status, measured) = running
+        .invoke("metrics.flow", TOKEN, json!({}), None, None, None)
+        .await;
+    assert_eq!(status, 200, "{measured}");
+    let measured = output(&measured);
+    let pack = measured["knowledge_pack_hit_rate"]
+        .as_f64()
+        .expect("a pack-hit rate");
+    assert!((pack - 2.0 / 3.0).abs() < 1e-9, "{measured}");
+    let lessons = measured["knowledge_lesson_promotion_rate"]
+        .as_f64()
+        .expect("a lesson-promotion rate");
+    assert!((lessons - 0.0).abs() < 1e-9, "{measured}");
+}
+
+/// One run row: `attempt` is the card's attempt sequence the store derives, never a stored flag.
+async fn run_row(
+    pg: &support::Pg,
+    seeded: &support::Seeded,
+    project: Uuid,
+    attempt: i32,
+    status: &str,
+) -> Uuid {
+    sqlx::query_scalar(
+        "INSERT INTO run (tenant_id, project_id, attempt, status)
+         VALUES ($1, $2, $3, $4) RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(project)
+    .bind(attempt)
+    .bind(status)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("run")
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn rework_rate_is_a_read_time_ratio_over_runs_and_approvals() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = programme(&pg, &seeded).await;
+    let rework_project = project(&pg, &seeded, programme, "REWORK").await;
+    // Five runs, two of them rework: a first attempt that failed and was never retried is a
+    // failure, not rework; a second attempt is; a rejected approval returns the card; an
+    // approval that passed does not.
+    run_row(&pg, &seeded, rework_project, 1, "succeeded").await;
+    run_row(&pg, &seeded, rework_project, 1, "failed").await;
+    run_row(&pg, &seeded, rework_project, 2, "succeeded").await;
+    let returned = run_row(&pg, &seeded, rework_project, 1, "failed").await;
+    let approved = run_row(&pg, &seeded, rework_project, 1, "succeeded").await;
+    sqlx::query(
+        "INSERT INTO approval (tenant_id, run_id, gate, kind, status)
+         VALUES ($1, $2, 'quality_gate', 'gate', 'rejected'),
+                ($1, $3, 'quality_gate', 'gate', 'approved')",
+    )
+    .bind(seeded.tenant_id)
+    .bind(returned)
+    .bind(approved)
+    .execute(&pg.super_pool)
+    .await
+    .expect("approvals");
+
+    let (status, body) = running
+        .invoke(
+            "metrics.flow",
+            TOKEN,
+            json!({"project_id": rework_project}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let flow = output(&body);
+    assert_eq!(flow["total_count"], 5, "{flow}");
+    assert_eq!(flow["rework_count"], 2, "{flow}");
+    let rate = flow["rework_rate"].as_f64().expect("the ratio");
+    assert!((rate - 0.4).abs() < 1e-12, "rate {rate}");
+
+    // A second read recomputes from the rows: the ratio is never a stored counter.
+    run_row(&pg, &seeded, rework_project, 2, "succeeded").await;
+    let (status, body) = running
+        .invoke(
+            "metrics.flow",
+            TOKEN,
+            json!({"project_id": rework_project}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let flow = output(&body);
+    assert_eq!(flow["total_count"], 6, "{flow}");
+    assert_eq!(flow["rework_count"], 3, "{flow}");
+    let rate = flow["rework_rate"].as_f64().expect("the ratio");
+    assert!((rate - 0.5).abs() < 1e-12, "rate {rate}");
+
+    // The tenant-wide read applies no rework_project filter: the same rows, unscoped.
+    let (status, body) = running
+        .invoke("metrics.flow", TOKEN, json!({}), None, None, None)
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let flow = output(&body);
+    assert_eq!(flow["total_count"], 6, "{flow}");
+    assert_eq!(flow["rework_count"], 3, "{flow}");
+
+    // Zero denominator: a rework_project with no runs reports null, never NaN or zero.
+    let empty = project(&pg, &seeded, programme, "EMPTY").await;
+    let (status, body) = running
+        .invoke(
+            "metrics.flow",
+            TOKEN,
+            json!({"project_id": empty}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let flow = output(&body);
+    assert_eq!(flow["total_count"], 0, "{flow}");
+    assert_eq!(flow["rework_count"], 0, "{flow}");
+    assert!(flow["rework_rate"].is_null(), "{flow}");
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn an_unpriced_period_refuses_an_exact_reconciliation() {
+    let (pg, running, seeded) = fixture().await;
+    // No `price` row for this model: the call's contribution would be a silent zero.
+    inference_call(
+        &pg,
+        &seeded,
+        "metrics-unpriced",
+        None,
+        None,
+        1000,
+        500,
+        "other",
+        Utc::now(),
+    )
+    .await;
+    let today = Utc::now().date_naive();
+    let (status, refused) = running
+        .invoke(
+            "metrics.reconcile",
+            TOKEN,
+            json!({"period_start": today, "period_end": today, "billing_rollup": {"rows": []}}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{refused}");
+    assert_eq!(output(&refused)["type"], "unpriced_calls", "{refused}");
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_malformed_billing_rollup_is_refused_not_read_as_zero() {
+    let (pg, running, seeded) = fixture().await;
+    let today = Utc::now().date_naive();
+    // Each is a document `billing.rollup` must never return: its total cannot be derived, and a
+    // silent zero would manufacture a match (P1.4/P5.4).
+    for malformed in [
+        json!({}),
+        json!({"rows": {}}),
+        json!({"rows": [{"amount_usd": 0.002}]}),
+        json!({"rows": [{"cost_usd": "0.002"}]}),
+    ] {
+        let (status, refused) = running
+            .invoke(
+                "metrics.reconcile",
+                TOKEN,
+                json!({"period_start": today, "period_end": today, "billing_rollup": malformed}),
+                None,
+                None,
+                None,
+            )
+            .await;
+        assert_eq!(status, 422, "{refused}");
+        assert_eq!(
+            output(&refused)["type"],
+            "billing_rollup_invalid",
+            "{refused}"
+        );
+    }
+    // A refused document records nothing: the verdict needs a real figure.
+    let records: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM metric_reconciliation WHERE tenant_id = $1")
+            .bind(seeded.tenant_id)
+            .fetch_one(&pg.super_pool)
+            .await
+            .expect("records");
+    assert_eq!(
+        records, 0,
+        "a malformed roll-up writes no reconciliation row"
+    );
+}
+
+#[tokio::test(flavor = "multi_thread")]
 async fn reconciliation_is_exact_or_opens_an_incident() {
     let (pg, running, seeded) = fixture().await;
     // The light catalogue seed carries only the project types; the full export carries
@@ -816,7 +1076,7 @@ async fn reconciliation_is_exact_or_opens_an_incident() {
         .invoke(
             "metrics.reconcile",
             TOKEN,
-            json!({"period_start": today, "period_end": today, "board_id": board, "list_id": list, "billing_total_usd": 0.002}),
+            json!({"period_start": today, "period_end": today, "board_id": board, "list_id": list, "billing_rollup": {"rows": [{"cost_usd": 0.001}, {"cost_usd": 0.001}]}}),
             None,
             None,
             None,
@@ -832,7 +1092,7 @@ async fn reconciliation_is_exact_or_opens_an_incident() {
         .invoke(
             "metrics.reconcile",
             TOKEN,
-            json!({"period_start": today, "period_end": today, "board_id": board, "list_id": list, "billing_total_usd": 0.003}),
+            json!({"period_start": today, "period_end": today, "board_id": board, "list_id": list, "billing_rollup": {"rows": [{"cost_usd": 0.003}]}}),
             None,
             None,
             None,
@@ -887,4 +1147,25 @@ async fn reconciliation_is_exact_or_opens_an_incident() {
         records, 2,
         "today (re-run, now difference) + yesterday (unavailable)"
     );
+
+    // The record has its reader: the latest state per period, the recomputed verdict, the
+    // incident link and the trend (v1-w4b-6).
+    let (status, history) = running
+        .invoke("metrics.reconciliation", TOKEN, json!({}), None, None, None)
+        .await;
+    assert_eq!(status, 200, "{history}");
+    let periods = output(&history)["periods"]
+        .as_array()
+        .expect("the periods array");
+    assert_eq!(periods.len(), 2, "{history}");
+    let today_label = today.to_string();
+    assert_eq!(periods[0]["period_start"], json!(today_label), "{history}");
+    assert_eq!(periods[0]["state"], "difference", "{history}");
+    assert_eq!(periods[0]["verdict"], "difference", "{history}");
+    assert!(
+        periods[0]["incident_card_id"].is_string(),
+        "the incident link is projected: {history}"
+    );
+    assert_eq!(periods[1]["state"], "unavailable", "{history}");
+    assert_eq!(periods[1]["verdict"], "unavailable", "{history}");
 }

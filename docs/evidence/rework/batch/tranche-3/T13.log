@@ -1,0 +1,248 @@
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project T13 --content docs/evidence/rework/tranche-3/rework-content-T13.json --tranche-label tranche 3 --demo-cadence 01a20280-ef3f-7aac-8fad-3840a7995847
+
+  01 projects.reopen ok
+  charter: already approved
+  closure outputs: already ['closure-review']
+  SoAW: already live
+  02 documents.compose ok
+  03 documents.publish ok
+  04 architecture.artifacts_supersede ok
+  05 architecture.artifacts_update ok
+  06 architecture.artifacts_approve ok
+  artefact: Stakeholder Map — T13 Tool platform (Phase A, retrospective) re-versioned, bound and documented
+  07 documents.compose ok
+  08 documents.publish ok
+  09 architecture.artifacts_supersede ok
+  10 architecture.artifacts_update ok
+  11 architecture.artifacts_approve ok
+  artefact: Driver/Goal/Objective Catalogue — T13 Tool platform (Phase A, retrospective) re-versioned, bound and documented
+  12 documents.compose ok
+  13 documents.publish ok
+  14 architecture.artifacts_supersede ok
+  15 architecture.artifacts_update ok
+  16 architecture.artifacts_approve ok
+  artefact: Requirements Catalogue — T13 Tool platform (Phase A, retrospective) re-versioned, bound and documented
+  17 documents.compose ok
+  18 documents.publish ok
+  19 architecture.artifacts_supersede ok
+  20 architecture.artifacts_update ok
+  21 architecture.artifacts_approve ok
+  artefact: Solution Concept Diagram — T13 Tool platform (Phase A, retrospective) re-versioned, bound and documented
+  22 documents.compose ok
+  23 documents.publish ok
+  24 architecture.artifacts_supersede ok
+  25 architecture.artifacts_update ok
+  26 architecture.artifacts_approve ok
+  artefact: Business Capability Map — T13 Tool platform (Phase B, retrospective) re-versioned, bound and documented
+  27 documents.compose ok
+  28 documents.publish ok
+  29 architecture.artifacts_supersede ok
+  30 architecture.artifacts_update ok
+  31 architecture.artifacts_approve ok
+  artefact: Data Entity Catalogue — T13 Tool platform (Phase C, retrospective) re-versioned, bound and documented
+  32 documents.compose ok
+  33 documents.publish ok
+  34 architecture.artifacts_supersede ok
+  35 architecture.artifacts_update ok
+  36 architecture.artifacts_approve ok
+  artefact: Technology Standards Catalogue — T13 Tool platform (Phase D, retrospective) re-versioned, bound and documented
+  37 architecture.artifacts_link ok
+  38 architecture.artifacts_link ok
+  39 architecture.artifacts_link ok
+  40 architecture.artifacts_link ok
+  41 architecture.artifacts_link ok
+  42 architecture.artifacts_link ok
+  43 architecture.artifacts_link ok
+  44 architecture.artifacts_link ok
+  45 architecture.artifacts_link ok
+  document architecture-artifact: already present and published
+  delivery contract: already live
+  register risk: The approved destructive execution path is not proved — only its refusal is already present
+  register risk: The storage round trip falls back to the in-memory store, so live MinIO stays unproved already present
+  register risk: The destination URL is process-global, so a parallel runner would produce false refusals already present
+  register issue: No production tool_binding writer exists — bindings are written directly in the suite already present
+  register issue: Catalogue actions and the estate import are deferred to T14 already present
+  register assumption: The six §12 proofs are sufficient evidence of the gate already present
+  register assumption: No destructive call is bound before its tenant configures approvals already present
+  register assumption: Directly written test rows exercise the same resolution the broker performs in production already present
+  register dependency: T13 needs T2's run and queue, and T14 needs T13 already present
+  register dependency: Calls depend on a reviewed destination alias, never a caller-supplied URL already present
+  register benefit: A job reaches a backend only through one governed call path already present
+  register benefit: Job bytes are tenant-separated without a compatibility shim already present
+  benefit transitions: none in the content
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
+  closure-review output: already published
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  46 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 2 change row(s) present
+  record fixes: none in the content
+  card discharge: no open rework card owned by the project
+  47 projects.close_request ok
+  48 approvals.decide ok
+  49 approvals.request ok
+  50 approvals.decide ok
+  51 projects.close ok
+  closed T13: 01a1d039-0d37-730f-8f8a-2f50e5a0933d
+T13: 51 acts recorded
+
+
+[exit 0]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T13 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T13-snap-wfghs_3p/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T13-snap-wfghs_3p/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-3/T13-bodies --local-bin /tmp/conv526-bin-8111c984
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [],
+  "skipped": [
+    {
+      "project_key": "T13",
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T13",
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T13",
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T13",
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "category": "closure-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T13",
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T13",
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T13",
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "category": "inception-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T13",
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T13",
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T13",
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "category": "project-registers",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T13",
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T13",
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "T13",
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T13",
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T13",
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "NO_EVIDENCE",
+        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
+      }
+    }
+  ],
+  "counts": {
+    "due": 3,
+    "present": 3,
+    "missing-edge": 0,
+    "stale": 9,
+    "ambiguous": 0
+  }
+}
+
+
+[exit 1]
+

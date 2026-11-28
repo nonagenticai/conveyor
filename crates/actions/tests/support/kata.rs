@@ -30,9 +30,31 @@ pub struct Anchor {
     pub job_id: Uuid,
 }
 
+/// The organisation spine `kata.open` requires, on an already-seeded tenant.
+pub struct Spine {
+    pub binding_id: Uuid,
+    pub release_hash: String,
+    pub job_id: Uuid,
+}
+
 /// Seed `dev-a`, its organisation spine and one ACTIVE `internal_agent` binding.
 pub async fn anchor(pg: &Pg) -> Anchor {
     let seeded = seed(pg, "dev-a", "alice", "Alice").await;
+    let spine = spine(pg, &seeded).await;
+    Anchor {
+        seeded,
+        binding_id: spine.binding_id,
+        release_hash: spine.release_hash,
+        job_id: spine.job_id,
+    }
+}
+
+/// One ACTIVE `internal_agent` binding on an industry → department → job → release chain.
+///
+/// A card carries the binding a kata opens under (SPEC_V2 §4.4), so a fixture that needs a
+/// measurable kata on a card of its own seeds the spine here instead of taking `anchor`'s
+/// tenant.
+pub async fn spine(pg: &Pg, seeded: &Seeded) -> Spine {
     let tenant: TenantId = seeded.tenant;
     let mut tx = begin_scoped(&pg.owner, tenant).await.expect("scope");
 
@@ -85,6 +107,7 @@ pub async fn anchor(pg: &Pg) -> Anchor {
         .expect("release");
     let capability: Uuid = sqlx::query_scalar(
         "INSERT INTO capability (tenant_id, code, label) VALUES ($1, 'kata', 'Kata')
+         ON CONFLICT (tenant_id, code) DO UPDATE SET label = excluded.label
          RETURNING id",
     )
     .bind(seeded.tenant_id)
@@ -119,8 +142,7 @@ pub async fn anchor(pg: &Pg) -> Anchor {
     .expect("binding");
     tx.commit().await.expect("commit the spine fixture");
 
-    Anchor {
-        seeded,
+    Spine {
         binding_id: binding.id,
         release_hash: binding.release_hash,
         job_id: job.id,

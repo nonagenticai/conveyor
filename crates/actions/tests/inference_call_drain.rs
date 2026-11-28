@@ -71,6 +71,7 @@ async fn a_cancelled_metered_call_is_read_to_completion() {
     support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
 
     let request = InvokeRequest {
+        credential_alias: None,
         action: "completions.create".to_owned(),
         input: json!({"messages": [{"role": "user", "content": "hello"}]}),
         precondition: None,

@@ -1,0 +1,15 @@
+{
+ "input": {
+  "run_id": "01a21278-2f0b-7d3d-b03c-6f9dc1c8eb78",
+  "tool": "coding.jobs_create",
+  "input": {
+   "kind": "check",
+   "input": {
+    "files": {
+     "README.md": "# t14 live call\n"
+    }
+   },
+   "idempotency_key": "t14-live-check-1"
+  }
+ }
+}

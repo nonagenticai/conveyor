@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Project Baseline — Skeleton — workspace, tenancy, auth, jobs, SSE · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/S02-bodies/S02/project-baseline.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="project-baseline--skeleton--workspace-tenancy-auth-jobs-sse">Project Baseline — Skeleton — workspace, tenancy, auth, jobs, SSE</h1>
+<h2 id="scope">Scope</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-baseline&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;approved_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T19:12:12.47338+00:00&quot;,
+      &quot;id&quot;: &quot;01a1ff85-faae-7c2e-b897-fe957985ca78&quot;,
+      &quot;kind&quot;: &quot;scope&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d27-7b45-abb5-bf851a4c3d4a&quot;,
+      &quot;snapshot&quot;: {
+        &quot;frozen&quot;: true,
+        &quot;project_id&quot;: &quot;01a1d039-0d27-7b45-abb5-bf851a4c3d4a&quot;,
+        &quot;register&quot;: [],
+        &quot;wbs&quot;: [
+          {
+            &quot;business_value&quot;: 8,
+            &quot;id&quot;: &quot;01a1ff85-f9d6-75b3-93cf-65b5df192376&quot;,
+            &quot;job_size&quot;: 13,
+            &quot;kind&quot;: &quot;deliverable&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;position&quot;: 1.0,
+            &quot;risk_reduction&quot;: 8,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;time_criticality&quot;: 8,
+            &quot;title&quot;: &quot;S02 \u2014 Skeleton: tenancy, auth, jobs and SSE on Postgres 18&quot;
+          }
+        ]
+      },
+      &quot;taken_at&quot;: &quot;2026-11-21T19:12:12.47338+00:00&quot;,
+      &quot;taken_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;taken_by_name&quot;: &quot;conveyor-e2e&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/project_baselines&quot;
+}</code></pre>
+<h2 id="schedule">Schedule</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-baseline&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;approved_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:50:29.80815+00:00&quot;,
+      &quot;id&quot;: &quot;01a217e8-4d37-7164-8980-5b06a1d23c14&quot;,
+      &quot;kind&quot;: &quot;schedule&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d27-7b45-abb5-bf851a4c3d4a&quot;,
+      &quot;snapshot&quot;: {
+        &quot;frozen&quot;: true,
+        &quot;project_id&quot;: &quot;01a1d039-0d27-7b45-abb5-bf851a4c3d4a&quot;,
+        &quot;register&quot;: [
+          {
+            &quot;code&quot;: &quot;&quot;,
+            &quot;id&quot;: &quot;01a217e8-4ca6-7926-9329-9fae825190d8&quot;,
+            &quot;impact&quot;: 4,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: &quot;low&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The two-worker proof turns the lease policy from a declaration into evidence&quot;
+          },
+          {
+            &quot;code&quot;: &quot;&quot;,
+            &quot;id&quot;: &quot;01a217e8-4c17-79e9-b360-904c1348f30d&quot;,
+            &quot;impact&quot;: 4,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: &quot;low&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The skeleton makes every later slice inherit isolation instead of re-implementing it&quot;
+          },
+          {
+            &quot;code&quot;: &quot;&quot;,
+            &quot;id&quot;: &quot;01a217e8-4b86-790c-897b-e9ca5483da48&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S00&#39;s signed parity inventory fixes the surfaces S02 must expose&quot;
+          },
+          {
+            &quot;code&quot;: &quot;&quot;,
+            &quot;id&quot;: &quot;01a217e8-4ad8-71ba-983c-f2753c475a9d&quot;,
+            &quot;impact&quot;: 2,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: &quot;low&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The scope baseline taken on 2026-11-21 still describes S02&#39;s boundary&quot;
+          },
+          {
+            &quot;code&quot;: &quot;&quot;,
+            &quot;id&quot;: &quot;01a217e8-4a3d-753c-8eaf-224b6673bf8f&quot;,
+            &quot;impact&quot;: 2,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The closure outputs were declared in the 2026-11-21 transcript but are absent from the replay row&quot;
+          },
+          {
+            &quot;code&quot;: &quot;&quot;,
+            &quot;id&quot;: &quot;01a217e8-499c-7d4f-89f5-5b169a5ae506&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;high&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Issue #2 was open at the start of the rework although its P2 test was already written&quot;
+          },
+          {
+            &quot;code&quot;: &quot;&quot;,
+            &quot;id&quot;: &quot;01a217e8-48e8-78b9-b262-178c9120880b&quot;,
+            &quot;impact&quot;: 4,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;high&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The rework could close S02 while issue #2 still reads open&quot;
+          },
+          {
+            &quot;code&quot;: &quot;&quot;,
+            &quot;id&quot;: &quot;01a217e8-483d-7858-a47d-cfa2a5d547bf&quot;,
+            &quot;impact&quot;: 2,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The two-worker lease proof is timing-sensitive and could flake under load&quot;
+          },
+          {
+            &quot;code&quot;: &quot;&quot;,
+            &quot;id&quot;: &quot;01a217e8-47b9-792b-a55f-dc7eba8cb02c&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The replay record lost the artefact rows, so a re-creation could duplicate a surviving row&quot;
+          },
+          {
+            &quot;code&quot;: &quot;U5-CHG-S02&quot;,
+            &quot;id&quot;: &quot;01a20200-d8b6-77fc-a176-76d4ea3f4567&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;change&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;accepted&quot;,
+            &quot;title&quot;: &quot;Retrospective MSP/TOGAF/SAFe rework of S02 under the #526 scope change&quot;
+          }
+        ],
+        &quot;wbs&quot;: [
+          {
+            &quot;business_value&quot;: 8,
+            &quot;id&quot;: &quot;01a1ff85-f9d6-75b3-93cf-65b5df192376&quot;,
+            &quot;job_size&quot;: 13,
+            &quot;kind&quot;: &quot;deliverable&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;position&quot;: 1.0,
+            &quot;risk_reduction&quot;: 8,
+            &quot;status&quot;: &quot;accepted&quot;,
+            &quot;time_criticality&quot;: 8,
+            &quot;title&quot;: &quot;S02 \u2014 Skeleton: tenancy, auth, jobs and SSE on Postgres 18&quot;
+          }
+        ]
+      },
+      &quot;taken_at&quot;: &quot;2026-11-26T12:50:29.80815+00:00&quot;,
+      &quot;taken_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;taken_by_name&quot;: &quot;conveyor-e2e&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/project_baselines&quot;
+}</code></pre>
+<h2 id="cost">Cost</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-baseline&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;approved_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:50:30.109182+00:00&quot;,
+      &quot;id&quot;: &quot;01a217e8-4e63-7ce4-8a6b-a6621def1957&quot;,
+      &quot;kind&quot;: &quot;cost&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d27-7b45-abb5-bf851a4c3d4a&quot;,
+      &quot;snapshot&quot;: {
+        &quot;frozen&quot;: true,
+        &quot;project_id&quot;: &quot;01a1d039-0d27-7b45-abb5-bf851a4c3d4a&quot;,
+        &quot;register&quot;: [
+          {
+            &quot;code&quot;: &quot;&quot;,
+            &quot;id&quot;: &quot;01a217e8-4ca6-7926-9329-9fae825190d8&quot;,
+            &quot;impact&quot;: 4,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: &quot;low&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The two-worker proof turns the lease policy from a declaration into evidence&quot;
+          },
+          {
+            &quot;code&quot;: &quot;&quot;,
+            &quot;id&quot;: &quot;01a217e8-4c17-79e9-b360-904c1348f30d&quot;,
+            &quot;impact&quot;: 4,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: &quot;low&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The skeleton makes every later slice inherit isolation instead of re-implementing it&quot;
+          },
+          {
+            &quot;code&quot;: &quot;&quot;,
+            &quot;id&quot;: &quot;01a217e8-4b86-790c-897b-e9ca5483da48&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S00&#39;s signed parity inventory fixes the surfaces S02 must expose&quot;
+          },
+          {
+            &quot;code&quot;: &quot;&quot;,
+            &quot;id&quot;: &quot;01a217e8-4ad8-71ba-983c-f2753c475a9d&quot;,
+            &quot;impact&quot;: 2,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: &quot;low&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The scope baseline taken on 2026-11-21 still describes S02&#39;s boundary&quot;
+          },
+          {
+            &quot;code&quot;: &quot;&quot;,
+            &quot;id&quot;: &quot;01a217e8-4a3d-753c-8eaf-224b6673bf8f&quot;,
+            &quot;impact&quot;: 2,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The closure outputs were declared in the 2026-11-21 transcript but are absent from the replay row&quot;
+          },
+          {
+            &quot;code&quot;: &quot;&quot;,
+            &quot;id&quot;: &quot;01a217e8-499c-7d4f-89f5-5b169a5ae506&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;high&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Issue #2 was open at the start of the rework although its P2 test was already written&quot;
+          },
+          {
+            &quot;code&quot;: &quot;&quot;,
+            &quot;id&quot;: &quot;01a217e8-48e8-78b9-b262-178c9120880b&quot;,
+            &quot;impact&quot;: 4,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;high&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The rework could close S02 while issue #2 still reads open&quot;
+          },
+          {
+            &quot;code&quot;: &quot;&quot;,
+            &quot;id&quot;: &quot;01a217e8-483d-7858-a47d-cfa2a5d547bf&quot;,
+            &quot;impact&quot;: 2,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The two-worker lease proof is timing-sensitive and could flake under load&quot;
+          },
+          {
+            &quot;code&quot;: &quot;&quot;,
+            &quot;id&quot;: &quot;01a217e8-47b9-792b-a55f-dc7eba8cb02c&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The replay record lost the artefact rows, so a re-creation could duplicate a surviving row&quot;
+          },
+          {
+            &quot;code&quot;: &quot;U5-CHG-S02&quot;,
+            &quot;id&quot;: &quot;01a20200-d8b6-77fc-a176-76d4ea3f4567&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;change&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;accepted&quot;,
+            &quot;title&quot;: &quot;Retrospective MSP/TOGAF/SAFe rework of S02 under the #526 scope change&quot;
+          }
+        ],
+        &quot;wbs&quot;: [
+          {
+            &quot;business_value&quot;: 8,
+            &quot;id&quot;: &quot;01a1ff85-f9d6-75b3-93cf-65b5df192376&quot;,
+            &quot;job_size&quot;: 13,
+            &quot;kind&quot;: &quot;deliverable&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;position&quot;: 1.0,
+            &quot;risk_reduction&quot;: 8,
+            &quot;status&quot;: &quot;accepted&quot;,
+            &quot;time_criticality&quot;: 8,
+            &quot;title&quot;: &quot;S02 \u2014 Skeleton: tenancy, auth, jobs and SSE on Postgres 18&quot;
+          }
+        ]
+      },
+      &quot;taken_at&quot;: &quot;2026-11-26T12:50:30.109182+00:00&quot;,
+      &quot;taken_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;taken_by_name&quot;: &quot;conveyor-e2e&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/project_baselines&quot;
+}</code></pre>
+<h2 id="approval">Approval</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-baseline&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;card_id&quot;: null,
+      &quot;created_at&quot;: &quot;2026-11-21T19:12:12.47338+00:00&quot;,
+      &quot;expires_at&quot;: null,
+      &quot;gate&quot;: &quot;baseline&quot;,
+      &quot;id&quot;: &quot;01a1ff85-fb0a-7e74-b5c5-cf27a530f0a8&quot;,
+      &quot;kind&quot;: &quot;pm&quot;,
+      &quot;meta&quot;: {
+        &quot;baseline_id&quot;: &quot;01a1ff85-faae-7c2e-b897-fe957985ca78&quot;,
+        &quot;description&quot;: &quot;Approve the scope baseline&quot;
+      },
+      &quot;project_id&quot;: &quot;01a1d039-0d27-7b45-abb5-bf851a4c3d4a&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;required_decisions&quot;: 1,
+      &quot;run_id&quot;: null,
+      &quot;status&quot;: &quot;approved&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T19:12:18.393901+00:00&quot;,
+      &quot;version&quot;: 2
+    },
+    {
+      &quot;card_id&quot;: null,
+      &quot;created_at&quot;: &quot;2026-11-26T12:50:29.80815+00:00&quot;,
+      &quot;expires_at&quot;: null,
+      &quot;gate&quot;: &quot;baseline&quot;,
+      &quot;id&quot;: &quot;01a217e8-4d39-7342-82b0-322f082e3804&quot;,
+      &quot;kind&quot;: &quot;pm&quot;,
+      &quot;meta&quot;: {
+        &quot;approver_kind&quot;: &quot;human&quot;,
+        &quot;baseline_id&quot;: &quot;01a217e8-4d37-7164-8980-5b06a1d23c14&quot;,
+        &quot;description&quot;: &quot;Approve the schedule baseline&quot;,
+        &quot;gate_policy&quot;: {
+          &quot;floor&quot;: 1,
+          &quot;source&quot;: &quot;default&quot;
+        }
+      },
+      &quot;project_id&quot;: &quot;01a1d039-0d27-7b45-abb5-bf851a4c3d4a&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;required_decisions&quot;: 1,
+      &quot;run_id&quot;: null,
+      &quot;status&quot;: &quot;approved&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T12:50:29.960551+00:00&quot;,
+      &quot;version&quot;: 2
+    },
+    {
+      &quot;card_id&quot;: null,
+      &quot;created_at&quot;: &quot;2026-11-26T12:50:30.109182+00:00&quot;,
+      &quot;expires_at&quot;: null,
+      &quot;gate&quot;: &quot;baseline&quot;,
+      &quot;id&quot;: &quot;01a217e8-4e65-7daa-9408-af7ef881bbf6&quot;,
+      &quot;kind&quot;: &quot;pm&quot;,
+      &quot;meta&quot;: {
+        &quot;approver_kind&quot;: &quot;human&quot;,
+        &quot;baseline_id&quot;: &quot;01a217e8-4e63-7ce4-8a6b-a6621def1957&quot;,
+        &quot;description&quot;: &quot;Approve the cost baseline&quot;,
+        &quot;gate_policy&quot;: {
+          &quot;floor&quot;: 1,
+          &quot;source&quot;: &quot;default&quot;
+        }
+      },
+      &quot;project_id&quot;: &quot;01a1d039-0d27-7b45-abb5-bf851a4c3d4a&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;required_decisions&quot;: 1,
+      &quot;run_id&quot;: null,
+      &quot;status&quot;: &quot;approved&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T12:50:30.24845+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;work.json#/approvals&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-1/S02-bodies/S02/project-baseline.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

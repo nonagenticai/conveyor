@@ -1,0 +1,20 @@
+{
+  "id": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+  "baseline": {
+    "definition": "check-registers at /tmp/conveyor-526-reg-snap",
+    "value": 28,
+    "unit": "open register/coverage findings",
+    "measured_at": "2026-11-22",
+    "method": "coverage.json vs seed/programme.json vs the published checklist at the W1 snapshot",
+    "evidence": {
+      "detail": {
+        "register_findings": 28,
+        "snapshot": "/tmp/conveyor-w1-526-snap"
+      },
+      "instrument": "coverage.json vs seed/programme.json vs the published checklist at the W1 snapshot",
+      "reference": "B6",
+      "value": 28.0
+    }
+  },
+  "change_id": "01a2076b-1e7a-77ee-beaa-82c207ed2109"
+}

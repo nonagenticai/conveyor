@@ -1,0 +1,70 @@
+{
+  "id": "01a1e9e0-fe45-77e0-993a-d571fecc5ec1",
+  "decision": "continue",
+  "evidence": {
+    "baselines": [
+      "01a1fba9-d095-757c-91ed-afd21ecfa960",
+      "01a1fba9-9afd-72e3-b41b-dc4287153c35",
+      "01a1fba9-308c-7cde-9d00-edb7f483f3af"
+    ],
+    "benefit_status": [
+      "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+      "01a1e9df-0308-7fdc-8492-32db1e582a2d",
+      "01a1e9df-0c4b-7807-b35c-5810ec418d45",
+      "01a1e9df-1592-79a5-839e-037d8fe4251b",
+      "01a1e9df-1e42-7199-87e1-23c577c62f8e",
+      "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+      "01a20c80-c0c3-7788-9cc2-bb18a102a2f7"
+    ],
+    "cadences": {
+      "demo_credit": "01a216d1-1976-7be8-b1a6-e85e9aeeea16",
+      "documents": {
+        "pi-objectives": "01a216d1-1cbe-7297-bc1e-ee5e29ea82cc",
+        "pi-plan": "01a216d1-1bb7-7376-905e-38a776f22190"
+      },
+      "pi": "01a216d1-1913-70dd-8f69-c8ad230f2364",
+      "pi_gate_approval": "01a216d1-1b0a-7249-8b6a-3a2872184f4c",
+      "refinement": "01a216d1-1a40-7246-ba5e-254b8c0986fe",
+      "retro": "01a216d1-19da-7162-a268-c92583ae89c7"
+    },
+    "conditions": [
+      "S17 stays active by acceptance/programme/S17.toml; the S18 conveyor arm is its next unit.",
+      "T17 stays active by acceptance/programme/T17.toml; its dependency order is refused at the draft attempt, not at publish.",
+      "T7 is closed; the live ops cluster proof is deploy-bound until the deployed image carries ca155fada.",
+      "v1-u5-copilot-gate-quorum remains open and owned by S10.",
+      "Tranche 6 (01a1e9e1-07d3-75d3-8c99-4002d5bfe8f7) is authorised in the same write."
+    ],
+    "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85",
+    "lane_head": "f8e9fe4d",
+    "note": "Rule review under the standing delegation; the five tranche-5 members' receipts are green and fresh at f8e9fe4d; tranche 5 closes and tranche 6 is authorised.",
+    "project_acceptance": {
+      "document": "docs/evidence/rework/<key>.json",
+      "verdict": {
+        "green": 5,
+        "members": {
+          "S06": "RECEIPT_GREEN",
+          "S08": "RECEIPT_GREEN",
+          "S17": "RECEIPT_GREEN",
+          "T17": "RECEIPT_GREEN",
+          "T7": "RECEIPT_GREEN"
+        },
+        "red": 0
+      }
+    },
+    "risk_register": [
+      "01a21a39-c245-77f6-985e-a01e62ed0051",
+      "01a21a39-c2c4-7bbe-ad04-bdbd456d30fe",
+      "01a21c16-a076-711a-815f-7043ab841533",
+      "01a21c16-a0ff-7dd2-ab1f-74ce913e9168",
+      "01a21c1b-ce25-7dc0-862a-444dcc165140",
+      "01a21c1b-ceac-7fbc-bdcb-d7611c88e90e",
+      "01a21c26-c9a0-7424-83ac-ebd5b932a16d",
+      "01a21c26-ca2c-7a40-8233-985a5dfa1d6d",
+      "01a21c1d-c26c-7fab-b9e1-3f2618e1485f",
+      "01a21c1d-c2f6-73ee-9447-8d1c89d0eb9a"
+    ],
+    "snapshot_manifest_sha256": "5f5db96e80e62fb043ecb5fad90d5fda5f337479c7afa6b88023329d657e6fb8",
+    "snapshot_sha": "f8e9fe4dbebac7b8c6a7d1f66c5d8144670c888c"
+  },
+  "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+}

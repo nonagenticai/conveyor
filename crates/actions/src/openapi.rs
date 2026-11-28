@@ -206,7 +206,7 @@ mod tests {
         for spec in registry.iter() {
             let item = operation_json(spec);
             assert_eq!(item["x-action-spec-hash"], spec.spec_hash());
-            assert_eq!(item["x-action-name"], spec.name);
+            assert_eq!(item["x-action-name"], spec.name.as_ref());
             assert_eq!(
                 item["requestBody"]["content"]["application/json"]["schema"]["properties"]["input"],
                 spec.input_schema()

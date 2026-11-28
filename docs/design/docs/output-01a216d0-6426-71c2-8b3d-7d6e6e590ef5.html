@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T3 — Statement of Architecture Work · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="statement-of-architecture-work" data-provenance-version="1" data-provenance-hash="43217d56d542483eb1d1f1d88097beee66defa8478f4dcdaf74515e00e7f3e69" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>statement-of-architecture-work</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>43217d56d542483eb1d1f1d88097beee66defa8478f4dcdaf74515e00e7f3e69</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Statement of Architecture Work — T3 PM job</h1>
+<h2>Assignment</h2>
+<p>The T3 slice (issue #74) under the programme's PM governance; the live delivery contract is
+<code>01a2052f-29da-76c4-9bda-e45e0f408fe8</code>, requested by the PM job and approved by the Architecture Board under the standing
+delegation.</p>
+<h2>Scope</h2>
+<p>The PM request-to-plan path (<code>pm.plan</code>, <code>projects.baseline</code>), the dual-controlled charter,
+baseline and change gates, the change-request path with its impact block, and closure against the
+frozen baseline (<code>projects.close_request</code>, <code>projects.close</code>). Not in scope: project creation and
+the board surfaces, which belong to S05.</p>
+<h2>Responsibilities</h2>
+<p>The PM job requests and plans; the approver job decides every gate and is never its requester;
+the programme manager owns delivery; the architect owns the baseline's architecture content; the
+programme board reviews the tranche.</p>
+<h2>Acceptance criteria</h2>
+<p>SPEC_V2 §12 T3: "PM runs a request end to end; cannot approve its own gate; a baseline change
+requires a change request". The manifest <code>acceptance/programme/T3.toml</code> is the gate, not this
+document; its checks execute against the live rows.</p>
+<h2>Contract</h2>
+<p>The live <code>delivery_contract</code> <code>01a2052f-29da-76c4-9bda-e45e0f408fe8</code> (phase g), approved by the Board decision under the standing
+delegation; its body names the same scope, obligations and acceptance.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>PM job · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

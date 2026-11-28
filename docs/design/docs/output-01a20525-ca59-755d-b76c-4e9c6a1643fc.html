@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T13 — Project context diagram (rework, 2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-context-diagram" data-provenance-version="2" data-provenance-hash="a4367e91c4e19e5e46146c7795757ef41c6269ca805182a22013e4d926fc88f0" data-provenance-status="active" data-provenance-owner="FR Test" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-context-diagram</dd></div><div><dt>Version</dt><dd>2</dd></div><div><dt>SHA-256</dt><dd>a4367e91c4e19e5e46146c7795757ef41c6269ca805182a22013e4d926fc88f0</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>FR Test</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project Context Diagram — T13 Tool platform</h1>
+<p>The context is the tool spine's boundary as the architecture design states it: what T13 owns,
+what it consumes, and which parts of the organisation and estate its calls touch.</p>
+<h2>Context</h2>
+<p>T13 sits in delivery tranche 3. It is the path T6 (the development project), T7 (operations) and
+the estate toolkits (T14), BYO tools (T15), ingestion (T16) and authoring (T17) build on. A job's
+run step calls a tool through <code>tools.call</code>; the broker resolves the binding, the pinned toolkit
+version and the ceiling, validates the input, dispatches, writes one <code>tool_call</code> row and emits
+<code>tool.called</code>. T13 owns the four tool tables, the <code>tools.*</code> family and the storage key discipline;
+it does not own credentials, approvals, the model, backend health or the card/run state machine.</p>
+<h2>Affected organisation</h2>
+<ul>
+<li><strong>Delivery jobs</strong> — coding and operations runs stop calling backends directly; their only path
+becomes the broker, and their tool grants become bindings.</li>
+<li><strong>The platform team</strong> — publishes toolkit versions, binds them to jobs, and reads the tool-call
+ledger to retire or justify a toolkit with no calls in a cycle (B2).</li>
+<li><strong>Tenants and their approvers</strong> — a destructive tool call consults the tenant's existing
+<code>approval_policy</code>/<code>approval_decision</code>; no second approvals model is introduced.</li>
+<li><strong>The programme board</strong> — the tool estate census is a B2 evidence source at each tranche review.</li>
+</ul>
+<h2>Affected systems</h2>
+<ul>
+<li><strong>The conveyor run/step executor</strong> — carries the binding and the run/step ids the broker resolves.</li>
+<li><strong>The secret store</strong> (<code>secret</code>) — holds the sealed credential a binding's alias names; the
+broker opens it, the prompt never sees it.</li>
+<li><strong>The approvals model</strong> (<code>approval_policy</code>, <code>approval_decision</code>) — gates a destructive call.</li>
+<li><strong>MinIO object storage</strong> — tenant-prefixed, server-side encrypted, content-hashed keys under
+<code>tenant/&lt;tenant&gt;/project/&lt;project&gt;/run/&lt;run&gt;/&lt;name&gt;</code>; no bucket administration, no S3 key in the
+prompt.</li>
+<li><strong>The eight V1 external backends</strong> — <code>workers.list</code>, <code>providers.list</code>, <code>graphs.list</code>,
+<code>artifacts.list</code>, <code>billing.summary</code>, <code>coding_jobs.create</code>, <code>coding_jobs.get</code>,
+<code>retrieval.query</code>; they stay where they are and their addresses move into toolkit operations.</li>
+<li><strong>The event/audit ledgers</strong> — <code>tool_call</code>, <code>event</code> and <code>audit_event</code> carry the call evidence.</li>
+<li><strong><code>nonagenticai_mcp_server</code></strong> — reference only (D44); never a runtime dependency.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Tool platform · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,206 @@
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project S02 --content docs/evidence/rework/tranche-1/rework-content-S02.json --tranche-label tranche 1 --demo-cadence 01a1ff74-9819-72dc-a1f2-e102c73e9672
+
+  01 projects.reopen ok
+  charter: already approved
+  closure outputs: already ['closure-review']
+  SoAW: already live
+  artefact: Stakeholder map — S02 Skeleton already present
+  artefact: Driver/goal/objective — S02 Skeleton already present
+  artefact: Requirements catalog — S02 Skeleton already present
+  artefact: Solution concept — S02 Skeleton already present
+  artefact: Business capability map — S02 Skeleton already present
+  artefact: Data entity catalog — S02 Skeleton already present
+  artefact: Technology standards — S02 Skeleton already present
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  08 architecture.artifacts_link ok
+  09 architecture.artifacts_link ok
+  10 architecture.artifacts_link ok
+  document architecture-artifact: already present and published
+  delivery contract: already live
+  register risk: The replay record lost the artefact rows, so a re-creation could duplicate a surviving row already present
+  register risk: The two-worker lease proof is timing-sensitive and could flake under load already present
+  register risk: The rework could close S02 while issue #2 still reads open already present
+  register issue: Issue #2 was open at the start of the rework although its P2 test was already written already present
+  register issue: The closure outputs were declared in the 2026-11-21 transcript but are absent from the replay row already present
+  register assumption: The scope baseline taken on 2026-11-21 still describes S02's boundary already present
+  register dependency: S00's signed parity inventory fixes the surfaces S02 must expose already present
+  register benefit: The skeleton makes every later slice inherit isolation instead of re-implementing it already present
+  register benefit: The two-worker proof turns the lease policy from a declaration into evidence already present
+  benefit transitions: none in the content
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
+  closure-review output: already published
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  11 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 1 change row(s) present
+  record fixes: none in the content
+  card discharge: no open rework card owned by the project
+  12 projects.close_request ok
+  13 approvals.decide ok
+  14 approvals.request ok
+  15 approvals.decide ok
+  16 projects.close ok
+  closed S02: 01a1d039-0d27-7b45-abb5-bf851a4c3d4a
+S02: 16 acts recorded
+
+
+[exit 0]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S02 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S02-snap-8qpk954l/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S02-snap-8qpk954l/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-1/S02-bodies --local-bin /tmp/conv526-bin-5dcfc953
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [],
+  "skipped": [
+    {
+      "project_key": "S02",
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "S02",
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S02",
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "category": "closure-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "S02",
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "S02",
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S02",
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S02",
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "S02",
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "category": "project-registers",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S02",
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S02",
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "S02",
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S02",
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S02",
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S02",
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "NO_EVIDENCE",
+        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
+      }
+    }
+  ],
+  "counts": {
+    "due": 4,
+    "present": 6,
+    "missing-edge": 0,
+    "stale": 4,
+    "ambiguous": 0
+  }
+}
+
+
+[exit 1]
+

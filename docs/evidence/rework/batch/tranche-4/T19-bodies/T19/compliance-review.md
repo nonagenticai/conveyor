@@ -1,0 +1,264 @@
+# Compliance Review — Decision forums (meetings)
+
+## Relationship
+
+Exactly one of irrelevant, consistent, compliant, conformant, fully conformant or non-conformant.
+
+```json
+{
+  "category": "compliance-review",
+  "count": 3,
+  "rows": [
+    {
+      "contract_id": "01a20ce0-5183-776c-84bd-327f2301b19b",
+      "created_at": "2026-11-24T09:37:58.210655+00:00",
+      "evidence": {
+        "basis": "docs/plans/T19/evidence.md and docs/plans/T19/closure-review.md",
+        "contract_id": "01a20ce0-5183-776c-84bd-327f2301b19b",
+        "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3"
+      },
+      "findings": [
+        {
+          "item": "meeting_type authoring route",
+          "kind": "follow-up",
+          "owner": "programme-architect"
+        },
+        {
+          "item": "T9 board / T10 cadence binding to meeting types",
+          "kind": "follow-up",
+          "owner": "programme-architect"
+        },
+        {
+          "item": "tranche-4 authorisation is the programme's retrospective chain (#526), not a T19 delivery deviation",
+          "kind": "note"
+        }
+      ],
+      "id": "01a20ceb-5316-7ea3-95df-001bd0b15560",
+      "level": "conformant",
+      "outcome": null,
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "reviewed_at": "2026-11-24T09:37:58.210655+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-24T09:37:58.210655+00:00",
+      "version": 1
+    },
+    {
+      "contract_id": "01a20cea-91bb-77f4-a880-044c90bb5f0e",
+      "created_at": "2026-11-24T09:38:03.239657+00:00",
+      "evidence": {
+        "basis": "docs/plans/T19/evidence.md and docs/plans/T19/closure-review.md",
+        "contract_id": "01a20cea-91bb-77f4-a880-044c90bb5f0e",
+        "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3"
+      },
+      "findings": [
+        {
+          "item": "meeting_type authoring route",
+          "kind": "follow-up",
+          "owner": "programme-architect"
+        },
+        {
+          "item": "T9 board / T10 cadence binding to meeting types",
+          "kind": "follow-up",
+          "owner": "programme-architect"
+        },
+        {
+          "item": "tranche-4 authorisation is the programme's retrospective chain (#526), not a T19 delivery deviation",
+          "kind": "note"
+        }
+      ],
+      "id": "01a20ceb-66b2-75a4-ac9f-6ceae8ab187d",
+      "level": "conformant",
+      "outcome": null,
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "reviewed_at": "2026-11-24T09:38:03.239657+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-24T09:38:03.239657+00:00",
+      "version": 1
+    },
+    {
+      "contract_id": "01a219df-06ee-783c-8b7f-bb01cb78a4c0",
+      "created_at": "2026-11-26T21:59:44.168368+00:00",
+      "evidence": {
+        "artefacts": "seven approved: stakeholder_map 01a20cdd-e71f-7d06-8ca5-701ff6b7d69e, driver_goal_objective 01a20cde-0f97-7f74-afd8-7cd74e0990e3, requirements_catalog 01a20cde-371c-7d85-ae2d-780453958bef, solution_concept 01a20cde-5f86-7720-9a16-36a964ef255d, business_capability_map 01a20cde-86d7-7257-a45e-b4731ab423a4, data_entity_catalog 01a20cde-adbf-7626-9b2b-58faf7164755, technology_standards 01a20cde-d6bd-7cfe-88ad-42a1e6db30a7",
+        "contracts": "SoAW 01a20ce0-5183-776c-84bd-327f2301b19b (approval 01a20ce0-644d-7340-a696-1af10fa8c61e); delivery contract 01a20cea-91bb-77f4-a880-044c90bb5f0e (approval 01a20cea-a68f-7e08-8d0c-399759ef16e0), both live",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "limit": "no acceptance run or suite result is recorded in the snapshot; this is a record-level retrospective",
+        "manifest": "acceptance/programme/T19.toml",
+        "outputs": "project-brief 01a20ca7-d162-7674-a022-cf2dff7b6cbd, inception-analysis 01a20ca7-e839-776b-a940-398db85449a8, architecture-design 01a20ca7-fee3-7296-82dd-142d538fcc35, evidence 01a20ca8-1595-71e2-9398-21bbd70ed089, closure-review 01a20ca8-2a1f-75bb-8dd2-fdde95e78a09, architecture-artifact 01a20ce4-73e4-7009-9ec7-eb2265e9e84e",
+        "project_row": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1, key T19, status closed, meta measured_status built, depends_on T1/T2/T3/P0, issues 605 and 606",
+        "reviews": "01a20ceb-5316-7ea3-95df-001bd0b15560 and 01a20ceb-66b2-75a4-ac9f-6ceae8ab187d, both conformant, 2026-11-24T09:37\u201309:38Z, conveyor-approver",
+        "sha": "df4a511718af8c52f04ab30f7f4a66c5ff4b1b06",
+        "snapshot": "/tmp/conv526-w1-snap/data, facts generated 2026-11-24T22:28:59+00:00",
+        "tranche": "tranche 4 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce authorised 2026-11-24T17:04:34Z by review 01a216d0-d634-738e-985a-00a85cfd48d9"
+      },
+      "findings": "Retrospective Phase-G review of T19 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The snapshot records the project row 01a20c80-b9b8-7214-abc6-f2c4f75a1fc1 as status closed with meta measured_status built; the seven Phase A\u2013D artefacts are approved; the SoAW contract 01a20ce0-5183-776c-84bd-327f2301b19b and the delivery contract 01a20cea-91bb-77f4-a880-044c90bb5f0e are live; and the two contract reviews 01a20ceb-5316-7ea3-95df-001bd0b15560 and 01a20ceb-66b2-75a4-ac9f-6ceae8ab187d are conformant, both decided by conveyor-approver on 2026-11-24. Tranche 4 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce was authorised at 2026-11-24T17:04:34Z by the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9 (decision continue), and issues #605 and #606 are CLOSED. The verdict is consistent: this pack reconstructs the record and authors the mandatory artefacts, but the snapshot holds no acceptance run of acceptance/programme/T19.toml or the eight meetings suites at rework time, so compliant or conformant would rest on the closure claim rather than measured evidence. Both linked issues are CLOSED and the project row is status closed, so the pack records the retrospective re-close dated 2026-11-24 with its closure review; the re-close rests on the snapshot record, not on a re-run acceptance. Nothing in the record is non_conformant.",
+      "id": "01a219df-2530-7597-8836-ec3dfc7154ef",
+      "level": "consistent",
+      "outcome": null,
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "reviewed_at": "2026-11-26T21:59:44.168368+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-26T21:59:44.168368+00:00",
+      "version": 1
+    }
+  ],
+  "source": "architecture.json#/compliance_reviews"
+}
+```
+
+## Findings
+
+The evidence for each finding, against the contract.
+
+```json
+{
+  "category": "compliance-review",
+  "count": 3,
+  "rows": [
+    {
+      "contract_id": "01a20ce0-5183-776c-84bd-327f2301b19b",
+      "created_at": "2026-11-24T09:37:58.210655+00:00",
+      "evidence": {
+        "basis": "docs/plans/T19/evidence.md and docs/plans/T19/closure-review.md",
+        "contract_id": "01a20ce0-5183-776c-84bd-327f2301b19b",
+        "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3"
+      },
+      "findings": [
+        {
+          "item": "meeting_type authoring route",
+          "kind": "follow-up",
+          "owner": "programme-architect"
+        },
+        {
+          "item": "T9 board / T10 cadence binding to meeting types",
+          "kind": "follow-up",
+          "owner": "programme-architect"
+        },
+        {
+          "item": "tranche-4 authorisation is the programme's retrospective chain (#526), not a T19 delivery deviation",
+          "kind": "note"
+        }
+      ],
+      "id": "01a20ceb-5316-7ea3-95df-001bd0b15560",
+      "level": "conformant",
+      "outcome": null,
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "reviewed_at": "2026-11-24T09:37:58.210655+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-24T09:37:58.210655+00:00",
+      "version": 1
+    },
+    {
+      "contract_id": "01a20cea-91bb-77f4-a880-044c90bb5f0e",
+      "created_at": "2026-11-24T09:38:03.239657+00:00",
+      "evidence": {
+        "basis": "docs/plans/T19/evidence.md and docs/plans/T19/closure-review.md",
+        "contract_id": "01a20cea-91bb-77f4-a880-044c90bb5f0e",
+        "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3"
+      },
+      "findings": [
+        {
+          "item": "meeting_type authoring route",
+          "kind": "follow-up",
+          "owner": "programme-architect"
+        },
+        {
+          "item": "T9 board / T10 cadence binding to meeting types",
+          "kind": "follow-up",
+          "owner": "programme-architect"
+        },
+        {
+          "item": "tranche-4 authorisation is the programme's retrospective chain (#526), not a T19 delivery deviation",
+          "kind": "note"
+        }
+      ],
+      "id": "01a20ceb-66b2-75a4-ac9f-6ceae8ab187d",
+      "level": "conformant",
+      "outcome": null,
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "reviewed_at": "2026-11-24T09:38:03.239657+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-24T09:38:03.239657+00:00",
+      "version": 1
+    },
+    {
+      "contract_id": "01a219df-06ee-783c-8b7f-bb01cb78a4c0",
+      "created_at": "2026-11-26T21:59:44.168368+00:00",
+      "evidence": {
+        "artefacts": "seven approved: stakeholder_map 01a20cdd-e71f-7d06-8ca5-701ff6b7d69e, driver_goal_objective 01a20cde-0f97-7f74-afd8-7cd74e0990e3, requirements_catalog 01a20cde-371c-7d85-ae2d-780453958bef, solution_concept 01a20cde-5f86-7720-9a16-36a964ef255d, business_capability_map 01a20cde-86d7-7257-a45e-b4731ab423a4, data_entity_catalog 01a20cde-adbf-7626-9b2b-58faf7164755, technology_standards 01a20cde-d6bd-7cfe-88ad-42a1e6db30a7",
+        "contracts": "SoAW 01a20ce0-5183-776c-84bd-327f2301b19b (approval 01a20ce0-644d-7340-a696-1af10fa8c61e); delivery contract 01a20cea-91bb-77f4-a880-044c90bb5f0e (approval 01a20cea-a68f-7e08-8d0c-399759ef16e0), both live",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "limit": "no acceptance run or suite result is recorded in the snapshot; this is a record-level retrospective",
+        "manifest": "acceptance/programme/T19.toml",
+        "outputs": "project-brief 01a20ca7-d162-7674-a022-cf2dff7b6cbd, inception-analysis 01a20ca7-e839-776b-a940-398db85449a8, architecture-design 01a20ca7-fee3-7296-82dd-142d538fcc35, evidence 01a20ca8-1595-71e2-9398-21bbd70ed089, closure-review 01a20ca8-2a1f-75bb-8dd2-fdde95e78a09, architecture-artifact 01a20ce4-73e4-7009-9ec7-eb2265e9e84e",
+        "project_row": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1, key T19, status closed, meta measured_status built, depends_on T1/T2/T3/P0, issues 605 and 606",
+        "reviews": "01a20ceb-5316-7ea3-95df-001bd0b15560 and 01a20ceb-66b2-75a4-ac9f-6ceae8ab187d, both conformant, 2026-11-24T09:37\u201309:38Z, conveyor-approver",
+        "sha": "df4a511718af8c52f04ab30f7f4a66c5ff4b1b06",
+        "snapshot": "/tmp/conv526-w1-snap/data, facts generated 2026-11-24T22:28:59+00:00",
+        "tranche": "tranche 4 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce authorised 2026-11-24T17:04:34Z by review 01a216d0-d634-738e-985a-00a85cfd48d9"
+      },
+      "findings": "Retrospective Phase-G review of T19 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The snapshot records the project row 01a20c80-b9b8-7214-abc6-f2c4f75a1fc1 as status closed with meta measured_status built; the seven Phase A\u2013D artefacts are approved; the SoAW contract 01a20ce0-5183-776c-84bd-327f2301b19b and the delivery contract 01a20cea-91bb-77f4-a880-044c90bb5f0e are live; and the two contract reviews 01a20ceb-5316-7ea3-95df-001bd0b15560 and 01a20ceb-66b2-75a4-ac9f-6ceae8ab187d are conformant, both decided by conveyor-approver on 2026-11-24. Tranche 4 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce was authorised at 2026-11-24T17:04:34Z by the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9 (decision continue), and issues #605 and #606 are CLOSED. The verdict is consistent: this pack reconstructs the record and authors the mandatory artefacts, but the snapshot holds no acceptance run of acceptance/programme/T19.toml or the eight meetings suites at rework time, so compliant or conformant would rest on the closure claim rather than measured evidence. Both linked issues are CLOSED and the project row is status closed, so the pack records the retrospective re-close dated 2026-11-24 with its closure review; the re-close rests on the snapshot record, not on a re-run acceptance. Nothing in the record is non_conformant.",
+      "id": "01a219df-2530-7597-8836-ec3dfc7154ef",
+      "level": "consistent",
+      "outcome": null,
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "reviewed_at": "2026-11-26T21:59:44.168368+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-26T21:59:44.168368+00:00",
+      "version": 1
+    }
+  ],
+  "source": "architecture.json#/compliance_reviews"
+}
+```
+
+## Waivers
+
+Each accepted deviation with its owner, reason, cost, risk and reassessment date.
+
+```json
+{
+  "category": "compliance-review",
+  "count": 1,
+  "rows": [
+    {
+      "kind": "waiver_status",
+      "title": "None recorded \u2014 0 waivers for this project",
+      "waivers": 0
+    }
+  ],
+  "source": "computed:waiver_status"
+}
+```
+
+## Decision
+
+The outcome and the conditions that attach to it.
+
+```json
+{
+  "category": "compliance-review",
+  "count": 1,
+  "rows": [
+    {
+      "conditions": "none recorded",
+      "decision": "consistent",
+      "findings": "Retrospective Phase-G review of T19 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The snapshot records the project row 01a20c80-b9b8-7214-abc6-f2c4f75a1fc1 as status closed with meta measured_status built; the seven Phase A\u2013D artefacts are approved; the SoAW contract 01a20ce0-5183-776c-84bd-327f2301b19b and the delivery contract 01a20cea-91bb-77f4-a880-044c90bb5f0e are live; and the two contract reviews 01a20ceb-5316-7ea3-95df-001bd0b15560 and 01a20ceb-66b2-75a4-ac9f-6ceae8ab187d are conformant, both decided by conveyor-approver on 2026-11-24. Tranche 4 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce was authorised at 2026-11-24T17:04:34Z by the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9 (decision continue), and issues #605 and #606 are CLOSED. The verdict is consistent: this pack reconstructs the record and authors the mandatory artefacts, but the snapshot holds no acceptance run of acceptance/programme/T19.toml or the eight meetings suites at rework time, so compliant or conformant would rest on the closure claim rather than measured evidence. Both linked issues are CLOSED and the project row is status closed, so the pack records the retrospective re-close dated 2026-11-24 with its closure review; the re-close rests on the snapshot record, not on a re-run acceptance. Nothing in the record is non_conformant.",
+      "id": "01a219df-2530-7597-8836-ec3dfc7154ef",
+      "kind": "governing_review",
+      "level": "consistent",
+      "phase_h_outcome": null,
+      "reviewed_at": "2026-11-26T21:59:44.168368+00:00",
+      "reviewed_by_name": "conveyor-approver",
+      "title": "governing review 01a219df-2530-7597-8836-ec3dfc7154ef: consistent governs; phase-H outcome not recorded (a phase-G decision is its level)"
+    }
+  ],
+  "source": "computed:governing_review"
+}
+```

@@ -27,9 +27,9 @@ fn only_the_locked_reads_are_declared() {
     let mut declared: Vec<&str> = registry()
         .iter()
         .filter(|spec| {
-            matches!(spec.handler, HandlerRef::External { service, .. } if service == "scientific")
+            matches!(&spec.handler, HandlerRef::External { service, .. } if service.as_ref() == "scientific")
         })
-        .map(|spec| spec.name)
+        .map(|spec| spec.name.as_ref())
         .collect();
     declared.sort_unstable();
     assert_eq!(
@@ -46,7 +46,7 @@ fn only_the_locked_reads_are_declared() {
     }
     // The dropped surface stays dropped: no graph, sandbox or write action hides behind a name.
     for spec in registry().iter() {
-        let name = spec.name;
+        let name = spec.name.as_ref();
         if name.starts_with("scientific") {
             assert!(
                 !name.contains("graph") && !name.contains("sandbox"),

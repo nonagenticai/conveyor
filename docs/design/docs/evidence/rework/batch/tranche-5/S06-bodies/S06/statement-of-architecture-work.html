@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Statement Of Architecture Work — Control plane — claims, runs, approvals, andon, comms and notifications · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-5/S06-bodies/S06/statement-of-architecture-work.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="statement-of-architecture-work--control-plane--claims-runs-approvals-andon-comms-and-notifications">Statement Of Architecture Work — Control plane — claims, runs, approvals, andon, comms and notifications</h1>
+<h2 id="assignment">Assignment</h2>
+<p>What the architecture work is asked to deliver and for whom.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a21a39-aae9-7d90-9069-b0576ed463d4&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-26T23:38:36.773008+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The slice gate in `acceptance/programme/S06.toml` and plan \u00a77: (a) golden path \u2014 card \u2192 claim \u2192 run \u2192 gate \u2192 decide \u2192 `cards.move(done)` yields `run.succeeded`, `approval.approved` and one audit, invocation and event row each; (b) dual control \u2014 `required_decisions=2`, one approve stays pending, the same approver again is 409, a second approver closes; (c) retry \u2014 `kill -9` mid-run leads to `run.reap`, a crashed run, then `attempt=2` with two rows and never two live runs; (d) andon \u2014 engaged gives 409 and a pending `run.execute` for 60 s, released resumes within one poll; (e) delivery retry \u2014 a stub 500 gives `attempts=5`, `state=failed`, one row; (f) no timers \u2014 `rg &#39;setInterval&#39; crates apps` is empty and every cadence is a `schedule` row; (g) human vs agent \u2014 `decided_by_kind` is `human` for one decision and `agent` for the other. The instrument is `acceptance/programme/S06.toml`; the close gate is decided by an approver other than its requester. The snapshot records no run of these properties and no Phase-G review; this rework records the level `non_conformant` rather than claiming a pass.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V1 slice S06 (SPEC \u00a78 S6) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter and the delivery contract, take the scope baseline with the one WBS deliverable, record the Phase-G compliance review, publish the expected outputs (`project-brief`, `evidence`) and the closure decision, and re-close through the acceptance instrument once its properties run.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the control-plane slice of the plan: the six tables of `02-DATA-ARCHITECTURE \u00a72.6` (`channel_binding`, `channel_preference`, `message`, `delivery`, `audience`, `audience_member` \u2014 the last two PENDING-S0), the 17 actions, the 17 events, the SSE topics `run:{id}`, `approval:{id}` and `tenant`, the Telegram in/out path with its sender-identity resolution, the andon gauge and poller pause, and the job kinds that replace 11 of fr&#39;s 14 timers (three deleted). Out of scope: the signed mcp_server channel (S06a), MCP tool surfacing (S10), `project_request.timeout` (S07), the UI (S12) and the audience screens (PENDING-S0).&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-26T23:38:36.518039+00:00&quot;,
+      &quot;id&quot;: &quot;01a21a39-aa69-7167-8696-e615aa3b012f&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d2a-7007-bcd8-29bb24f36b54&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 S06 Control Plane (retrospective, 2026-11-27)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T23:38:36.773008+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="scope">Scope</h2>
+<p>The boundaries, the artefacts expected and the phase set.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a21a39-aae9-7d90-9069-b0576ed463d4&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-26T23:38:36.773008+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The slice gate in `acceptance/programme/S06.toml` and plan \u00a77: (a) golden path \u2014 card \u2192 claim \u2192 run \u2192 gate \u2192 decide \u2192 `cards.move(done)` yields `run.succeeded`, `approval.approved` and one audit, invocation and event row each; (b) dual control \u2014 `required_decisions=2`, one approve stays pending, the same approver again is 409, a second approver closes; (c) retry \u2014 `kill -9` mid-run leads to `run.reap`, a crashed run, then `attempt=2` with two rows and never two live runs; (d) andon \u2014 engaged gives 409 and a pending `run.execute` for 60 s, released resumes within one poll; (e) delivery retry \u2014 a stub 500 gives `attempts=5`, `state=failed`, one row; (f) no timers \u2014 `rg &#39;setInterval&#39; crates apps` is empty and every cadence is a `schedule` row; (g) human vs agent \u2014 `decided_by_kind` is `human` for one decision and `agent` for the other. The instrument is `acceptance/programme/S06.toml`; the close gate is decided by an approver other than its requester. The snapshot records no run of these properties and no Phase-G review; this rework records the level `non_conformant` rather than claiming a pass.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V1 slice S06 (SPEC \u00a78 S6) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter and the delivery contract, take the scope baseline with the one WBS deliverable, record the Phase-G compliance review, publish the expected outputs (`project-brief`, `evidence`) and the closure decision, and re-close through the acceptance instrument once its properties run.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the control-plane slice of the plan: the six tables of `02-DATA-ARCHITECTURE \u00a72.6` (`channel_binding`, `channel_preference`, `message`, `delivery`, `audience`, `audience_member` \u2014 the last two PENDING-S0), the 17 actions, the 17 events, the SSE topics `run:{id}`, `approval:{id}` and `tenant`, the Telegram in/out path with its sender-identity resolution, the andon gauge and poller pause, and the job kinds that replace 11 of fr&#39;s 14 timers (three deleted). Out of scope: the signed mcp_server channel (S06a), MCP tool surfacing (S10), `project_request.timeout` (S07), the UI (S12) and the audience screens (PENDING-S0).&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-26T23:38:36.518039+00:00&quot;,
+      &quot;id&quot;: &quot;01a21a39-aa69-7167-8696-e615aa3b012f&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d2a-7007-bcd8-29bb24f36b54&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 S06 Control Plane (retrospective, 2026-11-27)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T23:38:36.773008+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="responsibilities">Responsibilities</h2>
+<p>Who does the work and who accepts it.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a21a39-aae9-7d90-9069-b0576ed463d4&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-26T23:38:36.773008+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The slice gate in `acceptance/programme/S06.toml` and plan \u00a77: (a) golden path \u2014 card \u2192 claim \u2192 run \u2192 gate \u2192 decide \u2192 `cards.move(done)` yields `run.succeeded`, `approval.approved` and one audit, invocation and event row each; (b) dual control \u2014 `required_decisions=2`, one approve stays pending, the same approver again is 409, a second approver closes; (c) retry \u2014 `kill -9` mid-run leads to `run.reap`, a crashed run, then `attempt=2` with two rows and never two live runs; (d) andon \u2014 engaged gives 409 and a pending `run.execute` for 60 s, released resumes within one poll; (e) delivery retry \u2014 a stub 500 gives `attempts=5`, `state=failed`, one row; (f) no timers \u2014 `rg &#39;setInterval&#39; crates apps` is empty and every cadence is a `schedule` row; (g) human vs agent \u2014 `decided_by_kind` is `human` for one decision and `agent` for the other. The instrument is `acceptance/programme/S06.toml`; the close gate is decided by an approver other than its requester. The snapshot records no run of these properties and no Phase-G review; this rework records the level `non_conformant` rather than claiming a pass.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V1 slice S06 (SPEC \u00a78 S6) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter and the delivery contract, take the scope baseline with the one WBS deliverable, record the Phase-G compliance review, publish the expected outputs (`project-brief`, `evidence`) and the closure decision, and re-close through the acceptance instrument once its properties run.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the control-plane slice of the plan: the six tables of `02-DATA-ARCHITECTURE \u00a72.6` (`channel_binding`, `channel_preference`, `message`, `delivery`, `audience`, `audience_member` \u2014 the last two PENDING-S0), the 17 actions, the 17 events, the SSE topics `run:{id}`, `approval:{id}` and `tenant`, the Telegram in/out path with its sender-identity resolution, the andon gauge and poller pause, and the job kinds that replace 11 of fr&#39;s 14 timers (three deleted). Out of scope: the signed mcp_server channel (S06a), MCP tool surfacing (S10), `project_request.timeout` (S07), the UI (S12) and the audience screens (PENDING-S0).&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-26T23:38:36.518039+00:00&quot;,
+      &quot;id&quot;: &quot;01a21a39-aa69-7167-8696-e615aa3b012f&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d2a-7007-bcd8-29bb24f36b54&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 S06 Control Plane (retrospective, 2026-11-27)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T23:38:36.773008+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="acceptance-criteria">Acceptance criteria</h2>
+<p>The conditions the architecture must meet to close Phase A.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a21a39-aae9-7d90-9069-b0576ed463d4&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-26T23:38:36.773008+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The slice gate in `acceptance/programme/S06.toml` and plan \u00a77: (a) golden path \u2014 card \u2192 claim \u2192 run \u2192 gate \u2192 decide \u2192 `cards.move(done)` yields `run.succeeded`, `approval.approved` and one audit, invocation and event row each; (b) dual control \u2014 `required_decisions=2`, one approve stays pending, the same approver again is 409, a second approver closes; (c) retry \u2014 `kill -9` mid-run leads to `run.reap`, a crashed run, then `attempt=2` with two rows and never two live runs; (d) andon \u2014 engaged gives 409 and a pending `run.execute` for 60 s, released resumes within one poll; (e) delivery retry \u2014 a stub 500 gives `attempts=5`, `state=failed`, one row; (f) no timers \u2014 `rg &#39;setInterval&#39; crates apps` is empty and every cadence is a `schedule` row; (g) human vs agent \u2014 `decided_by_kind` is `human` for one decision and `agent` for the other. The instrument is `acceptance/programme/S06.toml`; the close gate is decided by an approver other than its requester. The snapshot records no run of these properties and no Phase-G review; this rework records the level `non_conformant` rather than claiming a pass.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V1 slice S06 (SPEC \u00a78 S6) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter and the delivery contract, take the scope baseline with the one WBS deliverable, record the Phase-G compliance review, publish the expected outputs (`project-brief`, `evidence`) and the closure decision, and re-close through the acceptance instrument once its properties run.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the control-plane slice of the plan: the six tables of `02-DATA-ARCHITECTURE \u00a72.6` (`channel_binding`, `channel_preference`, `message`, `delivery`, `audience`, `audience_member` \u2014 the last two PENDING-S0), the 17 actions, the 17 events, the SSE topics `run:{id}`, `approval:{id}` and `tenant`, the Telegram in/out path with its sender-identity resolution, the andon gauge and poller pause, and the job kinds that replace 11 of fr&#39;s 14 timers (three deleted). Out of scope: the signed mcp_server channel (S06a), MCP tool surfacing (S10), `project_request.timeout` (S07), the UI (S12) and the audience screens (PENDING-S0).&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-26T23:38:36.518039+00:00&quot;,
+      &quot;id&quot;: &quot;01a21a39-aa69-7167-8696-e615aa3b012f&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d2a-7007-bcd8-29bb24f36b54&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 S06 Control Plane (retrospective, 2026-11-27)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T23:38:36.773008+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="contract">Contract</h2>
+<p>The contract record, its version and its approval.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a21a39-aae9-7d90-9069-b0576ed463d4&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-26T23:38:36.773008+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The slice gate in `acceptance/programme/S06.toml` and plan \u00a77: (a) golden path \u2014 card \u2192 claim \u2192 run \u2192 gate \u2192 decide \u2192 `cards.move(done)` yields `run.succeeded`, `approval.approved` and one audit, invocation and event row each; (b) dual control \u2014 `required_decisions=2`, one approve stays pending, the same approver again is 409, a second approver closes; (c) retry \u2014 `kill -9` mid-run leads to `run.reap`, a crashed run, then `attempt=2` with two rows and never two live runs; (d) andon \u2014 engaged gives 409 and a pending `run.execute` for 60 s, released resumes within one poll; (e) delivery retry \u2014 a stub 500 gives `attempts=5`, `state=failed`, one row; (f) no timers \u2014 `rg &#39;setInterval&#39; crates apps` is empty and every cadence is a `schedule` row; (g) human vs agent \u2014 `decided_by_kind` is `human` for one decision and `agent` for the other. The instrument is `acceptance/programme/S06.toml`; the close gate is decided by an approver other than its requester. The snapshot records no run of these properties and no Phase-G review; this rework records the level `non_conformant` rather than claiming a pass.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V1 slice S06 (SPEC \u00a78 S6) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter and the delivery contract, take the scope baseline with the one WBS deliverable, record the Phase-G compliance review, publish the expected outputs (`project-brief`, `evidence`) and the closure decision, and re-close through the acceptance instrument once its properties run.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the control-plane slice of the plan: the six tables of `02-DATA-ARCHITECTURE \u00a72.6` (`channel_binding`, `channel_preference`, `message`, `delivery`, `audience`, `audience_member` \u2014 the last two PENDING-S0), the 17 actions, the 17 events, the SSE topics `run:{id}`, `approval:{id}` and `tenant`, the Telegram in/out path with its sender-identity resolution, the andon gauge and poller pause, and the job kinds that replace 11 of fr&#39;s 14 timers (three deleted). Out of scope: the signed mcp_server channel (S06a), MCP tool surfacing (S10), `project_request.timeout` (S07), the UI (S12) and the audience screens (PENDING-S0).&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-26T23:38:36.518039+00:00&quot;,
+      &quot;id&quot;: &quot;01a21a39-aa69-7167-8696-e615aa3b012f&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d2a-7007-bcd8-29bb24f36b54&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 S06 Control Plane (retrospective, 2026-11-27)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T23:38:36.773008+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-5/S06-bodies/S06/statement-of-architecture-work.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

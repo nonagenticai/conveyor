@@ -1,23 +1,25 @@
 #![forbid(unsafe_code)]
 //! T3 — the PM job (SPEC_V2 §6.1, §5.4, §8.4; issue #74).
 //!
-//! The PM is a job, not a code path: every action here names the caller's `job_binding_id` and
-//! refuses unless that binding resolves to an active `job_catalogue(job_key='pm')` job. The
-//! PM creates the project, writes its charter, plans the WBS, takes the baseline, routes the
-//! gates with typed evidence, requests a baseline change, and closes the project after the
-//! closure gate — never approving any of those gates itself (the store's single decision
-//! writer already refuses a requester's decision, T1/#72).
+//! The PM is a job, not a code path: the PM's own actions name the caller's `job_binding_id` and
+//! refuse unless that binding resolves to an active `job_catalogue(job_key='pm')` job. The one
+//! exception is `changes.request`: a tenant with no PM process satisfies the WBS change guard
+//! through the project's approved scope baseline instead (v1-change-1). The PM creates the
+//! project, writes its charter, plans the WBS, takes the baseline, routes the gates with typed
+//! evidence, requests a baseline change, and closes the project after the closure gate — never
+//! approving any of those gates itself (the store's single decision writer already refuses a
+//! requester's decision, T1/#72).
 //!
 //! Reused, not rebuilt: the approval primitive, the WBS/baseline/register rows (T1, 0044), the
 //! governed-asset lifecycle (S07), the project/board/start-card creation (S13), and the trace
 //! edge (S07).
 
-use conveyor_domain::spine::WsjfInputs;
+use conveyor_domain::spine::{WbsKind, WsjfInputs};
 use conveyor_domain::{ApprovalStatus, AssetKind, AssetStatus};
 use conveyor_store as store;
 use conveyor_store::approval::{ApprovalRecord, NewApproval};
 use conveyor_store::governance::NewAsset;
-use conveyor_store::spine::{NewRegisterItem, NewWbsNode};
+use conveyor_store::spine::{NewRegisterItem, NewWbsNode, PlanStoreError};
 use conveyor_store::trace_link::NewTraceLink;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -26,7 +28,7 @@ use sqlx::PgConnection;
 use uuid::Uuid;
 
 use crate::board::projects::{insert_board_from_template, insert_start_card_and_run};
-use crate::control::store_error;
+use crate::control::{invalid, store_error};
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 
@@ -309,6 +311,10 @@ async fn assert_pm(
 
 /// Insert one approval and return its id.
 ///
+/// The tenant's gate policy row (`approval_policies.set` on the gate's name) is the floor: the
+/// caller may ask for more decisions, never fewer. The row's approver kind and the floor it set
+/// are recorded on the approval, which is what the decide path reads.
+///
 /// `pub(crate)`: `projects.charter` (the existing-project charter path) opens the same gate
 /// `pm.charter` opens, and must not grow a second approval writer.
 pub(crate) async fn open_gate(
@@ -317,14 +323,49 @@ pub(crate) async fn open_gate(
     project_id: Uuid,
     gate: &str,
     kind: &str,
-    required_decisions: u16,
-    meta: Value,
+    requested_decisions: Option<u16>,
+    mut meta: Value,
 ) -> Result<Uuid, ActionError> {
+    // An absent row is the strict default (one human decision), never a waiver. A row this
+    // build cannot parse is treated the same way: the gate opens at the default, and the decide
+    // path independently refuses a non-human decider it cannot authorise.
+    let (policy, source) = match store::approval_policy::get(&mut *conn, ctx.tenant, gate).await {
+        Ok(Some(policy)) => (policy, "tenant"),
+        Ok(None) => (
+            store::approval_policy::ApprovalPolicy::default_for(gate),
+            "default",
+        ),
+        Err(store::approval_policy::ApprovalPolicyStoreError::Database(error)) => {
+            tracing::error!(%error, "pm: read gate policy");
+            return Err(ActionError::internal());
+        }
+        Err(other) => {
+            // A row the build cannot parse is a configuration fault, not a waiver: falling back
+            // to the default would let a corrupted row lower the tenant's floor silently.
+            tracing::error!(%other, gate, "pm: unreadable gate policy");
+            return Err(ActionError::internal());
+        }
+    };
+    let floor = policy.required_decisions;
+    // ⛔ A caller may raise the quorum, never lower the tenant's floor.
+    let required_decisions = requested_decisions.unwrap_or(floor).max(floor);
+    let Some(meta) = meta.as_object_mut() else {
+        tracing::error!(gate, "pm: gate meta is not an object");
+        return Err(ActionError::internal());
+    };
+    meta.insert(
+        "approver_kind".to_owned(),
+        json!(policy.approver_kind.as_str()),
+    );
+    meta.insert(
+        "gate_policy".to_owned(),
+        json!({"source": source, "floor": floor}),
+    );
     let mut approval = NewApproval::new(gate, kind);
     approval.project_id = Some(project_id);
     approval.required_decisions = required_decisions;
     approval.requested_by = Some(ctx.actor_id);
-    approval.meta = meta;
+    approval.meta = Value::Object(std::mem::take(meta));
     let record = store::approval::insert_approval_tx(&mut *conn, ctx.tenant, &approval)
         .await
         .map_err(|error| {
@@ -506,7 +547,7 @@ async fn pm_charter(
         project.id,
         "charter",
         "pm",
-        1,
+        None,
         json!({
             "charter_asset_id": asset.id.to_string(),
             "description": format!("Approve the charter for {}", project.key),
@@ -529,6 +570,10 @@ pub struct PmWbsNode {
     pub kind: String,
     /// The node's title.
     pub title: String,
+    /// The card a `work_package` node executes. Required for that kind — a work package with no
+    /// card has no path to the work (SPEC_V2 §5.1, v1-p5-5) — and ignored for the other kinds.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub card_id: Option<Uuid>,
     /// The index (in this array) of the parent node.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub parent_index: Option<usize>,
@@ -558,6 +603,11 @@ pub struct PmPlanIn {
     /// `scope | schedule | cost`; `scope` when absent.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub baseline_kind: Option<String>,
+    /// The approved change request that names the baseline this plan replaces (§6.1). Required
+    /// when the project already holds an approved baseline of `baseline_kind`; an initial
+    /// baseline needs none.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub change_id: Option<Uuid>,
 }
 
 /// `pm.plan`'s result.
@@ -588,7 +638,15 @@ async fn pm_plan(
     input: PmPlanIn,
 ) -> Result<HandlerOutput<PmPlanOut>, ActionError> {
     assert_pm(&mut *tx, ctx.tenant, input.job_binding_id).await?;
-    plan_project(tx, &ctx, input.project_id, input.wbs, input.baseline_kind).await
+    plan_project(
+        tx,
+        &ctx,
+        input.project_id,
+        input.wbs,
+        input.baseline_kind,
+        input.change_id,
+    )
+    .await
 }
 
 /// `projects.baseline` — the charter-gated plan without a PM job binding.
@@ -605,6 +663,10 @@ pub struct ProjectBaselineIn {
     /// `scope | schedule | cost`; `scope` when absent.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub baseline_kind: Option<String>,
+    /// The approved change request that names the baseline this plan replaces (§6.1); required
+    /// only when the project already holds an approved baseline of `baseline_kind`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub change_id: Option<Uuid>,
 }
 
 #[crate::action(
@@ -623,7 +685,15 @@ async fn projects_baseline(
     ctx: HandlerCtx,
     input: ProjectBaselineIn,
 ) -> Result<HandlerOutput<PmPlanOut>, ActionError> {
-    plan_project(tx, &ctx, input.project_id, input.wbs, input.baseline_kind).await
+    plan_project(
+        tx,
+        &ctx,
+        input.project_id,
+        input.wbs,
+        input.baseline_kind,
+        input.change_id,
+    )
+    .await
 }
 
 /// The charter-gated plan shared by `pm.plan` and `projects.baseline`: WBS nodes, the baseline
@@ -634,6 +704,7 @@ async fn plan_project(
     project_id: Uuid,
     wbs: Vec<PmWbsNode>,
     baseline_kind: Option<String>,
+    change_id: Option<Uuid>,
 ) -> Result<HandlerOutput<PmPlanOut>, ActionError> {
     let charter_gate = approved_gate(&mut *tx, ctx.tenant, project_id, "charter").await?;
     let Some(_charter_gate) = charter_gate else {
@@ -643,6 +714,17 @@ async fn plan_project(
             "the charter gate must be approved before the project can be planned",
         ));
     };
+    let kind = baseline_kind.unwrap_or_else(|| "scope".to_owned());
+    if !matches!(kind.as_str(), "scope" | "schedule" | "cost") {
+        return Err(ActionError::new(
+            422,
+            "unknown_kind",
+            "baseline_kind must be scope, schedule or cost",
+        ));
+    }
+    // §6.1: replacing an approved baseline needs a named, approved change request. The guard
+    // runs BEFORE the WBS inserts so a refused re-plan writes nothing — no duplicate WBS.
+    crate::spine::baseline_change_guard(&mut *tx, ctx, project_id, &kind, change_id).await?;
     let mut wbs_ids = Vec::with_capacity(wbs.len());
     for node in &wbs {
         let parent_id = match node.parent_index {
@@ -655,6 +737,15 @@ async fn plan_project(
             })?),
             None => None,
         };
+        // v1-p5-5 (SPEC_V2 §5.1): a work-package node names the card that executes it; every
+        // other kind has no executor and stores none.
+        let card_id = if node.kind.trim() == WbsKind::WorkPackage.as_str() {
+            Some(node.card_id.ok_or_else(|| {
+                crate::spine::spine_error(PlanStoreError::CardRequired, ctx.action)
+            })?)
+        } else {
+            None
+        };
         let row = store::spine::insert_wbs_tx(
             &mut *tx,
             ctx.tenant,
@@ -666,6 +757,7 @@ async fn plan_project(
                 title: node.title.clone(),
                 body: String::new(),
                 acceptance: Value::Array(Vec::new()),
+                card_id,
                 inputs: WsjfInputs {
                     business_value: node.business_value,
                     time_criticality: node.time_criticality,
@@ -682,28 +774,15 @@ async fn plan_project(
         })?;
         wbs_ids.push(row.id);
     }
-    let kind = baseline_kind.unwrap_or_else(|| "scope".to_owned());
-    if !matches!(kind.as_str(), "scope" | "schedule" | "cost") {
-        return Err(ActionError::new(
-            422,
-            "unknown_kind",
-            "baseline_kind must be scope, schedule or cost",
-        ));
-    }
     let baseline =
-        store::spine::take_baseline_tx(&mut *tx, ctx.tenant, project_id, &kind, ctx.actor_id, None)
-            .await
-            .map_err(|error| {
-                tracing::error!(%error, "pm.plan: take baseline");
-                ActionError::internal()
-            })?;
+        crate::spine::take_baseline_linked(&mut *tx, ctx, project_id, &kind, change_id).await?;
     let approval_id = open_gate(
         &mut *tx,
         ctx,
         project_id,
         "baseline",
         "pm",
-        1,
+        None,
         json!({
             "baseline_id": baseline.id.to_string(),
             "description": format!("Approve the {kind} baseline"),
@@ -731,9 +810,18 @@ pub struct PmGateIn {
     /// How many distinct approvals resolve it; defaults to one.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub required_decisions: Option<u16>,
-    /// The typed evidence the gate resolves against.
+    /// The typed evidence the gate resolves against. §5.4: a gate with no evidence is refused
+    /// (`422 gate_evidence_missing`); the only opt-out is [`Self::evidence_waiver`].
     #[serde(default)]
     pub evidence: Vec<EvidenceRef>,
+    /// Why this gate carries no evidence — the explicit §5.4 override.
+    ///
+    /// A gate is required to name the artefact or run it judges. There is no boolean that turns
+    /// that off: the one override is this non-empty reason, which is stored on the approval
+    /// (`meta.evidence_waiver`) so the override is a row the governance audit reads, not a
+    /// caller's unrecorded flag.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub evidence_waiver: Option<String>,
     /// Refuse an empty evidence list when true.
     #[serde(default)]
     pub require_evidence: bool,
@@ -798,7 +886,7 @@ async fn pm_route_gate(
     // T9 (SPEC_V2 §8.1, D63): a delivery project cannot pass its design gate without the live
     // architecture contract that governs it. The refusal writes no approval row.
     if gate == "design" {
-        store::architecture::assert_design_contract_tx(&mut *tx, ctx.tenant, input.project_id)
+        store::architecture::assert_phase_g_tx(&mut *tx, ctx.tenant, input.project_id)
             .await
             .map_err(|error| match error {
                 store::architecture::ArchitectureStoreError::Database(error) => {
@@ -811,6 +899,20 @@ async fn pm_route_gate(
                     "architecture_contract_not_live",
                     format!("the delivery project's architecture contract is not live: {status}"),
                 ),
+                store::architecture::ArchitectureStoreError::Illegal(
+                    store::architecture::ArchitectureRule::ComplianceReviewMissing,
+                ) => ActionError::new(
+                    409,
+                    "architecture_review_missing",
+                    "the delivery project's live delivery contract has no Phase-G compliance review",
+                ),
+                store::architecture::ArchitectureStoreError::Illegal(
+                    store::architecture::ArchitectureRule::ComplianceWaiverMissing,
+                ) => ActionError::new(
+                    409,
+                    "architecture_review_non_conformant",
+                    "the Phase-G compliance review is non-conformant; an active waiver is required",
+                ),
                 _ => ActionError::new(
                     409,
                     "architecture_contract_missing",
@@ -818,12 +920,31 @@ async fn pm_route_gate(
                 ),
             })?;
     }
+    // SPEC_V2 §5.4: a gate with no evidence is refused. The one override is an explicit,
+    // recorded waiver reason; a caller's flag alone cannot open an evidence-less gate.
+    let waiver = input
+        .evidence_waiver
+        .as_deref()
+        .map(str::trim)
+        .filter(|reason| !reason.is_empty());
+    if input.evidence.is_empty() && waiver.is_none() {
+        return Err(ActionError::new(
+            422,
+            "gate_evidence_missing",
+            "a gate needs at least one typed evidence reference; pass `evidence`, or record an \
+             explicit `evidence_waiver` reason (the waiver is stored on the approval)",
+        ));
+    }
     let evidence = resolve_evidence(
         &mut *tx,
         ctx.tenant,
         &input.evidence,
-        input.require_evidence,
-        &input.required_kinds,
+        input.require_evidence && waiver.is_none(),
+        if waiver.is_none() {
+            &input.required_kinds
+        } else {
+            &[]
+        },
         input.pinned_spec_sha256.as_deref(),
     )
     .await?;
@@ -831,11 +952,23 @@ async fn pm_route_gate(
         "description": input.description,
         "evidence": evidence,
     });
+    if let Some(reason) = waiver {
+        // The override is recorded where the governance audit reads it (§5.4).
+        meta["evidence_waiver"] = json!(reason);
+    }
     if let Some(pin) = input.pinned_spec_sha256.as_deref() {
         meta["pinned_spec_sha256"] = Value::String(pin.to_owned());
     }
-    let approval_id =
-        open_gate(&mut *tx, &ctx, input.project_id, gate, kind, required, meta).await?;
+    let approval_id = open_gate(
+        &mut *tx,
+        &ctx,
+        input.project_id,
+        gate,
+        kind,
+        Some(required),
+        meta,
+    )
+    .await?;
     Ok(HandlerOutput::created(PmGateOut { approval_id }))
 }
 
@@ -957,6 +1090,23 @@ async fn pm_close(
             "only an open project can be closed",
         ));
     };
+    // The row is not the whole close: a consumer subscribed to the project aggregate must see
+    // it, so the event is appended in the same transaction as the status change (v1-project-1).
+    let event = store::NewEvent {
+        topic: format!("project:{}", project.id),
+        event_type: "project.updated".to_owned(),
+        aggregate_type: "project".to_owned(),
+        aggregate_id: project.id,
+        payload: json!({"id": project.id, "changed": ["status"]}),
+        correlation_id: None,
+        causation_id: None,
+    };
+    store::outbox::append(&mut *tx, ctx.tenant, &event)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "pm.close: append project event");
+            ActionError::internal()
+        })?;
     Ok(HandlerOutput::created(PmCloseOut {
         project_id: closed.id,
         status: closed.status,
@@ -1076,22 +1226,179 @@ async fn pm_get(
     }))
 }
 
+/// `pm.status` — the PM's status report: a draft governed asset computed from the live row.
+///
+/// §6.1 lists the status report among the PM's outputs. The body is not free prose: it is
+/// recomputed from the project, its WBS, every baseline, every gate and the open changes, and
+/// the caller's narrative sits beside those citations. The asset is written `draft` — the
+/// report is gated and versioned like every governed artefact, never published by this action.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct PmStatusIn {
+    /// The PM's active job binding.
+    pub job_binding_id: Uuid,
+    /// The project the report is about.
+    pub project_id: Uuid,
+    /// The PM's status narrative.
+    pub narrative: String,
+}
+
+/// `pm.status`'s result.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct PmStatusOut {
+    /// The project.
+    pub project_id: Uuid,
+    /// The draft status-report asset.
+    pub status_report_asset_id: Uuid,
+}
+
+#[crate::action(
+    name = "pm.status",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn pm_status(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: PmStatusIn,
+) -> Result<HandlerOutput<PmStatusOut>, ActionError> {
+    // Input is refused before the binding is resolved: an empty narrative is not a report.
+    let narrative = input.narrative.trim();
+    if narrative.is_empty() {
+        return Err(invalid(
+            "narrative",
+            "status_narrative_required",
+            "a status report needs the PM's narrative in `narrative`",
+        ));
+    }
+    assert_pm(&mut *tx, ctx.tenant, input.job_binding_id).await?;
+    let project = store::project::get_project_tx(&mut *tx, ctx.tenant, input.project_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "pm.status: read project");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| ActionError::resource_not_found("project"))?;
+    let wbs = store::spine::list_wbs_tx(&mut *tx, ctx.tenant, input.project_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "pm.status: wbs");
+            ActionError::internal()
+        })?;
+    let baselines = store::spine::list_baselines_tx(&mut *tx, ctx.tenant, input.project_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "pm.status: baselines");
+            ActionError::internal()
+        })?;
+    let gates: Vec<(Uuid, String, String)> = sqlx::query_as(
+        "SELECT id, gate, status FROM approval WHERE tenant_id = $1 AND project_id = $2 \
+         ORDER BY created_at DESC, id DESC",
+    )
+    .bind(ctx.tenant.as_uuid())
+    .bind(input.project_id)
+    .fetch_all(&mut *tx)
+    .await
+    .map_err(|error| {
+        tracing::error!(%error, "pm.status: gates");
+        ActionError::internal()
+    })?;
+    let changes =
+        store::spine::list_register_tx(&mut *tx, ctx.tenant, input.project_id, Some("change"))
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "pm.status: changes");
+                ActionError::internal()
+            })?;
+    // Every citation is the live row, by id — the same rows the gates and the baseline read.
+    // `open` is a change the change gate has not approved yet (approval sets `approved`).
+    let report = json!({
+        "narrative": narrative,
+        "project": {
+            "id": project.id,
+            "key": project.key,
+            "name": project.name,
+            "status": project.status,
+            "version": project.version,
+        },
+        "baselines": baselines
+            .iter()
+            .map(|row| json!({
+                "id": row.id, "kind": row.kind, "approved_by": row.approved_by,
+                "change_id": row.change_id, "taken_at": row.taken_at,
+            }))
+            .collect::<Vec<_>>(),
+        "wbs": wbs
+            .iter()
+            .map(|node| json!({
+                "id": node.id, "kind": node.kind, "title": node.title, "status": node.status,
+            }))
+            .collect::<Vec<_>>(),
+        "gates": gates
+            .iter()
+            .map(|(id, gate, status)| json!({ "id": id, "gate": gate, "status": status }))
+            .collect::<Vec<_>>(),
+        "pending_changes": changes
+            .iter()
+            .filter(|row| row.status == "open")
+            .map(|row| json!({
+                "id": row.id, "title": row.title, "status": row.status,
+                "baseline_ref": row.baseline_ref,
+            }))
+            .collect::<Vec<_>>(),
+    });
+    // A `Value` has no serialisation failure: the pretty form is the readable report, the
+    // compact form the fallback no caller should ever see.
+    let body = serde_json::to_string_pretty(&report).unwrap_or_else(|_| report.to_string());
+    let mut asset = NewAsset::new(
+        AssetKind::StatusReport,
+        format!("{}-STATUS-{}", project.key, Uuid::now_v7().simple()),
+        format!("Status report — {}", project.name),
+    );
+    asset.body = body;
+    asset.project_id = Some(project.id);
+    asset.owner_user_id = Some(ctx.actor_id);
+    asset.author_id = Some(ctx.actor_id);
+    // Draft: the report is gated and versioned like every governed artefact; this action
+    // never opens a gate and never publishes.
+    let asset = store::governance::insert_asset_tx(&mut *tx, ctx.tenant, &asset)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "pm.status: insert status report");
+            ActionError::internal()
+        })?;
+    Ok(HandlerOutput::created(PmStatusOut {
+        project_id: project.id,
+        status_report_asset_id: asset.id,
+    }))
+}
+
 /// `changes.request` — the only path that advances an approved baseline.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct ChangeRequestIn {
-    /// The PM's active job binding.
-    pub job_binding_id: Uuid,
+    /// The PM's active job binding — the process route. Omit it to authorise the change by the
+    /// project's approved scope baseline in `baseline_id`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub job_binding_id: Option<Uuid>,
     /// The project.
     pub project_id: Uuid,
-    /// The approved baseline the change would replace.
-    pub baseline_id: Uuid,
+    /// The approved baseline the change would replace. Required on the direct route (no
+    /// `job_binding_id`), where it must be the project's current approved scope baseline.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub baseline_id: Option<Uuid>,
     /// The change's title.
     pub title: String,
     /// The change's body.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub body: Option<String>,
-    /// The impact block (required by the register's CHECK).
-    pub impact: i64,
+    /// The scope/schedule/cost/risk impact block (SPEC_V2 §5.5): an object carrying at least
+    /// one of `scope`, `schedule`, `cost` or `risk`. It is stored in the change's `meta`.
+    pub impact: Value,
 }
 
 /// `changes.request`'s result.
@@ -1130,16 +1437,43 @@ async fn changes_request(
             "a change request needs a rationale in `body`",
         ));
     }
-    assert_pm(&mut *tx, ctx.tenant, input.job_binding_id).await?;
-    let impact = i32::try_from(input.impact)
-        .map_err(|_| ActionError::new(422, "invalid_value", "impact must fit a 32-bit integer"))?;
+    // Two authorities: a PM process run's active binding, or — for a tenant that has no PM
+    // process — the project's current approved scope baseline itself (v1-change-1). The direct
+    // route validates exactly what the WBS change guard resolves, so the change it opens can
+    // authorise a post-baseline mutation.
+    let baseline_id = match (input.job_binding_id, input.baseline_id) {
+        (None, None) => {
+            return Err(invalid(
+                "job_binding_id",
+                "change_authority_missing",
+                "a change needs the PM job's active `job_binding_id` or the project's approved \
+                 scope baseline in `baseline_id`",
+            ));
+        }
+        (Some(binding_id), Some(baseline_id)) => {
+            assert_pm(&mut *tx, ctx.tenant, binding_id).await?;
+            baseline_id
+        }
+        (Some(binding_id), None) => {
+            assert_pm(&mut *tx, ctx.tenant, binding_id).await?;
+            return Err(invalid(
+                "baseline_id",
+                "baseline_required",
+                "the process route names the approved baseline the change would replace",
+            ));
+        }
+        (None, Some(baseline_id)) => {
+            assert_direct_change_baseline(&mut *tx, &ctx, input.project_id, baseline_id).await?;
+            baseline_id
+        }
+    };
     // The change gate resolves the approved baseline it would replace before it is opened.
     let evidence = resolve_evidence(
         &mut *tx,
         ctx.tenant,
         &[EvidenceRef {
             kind: "baseline".to_owned(),
-            id: input.baseline_id,
+            id: baseline_id,
         }],
         true,
         // A change gate requires its baseline and nothing else: no proof can answer it, so it
@@ -1154,7 +1488,8 @@ async fn changes_request(
         &mut *tx,
         ctx.tenant,
         &NewRegisterItem {
-            project_id: input.project_id,
+            project_id: Some(input.project_id),
+            programme_id: None,
             kind: "change".to_owned(),
             code: String::new(),
             title: input.title,
@@ -1163,9 +1498,13 @@ async fn changes_request(
             status: "open".to_owned(),
             severity: None,
             probability: None,
-            impact: Some(impact),
+            impact: None,
             links: Value::Array(Vec::new()),
-            baseline_ref: Some(input.baseline_id),
+            baseline_ref: Some(baseline_id),
+            review_at: None,
+            response: None,
+            // The store validates the block (at least one of the four impact keys) in
+            // `insert_register_tx`; the numeric `impact` column stays empty for a change.
             meta: json!({ "impact": input.impact }),
         },
     )
@@ -1180,7 +1519,7 @@ async fn changes_request(
         input.project_id,
         "change",
         "pm",
-        1,
+        None,
         json!({
             "change_id": change.id.to_string(),
             "description": format!("Approve change {}", change.id),
@@ -1192,6 +1531,71 @@ async fn changes_request(
         change_id: change.id,
         approval_id,
     }))
+}
+
+/// The direct route's authority: `baseline_id` must be the project's current approved scope
+/// baseline. That is the baseline `wbs_change_guard` resolves, so a change opened against it is
+/// one the guard can accept; an older approved baseline, another project's row or an unapproved
+/// row would open a change that authorises nothing.
+async fn assert_direct_change_baseline(
+    conn: &mut PgConnection,
+    ctx: &HandlerCtx,
+    project_id: Uuid,
+    baseline_id: Uuid,
+) -> Result<(), ActionError> {
+    let baseline = store::spine::get_baseline_tx(&mut *conn, ctx.tenant, baseline_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "changes.request: read baseline");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| {
+            invalid(
+                "baseline_id",
+                "not_found",
+                format!("no baseline {baseline_id} in this tenant"),
+            )
+        })?;
+    if baseline.project_id != project_id {
+        return Err(invalid(
+            "baseline_id",
+            "baseline_project_mismatch",
+            format!("baseline {baseline_id} belongs to another project"),
+        ));
+    }
+    if baseline.kind != "scope" {
+        return Err(invalid(
+            "baseline_id",
+            "baseline_not_scope",
+            format!(
+                "baseline {baseline_id} is a {} baseline; the direct route needs the scope \
+                 baseline",
+                baseline.kind
+            ),
+        ));
+    }
+    if baseline.approved_by.is_none() {
+        return Err(invalid(
+            "baseline_id",
+            "baseline_not_approved",
+            format!("baseline {baseline_id} is not approved"),
+        ));
+    }
+    let current =
+        store::spine::latest_approved_baseline_tx(&mut *conn, ctx.tenant, project_id, "scope")
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "changes.request: read the current scope baseline");
+                ActionError::internal()
+            })?;
+    if current.as_ref().map(|row| row.id) != Some(baseline_id) {
+        return Err(invalid(
+            "baseline_id",
+            "baseline_not_current",
+            format!("baseline {baseline_id} is not the project's current approved scope baseline"),
+        ));
+    }
+    Ok(())
 }
 
 /// Move a governed asset to `approved` through its legal lifecycle.
@@ -1336,7 +1740,7 @@ pub(crate) async fn apply_gate_effect_tx(
             if kind != "governed_asset" {
                 continue;
             }
-            if let Err(error) = store::trace_link::insert_trace_link_tx(
+            match store::trace_link::insert_trace_link_if_absent_tx(
                 &mut *tx,
                 tenant,
                 &NewTraceLink {
@@ -1349,8 +1753,22 @@ pub(crate) async fn apply_gate_effect_tx(
             )
             .await
             {
-                // A duplicate edge is the same fact recorded twice; anything else is real.
-                tracing::warn!(%error, "gate effect: trace edge");
+                // The same fact recorded twice: the statement is `ON CONFLICT DO NOTHING`, so
+                // the duplicate is a no-op and the decision's transaction stays usable.
+                Ok(_) => {}
+                // Every non-conflict failure is the decision's real cause. Returning it here
+                // stops a later statement from masking it as an aborted transaction.
+                Err(store::trace_link::TraceLinkStoreError::EndNotFound { .. }) => {
+                    return Err(ActionError::new(
+                        409,
+                        "gate_evidence_not_found",
+                        format!("the gate's evidence {id} no longer resolves in this tenant"),
+                    ));
+                }
+                Err(error) => {
+                    tracing::error!(%error, "gate effect: trace edge");
+                    return Err(ActionError::internal());
+                }
             }
         }
     }

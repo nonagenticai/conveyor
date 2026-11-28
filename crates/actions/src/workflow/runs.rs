@@ -111,6 +111,7 @@ pub fn service_ctx(tenant: TenantId, app_key: &str) -> HandlerCtx {
         action: "workflow_runs.start",
         app_key: app_key.to_owned(),
         approval_id: None,
+        usage: None,
     }
 }
 
@@ -182,6 +183,37 @@ pub async fn start_published_tx(
         ));
     }
 
+    // S15's run wiring: a run that names an executor carries that executor's capability. The
+    // SAME readiness guard the process seam runs applies here — before the run row — so a
+    // required pack nobody published refuses with `409 capability_not_ready` instead of a run
+    // carrying `capability_id: None`. A run that names no executor declares no capability (an
+    // `agent.run` node then carries its whole config, CONTRACT §17), so there is nothing to
+    // check. A child run is a step already executing inside a started process, which passed
+    // readiness itself; re-checking there would break a live run when a pack changes.
+    let (capability_id, bound_agents) = match capability_agent_id {
+        Some(agent_id) => {
+            let agent = store::capability::get_agent_tx(&mut *tx, ctx.tenant, agent_id)
+                .await
+                .map_err(|error| {
+                    tracing::error!(%error, action, "read the workflow run's capability agent");
+                    ActionError::internal()
+                })?
+                .ok_or_else(|| ActionError::resource_not_found("capability agent"))?;
+            (Some(agent.capability_id), vec![agent_id])
+        }
+        None => (None, Vec::new()),
+    };
+    if parent.is_none() {
+        crate::capability::readiness::ensure_run_start_ready_tx(
+            &mut *tx,
+            ctx.tenant,
+            capability_id,
+            &bound_agents,
+            action,
+        )
+        .await?;
+    }
+
     let inputs = if inputs.is_null() { json!({}) } else { inputs };
     let attempt = match &card {
         Some(card) => store::run::next_attempt_for_card_tx(&mut *tx, ctx.tenant, card.id)
@@ -196,11 +228,10 @@ pub async fn start_published_tx(
         correlation_id: None,
         process_id: None,
         inputs,
-        // S15's run wiring resolves a capability; until then the explicit-input path is the
-        // whole gate (S13 §5.3 "Sequencing"). The executor id is the caller's: S13 step 8
-        // added the column pass-through so a resolved `capability_agent` reaches the step
-        // executor without S15 editing this action.
-        capability_id: None,
+        // The executor's capability, resolved above and guarded before this row. The executor
+        // id is the caller's: S13 step 8 added the column pass-through so a resolved
+        // `capability_agent` reaches the step executor.
+        capability_id,
         capability_agent_id,
         // A call step's workflow is a CHILD of the calling run; every other caller is a root.
         // `insert_child_run_tx` derives the depth and enforces the one-live-child rule.
@@ -211,6 +242,8 @@ pub async fn start_published_tx(
         workflow_step_id: None,
         depth: 0,
         process_version: 1,
+        // A workflow run is typed as such; a child copies its parent's kind in the store.
+        kind: store::run::RunKind::Workflow,
         // Workflow runs carry no organisation pin of their own (T0); a child inherits its
         // parent's pin inside `insert_child_run_tx`.
         job_binding_id: None,

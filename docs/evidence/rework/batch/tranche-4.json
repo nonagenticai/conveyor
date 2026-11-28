@@ -1,0 +1,18 @@
+{
+  "blocked": 0,
+  "generated_at": "2026-11-26T22:52:42+00:00",
+  "green": 1,
+  "members": [
+    {
+      "factory_exit": 0,
+      "gaps": [],
+      "key": "T14",
+      "log": "docs/evidence/rework/batch/tranche-4/T14.log",
+      "publish_exit": 1,
+      "state": "RECEIPT_GREEN"
+    }
+  ],
+  "red": 0,
+  "snapshot_sha": "18276de5e8ad4d19fa4c783109dbada1aa107be9",
+  "tranche": 4
+}

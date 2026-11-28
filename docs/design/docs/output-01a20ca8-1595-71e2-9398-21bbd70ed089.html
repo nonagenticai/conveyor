@@ -23,118 +23,27 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1>T19 — Decision forums: evidence</h1>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="evidence" data-provenance-version="2" data-provenance-hash="10ba40ec793b22ea54161d16292c622c5f5f53ede1abead46991deade4d80ff3" data-provenance-status="active" data-provenance-owner="FR Test" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>evidence</dd></div><div><dt>Version</dt><dd>2</dd></div><div><dt>SHA-256</dt><dd>10ba40ec793b22ea54161d16292c622c5f5f53ede1abead46991deade4d80ff3</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>FR Test</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Evidence — T19 Decision forums (meetings) (retrospective, 2026-11-24)</h1>
 <h2>Claim</h2>
-<p>Issue #606's D1–D8 are implemented on <code>issue/606-t19-meetings</code> and exercised on the deployed
-engine (<code>a8f67c3e</code>): the meeting is a typed card whose agenda resolves existing approvals, whose
-seats record positions, and whose outcome is derived by arithmetic over those positions and the
-linked approval's stricter policy — with the human seat available in the web room, over Telegram
-and over MCP, and the minutes a chaired governed asset. The live gate is recorded below.</p>
+<p>T19 is the decision-forums slice of the conveyor — meetings as cards plus typed records over the existing approval primitive — and its governance record is reconstructed here: seven approved Phase A–D artefacts, a Statement of Architecture Work, a delivery contract, one WBS deliverable and a Phase-G review, with the <code>project-brief</code> and <code>evidence</code> outputs. The pack claims the record's state at the 2026-11-24 snapshot; it does not claim a rework-time acceptance run; it records the retrospective re-close dated 2026-11-24.</p>
 <h2>Evidence</h2>
-<p>Every D-part has its named test file and every scenario has a passing row; the commands below were
-run at the branch head (the PR's CI is the merge gate).</p>
-<table><thead><tr><th>Part</th><th>Scenario</th><th>Evidence</th><th>Result</th></tr></thead><tbody>
-<tr><td>D1</td><td>one live meeting per cadence slot</td><td><code>crates/api/tests/meetings_policy.rs::a_second_live_meeting_in_a_slot_is_refused</code></td><td>pass</td></tr>
-<tr><td>D1</td><td>the meeting is a card with its DoD and <code>meeting.opened</code></td><td><code>meetings_policy.rs::a_meeting_is_a_card_with_its_dod</code></td><td>pass</td></tr>
-<tr><td>D1</td><td>the type version is pinned</td><td><code>meetings_policy.rs::a_meeting_pins_its_type_version</code></td><td>pass</td></tr>
-<tr><td>D1</td><td>a job seat writes one participant decision</td><td><code>meetings_policy.rs::a_job_seat_writes_a_participant_decision</code></td><td>pass</td></tr>
-<tr><td>D2</td><td>the item set is L0 over the sources</td><td><code>meetings_agenda.rs::the_item_set_is_l0_over_the_sources</code></td><td>pass</td></tr>
-<tr><td>D2</td><td>an item without evidence is 422</td><td><code>meetings_agenda.rs::an_item_without_evidence_is_refused</code></td><td>pass</td></tr>
-<tr><td>D2</td><td>one item, one approval</td><td><code>meetings_agenda.rs::an_item_names_exactly_one_approval</code></td><td>pass</td></tr>
-<tr><td>D3</td><td>one live position per participant</td><td><code>meetings_attendance.rs::one_live_position_per_participant</code></td><td>pass</td></tr>
-<tr><td>D3</td><td>a missing department defers <code>inquorate</code></td><td><code>meetings_attendance.rs::a_missing_department_defers_inquorate</code></td><td>pass</td></tr>
-<tr><td>D3</td><td>a closed item's position is immutable</td><td><code>meetings_attendance.rs::a_closed_item_position_is_immutable</code></td><td>pass</td></tr>
-<tr><td>D4</td><td>majority records each seat and keeps dissent</td><td><code>meetings_decision.rs::majority_records_each_seat_and_keeps_dissent</code></td><td>pass</td></tr>
-<tr><td>D4</td><td>a meeting never lowers dual control</td><td><code>meetings_decision.rs::a_meeting_never_lowers_dual_control</code></td><td>pass</td></tr>
-<tr><td>D4</td><td>a tie defers; observers never count</td><td><code>meetings_decision.rs::a_tie_defers_and_observers_do_not_count</code></td><td>pass</td></tr>
-<tr><td>D4</td><td>P4 excludes the judged seat</td><td><code>meetings_decision.rs::the_conflict_rule_excludes_the_judged_seat</code></td><td>pass</td></tr>
-<tr><td>D4</td><td>a unanimous reject resolves rejected</td><td><code>meetings_decision.rs::a_unanimous_reject_resolves_rejected</code></td><td>pass</td></tr>
-<tr><td>D5</td><td>a commitment needs owner and date</td><td><code>meetings_outcomes.rs::a_commitment_needs_owner_and_date</code></td><td>pass</td></tr>
-<tr><td>D5</td><td>an action becomes a card</td><td><code>meetings_outcomes.rs::an_action_becomes_a_card</code></td><td>pass</td></tr>
-<tr><td>D5</td><td>minutes need the chair and match the rows</td><td><code>meetings_outcomes.rs::minutes_need_the_chair_and_match_the_rows</code></td><td>pass</td></tr>
-<tr><td>D5</td><td>close refuses an open item</td><td><code>meetings_outcomes.rs::close_refuses_an_open_item</code></td><td>pass</td></tr>
-<tr><td>D6</td><td>the first decision across surfaces counts</td><td><code>meetings_human_seat.rs::the_first_decision_across_surfaces_counts</code></td><td>pass</td></tr>
-<tr><td>D6</td><td>the owner decides on web and MCP via meeting</td><td><code>meetings_human_seat.rs::the_owner_decides_on_web_and_mcp_via_meeting</code></td><td>pass</td></tr>
-<tr><td>D6</td><td>the ICS feed is a read</td><td><code>meetings_human_seat.rs::an_ics_feed_is_a_read</code></td><td>pass</td></tr>
-<tr><td>D7</td><td>participant-hours enter the roll-up</td><td><code>meetings_metering.rs::participant_hours_enter_the_rollup</code></td><td>pass</td></tr>
-<tr><td>D7</td><td>a never-decided forum is flagged</td><td><code>meetings_metering.rs::a_forum_with_no_decision_is_flagged</code></td><td>pass</td></tr>
-<tr><td>D8</td><td>a governance body convenes its standing meeting</td><td><code>meetings_console.rs::a_governance_body_convenes_its_standing_meeting</code></td><td>pass</td></tr>
-<tr><td>D8</td><td>a cadence slot resolves to a meeting</td><td><code>meetings_console.rs::a_cadence_slot_resolves_to_a_meeting</code></td><td>pass</td></tr>
-</tbody></table>
-<p>Supporting gates at the same head:</p>
-<table><thead><tr><th>Gate</th><th>Evidence</th><th>Result</th></tr></thead><tbody>
-<tr><td>the registry and the committed action dump agree (530 actions, 512 internal)</td><td><code>cargo test -p conveyor-actions --test registry</code></td><td>pass</td></tr>
-<tr><td>HTTP and MCP return the same body for all 530 actions</td><td><code>cargo test -p conveyor-actions --test parity_http_mcp</code></td><td>pass</td></tr>
-<tr><td>the migration ledger has <code>(65, "meetings")</code></td><td><code>cargo test -p conveyor-store migrate</code></td><td>pass</td></tr>
-<tr><td>the OpenAPI lock matches the 12 new operations</td><td><code>conveyor --print-openapi --write-lock</code> ran; <code>served-spec.lock.json</code> updated</td><td>pass</td></tr>
-<tr><td>the mock UI registers and renders the Meetings destination</td><td><code>node docs/design/scripts/check-v2.cjs</code>, <code>check-console.cjs</code></td><td>pass</td></tr>
-<tr><td>the real app's Meetings destination has a Playwright spec</td><td><code>apps/web/e2e/meetings.spec.ts</code> (empty, happy, refusal and phone/tablet layout)</td><td>runs in <code>web.yml</code> on the PR</td></tr>
-</tbody></table>
-<h3>The live gate — deployed <code>a8f67c3e</code>, tenant <code>nonagentic</code>, 2026-11-24</h3>
-<p>The human seat was exercised by the tenant's admin identity <code>FR Test</code> (app_user
-<code>01a1cf1e-09dd-7580-99cc-de395f3e86cc</code>), supplied by the owner for this proof; the evidence names
-the identity exactly and does not claim the owner's personal account. The meeting
-<code>01a20c8a-33ac-7f2a-b02f-0d2165ef05d5</code> was scheduled on the T19 board, opened, the chair invited
-and accepted, and two deciding items added (approvals <code>…5d47…</code> and <code>…bc7e…</code>). The seat approved
-item 1 in the web room and item 2 through the public <code>/mcp</code> transport; each item was closed from
-its own surface. The chair's minutes approval (<code>…a182</code>) was decided, the minutes governed asset
-<code>01a20ca3-7d7a-72f0-b63d-96a09064c6df</code> published, and the meeting closed at
-<code>2026-11-24T08:19:39Z</code>.</p>
-<p><code>python3 scripts/t19-live-gate-check.py --state docs/evidence/t19/live-gate.json --seed</code> reads the
-rows back through the deployed read actions — never SQL, never a captured fixture:</p>
-<table><thead><tr><th>Check</th><th>Result</th></tr></thead><tbody>
-<tr><td>the live project is T19 and its board is a row</td><td>pass</td></tr>
-<tr><td>one active <code>meeting</code> card type; benefit B7 is a row</td><td>pass</td></tr>
-<tr><td>the meeting is <code>closed</code>; two agenda items closed as <code>decision</code></td><td>pass</td></tr>
-<tr><td>web: one meeting decision row, approval <code>approved</code>, <code>via.channel='web'</code></td><td>pass</td></tr>
-<tr><td>mcp: one meeting decision row, approval <code>approved</code>, <code>via.channel='mcp'</code></td><td>pass</td></tr>
-<tr><td>both rows name one approver, and it is the seated principal</td><td>pass</td></tr>
-<tr><td>the minutes approval is <code>approved</code> (and <code>meetings.close</code> refuses without the published asset)</td><td>pass</td></tr>
-</tbody></table>
-<p>The gate found and closed two deployment defects, both in <code>gitops-production</code>:
-<code>CONVEYOR_MCP_ALLOWED_HOSTS</code> was unset, so rmcp's localhost-only allowlist answered every public
-handshake <code>403 Host header is not allowed</code> (#5429); and the MCP session lives in one pod's memory
-while the two-replica Service round-robins, so 6 of 8 post-initialize calls 404'd until a
-DestinationRule pinned the session on <code>mcp-session-id</code> (#5432). After the rollout, the same probe
-served 8 of 8.</p>
-<h2>Verification</h2>
-<pre><code class="language-bash">cargo test -p conveyor-api --test meetings_policy
-cargo test -p conveyor-api --test meetings_agenda
-cargo test -p conveyor-api --test meetings_attendance
-cargo test -p conveyor-api --test meetings_decision
-cargo test -p conveyor-api --test meetings_outcomes
-cargo test -p conveyor-api --test meetings_human_seat
-cargo test -p conveyor-api --test meetings_metering
-cargo test -p conveyor-api --test meetings_console
-cargo test -p conveyor-actions --test registry
-cargo test -p conveyor-actions --test parity_http_mcp
-cargo test -p conveyor-store migrate
-npx playwright test apps/web/e2e/meetings.spec.ts
-python3 scripts/t19-live-gate-check.py --state docs/evidence/t19/live-gate.json --seed
-</code></pre>
-<p>The Rust suites were run through <code>~/.claude/scripts/cargo-guard.py</code> on m4 (the estate's sanctioned
-interactive route); the compile/lint verdict is the branch's GitHub-hosted <code>preflight.yml</code>, and the
-PR's CI is the merge gate. The Playwright suite runs in <code>web.yml</code>, which is the first local-capable
-run of the real app (no <code>cargo-leptos</code> is installed on m4, and installing it would compile locally).</p>
-<h2>Links</h2>
 <ul>
-<li>Plan: <code>docs/plans/T19-decision-forums.md</code></li>
-<li>Issue: #606 (<code>Closes #606</code> in the PR); close-out: #650</li>
-<li>Specification: <code>docs/SPEC_V2.md</code> §6.8, §8.1–§8.3, §10.3–§10.5, §12 T19, D66</li>
-<li>Programme: <code>docs/design/Program_Architecture_and_Benefits_Realization.md</code>; B7 in <code>seed/programme-definition.json</code></li>
-<li>Architecture: <code>docs/plans/T19/architecture-design.md</code>; MSP: <code>docs/plans/T19/msp-profile.md</code>; SAFe: <code>docs/plans/T19/safe-epic.md</code></li>
-<li>Console: <code>apps/web/src/screens/meetings.rs</code>; design reference: <code>docs/design/v2.js</code> <code>meetings</code></li>
-<li>Live gate state and read-backs: <code>docs/evidence/t19/</code>; checker: <code>scripts/t19-live-gate-check.py</code></li>
-<li>Deployment fixes the gate required: gitops-production #5429 (MCP allowed hosts) and #5432 (MCP session affinity)</li>
+<li><strong>Project row:</strong> 01a20c80-b9b8-7214-abc6-f2c4f75a1fc1, key T19, "Decision forums (meetings)", status closed; meta adm_phase G, plateau capability, track v2, tranche 4, measured_status built, depends_on T1/T2/T3/P0, plan docs/SPEC_V2.md#12 (draft), expected_outputs project-brief and evidence, issues 605 and 606.</li>
+<li><strong>Issues:</strong> #605 "T19-0: plan and programme artefacts for decision forums (meetings)" and #606 "T19: decision forums — meetings as the decision forum", both CLOSED at the snapshot.</li>
+<li><strong>Artefacts:</strong> seven approved — stakeholder_map 01a20cdd-e71f-7d06-8ca5-701ff6b7d69e, driver_goal_objective 01a20cde-0f97-7f74-afd8-7cd74e0990e3, requirements_catalog 01a20cde-371c-7d85-ae2d-780453958bef, solution_concept 01a20cde-5f86-7720-9a16-36a964ef255d, business_capability_map 01a20cde-86d7-7257-a45e-b4731ab423a4, data_entity_catalog 01a20cde-adbf-7626-9b2b-58faf7164755, technology_standards 01a20cde-d6bd-7cfe-88ad-42a1e6db30a7.</li>
+<li><strong>Contracts and reviews:</strong> SoAW 01a20ce0-5183-776c-84bd-327f2301b19b (approval 01a20ce0-644d-7340-a696-1af10fa8c61e) and delivery contract 01a20cea-91bb-77f4-a880-044c90bb5f0e (approval 01a20cea-a68f-7e08-8d0c-399759ef16e0), both live; reviews 01a20ceb-5316-7ea3-95df-001bd0b15560 and 01a20ceb-66b2-75a4-ac9f-6ceae8ab187d, both conformant, decided by conveyor-approver on 2026-11-24.</li>
+<li><strong>Tranche:</strong> tranche 4 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce authorised at 2026-11-24T17:04:34Z by the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9.</li>
+<li><strong>Outputs:</strong> project-brief 01a20ca7-d162-7674-a022-cf2dff7b6cbd, inception-analysis 01a20ca7-e839-776b-a940-398db85449a8, architecture-design 01a20ca7-fee3-7296-82dd-142d538fcc35, evidence 01a20ca8-1595-71e2-9398-21bbd70ed089, closure-review 01a20ca8-2a1f-75bb-8dd2-fdde95e78a09, architecture-artifact 01a20ce4-73e4-7009-9ec7-eb2265e9e84e.</li>
 </ul>
+<h2>Verification</h2>
+<p>An independent reader can repeat the record check with <code>python3 scripts/rework-content-check.py --project T19 --content docs/evidence/rework/tranche-4/rework-content-T19.json --snapshot /tmp/conv526-w1-snap/data --wsjf 10,8,10,13 --closes false</code>, which validates the pack's shape, the seven-artefact set, the authored-prose gate, the WSJF inputs and every cited id against the snapshot. The row-level facts can be re-read with the programme record queries for project 01a20c80-b9b8-7214-abc6-f2c4f75a1fc1, its contracts and artefact rows, and <code>gh issue view 605</code> and <code>gh issue view 606</code>. The acceptance instrument is <code>acceptance/programme/T19.toml</code>; running it is the future verifier's job, not this pack's.</p>
+<h2>Links</h2>
+<p>SPEC_V2 §6.8 and the T19 row at §12; the slice plan <code>docs/plans/T19-decision-forums.md</code>; the acceptance gate <code>acceptance/programme/T19.toml</code>; the SoAW contract 01a20ce0-5183-776c-84bd-327f2301b19b and the delivery contract 01a20cea-91bb-77f4-a880-044c90bb5f0e; the project-brief output 01a20ca7-d162-7674-a022-cf2dff7b6cbd and the evidence output 01a20ca8-1595-71e2-9398-21bbd70ed089.</p>
 <h2>Gap</h2>
-<p>None. The live gate is recorded above at the deployed revision. Two items remain declared follow-ups
-rather than gaps: the <code>meeting_type</code> authoring route (a policy change is a new version through the
-governance route) and the T9 board / T10 cadence binding to meeting types; both are recorded as open
-items with owners in <code>docs/plans/T19/closure-review.md</code>.</p>
+<p>The snapshot holds no rework-time execution of <code>acceptance/programme/T19.toml</code>, the eight meetings suites or <code>meetings.spec.ts</code>, and no record of the live owner-seat gate; the closure claim rests on the project row, the CLOSED issues and the conformant contract reviews, not on measured output captured here. The pack records the retrospective re-close dated 2026-11-24 because the row reads <code>status: closed</code> and both captured issues are CLOSED. Until the acceptance instrument is run at a rework head, no verdict above consistent is evidenced.</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Decision forums (meetings) · conveyor output · published 2026-11-26T21:15:00Z · FR Test</code> at publish time.</span>
+      <span>Rendered from <code>Decision forums (meetings) · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · FR Test</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

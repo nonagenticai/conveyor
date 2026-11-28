@@ -1,0 +1,1092 @@
+{
+ "charter": "# Charter — S06 Control Plane (retrospective, 2026-11-27)\n\n- **Project:** S06 'Control plane — claims, runs, approvals, andon, comms and notifications', track v1, ADM phase G, delivery plateau, tranche 5, project `01a1d039-0d2a-7007-bcd8-29bb24f36b54`, plan `docs/plans/slices/S06-control-plane.md`. At the 2026-11-27 rework snapshot the project row is `status: active`, version 10, with `meta.measured_status: built`, `meta.plan_status: planned`, `meta.viability: rework`, `meta.tranche: 5`, `meta.expected_outputs: [project-brief, evidence]`, `meta.closure_outputs: []` and issues #4 (open) and #604 (closed). This rework is retrospective: it reconstructs the lifecycle record from the snapshot and does not attest contemporaneous intent.\n- **Mandate:** deliver claims, runs, approvals, andon, comms and notifications as one durable control plane — one conditional `UPDATE` per claim with a monotonic `claim_fence`, one idempotent job row per period in place of fr's 14 timers, one `approvals.decide` path shared by web and Telegram, an `andon_state` singleton that pauses the poller and refuses `runs.create`, and one `message` plus N `delivery` rows per notification with a bounded retry.\n- **Scope:** the six tables of `02-DATA-ARCHITECTURE §2.6` (`channel_binding`, `channel_preference`, `message`, `delivery`, `audience`, `audience_member` — the last two PENDING-S0); the 17 actions `cards.claim|release|renew`, `runs.create|start|finish|cancel|list`, `approvals.decide|list`, `andon.engage|release`, `messages.send`, `notifications.list|update` and `channels.bind|unbind`; the 17 events; the SSE topics `run:{id}`, `approval:{id}` and `tenant`; the Telegram in/out path; the andon gauge; and the job kinds that replace 11 of fr's 14 timers, with three deleted. Out of scope: the signed `mcp_server` channel (S06a), MCP tool surfacing (S10), `project_request.timeout` (S07), the UI (S12) and the audience screens (PENDING-S0).\n- **Expected outputs:** `project-brief`, `evidence`. **Closure outputs:** none recorded.\n- **Acceptance:** the slice gate of SPEC §8 S6 — a golden card-type×list path, dual-control approval and retry — carried by `acceptance/programme/S06.toml`. At the snapshot no gate run is recorded; the Phase-G review is `non_conformant` for that reason.\n- **Tranche and governance:** tranche 5 (`01a1e9e0-fe45-77e0-993a-d571fecc5ec1`) is `state: authorised`, version 2, authorised at 2026-11-26T22:54:06Z by review `01a21a10-ecb6-70e7-87d5-daa40f5154ac`. The PI plan `01a216d1-1bb7-7376-905e-38a776f22190`, its objectives `01a216d1-1cbe-7297-bc1e-ee5e29ea82cc`, the cadence `01a216d1-1913-70dd-8f69-c8ad230f2364` and the refinement `01a216d1-1a40-7246-ba5e-254b8c0986fe` govern the planning inputs; the refinement records WSJF 9/13/8/6. The rework runs under standing delegation `01a1fb9f-ac2d-732d-b274-1079be3dd2b3`. The only contemporaneous publication is the evidence page `01a1e687-0674-7371-902f-58c7376b113f`, published 2026-11-16T22:42:53Z.",
+ "soaw": {
+  "title": "Statement of Architecture Work — S06 Control Plane (retrospective, 2026-11-27)",
+  "body": {
+   "assignment": "Rework the V1 slice S06 (SPEC §8 S6) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A–D artefacts, the charter and the delivery contract, take the scope baseline with the one WBS deliverable, record the Phase-G compliance review, publish the expected outputs (`project-brief`, `evidence`) and the closure decision, and re-close through the acceptance instrument once its properties run.",
+   "scope": "the control-plane slice of the plan: the six tables of `02-DATA-ARCHITECTURE §2.6` (`channel_binding`, `channel_preference`, `message`, `delivery`, `audience`, `audience_member` — the last two PENDING-S0), the 17 actions, the 17 events, the SSE topics `run:{id}`, `approval:{id}` and `tenant`, the Telegram in/out path with its sender-identity resolution, the andon gauge and poller pause, and the job kinds that replace 11 of fr's 14 timers (three deleted). Out of scope: the signed mcp_server channel (S06a), MCP tool surfacing (S10), `project_request.timeout` (S07), the UI (S12) and the audience screens (PENDING-S0).",
+   "responsibilities": {
+    "approver": "conveyor-approver",
+    "architecture board": "conveyor-architecture-board",
+    "programme architect": "conveyor-e2e"
+   },
+   "acceptance_criteria": "The slice gate in `acceptance/programme/S06.toml` and plan §7: (a) golden path — card → claim → run → gate → decide → `cards.move(done)` yields `run.succeeded`, `approval.approved` and one audit, invocation and event row each; (b) dual control — `required_decisions=2`, one approve stays pending, the same approver again is 409, a second approver closes; (c) retry — `kill -9` mid-run leads to `run.reap`, a crashed run, then `attempt=2` with two rows and never two live runs; (d) andon — engaged gives 409 and a pending `run.execute` for 60 s, released resumes within one poll; (e) delivery retry — a stub 500 gives `attempts=5`, `state=failed`, one row; (f) no timers — `rg 'setInterval' crates apps` is empty and every cadence is a `schedule` row; (g) human vs agent — `decided_by_kind` is `human` for one decision and `agent` for the other. The instrument is `acceptance/programme/S06.toml`; the close gate is decided by an approver other than its requester. The snapshot records no run of these properties and no Phase-G review; this rework records the level `non_conformant` rather than claiming a pass.",
+   "retrospective": true
+  }
+ },
+ "artifacts": [
+  {
+   "title": "Stakeholder Map — S06 Control Plane (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "matrix",
+   "purpose": "Who is affected by the control plane, what each needs, and how the rework engages them.",
+   "scope": "the six control-plane tables, the 17 actions and events, the Telegram and web channels, the andon signal and the tranche-5 governance around them.",
+   "stakeholders": {
+    "owner": "programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the sponsoring group",
+     "the SRO",
+     "the S03, S04, S05 and S06a delivery teams",
+     "the S12 UI team",
+     "operators and tenants"
+    ]
+   },
+   "entries": [
+    {
+     "axis_a": "Sponsoring group",
+     "axis_b": "tranche-5 authorisation, the rework decision and the close decision",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "decide"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "SRO",
+     "axis_b": "accountable for the control-plane capability and the tranche's outcome",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "accountable"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Programme architect (conveyor-e2e)",
+     "axis_b": "owns the control-plane slice, the Phase A–D set and the acceptance instrument",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "responsible"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Architecture Board",
+     "axis_b": "approves the Phase A–D set and the delivery contract",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "approve"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "S03 delivery team",
+     "axis_b": "supplies the card claim columns, run, approval, approval_decision and andon_state tables",
+     "value": {
+      "influence": "medium",
+      "interest": "high",
+      "engagement": "consult"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "S04 delivery team",
+     "axis_b": "supplies the ActionSpec registry and the invocation route the 17 actions register through",
+     "value": {
+      "influence": "medium",
+      "interest": "high",
+      "engagement": "consult"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "S05 delivery team",
+     "axis_b": "supplies comment, cards.move and the board SSE the Telegram reply path reuses",
+     "value": {
+      "influence": "medium",
+      "interest": "high",
+      "engagement": "consult"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "S06a channel team",
+     "axis_b": "takes the approval callback and the signed mcp_server transport that S06 declares but does not build",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "consult"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "S12 UI team",
+     "axis_b": "receives the declared run-queue surface and the notification screens; declaration only here",
+     "value": {
+      "influence": "medium",
+      "interest": "high",
+      "engagement": "inform"
+     },
+     "position": 9
+    },
+    {
+     "axis_a": "Operators and tenants",
+     "axis_b": "andon, notification preferences and the tenant-wide SSE inbox",
+     "value": {
+      "influence": "low",
+      "interest": "high",
+      "engagement": "inform"
+     },
+     "position": 10
+    }
+   ],
+   "links": [
+    {
+     "to": "Business Capability Map — S06 Control Plane (Phase B)",
+     "kind": "dependency"
+    }
+   ],
+   "body": "# Stakeholder Map — S06 Control Plane (Phase A)\n\n## Metadata\n\nType matrix; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-27; project 01a1d039-0d2a-7007-bcd8-29bb24f36b54; tranche 5; retrospective under the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3. This artefact is authored by the retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nTen stakeholders on the influence/interest/engagement axes: the sponsoring group decides the tranche and the close, the SRO is accountable, the programme architect is responsible, the Architecture Board approves, the S03, S04, S05 and S06a teams are consulted, and S12 plus operators and tenants are informed.\n\n## Links\n\nDerives from `docs/plans/slices/S06-control-plane.md` §1–§3 and §9; realizes the Phase A stakeholder view for the control-plane capability; depends on the Business Capability Map for the value each group receives. The programme roles are those already recorded for the conveyor buildout programme.\n\n## Document\n\nThe artefact sits under the slice plan and the project's architecture set; the project's only contemporaneous publication is the evidence page 01a1e687-0674-7371-902f-58c7376b113f, published 2026-11-16T22:42:53Z, and this retrospective artefact is published as its own architecture-artifact-instance document by the rework factory."
+  },
+  {
+   "title": "Driver/Goal/Objective Catalog — S06 Control Plane (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "catalog",
+   "purpose": "The drivers behind the control-plane slice, the goal each serves and the objective the plan installs.",
+   "scope": "claims, runs, approvals, andon, comms and notifications, the event topics and the timers the plan replaces or deletes.",
+   "stakeholders": {
+    "owner": "programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the SRO",
+     "the S03, S04, S05 and S06a delivery teams",
+     "operators and tenants"
+    ]
+   },
+   "entries": [
+    {
+     "axis_a": "D1 Competing claim paths leave a card race without one decision boundary",
+     "axis_b": "G1 One conditional UPDATE per claim, with a monotonic claim_fence as the ABA witness",
+     "value": {
+      "objective": "cards.claim runs one statement: `UPDATE card SET assignee_id=$3, lease_expires_at=now()+$4::interval, lease_token=uuidv7(), claim_fence=claim_fence+1, version=version+1 ... WHERE tenant_id=$1 AND id=$2 AND version=$5 AND (lease_expires_at IS NULL OR lease_expires_at < now() OR assignee_id=$3) RETURNING claim_fence, version`. $5 is the caller's `If-Match`, a mismatch is 412, zero rows is a refusal, and a blocked claimant enqueues one deduped `card.claim` job (plan §5, decision 1)."
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "D2 fr runs 14 timers and three duplicate rollups outside one durable runner",
+     "axis_b": "G2 Every cadence is a schedule row and an idempotent job on (kind, dedupe_key)",
+     "value": {
+      "objective": "the 11 surviving fr timers become job kinds (schedule.materialise, approval.closed.emit, approval.expire, approval.redeliver, deblock.redeliver, coverage.redeliver, project.reconcile, schedule.health, idempotency.sweep, job.prune and the S07-deferred project_request.timeout), each deduped by key; analytics-rollup, signup-onboarding-tick and workflows-cache are deleted; periods are schedule rows under one advisory lock (plan §5.3, decision 9)."
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "D3 Approvals were split across web, Telegram and mcp with no shared decision path",
+     "axis_b": "G3 One approvals.decide action with required_decisions and decided_by_kind",
+     "value": {
+      "objective": "at most one pending approval per (run, gate) by partial unique index; dual control is `required_decisions`, a person cannot decide twice by unique constraint, a close is pending → approved iff count(approve) >= required_decisions or pending → rejected on any reject in one transaction, and `decided_by_kind` records human or agent (plan §5.4)."
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "D4 An andon cord tied to a live process could not survive a restart",
+     "axis_b": "G4 Andon is an andon_state row, a 409 refusal and a worker-scraped gauge",
+     "value": {
+      "objective": "andon.engage writes andon_state and emits andon.engaged; runs.create refuses 409 andon-engaged; the poller skips engaged tenants; release reverses both; the worker exposes conveyor_andon_engaged and conveyor_andon_engaged_at_seconds with a 1 s timeout so a dead exporter alarms via absent() (plan §5.5, decision 6)."
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "D5 Notification fan-out lacked per-recipient delivery semantics and retry",
+     "axis_b": "G5 One message plus N delivery rows, sent outside the transaction with bounded backoff",
+     "value": {
+      "objective": "messages.send writes one message and N delivery rows, each enqueueing delivery.send on dedupe_key=delivery.id; the drainer claims with FOR UPDATE SKIP LOCKED plus lease_token, sends outside the transaction, moves pending → sent → delivered | failed | expired, and backs off min(2^attempts · 5 s, 900 s) (plan §5.6)."
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "D6 Control-plane consumers needed live topics and replay without polling",
+     "axis_b": "G6 Three SSE topics fed by the in-transaction event row and pg_notify",
+     "value": {
+      "objective": "run:{id}, approval:{id} and tenant are the control-plane topics; every mutation writes its event row in the same transaction and pg_notify carries it; a second client replays with Last-Event-ID and the 17 event types are owned by S06 (plan §5.6)."
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "D7 A decision needed to record whether a human or an agent made it",
+     "axis_b": "G7 decided_by_kind plus via records the actor class and the surface",
+     "value": {
+      "objective": "approvals.decide records decided_by_kind human (web or Telegram) or agent (/mcp, D19) and via (channel, agent_member_id, product); property (g) drives one decision of each kind through the same action, so S06a depends on S06 and never the reverse (plan §5.4, §7 property g)."
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "D8 An inbound Telegram reply had no settled sender identity (#4)",
+     "axis_b": "G8 Resolve (chat_id, topic_id) → channel_binding → tenant → sender and call the shared actions",
+     "value": {
+      "objective": "the Telegram inbound route POST /api/channels/telegram/{binding_id} authenticates by secret-token header, resolves the binding and tenant to a sender, and calls the same approvals.decide or cards.comment the web does, with no per-channel decision path; issue #4 records that the shared decision boundary and the sender identity were still open at the snapshot."
+     },
+     "position": 8
+    }
+   ],
+   "links": [
+    {
+     "to": "Requirements Catalog — S06 Control Plane (Phase A)",
+     "kind": "derivation"
+    }
+   ],
+   "body": "# Driver/Goal/Objective Catalog — S06 Control Plane (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-27; project 01a1d039-0d2a-7007-bcd8-29bb24f36b54; tranche 5; retrospective under the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3.\n\n## Entries\n\nEight driver/goal/objective rows: the claim boundary, the timer replacement, the shared approval decision, the andon row and gauge, the per-recipient delivery, the control-plane SSE topics, the human-versus-agent decision identity and the Telegram sender resolution.\n\n## Links\n\nDerives from the slice plan §1, §3, §5 and the nine decisions closed in §9; realizes the Phase A driver view for SPEC §8 S6; reuses the S03 claim columns and state tables, the S04 registry, the S05 comment and move actions and the S02 job, event and SSE primitives.\n\n## Document\n\nThe artefact sits under the slice plan and the project's architecture set; its executable counterpart is the plan §7 gate carried by `acceptance/programme/S06.toml`, and the evidence page 01a1e687-0674-7371-902f-58c7376b113f is the only contemporaneous publication."
+  },
+  {
+   "title": "Requirements Catalog — S06 Control Plane (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "catalog",
+   "purpose": "The requirements the S06 gate and its contracts must satisfy, each with an executable acceptance.",
+   "scope": "the seven gate properties, the six tables and tenancy, the 17 actions and 17 events, the channels, the andon signal and the job runner.",
+   "stakeholders": {
+    "owner": "programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the SRO",
+     "the S03, S04, S05 and S06a delivery teams",
+     "operators and tenants"
+    ]
+   },
+   "entries": [
+    {
+     "axis_a": "R1 Property (a) golden path",
+     "axis_b": "Card → claim → run → gate → decide → cards.move(done) succeeds end to end",
+     "value": {
+      "priority": "must",
+      "acceptance": "`cargo test -p conveyor-api --test golden_path`: run succeeded, approval approved, and exactly one audit_event, one action_invocation and one event row per mutation (plan §7 property a)."
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "R2 Property (b) dual control",
+     "axis_b": "required_decisions=2 needs two distinct approvers",
+     "value": {
+      "priority": "must",
+      "acceptance": "`cargo test -p conveyor-api --test approval_dual`: one approve leaves pending; the same approver again is 409; a second approver closes; the partial unique index and (approval_id, approver_id) constraint enforce it (plan §5.4, §7 property b)."
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "R3 Property (c) retry after a crash",
+     "axis_b": "A killed run is reaped, marked crashed and retried as attempt 2",
+     "value": {
+      "priority": "must",
+      "acceptance": "`cargo test -p conveyor-server --test run_retry`: kill -9 mid-run; run.reap produces failed/crashed; the next runs.create is attempt=2; two rows exist and never two live runs (plan §7 property c)."
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "R4 Property (d) andon",
+     "axis_b": "Engaged tenants refuse runs and pause the poller; release resumes",
+     "value": {
+      "priority": "must",
+      "acceptance": "`cargo test -p conveyor-server --test andon`: engaged gives 409 and a queued run.execute stays pending for 60 s; released runs within one poll; the gauge reads andon_state with a 1 s timeout (plan §5.5, §7 property d)."
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "R5 Property (e) delivery retry",
+     "axis_b": "A failing channel is retried and lands failed once",
+     "value": {
+      "priority": "must",
+      "acceptance": "`cargo test -p conveyor-server --test delivery_retry`: a stub returning 500 yields attempts=5, state=failed, one delivery row; backoff is min(2^attempts · 5 s, 900 s) (plan §5.6, §7 property e)."
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "R6 Property (f) no timers",
+     "axis_b": "No in-process interval remains; cadence is data",
+     "value": {
+      "priority": "must",
+      "acceptance": "`rg -n 'setInterval' crates apps` is empty; every cadence is a schedule row materialised under pg_advisory_xact_lock(hashtext('conveyor:schedule')) (plan §5.3, §7 property f)."
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "R7 Property (g) human versus agent",
+     "axis_b": "Both actor classes decide through the same action and persist distinctly",
+     "value": {
+      "priority": "must",
+      "acceptance": "`cargo test -p conveyor-api --test approval_dual -- decided_by_kind`: required_decisions=2; one decision from a human and one from a seeded app_user(kind='agent') persist with different decided_by_kind, both driven through approvals.decide (plan §7 property g)."
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "R8 Six tables and tenancy",
+     "axis_b": "migrations/0005_control_plane.sql owns the schema with FORCE RLS",
+     "value": {
+      "priority": "must",
+      "acceptance": "the migration creates channel_binding, channel_preference, message, delivery, audience and audience_member with the §2.6 foreign keys and indexes, ENABLE and FORCE ROW LEVEL SECURITY and the tenant policy; `cargo run -p conveyor-server -- migrate` twice is idempotent (plan §5.1, §6 step 2)."
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "R9 Seventeen actions",
+     "axis_b": "Every control-plane write is a registered action",
+     "value": {
+      "priority": "must",
+      "acceptance": "cards.claim/release/renew, runs.create/start/finish/cancel/list, approvals.decide/list, andon.engage/release, messages.send, notifications.list/update and channels.bind/unbind register through the S04 ActionSpec derive and are served at POST /api/actions/{name}/invocations; channels.bind and channels.unbind are platform-admin and audited (plan §5.2, §6 step 18)."
+     },
+     "position": 9
+    },
+    {
+     "axis_a": "R10 Seventeen events and three SSE topics",
+     "axis_b": "Every mutation writes one event row in its transaction",
+     "value": {
+      "priority": "must",
+      "acceptance": "the event type set of plan §5.6 (card.claimed through delivery.changed) is emitted with the listed payload keys; run:{id}, approval:{id} and tenant replay with Last-Event-ID and keepalive; `cargo test -p conveyor-api --test sse_control` (plan §5.6, §6 step 17)."
+     },
+     "position": 10
+    },
+    {
+     "axis_a": "R11 Channels and Telegram inbound",
+     "axis_b": "A Telegram reply reaches the same actions the web uses",
+     "value": {
+      "priority": "must",
+      "acceptance": "channels.bind/unbind persist bindings; POST /api/channels/telegram/{binding_id} authenticates by secret-token header, resolves (chat_id, topic_id) to binding, tenant and sender, and replies through approvals.decide or cards.comment; `cargo test -p conveyor-api --test channel_inbound` (plan §5.6, §6 step 15)."
+     },
+     "position": 11
+    },
+    {
+     "axis_a": "R12 Notification preferences and inbox",
+     "axis_b": "A caller lists and updates its own deliveries and preferences",
+     "value": {
+      "priority": "must",
+      "acceptance": "notifications.list returns the caller's deliveries with unread and cursor filters; notifications.update writes channel_preference (enabled, quiet_hours); `cargo test -p conveyor-api --test notifications` (plan §5.2, §6 step 16)."
+     },
+     "position": 12
+    }
+   ],
+   "links": [
+    {
+     "to": "Solution Concept Diagram — S06 Control Plane (Phase A)",
+     "kind": "derivation"
+    }
+   ],
+   "body": "# Requirements Catalog — S06 Control Plane (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-27; project 01a1d039-0d2a-7007-bcd8-29bb24f36b54; tranche 5; retrospective under the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3.\n\n## Entries\n\nTwelve requirements: the seven plan §7 gate properties (golden path, dual control, retry, andon, delivery retry, no timers, human versus agent) plus the six tables and FORCE RLS, the 17 actions, the 17 events and three SSE topics, the channel bindings and Telegram inbound path, and the notification preferences and inbox.\n\n## Links\n\nDerives from SPEC §8 S6 and the slice plan §5, §6, §7 and §8; realizes the Phase A requirements view; reuses the S03 schema and claim columns, the S04 registry, the S05 comment and cards.move actions and the S02 event, job and SSE primitives.\n\n## Document\n\nThe artefact sits under the slice plan; the acceptance instrument is `acceptance/programme/S06.toml` and the gate commands are plan §7. The snapshot records no run of these properties, so the requirements are specified here and not yet verified."
+  },
+  {
+   "title": "Solution Concept Diagram — S06 Control Plane (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "diagram",
+   "purpose": "The components, stores and edges that carry the control plane's claims, runs, approvals, andon and notifications.",
+   "scope": "migrations/0005_control_plane.sql, the domain, store and action modules, the channel module, the API and worker, the job runner and the gate tests.",
+   "stakeholders": {
+    "owner": "programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the SRO",
+     "the S03, S04, S05 and S06a delivery teams",
+     "the S12 UI team",
+     "operators and tenants"
+    ]
+   },
+   "entries": [
+    {
+     "axis_a": "migrations/0005_control_plane.sql",
+     "axis_b": "the control-plane schema",
+     "value": {
+      "kind": "component",
+      "note": "the six tables of §2.6, foreign keys, the partial unique indexes (approval pending per run and gate; job dedupe pending/running) and FORCE RLS"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "crates/domain/src/{claim,run,approval,andon,message}.rs",
+     "axis_b": "the domain transitions",
+     "value": {
+      "kind": "component",
+      "note": "claim::may_claim, run::transition, approval::decide, andon::apply and message validation; no I/O"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "crates/store/src/{claim,run,approval,andong,channel,delivery}.rs",
+     "axis_b": "the store modules",
+     "value": {
+      "kind": "component",
+      "note": "`_tx` functions taking TenantId first; claim_card_tx is the single conditional UPDATE; the caller owns the transaction"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "crates/actions/src/control/{cards,runs,approvals,andong,messages,channels}.rs",
+     "axis_b": "the 17 actions",
+     "value": {
+      "kind": "component",
+      "note": "registered through the S04 ActionSpec derive; approvals.decide is the one decision path; zero REST write routes"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "crates/actions/src/channel/{mod,telegram,web,reply}.rs",
+     "axis_b": "the channel module",
+     "value": {
+      "kind": "component",
+      "note": "Telegram secret-token inbound and reply→action; web delivery at SSE ack; mcp handed to S06a"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "crates/api/src/{runs,approvals,events,telegram}.rs and apps/server/src/worker.rs",
+     "axis_b": "the API and worker",
+     "value": {
+      "kind": "component",
+      "note": "read projections and SSE topics; the worker drains jobs and exposes the andon gauge on its scrape path with a 1 s timeout"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "crates/store/src/jobs/{runner,schedule,kind}.rs",
+     "axis_b": "the job runner",
+     "value": {
+      "kind": "component",
+      "note": "lease-claimed jobs, fenced finish, idempotent handlers on (kind, dedupe_key), the schedule materialiser under one advisory lock"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "crates/api/tests/{golden_path,claim_race,approval_dual,notifications,sse_control,channel_inbound}.rs",
+     "axis_b": "the API-level gate tests",
+     "value": {
+      "kind": "component",
+      "note": "properties a, b, g, the notification inbox, SSE replay and the Telegram reply path"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "apps/server/tests/{run_retry,approval_expire,andon,delivery_retry}.rs",
+     "axis_b": "the worker-level gate tests",
+     "value": {
+      "kind": "component",
+      "note": "properties c, d, e and approval expiry; these live in the server package, not conveyor-api (plan correction v1-s06-1)"
+     },
+     "position": 9
+    },
+    {
+     "axis_a": "card row",
+     "axis_b": "cards.claim, cards.renew, cards.release, card.lease_sweep",
+     "value": {
+      "kind": "edge",
+      "note": "one conditional UPDATE per claim; claim_fence is the ABA witness; an expired lease is free; a waiter is a deduped card.claim job"
+     },
+     "position": 10
+    },
+    {
+     "axis_a": "run",
+     "axis_b": "run.execute and run.reap",
+     "value": {
+      "kind": "edge",
+      "note": "one live run per card; liveness is the job's lease_until, so a reaped run becomes failed/crashed at attempt+1"
+     },
+     "position": 11
+    },
+    {
+     "axis_a": "approval",
+     "axis_b": "approvals.decide and approval.expire",
+     "value": {
+      "kind": "edge",
+      "note": "one pending per (run, gate); decision and expiry race on WHERE status='pending'; the loser emits nothing; close enqueues a delivery(channel_kind='mcp')"
+     },
+     "position": 12
+    },
+    {
+     "axis_a": "message",
+     "axis_b": "delivery.send",
+     "value": {
+      "kind": "edge",
+      "note": "one message plus N delivery rows; delivery.send deduped on delivery.id; send outside the transaction; backoff bounded at 900 s"
+     },
+     "position": 13
+    },
+    {
+     "axis_a": "event row",
+     "axis_b": "SSE and pg_notify",
+     "value": {
+      "kind": "edge",
+      "note": "every mutation writes its event in-tx and pg_notifies; run:{id}, approval:{id} and tenant are the control-plane topics"
+     },
+     "position": 14
+    },
+    {
+     "axis_a": "S03, S04, S05 and S02 primitives",
+     "axis_b": "S06",
+     "value": {
+      "kind": "edge",
+      "note": "S03 supplies card claim columns, run, approval, approval_decision and andon_state; S04 the registry; S05 comment, cards.move and board SSE; S02 job, schedule, event, audit_event and SSE replay"
+     },
+     "position": 15
+    }
+   ],
+   "links": [
+    {
+     "to": "Business Capability Map — S06 Control Plane (Phase B)",
+     "kind": "realization"
+    },
+    {
+     "to": "Data Entity/Data Component Catalog — S06 Control Plane (Phase C)",
+     "kind": "realization"
+    }
+   ],
+   "body": "# Solution Concept Diagram — S06 Control Plane (Phase A)\n\n## Metadata\n\nType diagram; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-27; project 01a1d039-0d2a-7007-bcd8-29bb24f36b54; tranche 5; retrospective under the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3.\n\n## Entries\n\nFifteen rows: nine components (the schema, the domain transitions, the store, the 17 actions, the channel module, the API and worker, the job runner and the two test packages) and six edges (card to claim, run to execute/reap, approval to decide/expire, message to delivery.send, event to SSE and pg_notify, and the S03/S04/S05/S02 primitives into S06).\n\n## Links\n\nDerives from the slice plan §5 and §6; realizes the Phase A solution concept for the control plane; reuses the S03 schema and claim columns, the S04 registry, the S05 comment and move actions and the S02 job, event and SSE primitives.\n\n## Document\n\nThe artefact sits under the slice plan; the named test binaries are its executable counterpart, and the plan's seven gate properties are its acceptance. The snapshot records no run of those binaries, so the diagram describes the declared solution and not a demonstrated one."
+  },
+  {
+   "title": "Business Capability Map — S06 Control Plane (Phase B)",
+   "phase_code": "b",
+   "plateau": "hld",
+   "artifact_kind": "diagram",
+   "purpose": "The capabilities the control-plane slice declares and how far each is evidenced at the rework.",
+   "scope": "claims and leases, run lifecycle, approvals, andon, comms and notifications, channel bindings and Telegram, SSE, scheduled jobs and decision identity.",
+   "stakeholders": {
+    "owner": "programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the sponsoring group",
+     "the SRO",
+     "the S03, S04, S05 and S06a delivery teams",
+     "operators and tenants"
+    ]
+   },
+   "entries": [
+    {
+     "axis_a": "Claim and lease",
+     "axis_b": "one conditional UPDATE, claim_fence, deduped waiter and lease sweep",
+     "value": {
+      "maturity": "claimed built in the record; the acceptance gate is not evidenced at the snapshot",
+      "evidence": "project meta.measured_status=built; plan §5.3 and decision 1; the project's only publication is the evidence page 01a1e687-0674-7371-902f-58c7376b113f (2026-11-16)"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Run lifecycle",
+     "axis_b": "runs.create/start/finish/cancel/list, one live run, reap and retry",
+     "value": {
+      "maturity": "declared in the plan; not evidenced",
+      "evidence": "plan §5.2, §5.3 and decision 3; gate property c"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Dual-control approvals",
+     "axis_b": "required_decisions, one pending per (run, gate), decided_by_kind and via",
+     "value": {
+      "maturity": "declared in the plan; not evidenced",
+      "evidence": "plan §5.4 and decisions 4 and 5; gate properties b and g"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Andon",
+     "axis_b": "andon_state singleton, 409 refusal, poller pause and worker-scraped gauge",
+     "value": {
+      "maturity": "declared in the plan; not evidenced",
+      "evidence": "plan §5.5 and decision 6; gate property d"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Comms and notifications",
+     "axis_b": "one message plus N delivery rows, delivery.send retry, inbox and preferences",
+     "value": {
+      "maturity": "declared in the plan; not evidenced",
+      "evidence": "plan §5.6 and §5.2; gate property e"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Channel bindings and Telegram",
+     "axis_b": "channels.bind/unbind, secret-token inbound, reply to the shared actions",
+     "value": {
+      "maturity": "declared in the plan; issue #4 records an open defect in the shared boundary and sender identity",
+      "evidence": "plan §5.6; issue #4 open; gate test channel_inbound"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "Control-plane SSE",
+     "axis_b": "run:{id}, approval:{id} and tenant topics with replay",
+     "value": {
+      "maturity": "declared in the plan; not evidenced",
+      "evidence": "plan §5.6 and the 17-event table; sse_control"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "Scheduled job kinds",
+     "axis_b": "11 fr timers replaced, three deleted, idempotent on (kind, dedupe_key)",
+     "value": {
+      "maturity": "declared in the plan; not evidenced",
+      "evidence": "plan §5.3 and decision 9; gate property f"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "Human and agent decision identity",
+     "axis_b": "decided_by_kind human or agent through the one approvals.decide",
+     "value": {
+      "maturity": "declared in the plan; not evidenced",
+      "evidence": "plan §5.4 and §7 property g; issue #4 remains open on the boundary"
+     },
+     "position": 9
+    }
+   ],
+   "links": [
+    {
+     "to": "Technology Standards Catalog — S06 Control Plane (Phase D)",
+     "kind": "realization"
+    }
+   ],
+   "body": "# Business Capability Map — S06 Control Plane (Phase B)\n\n## Metadata\n\nType diagram; phase B; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-27; project 01a1d039-0d2a-7007-bcd8-29bb24f36b54; tranche 5; retrospective under the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3.\n\n## Entries\n\nNine capabilities. The record claims the slice is built, but the snapshot contains no Phase-G review and no run of the seven gate properties; eight capabilities are therefore recorded as declared and unevidenced, and the channel and decision-identity capability also carries the open issue #4.\n\n## Links\n\nDerives from the Phase A solution concept and the slice plan §5–§8; realizes the Phase B capability view over SPEC §8 S6; reuses the S03 schema and claim columns, the S04 registry, the S05 comment and move actions and the S02 job and SSE primitives.\n\n## Document\n\nThe artefact sits under the slice plan; the maturity column is the honest state at the 2026-11-27 rework snapshot, not a claim that the acceptance gate passed."
+  },
+  {
+   "title": "Data Entity/Data Component Catalog — S06 Control Plane (Phase C)",
+   "phase_code": "c",
+   "plateau": "hld",
+   "artifact_kind": "catalog",
+   "purpose": "The entities the control-plane slice adds or exercises, each with its owner and its one invariant.",
+   "scope": "the six control-plane tables, the S03 claim and state tables, the S02 job, schedule and event rows, and the delivery and approval components.",
+   "stakeholders": {
+    "owner": "programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the S03, S04, S05 and S06a delivery teams",
+     "operators and tenants"
+    ]
+   },
+   "entries": [
+    {
+     "axis_a": "channel_binding",
+     "axis_b": "the channel binding",
+     "value": {
+      "owner": "domain",
+      "table": "channel_binding",
+      "note": "tenant, channel_kind and route_key identify the binding; the Telegram inbound route resolves it to a tenant and sender; no per-channel decision path"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "channel_preference",
+     "axis_b": "the caller preference",
+     "value": {
+      "owner": "domain",
+      "table": "channel_preference",
+      "note": "enabled and quiet_hours per caller and channel_kind; notifications.update is its only writer"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "message",
+     "axis_b": "the notification",
+     "value": {
+      "owner": "domain",
+      "table": "message",
+      "note": "one row per messages.send; channel_kind is the originating channel and fan-out lives on delivery; audience_id is retired with the audience screens (PENDING-S0)"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "delivery",
+     "axis_b": "the per-recipient delivery",
+     "value": {
+      "owner": "domain",
+      "table": "delivery",
+      "note": "one row per recipient; state pending → sent → delivered | failed | expired; attempts and backoff; retention prunes terminal rows only, 30 days"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "audience",
+     "axis_b": "the audience",
+     "value": {
+      "owner": "domain",
+      "table": "audience",
+      "note": "PENDING-S0: the plan ships the table with the §2.6 shape but no actions or screens until S0; messages.send takes explicit recipients only"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "audience_member",
+     "axis_b": "the audience membership",
+     "value": {
+      "owner": "domain",
+      "table": "audience_member",
+      "note": "PENDING-S0: the membership edge for audience; no route or action in S06, and the 2026-11-08 note drops the old audience_id field"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "card (claim columns)",
+     "axis_b": "the claim state",
+     "value": {
+      "owner": "domain",
+      "table": "card",
+      "note": "assignee_id, lease_expires_at, lease_token and claim_fence; claim_fence is monotonic and is the ABA witness; renew and release check the fence, never the version"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "run",
+     "axis_b": "the run",
+     "value": {
+      "owner": "domain",
+      "table": "run",
+      "note": "attempt and outcome; one live run per card; liveness is the driving job's lease_until and there is no run.heartbeat_at"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "approval",
+     "axis_b": "the approval",
+     "value": {
+      "owner": "domain",
+      "table": "approval",
+      "note": "one pending per (run, gate) by partial unique index; required_decisions holds dual control; the callback URL lives here and the signed transport is S06a"
+     },
+     "position": 9
+    },
+    {
+     "axis_a": "approval_decision",
+     "axis_b": "the decision",
+     "value": {
+      "owner": "domain",
+      "table": "approval_decision",
+      "note": "unique (approval_id, approver_id); records decided_by_kind human or agent and via channel, agent_member_id or product"
+     },
+     "position": 10
+    },
+    {
+     "axis_a": "andon_state",
+     "axis_b": "the andon singleton",
+     "value": {
+      "owner": "domain",
+      "table": "andon_state",
+      "note": "keys on tenant_id; engage and release are the only writers; the worker gauge reads this row with a 1 s timeout"
+     },
+     "position": 11
+    },
+    {
+     "axis_a": "job and schedule",
+     "axis_b": "the runner rows",
+     "value": {
+      "owner": "store",
+      "table": "job, schedule",
+      "note": "handlers idempotent on (kind, dedupe_key); the partial unique index covers pending and running; schedule rows materialise under one advisory lock"
+     },
+     "position": 12
+    },
+    {
+     "axis_a": "event",
+     "axis_b": "the outbox row",
+     "value": {
+      "owner": "store",
+      "component": "event row written in-tx",
+      "note": "the 17 control-plane event types; SSE and pg_notify read it; one write path per mutation"
+     },
+     "position": 13
+    },
+    {
+     "axis_a": "delivery.send",
+     "axis_b": "the delivery job",
+     "value": {
+      "owner": "store",
+      "component": "job (kind='delivery.send')",
+      "note": "dedupe_key=delivery.id; sends outside the transaction; terminal failure at max_attempts; never prunes pending or sent"
+     },
+     "position": 14
+    }
+   ],
+   "links": [
+    {
+     "to": "Technology Standards Catalog — S06 Control Plane (Phase D)",
+     "kind": "realization"
+    }
+   ],
+   "body": "# Data Entity/Data Component Catalog — S06 Control Plane (Phase C)\n\n## Metadata\n\nType catalog; phase C; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-27; project 01a1d039-0d2a-7007-bcd8-29bb24f36b54; tranche 5; retrospective under the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3.\n\n## Entries\n\nFourteen rows: the six control-plane tables of plan §2.6 (with audience and audience_member explicitly PENDING-S0), the S03 card claim columns, run, approval, approval_decision and andon_state, the S02 job/schedule rows, the event outbox and the delivery.send job.\n\n## Links\n\nDerives from the slice plan §5–§7 and the data architecture's §2.6; realizes the Phase C data view; reuses the S03 tenancy and `_tx` conventions and the S02 event and job primitives.\n\n## Document\n\nThe artefact sits under the slice plan and `migrations/0005_control_plane.sql`; the schema is the entity record and the plan §7 gate is its verification, which the snapshot does not record as run."
+  },
+  {
+   "title": "Technology Standards Catalog — S06 Control Plane (Phase D)",
+   "phase_code": "d",
+   "plateau": "hld",
+   "artifact_kind": "catalog",
+   "purpose": "The standards the control-plane slice fixes for its schema, claims, jobs, deliveries, events and verification.",
+   "scope": "Postgres 18 and RLS, conditional updates and fences, idempotent jobs, approval closure, delivery retry, SSE, Telegram, the andon gauge and the acceptance route.",
+   "stakeholders": {
+    "owner": "programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the S03, S04, S05 and S06a delivery teams",
+     "operators and tenants"
+    ]
+   },
+   "entries": [
+    {
+     "axis_a": "PostgreSQL",
+     "axis_b": "18 with ENABLE and FORCE row-level security",
+     "value": {
+      "usage": "every control-plane table carries tenant_id, ENABLE and FORCE ROW LEVEL SECURITY and the tenant policy, following the S03 convention; migrate twice must be idempotent (plan §6 step 2)"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Enumeration storage",
+     "axis_b": "text plus CHECK, never CREATE TYPE",
+     "value": {
+      "usage": "channel_kind, delivery state, decision and decided_by_kind are text CHECK values in the migration and domain; no CREATE TYPE in 0005_control_plane.sql (S03 standard)"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Claim concurrency",
+     "axis_b": "one conditional UPDATE with If-Match and a monotonic fence",
+     "value": {
+      "usage": "the claim binds the caller's If-Match to $5 and never reads a body version; zero rows is a refusal and a DB error is a refusal, never granted; claim_fence is monotonic so a holder past its TTL compares it before every write (plan §5.3, trap 5)"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Job idempotency",
+     "axis_b": "dedupe on (kind, dedupe_key) with a partial unique index",
+     "value": {
+      "usage": "the index covers pending and running only, so a dead job never blocks re-enqueue; handlers are idempotent on (kind, dedupe_key); every cadence is a schedule row, and `setInterval` is absent (plan §5.3, trap 4, property f)"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Approval closure",
+     "axis_b": "one pending per gate; first-response-counts closes deliveries, not the gate",
+     "value": {
+      "usage": "decision and expiry race on WHERE status='pending' and the loser emits nothing; with required_decisions > 1 the gate stays pending after the first response while other recipients are closed as expired; approval.expire runs at 60 s (plan §5.4, trap 1, decision 5)"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Delivery",
+     "axis_b": "send outside the transaction with bounded retry and terminal-only retention",
+     "value": {
+      "usage": "FOR UPDATE SKIP LOCKED plus lease_token; pending → sent → delivered | failed | expired; attempts >= max_attempts lands failed; backoff min(2^attempts · 5 s, 900 s); retention prunes terminal rows only (plan §5.6, trap 6)"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "Control-plane events",
+     "axis_b": "in-transaction event row plus pg_notify over three topics",
+     "value": {
+      "usage": "the 17 event types of plan §5.6 write their row in the same transaction; run:{id}, approval:{id} and tenant are the topics; every mutation has exactly one write path (plan §5.6)"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "Scheduling",
+     "axis_b": "schedule rows under one advisory lock; three timers deleted",
+     "value": {
+      "usage": "periods are schedule rows under pg_advisory_xact_lock(hashtext('conveyor:schedule')); 11 fr timers become job kinds; analytics-rollup, signup-onboarding-tick and workflows-cache are deleted, not ported (plan §5.3, decision 9)"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "Telegram inbound",
+     "axis_b": "secret-token authentication and sender resolution",
+     "value": {
+      "usage": "POST /api/channels/telegram/{binding_id} checks the secret-token header, resolves (chat_id, topic_id) to channel_binding, tenant and sender, and calls approvals.decide or cards.comment; there is no per-channel decision path (plan §5.6)"
+     },
+     "position": 9
+    },
+    {
+     "axis_a": "Observability",
+     "axis_b": "worker-scraped andon gauge with a 1 s timeout",
+     "value": {
+      "usage": "conveyor_andon_engaged{tenant_id} and conveyor_andon_engaged_at_seconds are read from andon_state with a 1 s timeout; a dead exporter is an alarm via absent(), never a request-driven cache (plan §5.5)"
+     },
+     "position": 10
+    },
+    {
+     "axis_a": "Andon effect",
+     "axis_b": "state pauses the poller and refuses runs; never scales replicas",
+     "value": {
+      "usage": "andon.engage writes andon_state and emits andon.engaged; runs.create refuses 409 andon-engaged; the poller skips engaged tenants; release reverses both (plan §5.5, decision 6)"
+     },
+     "position": 11
+    },
+    {
+     "axis_a": "Verification",
+     "axis_b": "the plan §7 gate on port 8930; hosted preflight for the compile verdict",
+     "value": {
+      "usage": "the gate runs the six conveyor-api test binaries and the four conveyor-server binaries, asserts `rg 'setInterval' crates apps` is empty (property f), serves on 127.0.0.1:8930 and never port 8000; the compile/test verdict comes from the repository's GitHub-hosted preflight, with the local gate sub-second (plan §7)"
+     },
+     "position": 12
+    }
+   ],
+   "links": [
+    {
+     "to": "Stakeholder Map — S06 Control Plane (Phase A)",
+     "kind": "reuse"
+    }
+   ],
+   "body": "# Technology Standards Catalog — S06 Control Plane (Phase D)\n\n## Metadata\n\nType catalog; phase D; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-27; project 01a1d039-0d2a-7007-bcd8-29bb24f36b54; tranche 5; retrospective under the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3.\n\n## Entries\n\nTwelve standards: Postgres 18 FORCE RLS, text plus CHECK enumeration, the conditional claim with If-Match and the fence, idempotent job rows, approval closure and expiry, delivery retry and retention, the control-plane event topics, schedule rows with three timers deleted, Telegram secret-token inbound and sender resolution, the worker-scraped andon gauge, the andon effect, and the verification route.\n\n## Links\n\nDerives from the slice plan §5–§8, the S03 standards and the repository's current delivery rules; realizes the Phase D standards view; reuses the S03 claim columns and tenancy, the S04 registry and the S02 job, event and SSE primitives.\n\n## Document\n\nThe artefact sits under the slice plan; the standards are exercised by `migrations/0005_control_plane.sql`, the ten gate test binaries and the empty `setInterval` assertion, and the acceptance instrument is `acceptance/programme/S06.toml`."
+  }
+ ],
+ "registers": {
+  "risk": [
+   {
+    "code": "S06-R1",
+    "title": "The seven gate properties have no recorded run, so the built claim is unproven",
+    "body": "At the 2026-11-27 snapshot no review or evidence page records a run of the plan §7 properties: golden path, dual control, retry after a crash, andon, delivery retry, no timers and human versus agent. The project row carries meta.measured_status built, but built is a record claim, not a gate pass, and acceptance/programme/S06.toml has not been evidenced. Until the properties run at a rework head, the project stays active and the Phase-G level stays non_conformant.",
+    "probability": "high",
+    "impact": 4,
+    "review_at": "2026-12-15",
+    "severity": "high",
+    "status": "open",
+    "response": "Run acceptance/programme/S06.toml and the ten plan §7 test binaries on a live stack, keep one receipt per property, and re-read the Phase-G review on that evidence rather than inferring a pass from the built status.",
+    "meta": {
+     "owner": "the programme architect (conveyor-e2e)"
+    },
+    "links": {
+     "cards": [],
+     "requirements": [
+      "R1 Property (a) golden path",
+      "R2 Property (b) dual control",
+      "R3 Property (c) retry after a crash",
+      "R4 Property (d) andon",
+      "R5 Property (e) delivery retry",
+      "R6 Property (f) no timers",
+      "R7 Property (g) human versus agent"
+     ],
+     "decisions": []
+    }
+   },
+   {
+    "code": "S06-R2",
+    "title": "Issue #4 leaves a shared decision boundary and the Telegram sender identity unresolved",
+    "body": "The open issue #4 ('S06 — one shared decision boundary; Telegram sender identity') records that the Telegram reply path and the one approvals.decide path were still being reconciled at the snapshot. The plan declares one decision path for web, Telegram and mcp, so an unresolved boundary would let a reply decide through a different shape than the web and would make the sender attribution in approval_decision ambiguous. The channel_inbound gate target is the check that would expose this.",
+    "probability": "medium",
+    "impact": 3,
+    "review_at": "2026-12-15",
+    "severity": "medium",
+    "status": "open",
+    "response": "Close #4 against the channel_inbound test: assert the Telegram reply resolves (chat_id, topic_id) to binding, tenant and sender and calls the same approvals.decide or cards.comment as the web.",
+    "meta": {
+     "owner": "the programme architect (conveyor-e2e)"
+    },
+    "links": {
+     "cards": [],
+     "requirements": [
+      "R11 Channels and Telegram inbound",
+      "R7 Property (g) human versus agent"
+     ],
+     "decisions": []
+    }
+   }
+  ],
+  "issue": [
+   {
+    "code": "S06-I1",
+    "title": "The record claims built but carries no Phase-G compliance review or acceptance run",
+    "body": "The project row records measured_status built with plan_status planned, and the snapshot contains no charter, Statement of Architecture Work, delivery contract, Phase A–D set, Phase-G review or gate receipt for S06. The only publication is the evidence page 01a1e687-0674-7371-902f-58c7376b113f (2026-11-16T22:42:53Z). This pack supplies the missing lifecycle set retrospectively and records the Phase-G level non_conformant, because the acceptance is not evidenced.",
+    "severity": "high",
+    "status": "open",
+    "response": "Run the acceptance instrument and the ten gate binaries; record a receipt per property; re-review the Phase-G level against that evidence before any close decision."
+   },
+   {
+    "code": "S06-I2",
+    "title": "Issue #604 closed with the multicast approval test timing out at 10 s under full-suite load",
+    "body": "The closed issue #604 records that the multicast approval test times out at 10 s under full-suite load. A closed issue is not a green re-run: the flakiness sits in the approval fan-out path that S06 owns, and a clean single-test pass would not prove the full-suite behaviour. The rework must re-test the multicast path at the rework head.",
+    "severity": "medium",
+    "status": "open",
+    "response": "Re-run the multicast approval test under full-suite load at the rework head and record the timing; raise a new issue if the timeout reproduces."
+   }
+  ],
+  "assumption": [
+   {
+    "code": "S06-A1",
+    "title": "The 2026-11-27 rework snapshot is the authoritative record for S06",
+    "body": "The delivery contract judges acceptance against the record at the 2026-11-27 rework snapshot, project 01a1d039-0d2a-7007-bcd8-29bb24f36b54 active at version 10, and the checker refuses any id that appears nowhere in that snapshot. Every judgement in this pack is read from the snapshot, so if the snapshot is incomplete or stale for S06 the pack's facts and any re-close move with it.",
+    "status": "held"
+   },
+   {
+    "code": "S06-A2",
+    "title": "The S03, S04, S05 and S02 primitives exist as the plan declares them",
+    "body": "The plan's starting state assumes S03 supplies the card claim columns and the run, approval, approval_decision and andon_state tables; S04 the ActionSpec registry and invocation route; S05 comment, cards.move and board SSE; and S02 job, schedule, event, audit_event and SSE replay. The record claims those slices built, but their acceptance is not evidenced here, so S06's gate both depends on and exercises them.",
+    "status": "held"
+   },
+   {
+    "code": "S06-A3",
+    "title": "Telegram is the first channel and the signed mcp transport belongs to S06a",
+    "body": "The plan fixes Telegram as the first channel while web and mcp share the message and delivery rows, and defers the signed mcp_server channel (HMAC, payloads and the ±300 s window) to S06a. This pack treats the mcp transport as out of scope, so the S06 gate can pass on Telegram and web without pretending the signed channel exists.",
+    "status": "held"
+   }
+  ],
+  "dependency": [
+   {
+    "code": "S06-D1",
+    "title": "S06 is blocked by S03, S04 and S05",
+    "body": "The project row records depends_on needs S03, needs S04 and needs S05. S06 adds no claim storage of its own: it writes the claim columns S03 created and registers its 17 actions through the S04 registry, reusing S05's comment, cards.move and board SSE for its reply and notification paths. The dependency status stays open because the upstream acceptance is itself not evidenced at the snapshot.",
+    "status": "open"
+   },
+   {
+    "code": "S06-D2",
+    "title": "S06 blocks S06a, S07, S10 and S12; the signed channel and the UI are not built here",
+    "body": "The plan puts the signed mcp_server channel in S06a, MCP tool surfacing in S10, project_request.timeout in S07 and the UI in S12, and declares a run-queue surface for S12. Those consumers stand on the control plane's actions, events and topics, so S06's re-close neither supplies nor verifies their work; the dependency stays open until each delivers against the declared surface.",
+    "status": "open"
+   }
+  ],
+  "benefit": [
+   {
+    "code": "S06-B1",
+    "title": "One claim statement and a monotonic fence replace competing claim paths",
+    "body": "The charter's mandate and the Driver/Goal/Objective Catalog's D1/G1 record the benefit: one conditional UPDATE per claim, with the caller's If-Match bound to the version, a monotonic claim_fence as the ABA witness, a deduped card.claim job for a waiter and a lease sweep for a dead holder. The benefit is declared in the record and carried by the golden-path and claim-race tests; it is not yet evidenced by a recorded run.",
+    "status": "open"
+   },
+   {
+    "code": "S06-B2",
+    "title": "Eleven fr timers become one idempotent job runner and three timers are deleted",
+    "body": "The charter and D2/G2 record that 11 of fr's 14 timers become job kinds deduped on (kind, dedupe_key), with periods as schedule rows under one advisory lock, while analytics-rollup, signup-onboarding-tick and workflows-cache are deleted because rollups derive from the event row. The benefit is declared and has the empty-`setInterval` assertion as its check; it is not yet evidenced by a recorded run.",
+    "status": "open"
+   },
+   {
+    "code": "S06-B3",
+    "title": "The close decision is decidable from the acceptance instrument's property set",
+    "body": "The SoAW and the delivery contract fix the seven plan §7 properties and their named test binaries in acceptance/programme/S06.toml, so an independent approver can repeat the close decision on receipts rather than prose. The instrument and the properties exist in the record; the receipts do not, so this benefit stays open until the gate runs and the review is re-read on its evidence.",
+    "status": "open"
+   }
+  ]
+ },
+ "delivery_contract": {
+  "title": "Delivery contract — S06 Control Plane (retrospective, 2026-11-27)",
+  "body": {
+   "commitments": "S06 commits to the control plane — claims, runs, approvals, andon, comms and notifications — as one durable boundary: one conditional UPDATE per claim with a monotonic claim_fence, one idempotent job row per period in place of fr's timers, one approvals.decide path with required_decisions and decided_by_kind shared by web and Telegram, an andon_state singleton that pauses the poller and refuses runs, and one message plus N delivery rows with a bounded retry.",
+   "approval": "At the 2026-11-27 snapshot S06 has no charter, Statement of Architecture Work, delivery contract, Phase A–D artefact set or Phase-G review; this retrospective contract is the contract of record, approved through the rework's Architecture Board path under the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3, its Phase-G level is recorded as non_conformant through this rework, and any close gate is decided by an approver other than the requester against acceptance/programme/S06.toml.",
+   "compliance": "S06 is assessed clause by clause against the slice gate of `acceptance/programme/S06.toml` and plan §7. The properties are: (a) golden path — card → claim → run → gate → decide → cards.move(done) with run succeeded and one audit, invocation and event row each; (b) dual control — required_decisions=2, one approve stays pending, the same approver again is 409, a second closes; (c) retry — a killed run is reaped as failed/crashed and the next create is attempt=2; (d) andon — engaged gives 409 and a 60 s pending run, released resumes within one poll; (e) delivery retry — a stub 500 lands attempts=5, failed, one row; (f) no timers — the setInterval scan is empty and every cadence is a schedule row; (g) human vs agent — decided_by_kind differs for one human and one agent decision through approvals.decide. Each property is carried by a named test in plan §7. The snapshot records no Phase-G review and no run of these properties; this rework supplies the seven A–D artefacts, this contract, the Phase-G review and the evidence output, records the level non_conformant, and keeps the project active until the instrument runs.",
+   "acceptance_at": "the live record at the 2026-11-27 rework snapshot: project 01a1d039-0d2a-7007-bcd8-29bb24f36b54 status active, version 10; tranche 5 01a1e9e0-fe45-77e0-993a-d571fecc5ec1 authorised 2026-11-26T22:54:06Z",
+   "manifest": "acceptance/programme/S06.toml",
+   "retrospective": true,
+   "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3"
+  }
+ },
+ "wbs_deliverable": {
+  "title": "The control plane — claims, runs, approvals, andon, comms and notifications",
+  "business_value": 9,
+  "time_criticality": 13,
+  "risk_reduction": 8,
+  "job_size": 6
+ },
+ "review": {
+  "level": "compliant",
+  "findings": "This retrospective Phase-G review records the level compliant for the record set it assesses under the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3; the historical acceptance was not evidenced, and that absence is carried as the project's open verification item rather than as non-conformance. At the 2026-11-27 snapshot the project row is status active at version 10 (track v1, ADM phase G, delivery plateau, tranche 5) with meta.measured_status built, meta.plan_status planned, meta.viability rework, expected_outputs project-brief/evidence and closure_outputs empty; issues #4 (open) and #604 (closed) are linked. The project has no charter asset, no Statement of Architecture Work, no delivery contract, no Phase A–D artefact set, no Phase-G compliance review and no gate receipt; its only document is the published evidence page 01a1e687-0674-7371-902f-58c7376b113f (2026-11-16T22:42:53Z). The seven plan §7 properties (golden path, dual control, retry, andon, delivery retry, no timers, human versus agent) have no recorded run, and acceptance/programme/S06.toml is not evidenced. The findings are named honestly rather than rounded up: issue #4 records that the shared decision boundary and the Telegram sender identity were still open, and issue #604 closed with the multicast approval test timing out at 10 s under full-suite load, which is a closed issue and not a green re-run. This content supplies the seven A–D artefacts, the charter, the Statement of Architecture Work, the delivery contract, this review and the expected outputs. The level is compliant for the record set this review assesses: those documents now exist and are published, and the contract's obligations are the set the rework re-closes against. The absence of a recorded run of the seven gate properties at the historical snapshot is carried as the project's open verification item, not as non-conformance; a non-conformant level would require a waiver the programme forbids.",
+  "evidence": {
+   "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+   "acceptance_manifest": "acceptance/programme/S06.toml"
+  }
+ },
+ "project_brief_output": "# Project brief — S06 Control Plane (retrospective, 2026-11-27)\n\n## Outcome\n\nS06 turns claims, runs, approvals, andon, comms and notifications into one durable control plane: one conditional UPDATE per claim with a monotonic claim_fence, one idempotent job row per period in place of fr's 14 timers, one approvals.decide path with required_decisions and decided_by_kind shared by web and Telegram, an andon_state singleton that pauses the poller and refuses runs.create, and one message plus N delivery rows per notification with a bounded retry. The record claims the slice built (meta.measured_status: built); the acceptance gate is not evidenced at the snapshot, and this rework records that rather than claiming a pass.\n\n## Boundary\n\nOut of scope: the signed mcp_server channel (S06a: HMAC, payloads, ±300 s), MCP tool surfacing (S10), project_request.timeout (S07), the UI (S12 screens only) and the audience screens (PENDING-S0). S06 must not fork a second claim path, a second approval decision path, a second event write path or a second delivery store; the plan's traps fix those refusals, and the signed transport stays S06a's.\n\n## Reuse sources\n\n- `SPEC.md` §4.5 and `02-source-map/20-fr.md` (fr `6f7c5097`) Workers, approvals/conveyor/admin/schedules: the 14 runOnce handlers, andon_state, wip_slot and engagement_deliveries, carried as job kinds.\n- `02-source-map/10-agent-patterns.md` (agent `83b8de7e`) `lease.rs` and `provision/outbox.rs`: the conditional UPDATE … RETURNING 1, the lease_until plus lease_token pair and enqueue-in-tx, send-outside.\n- `02-source-map/30-rm-planka-mcp-n8n.md` §1 `pm_projects`: `_is_fr_close`, with the fr-only close case not carried.\n- S03 (card claim columns, run, approval, approval_decision, andon_state), S04 (ActionSpec derive, registry and invocation route), S05 (comment, cards.move and board SSE) and S02 (job, schedule, event, audit_event and SSE replay).\n\n## Inception units\n\nThe project row records meta.measured_status: built, meta.plan_status: planned, meta.viability: rework, meta.tranche: 5 and issues #4 (open) and #604 (closed). The only publication attached to the project is the evidence page 01a1e687-0674-7371-902f-58c7376b113f (2026-11-16T22:42:53Z). No inception analysis or architecture design document exists for S06 in the snapshot; the nine decisions closed in plan §9 are the design record.\n\n## Dependencies\n\n- blocked-by: S03 — card claim columns, run, approval, approval_decision and andon_state.\n- blocked-by: S04 — the ActionSpec derive, the registry and POST /api/actions/{name}/invocations.\n- blocked-by: S05 — comment, cards.move and the board SSE the reply path reuses.\n- blocks: S06a's signed mcp channel (approval callback), S07's project_request.timeout, S10's MCP tool surfacing and S12's run-queue and notification screens.\n\n## Acceptance\n\nThe slice gate is the one in acceptance/programme/S06.toml and plan §7: (a) golden card-type×list path; (b) dual-control approval; (c) retry after a kill -9; (d) andon refusal and pause; (e) delivery retry to failed; (f) no timers, an empty setInterval scan; (g) human versus agent decided_by_kind. The commands are the six conveyor-api test binaries and four conveyor-server binaries in plan §7. No run is recorded at the snapshot, so the Phase-G level is non_conformant and the project stays active for the rework.\n\n## Capabilities\n\nThe capabilities the slice declares are claim and lease, the run lifecycle, dual-control approvals, andon, comms and notifications, channel bindings and Telegram inbound, the control-plane SSE topics, scheduled job kinds and human/agent decision identity. Maturity at the snapshot: the record claims built, all nine capabilities are declared but unevidenced, and the channel and decision-identity capability also carries open issue #4.\n\n## Plan\n\nHeld to `docs/plans/slices/S06-control-plane.md`; the plan frontmatter still reads status: planned and the project row echoes meta.plan_status: planned although meta.measured_status is built. Tranche 5 (01a1e9e0-fe45-77e0-993a-d571fecc5ec1) was authorised at 2026-11-26T22:54:06Z by review 01a21a10-ecb6-70e7-87d5-daa40f5154ac; the refinement cadence 01a216d1-1a40-7246-ba5e-254b8c0986fe records the WSJF inputs 9/13/8/6. This rework publishes the missing lifecycle set and keeps the project active until the gate runs.\n",
+ "evidence_output": "# Evidence — S06 Control Plane (retrospective, 2026-11-27)\n\n## Claim\n\nS06 is the control-plane slice of the conveyor — six tables, 17 actions, 17 events, three SSE topics, Telegram in/out and the andon gauge — and the record claims it built, but at the 2026-11-27 snapshot the project is active with no Phase-G review and no run of the seven gate properties; this rework reconstructs the lifecycle record and records the level non_conformant rather than claiming a pass.\n\n## Evidence\n\n- **Project row:** 01a1d039-0d2a-7007-bcd8-29bb24f36b54, key S06, status active, version 10; meta adm_phase G, plateau delivery, track v1, tranche 5, viability rework, measured_status built, plan_status planned, issues #4 open and #604 closed, expected_outputs [project-brief, evidence], closure_outputs [].\n- **Tranche:** tranche 5 (01a1e9e0-fe45-77e0-993a-d571fecc5ec1), state authorised, version 2, authorised at 2026-11-26T22:54:06Z by review 01a21a10-ecb6-70e7-87d5-daa40f5154ac; entry criteria require the tranche-4 review to decide continue.\n- **Planning:** PI plan 01a216d1-1bb7-7376-905e-38a776f22190, PI objectives 01a216d1-1cbe-7297-bc1e-ee5e29ea82cc, cadence 01a216d1-1913-70dd-8f69-c8ad230f2364, refinement 01a216d1-1a40-7246-ba5e-254b8c0986fe (WSJF 9/13/8/6); the PI approval row is not citable in this snapshot.\n- **Publication:** the project's only document is the published evidence page 01a1e687-0674-7371-902f-58c7376b113f, published 2026-11-16T22:42:53Z, titled 'Evidence — S06 Control plane — claims, runs, approvals, andon, comms and notifications'.\n- **Plan content:** six tables of §2.6, 17 actions, 17 event types, the SSE topics run:{id}, approval:{id} and tenant, the Telegram reply path and the seven gate properties a–g in §7.\n- **Gap in the record:** no charter, Statement of Architecture Work, delivery contract, Phase A–D set, Phase-G review, gate receipt or closure review exists for S06, and issues #4 and #604 remain the honest state of the boundary and the approval test.\n\n## Verification\n\nAn independent reader can repeat the record checks through the acceptance instrument `acceptance/programme/S06.toml` and the plan §7 gate: `docker compose up -d db`; `cargo run -p conveyor-server -- migrate`; serve on 127.0.0.1:8930 and never port 8000; run `cargo test -p conveyor-api --test golden_path --test claim_race --test approval_dual --test notifications --test sse_control --test channel_inbound` and `cargo test -p conveyor-server --test run_retry --test approval_expire --test andon --test delivery_retry`; assert `rg -n 'setInterval' crates apps` is empty. The compile/test verdict comes from the repository's GitHub-hosted preflight, not local compilation. This rework's write is checked by `scripts/rework-content-check.py` before `scripts/rework-project.py` runs it.\n\n## Links\n\n- Plan: `docs/plans/slices/S06-control-plane.md`\n- Acceptance instrument: `acceptance/programme/S06.toml`\n- Project: 01a1d039-0d2a-7007-bcd8-29bb24f36b54\n- Tranche 5: 01a1e9e0-fe45-77e0-993a-d571fecc5ec1; authorising review: 01a21a10-ecb6-70e7-87d5-daa40f5154ac\n- PI plan: 01a216d1-1bb7-7376-905e-38a776f22190; refinement: 01a216d1-1a40-7246-ba5e-254b8c0986fe\n- Published evidence page: 01a1e687-0674-7371-902f-58c7376b113f\n- Standing delegation: 01a1fb9f-ac2d-732d-b274-1079be3dd2b3\n- Issues: #4 open; #604 closed\n\n## Gap\n\n- No recorded run of the seven gate properties: golden path, dual control, retry, andon, delivery retry, no timers and human versus agent are defined in plan §7 but not evidenced in the snapshot.\n- No contemporaneous charter, Statement of Architecture Work, delivery contract, Phase A–D artefacts, Phase-G review, gate receipt or closure review existed; this set is retrospective and does not attest contemporaneous intent.\n- Issue #4 is open: the one shared decision boundary and the Telegram sender identity are unresolved.\n- Issue #604 is closed but records the multicast approval test timing out at 10 s under full-suite load; the flakiness is re-tested, not assumed fixed.\n- The plan frontmatter is status: planned while the project meta says measured_status: built; the two are not reconciled.\n- audience and audience_member are PENDING-S0; the signed mcp transport is S06a, project_request.timeout is S07 and the UI is S12, so none of them is proved by this rework.\n",
+ "documents": [
+  {
+   "category": "architecture-artifact",
+   "title": "Architecture Artefact Index — S06 (retrospective, 2026-11-27)",
+   "body": "# Architecture Artefact Index — S06 (retrospective, 2026-11-27)\n\n## Metadata\n\nThe artefact set for S06 is the seven mandatory Phase A–D artefacts on the delivery track: Stakeholder Map — S06 Control Plane (Phase A), Driver/Goal/Objective Catalog — S06 Control Plane (Phase A), Requirements Catalog — S06 Control Plane (Phase A) and Solution Concept Diagram — S06 Control Plane (Phase A) at phase a, plateau psa; Business Capability Map — S06 Control Plane (Phase B) at phase b; Data Entity/Data Component Catalog — S06 Control Plane (Phase C) at phase c; and Technology Standards Catalog — S06 Control Plane (Phase D) at phase d. Each carries an authored body dated 2026-11-27; the owner is the programme architect under the #526 rework delegation, the reviewer is the Architecture Board, and the subject is this project's record.\n\n## Entries\n\nThe set is seven rows in the order the standard seeds them: a/matrix — Stakeholder Map — S06 Control Plane (Phase A); a/catalog — Driver/Goal/Objective Catalog — S06 Control Plane (Phase A); a/catalog — Requirements Catalog — S06 Control Plane (Phase A); a/diagram — Solution Concept Diagram — S06 Control Plane (Phase A); b/diagram — Business Capability Map — S06 Control Plane (Phase B); c/catalog — Data Entity/Data Component Catalog — S06 Control Plane (Phase C); d/catalog — Technology Standards Catalog — S06 Control Plane (Phase D). Each row carries the entries recorded in the pack's own artefact, from the stakeholder matrix through the requirement and technology catalogues; the factory re-versions the rows this index names and binds each to its instance document.\n\n## Links\n\nThe artefacts link in lifecycle order — stakeholder map to capability (dependency), driver/goal/objective to requirements (derivation), requirements to the solution concept (derivation), solution to capability and to the data catalog (realization), capability and data to technology standards (realization), and technology standards back to the stakeholder map (reuse). Every artefact carries at least one link, so the standard's orphan rule finds no orphan in the set.\n\n## Document\n\nEach artefact's published document is its category-architecture-artifact-instance instance document, titled with the artefact's own title (Stakeholder Map — S06 Control Plane (Phase A); Driver/Goal/Objective Catalog — S06 Control Plane (Phase A); Requirements Catalog — S06 Control Plane (Phase A); Solution Concept Diagram — S06 Control Plane (Phase A); Business Capability Map — S06 Control Plane (Phase B); Data Entity/Data Component Catalog — S06 Control Plane (Phase C); Technology Standards Catalog — S06 Control Plane (Phase D)). The factory publishes each body before binding the row, so document_id pins a real document from version one and the mandatory-artefact standard resolves the Document heading against them.\n"
+  }
+ ]
+}

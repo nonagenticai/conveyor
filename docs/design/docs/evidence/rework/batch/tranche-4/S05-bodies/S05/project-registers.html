@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Project Registers — Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S05-bodies/S05/project-registers.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="project-registers--board--projects-boards-lists-cards-labels-comments-tasks-custom-fields-webhooks-sse">Project Registers — Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE</h1>
+<h2 id="risks">Risks</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The Phase-G review, the delivery contract and the evidence Gap all record that at the 2026-11-24 snapshot no review records a run of the six plan section 7 properties: replay fidelity, one winner, 1k load, webhook shape, SSE and no second store. The project row is closed with meta.measured_status built, but built is a record claim, not a gate pass, and acceptance/programme/S05.toml has 17 checks whose closed-on-red state is the reason this rework exists. Until the properties run at a rework head, the re-close rests on the record set and the accepted P0 exception that carries the out-of-sequence close.&quot;,
+      &quot;code&quot;: &quot;S05-R1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:52:38.518266+00:00&quot;,
+      &quot;id&quot;: &quot;01a219d8-a67c-75d1-a9a5-17a0c715b121&quot;,
+      &quot;impact&quot;: 4,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;R1 Property (a) replay fidelity&quot;,
+          &quot;R2 Property (b) one winner&quot;,
+          &quot;R3 Property (c) 1k load&quot;,
+          &quot;R4 Property (d) webhook shape&quot;,
+          &quot;R5 Property (e) SSE&quot;,
+          &quot;R6 Property (f) no second store&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;high&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d29-796d-967b-1e819a4dd40a&quot;,
+      &quot;response&quot;: &quot;Run acceptance/programme/S05.toml and the four gate test binaries plus tests/load/board.js on a live stack, keep one receipt per property, and re-read the closure review on that evidence rather than inferring a pass from the built status.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-15&quot;,
+      &quot;severity&quot;: &quot;high&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The six gate properties have no recorded run, so the built claim is unproven&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:52:38.518266+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The project brief&#39;s Plan section and the evidence Gap both record that the slice plan frontmatter still reads status: planned and the project meta echoes meta.plan_status: planned although meta.measured_status is built. The Phase-G review judges the record set and does not reconcile the two, so a reader can take an unaccepted plan for an accepted one; the re-close rests on the acceptance record, not on the plan.&quot;,
+      &quot;code&quot;: &quot;S05-R2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:52:38.672575+00:00&quot;,
+      &quot;id&quot;: &quot;01a219d8-a714-72fe-b1d9-6076461df613&quot;,
+      &quot;impact&quot;: 3,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;acceptance/programme/S05.toml&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;medium&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d29-796d-967b-1e819a4dd40a&quot;,
+      &quot;response&quot;: &quot;Reconcile the plan frontmatter with meta.measured_status at the tranche-4 review and record the decision in the plan of record.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-15&quot;,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The plan frontmatter says planned while the project meta says built&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:52:38.672575+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="issues">Issues</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Closed in an unauthorised tranche before the tranche review; accepted by the delegate as a retrospective exception under the standing delegation. The project is reworked in its batch and re-closed through the gates.&quot;,
+      &quot;code&quot;: &quot;U3-EXC-S05&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T01:16:24.209747+00:00&quot;,
+      &quot;id&quot;: &quot;01a1fbad-0be3-7557-9402-cfb405a3147c&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d29-796d-967b-1e819a4dd40a&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;P0&quot;,
+      &quot;status&quot;: &quot;accepted&quot;,
+      &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (S05)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T01:16:24.209747+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The project closed at 2026-11-21T01:05:43Z (version 7) and tranche 4 was authorised at 2026-11-24T17:04:34Z by the tranche-3 review; the accepted P0 issue records the close in an unauthorised tranche before the tranche review as a retrospective exception under the standing delegation. The charter, the Statement of Architecture Work and the evidence Gap carry the same order, so this rework&#39;s governance acts follow the close rather than precede it.&quot;,
+      &quot;code&quot;: &quot;S05-I1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:52:38.830357+00:00&quot;,
+      &quot;id&quot;: &quot;01a219d8-a7b2-71bb-ad4e-ec84c334b0bd&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d29-796d-967b-1e819a4dd40a&quot;,
+      &quot;response&quot;: &quot;Have the tranche-4 review ratify the retrospective exception and this re-close in one decision, or return S05 to the board.&quot;,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;high&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The close preceded tranche 4&#39;s authorisation by three days and rests only on an accepted P0 exception&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:52:38.830357+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The Technology Standards Catalog&#39;s source-discipline row and the evidence Gap record that the Planka fork is not present and that the per-event data envelope and the List.type transitions stay UNVERIFIED until measured. The plan&#39;s trap 1 forbids guessing them, so the board slice&#39;s reuse of Planka field shapes rests on the openapi and schema inventory, not on a runnable source.&quot;,
+      &quot;code&quot;: &quot;S05-I2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:52:38.979664+00:00&quot;,
+      &quot;id&quot;: &quot;01a219d8-a847-711a-a1cc-e070482e5879&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d29-796d-967b-1e819a4dd40a&quot;,
+      &quot;response&quot;: &quot;Measure the per-event envelope and the List.type transitions when the fork is restored, and keep the S14 cutover adapter deferred until then.&quot;,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The Planka fork is absent, so the per-event envelope and List.type transitions stay unverified&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:52:38.979664+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="assumptions">Assumptions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The delivery contract judges acceptance against the record at the 2026-11-24 rework snapshot, project closed 2026-11-21T01:05:43Z at version 7, and the checker refuses any id that appears nowhere in that snapshot. Every judgement in this pack is read from the snapshot, so if the snapshot is incomplete or stale for S05 the pack&#39;s facts and this re-close move with it.&quot;,
+      &quot;code&quot;: &quot;S05-A1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:52:39.1641+00:00&quot;,
+      &quot;id&quot;: &quot;01a219d8-a8ff-7400-8cee-ec579f0b00e6&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d29-796d-967b-1e819a4dd40a&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;held&quot;,
+      &quot;title&quot;: &quot;The 2026-11-24 rework snapshot is the authoritative record for S05&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:52:39.1641+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The project brief&#39;s reuse sources and the evidence Gap record that the live Planka database holds five cards, three webhooks and zero tasks, and plan traps 1 and 8 make it a test-data warning rather than evidence. The gate therefore rests on the two committed fixtures, v1-recording.json and v1-1000.json, so the live database can neither prove nor refute the six properties.&quot;,
+      &quot;code&quot;: &quot;S05-A2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:52:39.311576+00:00&quot;,
+      &quot;id&quot;: &quot;01a219d8-a992-7cf2-8c55-cd7cf1d52f73&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d29-796d-967b-1e819a4dd40a&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;held&quot;,
+      &quot;title&quot;: &quot;The live Planka database is test data and never gate evidence&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:52:39.311576+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="dependencies">Dependencies</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The project brief makes S05 blocked-by S03 (project, board, list, card, card_type, catalogue_entry, may_move and card.version), S04 (the ActionSpec derive, the registry and POST /api/actions/{name}/invocations) and S02 (event, job, audit_event and the /api/events SSE with Last-Event-ID replay). S05 adds no card state column and no second write path, so its build and its gate stand on those three slices.&quot;,
+      &quot;code&quot;: &quot;S05-D1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:52:39.454823+00:00&quot;,
+      &quot;id&quot;: &quot;01a219d8-aa21-7bb6-b1c6-8f00bfeb1a87&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d29-796d-967b-1e819a4dd40a&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;satisfied&quot;,
+      &quot;title&quot;: &quot;S05 is blocked by S03, S04 and S02&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:52:39.454823+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The project brief makes S05 block S12&#39;s declared board and card-cockpit surface and S06&#39;s control-plane writes over the board (claims, assignee and stopwatch), and the charter puts those writes out of scope. The dependency stays open until S12 and S06 deliver against the declared surface; S05&#39;s re-close neither supplies nor verifies them.&quot;,
+      &quot;code&quot;: &quot;S05-D2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:52:39.59715+00:00&quot;,
+      &quot;id&quot;: &quot;01a219d8-aab0-72e7-98cd-00e76378760e&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d29-796d-967b-1e819a4dd40a&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;S12 and S06 consume the board surface; S05 never writes claims, assignee or stopwatch&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:52:39.59715+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="benefits">Benefits</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The charter&#39;s mandate and the Driver/Goal/Objective Catalog&#39;s D1/G1 record the benefit: cards.move loads the card, both lists and project.project_type_code, then reads the matrix from catalogue_entry once and caches it per (tenant, project_type_code), instead of duplicating 280 board\u2194project lookup flows across board surfaces. The benefit is declared in the record and carried by the R1-R6 gate; it is not yet evidenced by a recorded run.&quot;,
+      &quot;code&quot;: &quot;S05-B1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:52:39.768564+00:00&quot;,
+      &quot;id&quot;: &quot;01a219d8-ab5b-7c62-9da1-3ae8c9b952cc&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d29-796d-967b-1e819a4dd40a&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The 280 board\u2194project lookup flows become one foreign-key read through the project_type matrix&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:52:39.768564+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The charter&#39;s mandate and the Driver/Goal/Objective Catalog&#39;s D2/G2 record one comment table and one board_membership row (owner, admin, member or viewer with can_comment and watching, and project_manager and board_subscription folded in) as the replacement for the duplicated Planka and fr stores, with gate property f (R6) as its check. As with B1 the benefit is declared in the record and unevidenced until the property runs.&quot;,
+      &quot;code&quot;: &quot;S05-B2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:52:39.943073+00:00&quot;,
+      &quot;id&quot;: &quot;01a219d8-ac0a-778b-8e66-145431e0206b&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d29-796d-967b-1e819a4dd40a&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;One comment store and one membership model replace the Planka and fr duplication&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:52:39.943073+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The closure states that S05 re-closes on the P0 checks of acceptance/programme/S05.toml, 17 checks with only lessons and artefact-standard at P1, so the close decision is repeatable by an independent reader rather than resting on prose. The Phase-G review and the closure review both judge the record set against that manifest.&quot;,
+      &quot;code&quot;: &quot;S05-B3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:52:40.090106+00:00&quot;,
+      &quot;id&quot;: &quot;01a219d8-ac9d-73cf-9758-7d99d8411538&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d29-796d-967b-1e819a4dd40a&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;realized&quot;,
+      &quot;title&quot;: &quot;The re-close is decidable from the acceptance instrument&#39;s P0 checks&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:52:40.090106+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="changes">Changes</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: &quot;01a219d8-ad39-77c1-83f6-da901324441d&quot;,
+      &quot;body&quot;: &quot;The retrospective MSP/TOGAF/SAFe rework changed this project&#39;s record: its artefacts were re-versioned with documents and links, its register was written, and its schedule and cost baselines were taken. This change records that rework against the frozen scope baseline.&quot;,
+      &quot;code&quot;: &quot;CH-S05-5528da&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:52:49.204056+00:00&quot;,
+      &quot;id&quot;: &quot;01a219d8-d03a-7479-b67b-7822365528da&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;change&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {
+        &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+        &quot;impact&quot;: {
+          &quot;scope&quot;: &quot;the retrospective rework&#39;s record acts&quot;
+        }
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d29-796d-967b-1e819a4dd40a&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;approved&quot;,
+      &quot;title&quot;: &quot;The retrospective rework of S05&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T22:48:43.246893+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-4/S05-bodies/S05/project-registers.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

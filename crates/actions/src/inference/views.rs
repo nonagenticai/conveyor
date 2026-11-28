@@ -92,7 +92,8 @@ pub struct InferenceUsageReportIn {
     pub since: DateTime<Utc>,
     /// Exclusive upper bound on the call time.
     pub until: DateTime<Utc>,
-    /// `day | model | caller_kind | cache_status | prompt_sha | project`.
+    /// `day | model | caller_kind | cache_status | prompt_sha | project | department |
+    /// programme | job | run | step`.
     pub group_by: String,
 }
 
@@ -139,6 +140,12 @@ pub struct UsageRowView {
     pub unpriced_calls: i64,
     /// Wall time summed for the bucket, the load side of the same window.
     pub latency_ms: i64,
+    /// Tool calls attributed to the bucket from the tool ledger. Zero on a dimension the ledger
+    /// cannot attribute (model, caller kind, cache status, prompt SHA).
+    pub tool_calls: i64,
+    /// The tool ledger's spend for the bucket, in USD, as a decimal string. Summed at read time;
+    /// an unpriced tool call contributes `0` and is still counted in `tool_calls`.
+    pub tool_cost_usd: String,
     /// The commercial unit of a uniformly non-token bucket (`image`, `character`, `second`);
     /// `None` for a token bucket, a mixed bucket, or one containing an unpriced call.
     pub unit: Option<String>,
@@ -162,6 +169,8 @@ impl From<conveyor_domain::inference::UsageRow> for UsageRowView {
             priced_calls: row.priced_calls,
             unpriced_calls: row.unpriced_calls,
             latency_ms: row.latency_ms,
+            tool_calls: row.tool_calls,
+            tool_cost_usd: row.tool_cost_usd.to_string(),
             unit: row.unit,
             units: row.units.map(|units| units.to_string()),
         }

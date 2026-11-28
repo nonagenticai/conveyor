@@ -1,9 +1,9 @@
 import { expect, test } from "./fixture";
 
 import {
-  allowSelfApproval,
   createBoardCard,
   decideAsReviewer,
+  FIXTURE_EVIDENCE_WAIVER,
   invoke,
   isDevAuth,
 } from "./helpers";
@@ -87,13 +87,16 @@ test("a_self_gate_is_shown_but_not_decidable_in_the_cockpit", async ({ page, req
   await expect(page.locator(".problem")).toHaveCount(0);
 });
 
-test("a_self_gate_is_decided_when_the_policy_allows_it", async ({ page, request }) => {
-  const title = `e2e self-approved ${Date.now()}`;
+test("a_registered_action_gate_is_decided_by_a_distinct_approver", async ({
+  page,
+  request,
+}) => {
+  const title = `e2e action gate ${Date.now()}`;
   const fixture = await createBoardCard(request, title);
-  // The card gate's name is not a registered action, so a policy can never allow it; this one
-  // is, and the tenant's policy is what re-enables the requester's own Approve.
-  await allowSelfApproval(request, "cards.archive");
-  await invoke(request, "approvals.request", {
+  // §5.4 is an invariant, not a policy: a registered destructive action's gate names evidence,
+  // and no policy can let its requester decide it. The request records the fixture waiver
+  // because this spec is about who may decide, not about the gate's subject.
+  const gate = await invoke<{ id: string }>(request, "approvals.request", {
     gate: "cards.archive",
     kind: "action",
     action: "cards.archive",
@@ -101,15 +104,24 @@ test("a_self_gate_is_decided_when_the_policy_allows_it", async ({ page, request 
     input: { id: fixture.card.id },
     proposed_input: { id: fixture.card.id },
     required_decisions: 1,
+    evidence_waiver_reason: FIXTURE_EVIDENCE_WAIVER,
   });
 
   await page.goto(`/card/${fixture.card.id}`);
   const approve = page.getByRole("button", { name: "Approve" });
-  await expect(approve).toBeEnabled();
-  await approve.click();
+  // The requester's own control is disabled with the reason, for a registered action too.
+  await expect(approve).toBeDisabled();
+  await expect(page.getByText(SELF_GATE_REASON)).toBeVisible();
 
-  // The pill moves off pending: the requester decided their own gate, which the policy allows.
-  await expect(page.locator(".pill", { hasText: /approved/i })).toBeVisible({ timeout: 10_000 });
-  await expect(page.locator(".pill", { hasText: /^pending$/i })).toHaveCount(0);
+  // Only the dev seed has a second dev-a admin to decide it.
+  test.skip(!isDevAuth(), "the deployed suite has one principal, so nobody else can decide");
+  await decideAsReviewer(request, "approvals.decide", gate.id);
+
+  const approved = page.locator(".pill", { hasText: /approved/i });
+  await expect(approved)
+    .toBeVisible({ timeout: 10_000 })
+    .catch(() => page.reload());
+  await expect(approved).toBeVisible();
+  await expect(page.locator(".pill", { hasText: "Reviewer · human · web" })).toBeVisible();
   await expect(page.locator(".problem")).toHaveCount(0);
 });

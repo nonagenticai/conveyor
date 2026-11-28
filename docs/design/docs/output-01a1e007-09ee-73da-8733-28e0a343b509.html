@@ -23,86 +23,18 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1>Architecture and analysis pack — current state, options, risks</h1>
-<p><strong>Programme:</strong> conveyor buildout · <strong>Status:</strong> adopted by P0 · <strong>Date:</strong> 2026-11-15</p>
-<h2>1. Current state (measured)</h2>
-<ul>
-<li><strong>The application is live.</strong> <code>conveyor.nonagentic.ai</code> runs the one Rust service on Postgres; the
-public programme site reads the database through <code>/design/data/snapshot.js</code>,
-<code>/design/docs/outputs.js</code> and <code>/design/docs/output-&lt;id&gt;.html</code>.</li>
-<li><strong>The programme is 48 projects.</strong> <code>data/coverage.json</code> at this baseline measures <strong>26 built, 2
-partial (S14, S21), 17 proposed, 1 archived, 1 standing, 1 planned (P0)</strong>; tranches 0–13
-(<code>scripts/build-coverage.py</code>).</li>
-<li><strong>V1's build record is 83+ tables and 290+ served operations</strong>; the served-spec lock is the drift
-gate (<code>docs/SPEC_V2.md</code> §1.1).</li>
-<li><strong>The work store is real but nearly empty.</strong> The document aggregate carries body, <code>publishable</code>
-and ETag; the public route serves published rows; at the P0 baseline one published output exists.
-The expected outputs per project are the missing index (this definition set adds them).</li>
-<li><strong>The engine proof is not claimed.</strong> No run has executed a step against a model; the seeded
-agents' <code>allowed_actions</code> are empty. A5 is a separate unit and is not a precondition for this
-programme's definition work.</li>
-<li><strong>The tenant identity is being repaired.</strong> The app's tenant was seeded locally; the licences
-registry's canonical tenant differs. The owner's ruling is to licence the app's own tenant, and
-the signed-in console is gated on that grant (2026-11-15).</li>
-</ul>
-<h2>2. Options considered</h2>
-<table><thead><tr><th>Option</th><th>Why it was rejected</th></tr></thead><tbody>
-<tr><td><strong>Reuse fr/agent as the runtime and add a UI</strong></td><td>The conveyor would become a facade over other applications' models; the program exists to own its whole model (D33). The agent is a front end over MCP.</td></tr>
-<tr><td><strong>A fleet of small services per aggregate</strong></td><td>The V1 measurement showed the cost of a fleet: cross-service contracts, duplicated concepts, a distributed transaction in every workflow. One Rust app, one database, one action registry wins.</td></tr>
-<tr><td><strong>Documents as files in git, not rows</strong></td><td>The programme's work products need retrieve/update/version semantics and a live public URL; git alone cannot give a non-engineer an editor or the app a checklist. The DB is the store; the one-way <code>programme/</code> export is the public record.</td></tr>
-<tr><td><strong>Agents execute the programme's work now</strong></td><td>The engine proof is not done; the programme can run on people and sessions today. Coupling the programme's definition to A5 would block it on model credentials.</td></tr>
-<tr><td><strong>A second UI framework</strong></td><td>The pack is already a working console; a rewrite would repeat the S12 cost before the programme has a single published brief.</td></tr>
-</tbody></table>
-<h2>3. Risks</h2>
-<p>From <code>docs/SPEC_V2.md</code> §14, the ones this programme owns directly:</p>
-<ol>
-<li><strong>Over-abstraction (R1).</strong> Four <code>wf_*</code> types "serve nothing" in the v4 lesson. Rule: no aggregate
-without a named procedure and a metric; kill any table with zero use after one cycle.</li>
-<li><strong>Meta-job recursion (R2).</strong> Coach cards about coach cards; 9/9 katas failed. Rule: closed
-triage/remedy sets, per-signature uniqueness, depth cap, evidence before kata.</li>
-<li><strong>Reimplementation drift (R3).</strong> The conveyor duplicates concepts from other applications and
-they diverge. Rule: the conveyor owns its model; concept parity is tested only where a channel
-contract depends on it.</li>
-<li><strong>LLM decision creep (R4).</strong> Routing logic reappears in prompts. Rule: the decision-ladder types;
-a generated result has no transition path.</li>
-<li><strong>Governance theatre (R5).</strong> A gate that cannot fail. Rule: every gate ships with a negative
-test; never-refused gates are flagged.</li>
-<li><strong>Self-development runaway (R6).</strong> The system changes the gates that judge it. Rule: no changing
-own gates/instruments; merge and deploy are separate human decisions; rollback is mandatory.</li>
-<li><strong>Tool sprawl (R13) and SSRF/credential leak (R14).</strong> One owner per toolkit; a probe; effect
-classes; destination aliases; sealed credentials; response caps.</li>
-<li><strong>Standards cosplay (R10).</strong> TOGAF/SAFe in name only. Rule: a lean profile with named artefacts
-and gates; the first architecture project is the test.</li>
-</ol>
-<h2>4. Dependency map</h2>
-<pre><code>P0 ──gates──&gt; T1..T17
-T0 ─&gt; T1 ─&gt; T2 ─&gt; T3
-              ├─&gt; T4 ─&gt; T7
-              ├─&gt; T13 ─&gt; T6, T7, T14, T15, T16
-              └─&gt; T9, T10 (after T1/T3)
-T5 ─&gt; T6, T8     (T5 after T2 and S16–S20)
-T12 = after all  (the one-organisation loop)
-</code></pre>
-<p>The full typed graph is <code>seed/programme.json</code> <code>meta.depends_on</code>; <code>data/coverage.json</code> computes the
-tranche as the longest path. The V1 slices run on their own edges (S00–S21); S14 is the cutover.</p>
-<h2>5. Open issues at this baseline</h2>
-<ul>
-<li><strong>A5 (engine proof)</strong>: sign-in, model/inference credentials and a non-empty <code>allowed_actions</code> are
-needed; no run has executed a step. Not a P0 gate.</li>
-<li><strong>Tenant identity</strong>: the app's tenant and the licences registry's canonical tenant differ; the
-owner chose to licence the app's tenant. The re-key is a separate estate decision.</li>
-<li><strong>CI capacity</strong>: the measured 102-minute run and the runner queue are the development loop's
-bottleneck (<code>docs/plans/development-process-speed.md</code>); <code>PLATFORM</code> owns it.</li>
-<li><strong>The programme mirror</strong>: the DB is authoritative; the <code>programme/</code> export is one-way. A merged
-design PR is applied by a maintainer, not automatically.</li>
-</ul>
-<h2>6. What this pack commits to</h2>
-<p>Every delivery project's inception analysis starts from this state and these options; it does not
-re-open the choices in §2 without a decision record. The risks in §3 are checked at each project's
-gate; a project that increases one of them names the mitigation.</p>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="architecture-analysis" data-provenance-version="4" data-provenance-hash="eee5662bd2d8f1bf5792a5c68792f485ae99d561233260ed5cb4eedc0f0ec1bb" data-provenance-status="active" data-provenance-owner="unrecorded" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>architecture-analysis</dd></div><div><dt>Version</dt><dd>4</dd></div><div><dt>SHA-256</dt><dd>eee5662bd2d8f1bf5792a5c68792f485ae99d561233260ed5cb4eedc0f0ec1bb</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>unrecorded</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Architecture and analysis pack — P0 (retrospective, 2026-11-26)</h1>
+<h2>Current state</h2>
+<p>The current-state analysis rests on the P0 baseline: V1 is far implemented with 25 measured-built slices and two partial (S14, S21), the T0 organisation spine is merged (#65, migration 0040), and the programme seed holds 47 projects with none for programme definition. <code>docs/SPEC_V2.md</code> is the design record and <code>docs/SPEC.md</code> the V1 build record. The pack published on 2026-11-18 at 08:18:20 (<code>01a1e007-09ee-73da-8733-28e0a343b509</code>) is the current-state, options and risk view between them.</p>
+<h2>Options considered</h2>
+<p>The pack weighed defining the programme from the existing seed against inventing a parallel list, and adopted the seed update in plan §3 item 7. It weighed a document library against a row-backed programme model, and adopted SPEC_V2 §8.3's rows and gates. It also treated the SAFe cadence and the MSP definition track as complements rather than alternatives, which is the split SPEC_V2 §8.2 and §8.3 record.</p>
+<h2>Risks</h2>
+<p>The risk view P0 leaves is one of dependencies: the typed architecture rows belong to T9 (#81), T1–T19 depend on P0's acceptance, and every benefit depends on operational change after delivery. The plan's acceptance conditions — passing <code>check-coverage</code>, an idempotent seed regen and a <code>build-docs</code> index of the plan — are the checks that would show the definition pack is coherent. This retrospective does not claim they were re-run on 2026-11-26.</p>
+<h2>Dependency map</h2>
+<p>The map follows the SPEC_V2 §8.5 trace chain: stakeholder or driver to goal, to principle, requirement or decision record, to architecture artefact, to architecture contract, to project charter, to WBS deliverable and work package, then card, run, step, evidence, acceptance and closure. At programme level, P0 blocks T1–T19, tranche 1 depends on tranche 0's continue decision, and each benefit depends on the capability and operational area named in its profile.</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-26T21:15:00Z</code> at publish time.</span>
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-27T12:10:18.740973+00:00</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

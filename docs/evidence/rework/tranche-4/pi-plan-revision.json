@@ -1,0 +1,32 @@
+{
+ "schema": "conveyor-pi-plan-revision/v1",
+ "tranche": 4,
+ "cadence_id": "01a202a1-dbb9-7e49-b64a-cf97c3fab095",
+ "head": "364ffd79",
+ "recorded_at": "2026-11-24",
+ "old_scope": [
+  "T9",
+  "T10",
+  "T4",
+  "T14",
+  "T16",
+  "S05",
+  "S07",
+  "S09"
+ ],
+ "new_scope": [
+  "T9",
+  "T10",
+  "T4",
+  "T14",
+  "T16",
+  "S05",
+  "S07",
+  "S09",
+  "T19",
+  "T18"
+ ],
+ "why": "the published plan named eight members while ten projects carry meta.tranche 4: T18 (O2 harness) and T19 (meetings record set) were omitted. The scope and capacity are revised to the live membership; the refinement cadence records each member's four WSJF inputs, which the plan previously left unrecorded.",
+ "refinement": "01a202a2-2705-7392-a2d1-03ca2b3a174e",
+ "wsjf_evidence": "docs/evidence/rework/tranche-4/refinement-wsjf.json"
+}

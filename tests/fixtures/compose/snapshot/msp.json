@@ -1,0 +1,7 @@
+{
+  "items": [
+    {"id": "ev-2", "name": "Second evidence"},
+    {"id": "ev-1", "name": "First evidence"}
+  ],
+  "empty": []
+}

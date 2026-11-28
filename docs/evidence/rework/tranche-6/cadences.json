@@ -1,0 +1,13 @@
+{
+  "schema": "conveyor-tranche-cadences/v1",
+  "tranche": 6,
+  "tranche_id": "01a1e9e1-07d3-75d3-8c99-4002d5bfe8f7",
+  "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+  "cadences": {
+    "pi": "01a21c62-698d-7a02-b32a-1e3cad0ba69e",
+    "refinement": "01a21c62-6a43-7d17-9d5b-836ad1801e45",
+    "demo": "01a21c62-6aeb-764e-af16-44eefdee7186",
+    "retro": "01a21c62-6b8c-73d2-a4cd-425f244cde36"
+  },
+  "verified": "cadences.list on the replay record, all four rows at period tranche-6; the refinement row carries meta.refinement.wsjf_inputs"
+}

@@ -38,8 +38,8 @@ const dataPath = path.join(dataDir, "standards.json");
 const STATUSES = new Set(["evidenced", "partial", "absent"]);
 const STANDARDS = new Set(["MSP", "TOGAF", "SAFe", "PMP", "SPEC"]);
 const LEVELS = new Set(["portfolio", "programme", "project", "work_package"]);
-const SUBJECTS = new Set(["programme", "project", "tranche", "benefit", "capability", "phase", "card"]);
-const SOURCE_KINDS = new Set(["rows", "documents", "computed", "register"]);
+const SUBJECTS = new Set(["programme", "project", "tranche", "benefit", "capability", "phase", "artifact", "card"]);
+const SOURCE_KINDS = new Set(["rows", "documents", "computed", "register", "absence"]);
 
 function validate(record, documentsRoot, registerKeys) {
   const errors = [];
@@ -66,8 +66,20 @@ function validate(record, documentsRoot, registerKeys) {
     const sections = Array.isArray(artefact.sections) ? artefact.sections : [];
     if (!sections.length) errors.push(`${id}: no sections`);
     const evidenced = sections.filter((section) => section.status === "evidenced").length;
-    const expected =
-      evidenced === sections.length ? "evidenced" : evidenced ? "partial" : "absent";
+    // Row evidence alone is not the artefact: when the published-document section is absent, the
+    // record is absent regardless of how many of its other sections have rows. This is the
+    // generator's own doctrine (`document_missing` in generate-standards.py), and it must be the
+    // verifier's too, or a record can never be honest about a missing document.
+    const documentMissing = sections.some(
+      (section) => section.heading === "Published document" && section.status === "absent"
+    );
+    const expected = documentMissing
+      ? "absent"
+      : evidenced === sections.length
+        ? "evidenced"
+        : evidenced
+          ? "partial"
+          : "absent";
     if (artefact.status !== expected) {
       errors.push(`${id}: status ${artefact.status} but sections say ${expected}`);
     }
@@ -87,9 +99,23 @@ function validate(record, documentsRoot, registerKeys) {
         if ((source.kind === "rows" || source.kind === "documents") && !String(source.pointer || "").startsWith("/")) {
           errors.push(`${id}: section ${section.heading} has no JSON pointer`);
         }
+        if (source.kind === "absence" && !String(source.record || "").trim()) {
+          errors.push(`${id}: section ${section.heading} has an absence source with no record`);
+        }
       }
     }
-    if (artefact.mandatory && artefact.status !== "evidenced") {
+    // A package is owed exactly when a REQUIRED section is unresolved. `generate-standards.py`
+    // creates no finding for an optional section with no rows (it is the page's honest absence),
+    // so demanding a package for it would queue work no row can discharge. The page's status
+    // still counts every section, so an optional absence keeps the page `partial` and visible.
+    const artefactSections = artefact.sections || [];
+    const missingRequired =
+      artefactSections.length === 0
+        ? artefact.status !== "evidenced"
+        : artefactSections.some(
+            (section) => section.required !== false && section.status !== "evidenced",
+          );
+    if (artefact.mandatory && missingRequired) {
       if (!artefact.package_key) errors.push(`${id}: ${artefact.status} and no package key`);
       if (artefact.package_published !== true) {
         errors.push(`${id}: ${artefact.status} but its package is not in the published register`);
@@ -170,9 +196,37 @@ function selfTest() {
   const unlinked = base();
   unlinked.artefacts[0].package_published = false;
   cases.push(["a mandatory absent artefact with no published package", unlinked, false]);
+  const optionalOnly = base();
+  optionalOnly.summary = { artefacts: 1, mandatory: 1, evidenced: 0, partial: 1, absent: 0, findings: 1 };
+  optionalOnly.by_standard = { MSP: { artefacts: 1, evidenced: 0, partial: 1, absent: 0 } };
+  optionalOnly.artefacts[0].status = "partial";
+  optionalOnly.artefacts[0].sections = [
+    {
+      heading: "Purpose",
+      status: "evidenced",
+      required: true,
+      sources: [{ kind: "rows", pointer: "/x", count: 2 }],
+    },
+    {
+      heading: "Links",
+      status: "absent",
+      required: false,
+      sources: [{ kind: "rows", pointer: "/y", count: 0 }],
+    },
+  ];
+  optionalOnly.artefacts[0].package_published = false;
+  cases.push(["a mandatory page whose only absence is optional", optionalOnly, true]);
   const badSource = base();
   badSource.artefacts[0].sections[0].sources = [{ kind: "not-a-kind", pointer: "/x", count: 0 }];
   cases.push(["an unknown source kind", badSource, false]);
+  const absenceSource = base();
+  absenceSource.artefacts[0].sections[0].sources = [
+    { kind: "absence", record: "docs/evidence/example.md", count: 0 },
+  ];
+  cases.push(["a declared absence source", absenceSource, true]);
+  const absenceNoRecord = base();
+  absenceNoRecord.artefacts[0].sections[0].sources = [{ kind: "absence", count: 0 }];
+  cases.push(["an absence source with no record", absenceNoRecord, false]);
   let failures = 0;
   for (const [label, candidate, expectValid] of cases) {
     const errors = validate(candidate, tmp);

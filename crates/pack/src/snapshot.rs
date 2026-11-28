@@ -80,6 +80,9 @@ pub struct SnapshotArgs {
     /// The commit the published pack describes. Absent means `git rev-parse HEAD` in the
     /// working directory; a pod has no checkout, so a publish passes it explicitly.
     pub git_sha: Option<String>,
+    /// Rehash an already-written pack directory and rewrite its `manifest.json`; nothing else
+    /// is regenerated and no database is read.
+    pub manifest_only: bool,
     /// When the image that produced the pack was built (RFC 3339). Absent means `unknown`; the
     /// live page marks its data stale against this stamp (#867 / #782 P3.2).
     pub build_time: Option<String>,
@@ -144,10 +147,37 @@ pub enum SnapshotError {
         /// Why it was refused.
         detail: String,
     },
+    /// `--manifest-only` names a directory with no readable, snapshot-shaped `manifest.json`.
+    #[error("manifest-only {path}: {detail}")]
+    ManifestOnly {
+        /// The `manifest.json` path that was read.
+        path: String,
+        /// Why it was refused.
+        detail: String,
+    },
+    /// The issue registry carries no `provenance.tenant`/`provenance.source` block.
+    #[error("issue registry {path}: no provenance; a registry must declare its tenant and source")]
+    IssuesProvenanceMissing {
+        /// The path the snapshot read.
+        path: String,
+    },
+    /// The issue registry was fetched for another tenant than the snapshot's.
+    #[error(
+        "issue registry declares tenant {declared:?}, but this snapshot is for tenant {requested:?}"
+    )]
+    IssuesTenantMismatch {
+        /// The tenant the registry names.
+        declared: String,
+        /// The tenant the snapshot was asked for.
+        requested: String,
+    },
 }
 
 /// Read one tenant and write every snapshot file.
 pub async fn run(args: SnapshotArgs) -> Result<SnapshotReport, SnapshotError> {
+    if args.manifest_only {
+        return manifest_only(&args);
+    }
     let database_url = args
         .database_url
         .clone()
@@ -165,14 +195,13 @@ pub async fn run_with_pool(
     pool: &sqlx::PgPool,
     args: SnapshotArgs,
 ) -> Result<SnapshotReport, SnapshotError> {
+    if args.manifest_only {
+        return manifest_only(&args);
+    }
     let tenant = store::tenants::id_by_slug(pool, &args.tenant)
         .await?
         .ok_or_else(|| SnapshotError::UnknownTenant(args.tenant.clone()))?;
 
-    let generated_at = args
-        .generated_at
-        .clone()
-        .unwrap_or_else(|| chrono::Utc::now().to_rfc3339());
     let git_sha = args.git_sha.clone().unwrap_or_else(git_sha);
     let deployed_at = args.build_time.as_deref().unwrap_or("unknown");
     let migration_version = store::MIGRATOR
@@ -190,6 +219,13 @@ pub async fn run_with_pool(
     let mut data = store::snapshot::snapshot_tx(&mut tx, tenant).await?;
     tx.rollback().await?;
 
+    // One clock for both producers (v1-pack-2): the live view derives the same value from the
+    // same `SnapshotData`, so a download served from memory is the file this run writes.
+    let generated_at = args
+        .generated_at
+        .clone()
+        .unwrap_or_else(|| snapshot_generated_at(&data));
+
     // The register compares the standard's declared kinds with the rows this snapshot publishes.
     // Read them once and reuse them for the pages: one read is what keeps `register.json` and
     // `outputs.js` describing the same published set.
@@ -204,7 +240,7 @@ pub async fn run_with_pool(
         &generated_at,
     );
 
-    let issues = read_issues(&args.issues)?;
+    let (issues, issues_bytes) = read_issues(&args.issues, &args.tenant)?;
     let feedback = feedback_issues(&issues);
     // The rework register is a file input like the issue registry, but the flag is explicit:
     // an unreadable register or a wrong schema is refused, never silently omitted.
@@ -348,8 +384,37 @@ pub async fn run_with_pool(
             &generated_at,
             crate::outputs::rendered_commit().as_deref(),
         )?;
-        outputs = crate::outputs::write_rendered(dir, &index, &pages)?;
+        let (count, written) = crate::outputs::write_rendered_with_files(dir, &index, &pages)?;
+        outputs = count;
+        // ⛔ Every published page is in the manifest (v1-pack-3): the path is relative to the
+        // data directory, so `check-data.cjs` hashes a page exactly as it hashes `programme.json`.
+        for output in written {
+            files.push(SnapshotFile {
+                path: relative_manifest_path(&args.out, dir, &output.name),
+                sha256: sha256_hex(&output.bytes),
+                bytes: output.bytes.len(),
+                records: 0,
+            });
+        }
         tracing::info!(outputs, dir = %dir.display(), "platform outputs written");
+    }
+
+    // The issue registry is an input, but it publishes beside the data (`data/issues.json`). Its
+    // hash in the manifest is the registry's provenance (v1-pack-3/5): an app publish that carries
+    // another image's registry names a hash the target branch does not have, and the public gate
+    // rejects it instead of silently relabelling producer B's registry as tenant A's.
+    if let Some(bytes) = issues_bytes
+        && args.issues.file_name() == Some(std::ffi::OsStr::new("issues.json"))
+    {
+        files.push(SnapshotFile {
+            path: "issues.json".to_owned(),
+            sha256: sha256_hex(&bytes),
+            bytes: bytes.len(),
+            records: issues
+                .get("issues")
+                .and_then(Value::as_array)
+                .map_or(0, Vec::len),
+        });
     }
 
     files.sort_by(|a, b| a.path.cmp(&b.path));
@@ -379,6 +444,153 @@ pub async fn run_with_pool(
     })
 }
 
+/// `--manifest-only` (v1-pack-3): rehash every file already in the pack directory and rewrite
+/// `manifest.json` from those bytes.
+///
+/// The snapshot writes its manifest before the publish's later generators (conformance,
+/// standards, documents), so those files would publish unhashed. This pass runs after the last
+/// generator: it keeps the old manifest's header, takes each file's `records` from the old
+/// manifest when it listed that path (never inventing one), and hashes the bytes on disk now.
+fn manifest_only(args: &SnapshotArgs) -> Result<SnapshotReport, SnapshotError> {
+    let out = &args.out;
+    let manifest_path = out.join("manifest.json");
+    let path_label = manifest_path.display().to_string();
+
+    let read =
+        std::fs::read_to_string(&manifest_path).map_err(|error| SnapshotError::ManifestOnly {
+            path: path_label.clone(),
+            detail: if error.kind() == std::io::ErrorKind::NotFound {
+                "no manifest.json; run a normal snapshot first".to_owned()
+            } else {
+                error.to_string()
+            },
+        })?;
+    let old: Value = serde_json::from_str(&read).map_err(|error| SnapshotError::ManifestOnly {
+        path: path_label.clone(),
+        detail: format!("does not parse: {error}"),
+    })?;
+    if old.get("schema").and_then(Value::as_str) != Some(SCHEMA) {
+        return Err(SnapshotError::ManifestOnly {
+            path: path_label.clone(),
+            detail: format!(
+                "schema is {}, expected {SCHEMA:?}",
+                old.get("schema")
+                    .map_or_else(|| "absent".to_owned(), |schema| schema.to_string())
+            ),
+        });
+    }
+    let old_files =
+        old.get("files")
+            .and_then(Value::as_array)
+            .ok_or_else(|| SnapshotError::ManifestOnly {
+                path: path_label.clone(),
+                detail: "carries no files array".to_owned(),
+            })?;
+
+    let mut old_records = std::collections::HashMap::new();
+    for file in old_files {
+        if let (Some(path), Some(records)) = (
+            file.get("path").and_then(Value::as_str),
+            file.get("records").and_then(Value::as_u64),
+        ) {
+            old_records.insert(path.to_owned(), records as usize);
+        }
+    }
+
+    let mut paths = Vec::new();
+    collect_files(out, out, &mut paths)?;
+    paths.sort();
+
+    let mut files = Vec::with_capacity(paths.len() + old_files.len());
+    let mut walked = std::collections::HashSet::new();
+    for path in paths {
+        let bytes = std::fs::read(out.join(&path))?;
+        walked.insert(path.clone());
+        files.push(SnapshotFile {
+            path: path.clone(),
+            sha256: sha256_hex(&bytes),
+            bytes: bytes.len(),
+            records: old_records.get(&path).copied().unwrap_or(0),
+        });
+    }
+
+    // The snapshot's platform pages live outside the data directory (`../docs/…`). They are
+    // published pack files too, so keep an old entry whose file still exists; an entry whose
+    // file is gone is dropped, because the manifest must name only files that are there.
+    for file in old_files {
+        let Some(path) = file.get("path").and_then(Value::as_str) else {
+            continue;
+        };
+        if walked.contains(path) || path == "manifest.json" {
+            continue;
+        }
+        if !out.join(path).is_file() {
+            continue;
+        }
+        let bytes = std::fs::read(out.join(path))?;
+        files.push(SnapshotFile {
+            path: path.to_owned(),
+            sha256: sha256_hex(&bytes),
+            bytes: bytes.len(),
+            records: old_records.get(path).copied().unwrap_or(0),
+        });
+    }
+    files.sort_by(|a, b| a.path.cmp(&b.path));
+
+    let header = |key: &str| old.get(key).cloned().unwrap_or(Value::Null);
+    let manifest = json!({
+        "schema": SCHEMA,
+        "generated_at": header("generated_at"),
+        "tenant": header("tenant"),
+        "git_sha": header("git_sha"),
+        "migration": header("migration"),
+        "feedback_url": header("feedback_url"),
+        "redaction": header("redaction"),
+        "files": &files,
+    });
+    let manifest_bytes = to_pretty_bytes(&manifest)?;
+    std::fs::write(&manifest_path, &manifest_bytes)?;
+    let manifest_sha256 = sha256_hex(&manifest_bytes);
+
+    Ok(SnapshotReport {
+        tenant: old
+            .get("tenant")
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .to_owned(),
+        out: out.clone(),
+        files,
+        generated_at: old
+            .get("generated_at")
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .to_owned(),
+        manifest_sha256,
+        outputs: 0,
+    })
+}
+
+/// Every file under `dir`, as a forward-slash path relative to `root`, excluding the root
+/// `manifest.json` (the file this pass rewrites).
+fn collect_files(root: &Path, dir: &Path, out: &mut Vec<String>) -> Result<(), std::io::Error> {
+    for entry in std::fs::read_dir(dir)? {
+        let path = entry?.path();
+        if path.is_dir() {
+            collect_files(root, &path, out)?;
+            continue;
+        }
+        let relative = path
+            .strip_prefix(root)
+            .unwrap_or(&path)
+            .to_string_lossy()
+            .replace('\\', "/");
+        if relative != "manifest.json" {
+            out.push(relative);
+        }
+    }
+    Ok(())
+}
+
 /// One snapshot section as the standalone JSON file the CLI writes.
 ///
 /// The live `/design/data/programme.json` route serves this from memory, so the download and the
@@ -391,6 +603,57 @@ pub(crate) fn section_json(section: &Value, generated_at: &str) -> Result<String
     let mut text = serde_json::to_string_pretty(&value)?;
     text.push('\n');
     Ok(text)
+}
+
+/// The clock the CLI and the live view share: the newest published document in the programme
+/// snapshot, or [`crate::live::EMPTY_GENERATED_AT`] when there is none.
+///
+/// v1-pack-2: both producers compute this from the same `SnapshotData`, so a CLI run without
+/// `--generated-at` and the live route cannot disagree about `generated_at` — and therefore about
+/// the manifest timestamp or `snapshot.js.payload_sha256`.
+pub(crate) fn snapshot_generated_at(data: &store::snapshot::SnapshotData) -> String {
+    data.artefacts
+        .get("documents")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .filter_map(|document| document.get("updated_at").and_then(Value::as_str))
+        .filter_map(|at| chrono::DateTime::parse_from_rfc3339(at).ok())
+        .max()
+        .map(|at| at.to_rfc3339())
+        .unwrap_or_else(|| crate::live::EMPTY_GENERATED_AT.to_owned())
+}
+
+/// The manifest path of one file in the outputs directory, relative to the data directory.
+///
+/// The pack's two writers lay the directories out as siblings (`data/` and `docs/`), so
+/// `output-<id>.html` is `../docs/output-<id>.html` in `data/manifest.json` — the form
+/// `check-data.cjs` resolves against its data directory.
+fn relative_manifest_path(out: &Path, outputs_dir: &Path, name: &str) -> String {
+    let mut base = out;
+    let mut ups = 0usize;
+    loop {
+        if let Ok(rest) = outputs_dir.strip_prefix(base) {
+            if rest.as_os_str().is_empty() {
+                return name.to_owned();
+            }
+            let mut path = PathBuf::new();
+            for _ in 0..ups {
+                path.push("..");
+            }
+            path.push(rest);
+            path.push(name);
+            return path.to_string_lossy().replace('\\', "/");
+        }
+        match base.parent() {
+            Some(parent) => {
+                base = parent;
+                ups += 1;
+            }
+            None => break,
+        }
+    }
+    outputs_dir.join(name).to_string_lossy().replace('\\', "/")
 }
 
 /// Add the schema and timestamp so every file is self-describing.
@@ -554,6 +817,27 @@ static HOME_PATH_PATTERN: std::sync::LazyLock<regex::Regex> = std::sync::LazyLoc
     regex::Regex::new(r#"(?:/Users/[A-Za-z0-9._-]+|/home/[A-Za-z0-9._-]+|~/)[^\s"']*"#)
         .expect("the home-path pattern is a constant")
 });
+static INTERNAL_HOST_PATTERN: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r"\b([A-Za-z0-9][A-Za-z0-9_-]*)\.internal\b")
+        .expect("the internal-host pattern is a constant")
+});
+static PRIVATE_REPO_PATTERN: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r"nonagenticai/gitops-production")
+        .expect("the private-repo pattern is a constant")
+});
+static DEPLOY_KEY_PATTERN: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r"strato-vps").expect("the deploy-key pattern is a constant")
+});
+static DEPLOY_HOST_PATTERN: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r"strato-server").expect("the deploy-host pattern is a constant")
+});
+static TAILNET_PATTERN: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r"\bts\.net\b").expect("the tailnet pattern is a constant")
+});
+static NODE_PATTERN: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r"\b(hp1|hp2|mf1|worker3|mini1|mini2|pgx)\b")
+        .expect("the node-name pattern is a constant")
+});
 
 /// Mask emails, credential-shaped strings, IPs and home paths anywhere in a value.
 ///
@@ -570,6 +854,24 @@ pub(crate) fn redact(value: &mut Value) {
             let masked = PRIVATE_KEY_PATTERN.replace_all(&masked, "[redacted-key]");
             let masked = IP_PATTERN.replace_all(&masked, "[redacted-ip]");
             let masked = HOME_PATH_PATTERN.replace_all(&masked, "[redacted-path]");
+            let masked = INTERNAL_HOST_PATTERN.replace_all(&masked, "$1.example.com");
+            let masked = PRIVATE_REPO_PATTERN.replace_all(&masked, "gitops-production");
+            let masked = DEPLOY_KEY_PATTERN.replace_all(&masked, "deploy-key");
+            let masked = DEPLOY_HOST_PATTERN.replace_all(&masked, "deploy-host");
+            let masked = TAILNET_PATTERN.replace_all(&masked, "tailnet");
+            let masked = NODE_PATTERN.replace_all(&masked, |caps: &regex::Captures<'_>| {
+                match &caps[1] {
+                    "hp1" => "compute-1",
+                    "hp2" => "ci-1",
+                    "mf1" => "storage-1",
+                    "worker3" => "registry-1",
+                    "mini1" => "media-1",
+                    "mini2" => "media-2",
+                    "pgx" => "gpu-1",
+                    _ => "",
+                }
+                .to_owned()
+            });
             if masked.as_ref() != text.as_str() {
                 *text = masked.into_owned();
             }
@@ -590,20 +892,71 @@ pub(crate) fn redact_text(text: &str) -> String {
     }
 }
 
-/// The issue registry written by `scripts/fetch-issues.sh`. Absent is not fatal: the app does
-/// not call GitHub at runtime, and a snapshot without the registry still renders every row.
-fn read_issues(path: &Path) -> Result<Value, SnapshotError> {
+/// The bytes come back so the manifest can name the registry it published — its provenance.
+///
+/// A registry that exists must name the tenant it was fetched for. The publisher runs in a
+/// multi-tenant estate: an image built for one tenant must never inject its registry into
+/// another tenant's programme, so a missing or foreign `provenance.tenant` is refused, never
+/// published. The accepted registry is stamped with the SHA-256 of its issues array.
+fn read_issues(path: &Path, tenant: &str) -> Result<(Value, Option<Vec<u8>>), SnapshotError> {
     if !path.exists() {
         tracing::warn!(path = %path.display(), "issue registry absent; publishing no issue links");
-        return Ok(json!({"issues": []}));
+        return Ok((json!({"issues": []}), None));
     }
     let text = std::fs::read_to_string(path)?;
+    let bytes = text.clone().into_bytes();
     let value: Value = serde_json::from_str(&text)?;
-    Ok(if value.get("issues").is_some() {
+    let value = if value.get("issues").is_some() {
         value
     } else {
         json!({"issues": value})
-    })
+    };
+    let provenance =
+        value
+            .get("provenance")
+            .ok_or_else(|| SnapshotError::IssuesProvenanceMissing {
+                path: path.display().to_string(),
+            })?;
+    let declared = provenance
+        .get("tenant")
+        .and_then(Value::as_str)
+        .ok_or_else(|| SnapshotError::IssuesProvenanceMissing {
+            path: path.display().to_string(),
+        })?;
+    provenance
+        .get("source")
+        .and_then(Value::as_str)
+        .ok_or_else(|| SnapshotError::IssuesProvenanceMissing {
+            path: path.display().to_string(),
+        })?;
+    if declared != tenant {
+        return Err(SnapshotError::IssuesTenantMismatch {
+            declared: declared.to_owned(),
+            requested: tenant.to_owned(),
+        });
+    }
+    Ok((issue_registry_hash(value)?, Some(bytes)))
+}
+
+/// The registry's `provenance`, with the SHA-256 of its serialized `issues` array added, so the
+/// published programme names the tenant, source and exact content it was built from.
+///
+/// The live view stamps the same registry the same way, which keeps its wrapper and the CLI's
+/// byte-identical. A registry with no `provenance` object is returned unchanged: the hash
+/// describes a provenance block, and the live fallback (an image carrying no registry) has none.
+pub(crate) fn issue_registry_hash(mut registry: Value) -> Result<Value, SnapshotError> {
+    if !registry.get("provenance").is_some_and(Value::is_object) {
+        return Ok(registry);
+    }
+    let issues = registry.get("issues").cloned().unwrap_or_else(|| json!([]));
+    let digest = sha256_hex(serde_json::to_string(&issues)?.as_bytes());
+    if let Some(provenance) = registry
+        .get_mut("provenance")
+        .and_then(Value::as_object_mut)
+    {
+        provenance.insert("sha256".to_owned(), Value::String(digest));
+    }
+    Ok(registry)
 }
 
 /// The rework register `--conformance` names.
@@ -736,6 +1089,24 @@ impl SnapshotReport {
             self.manifest_sha256
         );
         line
+    }
+}
+
+#[cfg(test)]
+mod private_ref_tests {
+    use super::redact_text;
+    use serde_json::Value;
+
+    #[test]
+    fn redact_matches_the_shared_private_refs_fixture() {
+        let cases: Vec<Value> =
+            serde_json::from_str(include_str!("../../../scripts/fixtures/private-refs.json"))
+                .expect("the shared private-refs fixture is valid JSON");
+        for case in cases {
+            let input = case["input"].as_str().expect("input");
+            let expected = case["rust"].as_str().expect("rust expectation");
+            assert_eq!(redact_text(input), expected, "input: {input}");
+        }
     }
 }
 

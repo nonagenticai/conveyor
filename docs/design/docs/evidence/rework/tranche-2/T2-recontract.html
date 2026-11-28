@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T2 — the superseding delivery contract and its Phase-G re-review · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-2/T2-recontract.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t2--the-superseding-delivery-contract-and-its-phase-g-re-review">T2 — the superseding delivery contract and its Phase-G re-review</h1>
+<p><strong>Recorded 2026-11-22; corrected 2026-11-26.</strong> The original note recorded a compliant re-review that carried <code>v1-w1c-3</code> and <code>v1-w1c-4</code> as deviations. Both are now resolved on the lane (<code>864e71c4</code> and <code>78cdf4eb</code>), and every one of the six findings the 2026-11-21 review admitted has a resolution commit and a test. The 2026-11-26 re-review therefore records <code>compliant</code> with no open finding — the earlier note's deviation table is superseded, not re-dated.</p>
+<p>A compliance review is unique per contract and immutable (<code>review_for_contract_tx</code> reads one), so a stale level cannot be replaced in place. T2 held two live contracts from earlier passes (<code>01a2005a</code>, the retrospective SoAW, and <code>01a217f8</code>, a delivery contract carrying the stale <code>non_conformant</code> review). Both were superseded through <code>architecture.contracts_supersede</code>; the factory then recreated the SoAW and the delivery contract from the corrected pack and recorded the re-review on the new contract.</p>
+<h2 id="what-the-re-review-records">What the re-review records</h2>
+<p><strong>Level:</strong> <code>compliant</code>. Every admitted finding is resolved at its cited commit and test:</p>
+<table>
+<thead>
+<tr>
+<th>Finding</th>
+<th>Disposition</th>
+<th>Commit</th>
+<th>Test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>v1-t2-1</code> (P0)</td>
+<td>fixed</td>
+<td><code>920a1dcb</code></td>
+<td><code>documents_compose_gate.rs</code></td>
+</tr>
+<tr>
+<td><code>v1-t2-2</code></td>
+<td>duplicate of <code>v1-w1c-3</code>, resolved</td>
+<td><code>864e71c4</code></td>
+<td><code>decision_ladder::a_confidence_posted_directly_cannot_produce_a_laya_decision</code></td>
+</tr>
+<tr>
+<td><code>v1-t2-3</code> (P1)</td>
+<td>fixed</td>
+<td><code>fcb96fa9</code></td>
+<td><code>decision_ladder.rs</code></td>
+</tr>
+<tr>
+<td><code>v1-t2-4</code></td>
+<td>duplicate of <code>v1-w1c-4</code>, resolved</td>
+<td><code>78cdf4eb</code></td>
+<td><code>decision_ladder::a_caller_cannot_supply_its_own_options</code></td>
+</tr>
+<tr>
+<td><code>v1-t2-5</code> (P2)</td>
+<td>fixed</td>
+<td><code>624abeb4</code></td>
+<td><code>tool_budget.rs</code></td>
+</tr>
+<tr>
+<td><code>v1-t2-6</code> (P1)</td>
+<td>fixed</td>
+<td><code>1167127d</code></td>
+<td><code>ladder_human_gate.rs</code></td>
+</tr>
+</tbody>
+</table>
+<p>The re-review also found and fixed one defect of its own at <code>c6341a8a</code>: <code>decision_policies.update</code> could not clear <code>fire_when</code> because serde read JSON <code>null</code> as an absent member (<code>decision_ladder::a_policy_fire_when_is_validated_and_can_be_cleared</code>).</p>
+<p><strong>Evidence:</strong> <code>acceptance/programme/T2.toml</code>; <code>docs/evidence/v1-conformance-findings.json</code> (<code>resolved_by</code> per finding); the four cited targets re-run at <code>c6341a8a</code> — decision_ladder 26/26, ladder_human_gate 10/10, documents_compose_gate 7/7, tool_budget 14/14 — and the independent receipt re-run on a fresh post-run snapshot.</p>
+<h2 id="the-rows-2026-11-26">The rows (2026-11-26)</h2>
+<table>
+<thead>
+<tr>
+<th>Act</th>
+<th>Action</th>
+<th>Row</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>supersede the stale retrospective SoAW</td>
+<td><code>architecture.contracts_supersede</code></td>
+<td><code>01a2005a</code> → superseded</td>
+</tr>
+<tr>
+<td>supersede the stale delivery contract</td>
+<td><code>architecture.contracts_supersede</code></td>
+<td><code>01a217f8</code> → superseded</td>
+</tr>
+<tr>
+<td>fresh retrospective SoAW</td>
+<td><code>architecture.contracts_request</code> / <code>_approve</code></td>
+<td><code>01a2180f-15fe</code> (live)</td>
+</tr>
+<tr>
+<td>first fresh delivery contract</td>
+<td><code>architecture.contracts_request</code> / <code>_approve</code></td>
+<td><code>01a2180f-1c53</code> (superseded by the revision)</td>
+</tr>
+<tr>
+<td>delivery contract carrying <code>commitments</code></td>
+<td><code>architecture.contracts_request</code> / <code>_approve</code></td>
+<td><code>01a21810-707f</code> (live)</td>
+</tr>
+<tr>
+<td>Phase-G re-review</td>
+<td><code>architecture.reviews_record</code></td>
+<td><code>01a21810-7eab</code> (level <code>compliant</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>The stale <code>non_conformant</code> review remains attached to the superseded <code>01a217f8</code>; that is history and is not read by the live close gate.</p>
+<h2 id="the-chain">The chain</h2>
+<ol type="1">
+<li><code>architecture.contracts_supersede</code> on every live contract carrying a stale review.</li>
+<li>The factory's step 6 requests a superseding delivery contract when the live body lacks a field the standard's page reads (measured here: <code>commitments</code>) and approves it with a board decision.</li>
+<li><code>architecture.reviews_record</code> on the new contract, level <code>compliant</code>, the dispositions above.</li>
+<li><code>projects.close</code> — closure decision by a distinct approver, then the close gate.</li>
+</ol>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/tranche-2/T2-recontract.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

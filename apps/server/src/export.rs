@@ -1099,6 +1099,7 @@ impl Importer<'_> {
             conveyor_actions::registry(),
             self.tenant,
             InvokeRequest {
+                credential_alias: None,
                 action: action.to_owned(),
                 input,
                 precondition: precondition.map(conveyor_actions::Precondition::Version),

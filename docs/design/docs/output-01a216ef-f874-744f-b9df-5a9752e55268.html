@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Context Diagram — DESIGN-PUBLISH (retrospective, 2026-11-26) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-context-diagram" data-provenance-version="1" data-provenance-hash="73c7ed1269cdf245456c5da87c7e465f5cc0b981df7fbd02986a866659e64773" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-context-diagram</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>73c7ed1269cdf245456c5da87c7e465f5cc0b981df7fbd02986a866659e64773</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project Context Diagram — DESIGN-PUBLISH (retrospective, 2026-11-26)</h1>
+<h2>Context</h2>
+<p>The work package is DESIGN-PUBLISH's retrospective rework: the project that publishes the SPEC_V2 studio design. Its boundary is the programme record — projects, artefacts, documents, registers, baselines and contracts — together with the published-output index the public site reads. Runtime infrastructure belongs inside the boundary only where that index depends on it.</p>
+<h2>Affected organisation</h2>
+<p>The programme office consumes the closure record and decides the closure gate. The programme architect owns the artefact set under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The public reader is an external actor who reads the live pages and never touches the record. The Architecture Board reviews the artefact set and the delivery contract.</p>
+<h2>Affected systems</h2>
+<p>The record database (PostgreSQL 18, migration 0107 on this lane) holds the projects, artefacts, documents, registers and baselines. The document store (MinIO at minio.example.com:8389) backs published bodies; this box cannot reach it, so the replay base keeps the bodies in the database. The snapshot projection is the read model every receipt measures.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Publish the SPEC_V2 studio design pack, live · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

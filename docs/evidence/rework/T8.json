@@ -1,0 +1,193 @@
+{
+  "checks": [
+    {
+      "check": "project",
+      "description": "T8 is active",
+      "detail": "status is 'closed', expected 'active'",
+      "id": "T8-project",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "project_baseline",
+      "description": "the scope baseline is approved; the close gate reads the approved row",
+      "detail": "no project baseline",
+      "id": "T8-baseline",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d35-76bb-a22e-be49e3e95d16\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
+      "description": "the charter asset exists and the charter gate is approved",
+      "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
+      "exit": 1,
+      "id": "T8-charter",
+      "kind": "command",
+      "result": "fail",
+      "severity": "P0",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset\n",
+      "stdout": ""
+    },
+    {
+      "check": "contract",
+      "description": "a live board-approved delivery contract exists",
+      "detail": "no live board-approved delivery contract",
+      "id": "T8-contract",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "review",
+      "description": "the Phase-G review cites a published standing delegation",
+      "detail": "no Phase-G compliance review for the project's live contract",
+      "id": "T8-review",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "waivers",
+      "description": "no active waiver is expired or owned by its reviewer",
+      "detail": "0 active waiver(s), all dated and distinct from the reviewer",
+      "id": "T8-waivers",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_cadence",
+      "description": "the project's PI has a cadence row and a backlog-refinement row",
+      "detail": "no PI cadence row for tranche-11",
+      "id": "T8-pi-cadence",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_plan",
+      "description": "the project tranche's PI plan is published",
+      "detail": "no published pi-plan output for tranche-11",
+      "id": "T8-pi-plan",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_objectives",
+      "description": "the project tranche's PI objectives are published",
+      "detail": "no published pi-objectives output for tranche-11",
+      "id": "T8-pi-objectives",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "wsjf",
+      "description": "every WBS deliverable of the project carries the four typed WSJF inputs",
+      "detail": "no WBS deliverable carries the plan",
+      "id": "T8-wsjf",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "demo_credits",
+      "description": "every accepted deliverable has a demo credit carrying its evidence",
+      "detail": "no accepted deliverable to demo",
+      "id": "T8-demo-credits",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "lessons",
+      "description": "the tranche retro produced at least one lesson",
+      "detail": "no retro cadence row for tranche-11",
+      "id": "T8-lessons",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P1"
+    },
+    {
+      "check": "product_findings",
+      "description": "no open P0 product finding remains for the project",
+      "detail": "1 open P0 package(s): closed_without_closure_review:T8",
+      "id": "T8-product",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "artefact_standard",
+      "description": "every mandatory standard artefact this project owns is evidenced",
+      "detail": "10 mandatory artefact package(s) open: closed_without_closure_review:T8, project_in_unauthorised_tranche:T8, unpublished_declared_output:T8, contract_missing:T8, mandatory_artefacts:T8, std-pmp-change-control-t8:T8, std-pmp-project-baseline-t8:T8, std-pmp-project-registers-t8:T8, +2 more",
+      "id": "T8-artefact-standard",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P1"
+    },
+    {
+      "check": "rework_resolution",
+      "description": "no unresolved P0/P1 rework package remains for the project",
+      "detail": "6 unresolved P0/P1 package(s): closed_without_closure_review:T8 (P0), project_in_unauthorised_tranche:T8 (P0), unpublished_declared_output:T8 (P1), v1-w3c-4:T8 (P1), contract_missing:T8 (P1), mandatory_artefacts:T8 (P1)",
+      "id": "T8-rework",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "description": "the declared gate is discharged by executable checks",
+      "detail": "the gate check 'T8-project' did not pass; the gate check 'T8-baseline' did not pass; the gate check 'T8-charter' did not pass; the gate check 'T8-contract' did not pass; the gate check 'T8-review' did not pass; the gate check 'T8-pi-cadence' did not pass; the gate check 'T8-pi-plan' did not pass; the gate check 'T8-pi-objectives' did not pass; the gate check 'T8-wsjf' did not pass; the gate check 'T8-demo-credits' did not pass; the gate check 'T8-lessons' did not pass; the gate check 'T8-product' did not pass; the gate check 'T8-artefact-standard' did not pass; the gate check 'T8-rework' did not pass",
+      "id": "gate",
+      "kind": "manifest",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "description": "a closed project must not carry a red acceptance manifest",
+      "detail": "the project is closed while its manifest is red",
+      "id": "closed-on-red",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    }
+  ],
+  "failures": [
+    "T8-project (P0): status is 'closed', expected 'active'",
+    "T8-baseline (P0): no project baseline",
+    "T8-charter (P0): exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
+    "T8-contract (P0): no live board-approved delivery contract",
+    "T8-review (P0): no Phase-G compliance review for the project's live contract",
+    "T8-pi-cadence (P0): no PI cadence row for tranche-11",
+    "T8-pi-plan (P0): no published pi-plan output for tranche-11",
+    "T8-pi-objectives (P0): no published pi-objectives output for tranche-11",
+    "T8-wsjf (P0): no WBS deliverable carries the plan",
+    "T8-demo-credits (P0): no accepted deliverable to demo",
+    "T8-lessons (P1): no retro cadence row for tranche-11",
+    "T8-product (P0): 1 open P0 package(s): closed_without_closure_review:T8",
+    "T8-artefact-standard (P1): 10 mandatory artefact package(s) open: closed_without_closure_review:T8, project_in_unauthorised_tranche:T8, unpublished_declared_output:T8, contract_missing:T8, mandatory_artefacts:T8, std-pmp-change-control-t8:T8, std-pmp-project-baseline-t8:T8, std-pmp-project-registers-t8:T8, +2 more",
+    "T8-rework (P0): 6 unresolved P0/P1 package(s): closed_without_closure_review:T8 (P0), project_in_unauthorised_tranche:T8 (P0), unpublished_declared_output:T8 (P1), v1-w3c-4:T8 (P1), contract_missing:T8 (P1), mandatory_artefacts:T8 (P1)",
+    "gate (P0): the gate check 'T8-project' did not pass; the gate check 'T8-baseline' did not pass; the gate check 'T8-charter' did not pass; the gate check 'T8-contract' did not pass; the gate check 'T8-review' did not pass; the gate check 'T8-pi-cadence' did not pass; the gate check 'T8-pi-plan' did not pass; the gate check 'T8-pi-objectives' did not pass; the gate check 'T8-wsjf' did not pass; the gate check 'T8-demo-credits' did not pass; the gate check 'T8-lessons' did not pass; the gate check 'T8-product' did not pass; the gate check 'T8-artefact-standard' did not pass; the gate check 'T8-rework' did not pass",
+    "closed-on-red (P0): the project is closed on a red manifest"
+  ],
+  "gate": "T8 is NOT built, and its acceptance \u2014 `SPEC_V2` \u00a712: 'a lesson with one evidence ref is refused; two independent refs + review promotes a source draft; a bad run never becomes doctrine' \u2014 is the condition on which it may be closed, not a claim that it is met.",
+  "generated_at": "2026-11-25T10:37:54.765047+00:00",
+  "kind": "all",
+  "manifest": "acceptance/programme/T8.toml",
+  "name": "Organisational memory",
+  "project": "T8",
+  "schema": "project-acceptance/v1",
+  "snapshot": {
+    "generated_at": "2026-11-25T10:31:33Z",
+    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
+    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
+  },
+  "verdict": "red",
+  "warnings": []
+}

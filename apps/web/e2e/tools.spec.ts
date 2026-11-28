@@ -1,6 +1,6 @@
 import { expect, test, type APIRequestContext, type Page } from "./fixture";
 
-import { invoke, isDevAuth } from "./helpers";
+import { activateJob, createActiveBinding, invoke, isDevAuth } from "./helpers";
 
 const baseURL = process.env.BASE_URL ?? "http://127.0.0.1:8931";
 
@@ -47,6 +47,8 @@ async function binding(request: APIRequestContext): Promise<string> {
     },
     departments: [{ department_id: department.id, ordinal: 1, is_primary: true }],
   });
+  // A job is born a draft; only an active job may publish a release or be bound.
+  await activateJob(request, position.id);
   const release = await invoke<{ id: string; release_hash: string }>(
     request,
     "job_releases.publish",
@@ -57,7 +59,7 @@ async function binding(request: APIRequestContext): Promise<string> {
   });
   const agent = agents.items[0];
   expect(agent, "the dev seed carries one fixture capability agent").toBeTruthy();
-  const created = await invoke<{ id: string }>(request, "job_bindings.create", {
+  const created = await createActiveBinding<{ id: string }>(request, {
     job_id: position.id,
     release_id: release.id,
     executor_kind: "internal_agent",

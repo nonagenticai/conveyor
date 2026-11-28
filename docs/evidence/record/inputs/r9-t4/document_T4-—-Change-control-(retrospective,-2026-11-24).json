@@ -1,0 +1,8 @@
+{
+ "body": "# T4 \u2014 Change control (retrospective, 2026-11-24)\n\n## Change requests\n\n| Change | Title | Status |\n|---|---|---|\n| CHG-T4-1 | Remediate T4's four Phase-G findings | approved |\n\nThe 2026-11-22 Phase-G review recorded T4 non_conformant and named four findings. The remediation\nis a change against the frozen scope baseline: the coach loop's producers, the per-signature cap,\nthe measured kata and the public create path.\n\n## Impact\n\n- Scope: no scope change; the four findings are remediated and re-reviewed.\n- Baseline: unchanged; the single accepted deliverable stands.\n- Contract: the delivery contract is superseded by v2, which cites each resolution.\n\n## Decisions\n\n- Approved by the distinct approver `01a1e8a7-8b23-76a9-9114-aafb95f7a545` under the published standing delegation.\n- The resolutions the change cites:\n  - v1-p6-2 \u2014 `coach::a_systemic_class_opens_one_measured_kata` (commit `2fe0d30c`)\n  - v1-p6-4 \u2014 `computed_set::a_distinct_signature_is_never_suppressed_by_a_card_level_count` (commit `8842195f`)\n  - v1-p6-5 \u2014 `approval_expire::a_card_scoped_gate_timeout_opens_one_interruption` (commit `fc020437`), plus `lease_sweep`\n  - v1-p6-6 \u2014 `coach::a_coach_card_cannot_be_created_through_the_public_path` (commit `8842195f`)\n",
+ "category": "change-control",
+ "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+ "publishable": true,
+ "title": "T4 \u2014 Change control (retrospective, 2026-11-24)",
+ "unit": "T4"
+}

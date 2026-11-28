@@ -1,6 +1,17 @@
 import { expect, test } from "./fixture";
 
-import { allowSelfApproval, createBoardCard, invoke } from "./helpers";
+import {
+  answerWaiverPrompt,
+  archiveTarget,
+  createBoardCard,
+  decideAsReviewer,
+  FIXTURE_EVIDENCE_WAIVER,
+  invoke,
+  isDevAuth,
+  pendingGateFor,
+  setApprovalPolicy,
+  submitUntil,
+} from "./helpers";
 
 // The board is the first screen where a write matters: `cards.move` carries the card's
 // version as If-Match, and the lane is the state. Both pointer and keyboard paths are real.
@@ -123,16 +134,21 @@ test("a project, its card, an edit and an archive round-trip through the UI", as
   const projectTitle = `AAA Playwright board ${stamp}`;
   const cardName = `Playwright card ${stamp}`;
 
-  // #285: archiving is destructive and runs only behind a gate. The dev seed has one principal
-  // per tenant, so the tenant allows the requester to decide — the console still requests,
-  // decides and invokes; nothing here skips the gate.
-  await allowSelfApproval(request, "cards.archive");
+  // #285: archiving is destructive and runs only behind a gate. §5.4 makes the requester's
+  // exclusion an invariant, so the gate is decided by the seed's second principal, and the
+  // console's §5.4 bridge records the fixture waiver reason for the evidence-less gate.
+  await setApprovalPolicy(request, "cards.archive", "required");
+  answerWaiverPrompt(page, [FIXTURE_EVIDENCE_WAIVER]);
 
   await page.goto("/boards");
   await expect(page.getByRole("heading", { name: "Board", exact: true })).toBeVisible();
 
-  // The project is created by the form under test, not by the helper.
+  // The project is created by the form under test, not by the helper. The form's default type
+  // is the catalogue's first, `architecture`, and a card on an architecture-governed board is
+  // refused without a trace link to an approved requirement (v1-w2c-6) — which this round-trip
+  // is not about. State the type explicitly, as the helper's fixtures do.
   await page.getByLabel("Project title").fill(projectTitle);
+  await page.getByLabel("Project type").selectOption("delivery");
   await page.getByRole("button", { name: "Create project" }).click();
 
   // The index is a keyset page. This title derives an early key, but a long-lived dev
@@ -151,46 +167,59 @@ test("a project, its card, an edit and an archive round-trip through the UI", as
 
   const intake = page.locator(".lane", { hasText: "Intake" });
   await expect(intake).toBeVisible();
-  await intake.getByLabel("Card name").fill(cardName);
-  await intake.getByRole("button", { name: "Add card" }).click();
 
   // The action's effect is proved on the board's own rows before the screen read: under the
   // full suite the screen's refetch can be delayed past a DOM wait (measured in CI 2026-11-20).
   const boardId = page.url().split("/").pop();
-  await expect
-    .poll(
-      async () => {
-        const view = await request
-          .get(`/api/boards/${boardId}/cards?limit=200`)
-          .then((r) => r.json());
-        return (view.items ?? []).map((row: { name: string }) => row.name);
-      },
-      { timeout: 30_000 },
-    )
-    .toContain(cardName);
+  const cardNames = async (): Promise<string[]> => {
+    const view = await request
+      .get(`/api/boards/${boardId}/cards?limit=200`)
+      .then((r) => r.json());
+    return (view.items ?? []).map((row: { name: string }) => row.name);
+  };
+
+  // The board re-renders whenever its own refetch lands, and the form is recreated with it —
+  // so a click dispatched in that window posts nothing (measured 2026-11-27: `projects.create`
+  // 201, no `cards.create` on the wire). The start run's coach card arrives seconds later, so
+  // the window is real here. The assertion below is still the board's own rows.
+  await submitUntil(
+    async () => {
+      await intake.getByLabel("Card name").fill(cardName);
+      await intake.getByRole("button", { name: "Add card" }).click();
+    },
+    async () => (await cardNames()).includes(cardName),
+  );
+  await expect.poll(cardNames, { timeout: 30_000 }).toContain(cardName);
   await page.reload();
 
   const card = page.locator(".card", { hasText: cardName });
   await expect(card).toBeVisible();
 
   const editedName = `${cardName} edited`;
-  await card.getByRole("button", { name: "Edit" }).click();
-  await card.getByLabel("Card name").fill(editedName);
-  await card.getByLabel("Card description").fill("Edited through the board screen");
-  await card.getByRole("button", { name: "Save" }).click();
+  // The save is the same re-render window as the add: measured in CI 2026-11-27 as the board
+  // still carrying the unedited name after the click, so it is re-driven the same way.
+  await submitUntil(
+    async () => {
+      if ((await card.getByLabel("Card name").count()) === 0) {
+        await card.getByRole("button", { name: "Edit" }).click();
+      }
+      await card.getByLabel("Card name").fill(editedName);
+      await card.getByLabel("Card description").fill("Edited through the board screen");
+      await card.getByRole("button", { name: "Save" }).click();
+    },
+    async () => (await cardNames()).includes(editedName),
+  );
 
   // Same proof-then-read as the add: the save's effect on the board's own rows, then the screen.
-  await expect
-    .poll(
-      async () => {
-        const view = await request
-          .get(`/api/boards/${boardId}/cards?limit=200`)
-          .then((r) => r.json());
-        return (view.items ?? []).map((row: { name: string }) => row.name);
-      },
-      { timeout: 30_000 },
-    )
-    .toContain(editedName);
+  await expect.poll(cardNames, { timeout: 30_000 }).toContain(editedName);
+  // The edited row's id is the gate target's subject; the name already proves the row exists.
+  const boardCards = await request
+    .get(`/api/boards/${boardId}/cards?limit=200`)
+    .then((r) => r.json());
+  const editedRow = (boardCards.items ?? []).find(
+    (row: { id: string; name: string }) => row.name === editedName,
+  ) as { id: string } | undefined;
+  expect(editedRow, "the edited card's row").toBeTruthy();
   await page.reload();
 
   const edited = page.locator(".card", { hasText: editedName });
@@ -198,6 +227,13 @@ test("a project, its card, an edit and an archive round-trip through the UI", as
   await expect(edited.locator(".card-title")).toHaveText(editedName);
   await expect(page.getByText(cardName, { exact: true })).toHaveCount(0);
 
+  // The first click asks for the gate; the requester cannot decide it, so a distinct approver
+  // does, and the requester's retry spends that approval.
+  await edited.getByRole("button", { name: "Archive" }).click();
+  await expect(page.locator(".toast")).toContainText("Waiting for approval");
+  test.skip(!isDevAuth(), "the deployed suite has one principal, so nobody else can decide");
+  const gate = await pendingGateFor(request, archiveTarget(editedRow!.id));
+  await decideAsReviewer(request, "approvals.decide", gate.id);
   await edited.getByRole("button", { name: "Archive" }).click();
   // Prove the archive on the board's own read before the screen: the destructive path's
   // refetch can be delayed past the default auto-wait under the full suite.
@@ -250,7 +286,11 @@ test("a board beyond 200 cards pages instead of hiding the tail", async ({ page,
 test("more than 50 projects page instead of hiding the tail", async ({ page, request }) => {
   const stamp = Date.now();
   for (let index = 0; index < 51; index += 1) {
-    await invoke(request, "projects.create", { title: `e2e paging project ${stamp} ${index}` });
+    await invoke(request, "projects.create", {
+      title: `e2e paging project ${stamp} ${index}`,
+      // v1-e2e-1: the 51 paging rows are fixtures, not programme work.
+      test_row: true,
+    });
   }
 
   await page.goto("/boards");
@@ -271,30 +311,34 @@ test("a label, a lane and an unarchive round-trip through the UI", async ({ page
   const stamp = Date.now();
   const title = `e2e authoring ${stamp}`;
   const fixture = await createBoardCard(request, title);
-  await allowSelfApproval(request, "cards.archive");
+  // The archive below is a real gate: the requester cannot decide it, and the fixture gate
+  // records the §5.4 waiver reason because the row, not a document, is its subject.
+  await setApprovalPolicy(request, "cards.archive", "required");
+  answerWaiverPrompt(page, [FIXTURE_EVIDENCE_WAIVER]);
 
   await page.goto(`/board/${fixture.boardId}`);
   // The screen's heading is the board's name, not the project's; the fixture's card is the mark.
   await expect(page.locator(".card", { hasText: title })).toBeVisible();
 
-  // A label: created through the panel's form, then attached to the start card's row.
+  // A label: created through the panel's form, then attached to the start card's row. The same
+  // re-render window applies to this form, so the click is re-driven while the board's own read
+  // carries no such label.
   const label = `e2e-label-${stamp}`;
-  await page.getByLabel("Label name").fill(label);
-  await page.getByLabel("Label color").fill("teal");
-  await page.getByRole("button", { name: "Create label" }).click();
+  const labelNames = async (): Promise<string[]> => {
+    const board = await request.get(`/api/boards/${fixture.boardId}`).then((r) => r.json());
+    return (board.labels ?? []).map((entry: { name: string }) => entry.name);
+  };
+  await submitUntil(
+    async () => {
+      await page.getByLabel("Label name").fill(label);
+      await page.getByLabel("Label color").fill("teal");
+      await page.getByRole("button", { name: "Create label" }).click();
+    },
+    async () => (await labelNames()).includes(label),
+  );
   // Prove the label on the board's own read before waiting on the screen; the refetch can be
   // delayed past the default DOM wait under the full suite.
-  await expect
-    .poll(
-      async () => {
-        const board = await request
-          .get(`/api/boards/${fixture.boardId}`)
-          .then((r) => r.json());
-        return (board.labels ?? []).map((entry: { name: string }) => entry.name);
-      },
-      { timeout: 30_000 },
-    )
-    .toContain(label);
+  await expect.poll(labelNames, { timeout: 30_000 }).toContain(label);
   await expect(page.locator(".label", { hasText: label })).toBeVisible({ timeout: 30_000 });
 
   // The panel's per-card rows, scoped to the labels panel: an unscoped `div` filter reaches the
@@ -344,6 +388,12 @@ test("a label, a lane and an unarchive round-trip through the UI", async ({ page
   });
   await page.reload();
   const card = page.locator(".card", { hasText: featureName });
+  // The first click asks for the gate; a distinct approver decides it, then the retry archives.
+  await card.getByRole("button", { name: "Archive" }).click();
+  await expect(page.locator(".toast")).toContainText("Waiting for approval");
+  test.skip(!isDevAuth(), "the deployed suite has one principal, so nobody else can decide");
+  const gate = await pendingGateFor(request, archiveTarget(feature.id));
+  await decideAsReviewer(request, "approvals.decide", gate.id);
   await card.getByRole("button", { name: "Archive" }).click();
   // Prove the write on the card's own row before reading the screen (#733, the #512 family):
   // under the full suite the panel's refetch can outlast a DOM wait.

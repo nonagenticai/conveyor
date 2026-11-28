@@ -1,0 +1,39 @@
+{
+  "document": {
+    "body": null,
+    "card_id": null,
+    "category": null,
+    "content_hash": "90d4faabb8b66510bf6e1120098e563afc5b76d6e3bebcb5ce9f5f0c863ba356",
+    "content_type": "text/plain",
+    "created_at": "2026-11-26T22:39:29.756099Z",
+    "created_by": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+    "created_by_name": "FR Test",
+    "external_ref": null,
+    "id": "01a21a03-8be0-736e-8e67-4eaca3a62f58",
+    "kind": "document",
+    "meta": {
+      "content_type": "text/plain",
+      "size_bytes": 57
+    },
+    "parent_document_id": null,
+    "project_id": null,
+    "publish_requested_at": null,
+    "publishable": false,
+    "published_at": null,
+    "published_by": null,
+    "published_by_name": null,
+    "size_bytes": 57,
+    "status": "active",
+    "title": "Transcript",
+    "unit": null,
+    "updated_at": "2026-11-26T22:39:29.756099Z",
+    "updated_by": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+    "updated_by_name": "FR Test",
+    "version": 1
+  },
+  "text": "The ConveyR Toolkit GATS speaks once on 26 November 2026.",
+  "usage": {
+    "seconds": 4.9851875,
+    "type": "duration"
+  }
+}

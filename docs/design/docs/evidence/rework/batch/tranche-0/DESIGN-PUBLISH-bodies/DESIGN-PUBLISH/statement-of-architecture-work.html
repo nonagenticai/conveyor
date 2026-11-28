@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Statement Of Architecture Work — Publish the SPECV2 studio design pack, live · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies/DESIGN-PUBLISH/statement-of-architecture-work.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="statement-of-architecture-work--publish-the-spec_v2-studio-design-pack-live">Statement Of Architecture Work — Publish the SPEC_V2 studio design pack, live</h1>
+<h2 id="assignment">Assignment</h2>
+<p>What the architecture work is asked to deliver and for whom.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-21T17:52:06.626934+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;Four, each with its check: (1) the public site renders the programme from Postgres \u2014 `data/snapshot.js` carries the programme&#39;s rows and the public sidebar names it only when the snapshot does (#470, 7d4e0d27); (2) a published output appears at its stable URL \u2014 165 committed output pages, every one named by `docs/design/docs/outputs.js` (#516, 06ba0fe3); (3) signed out there is no API request and no write control \u2014 `node docs/design/scripts/check-console.cjs`; (4) the pack&#39;s claims are checked like code \u2014 `build-coverage.py --check`, `build-docs.py --check` and the surface checks in the `design-pack` job of `.github/workflows/ci-public.yml`. The project&#39;s own gate is `acceptance/programme/DESIGN-PUBLISH.toml`.&quot;,
+        &quot;assignment&quot;: &quot;Deliver to the programme owner, the Architecture Board and every outside reader the published studio design pack that makes the SPEC_V2 operating model readable and challengeable from a browser, and keep it live from the application image. This is the Phase A architecture work of a programme-level project in tranche 0, held to `docs/design/STUDIO-SPEC.md`. Recorded retrospectively on 2026-11-21: the pack was built and published by units #32, #33, #36, #37, #89, #97, #103 and #149, all closed.&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/DESIGN-PUBLISH.toml&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;The Phase A artefact set at plateau psa \u2014 stakeholder map (matrix), driver/goal/objective catalog, requirements catalog and solution concept (diagram) \u2014 with the Phase B\u2013D catalogues: business capability map, data entity catalog and technology standards. The published surfaces: `studio.html` offline, `https://conveyor.nonagentic.ai/design/` from the app image, `/design/data/snapshot.js` read from the tenant&#39;s rows, and `/design/docs/output-&lt;id&gt;.html` for every published output. Out of scope: any V2 backend aggregate, any signed-out write path, and the retired homepage mirror.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-21T17:51:55.933191+00:00&quot;,
+      &quot;id&quot;: &quot;01a1ff3c-7aad-7dda-820e-1c7d85fe70a8&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d39-7414-b43c-450de170ffe1&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 DESIGN-PUBLISH: the published studio design pack&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T17:52:06.626934+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="scope">Scope</h2>
+<p>The boundaries, the artefacts expected and the phase set.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-21T17:52:06.626934+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;Four, each with its check: (1) the public site renders the programme from Postgres \u2014 `data/snapshot.js` carries the programme&#39;s rows and the public sidebar names it only when the snapshot does (#470, 7d4e0d27); (2) a published output appears at its stable URL \u2014 165 committed output pages, every one named by `docs/design/docs/outputs.js` (#516, 06ba0fe3); (3) signed out there is no API request and no write control \u2014 `node docs/design/scripts/check-console.cjs`; (4) the pack&#39;s claims are checked like code \u2014 `build-coverage.py --check`, `build-docs.py --check` and the surface checks in the `design-pack` job of `.github/workflows/ci-public.yml`. The project&#39;s own gate is `acceptance/programme/DESIGN-PUBLISH.toml`.&quot;,
+        &quot;assignment&quot;: &quot;Deliver to the programme owner, the Architecture Board and every outside reader the published studio design pack that makes the SPEC_V2 operating model readable and challengeable from a browser, and keep it live from the application image. This is the Phase A architecture work of a programme-level project in tranche 0, held to `docs/design/STUDIO-SPEC.md`. Recorded retrospectively on 2026-11-21: the pack was built and published by units #32, #33, #36, #37, #89, #97, #103 and #149, all closed.&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/DESIGN-PUBLISH.toml&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;The Phase A artefact set at plateau psa \u2014 stakeholder map (matrix), driver/goal/objective catalog, requirements catalog and solution concept (diagram) \u2014 with the Phase B\u2013D catalogues: business capability map, data entity catalog and technology standards. The published surfaces: `studio.html` offline, `https://conveyor.nonagentic.ai/design/` from the app image, `/design/data/snapshot.js` read from the tenant&#39;s rows, and `/design/docs/output-&lt;id&gt;.html` for every published output. Out of scope: any V2 backend aggregate, any signed-out write path, and the retired homepage mirror.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-21T17:51:55.933191+00:00&quot;,
+      &quot;id&quot;: &quot;01a1ff3c-7aad-7dda-820e-1c7d85fe70a8&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d39-7414-b43c-450de170ffe1&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 DESIGN-PUBLISH: the published studio design pack&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T17:52:06.626934+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="responsibilities">Responsibilities</h2>
+<p>Who does the work and who accepts it.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-21T17:52:06.626934+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;Four, each with its check: (1) the public site renders the programme from Postgres \u2014 `data/snapshot.js` carries the programme&#39;s rows and the public sidebar names it only when the snapshot does (#470, 7d4e0d27); (2) a published output appears at its stable URL \u2014 165 committed output pages, every one named by `docs/design/docs/outputs.js` (#516, 06ba0fe3); (3) signed out there is no API request and no write control \u2014 `node docs/design/scripts/check-console.cjs`; (4) the pack&#39;s claims are checked like code \u2014 `build-coverage.py --check`, `build-docs.py --check` and the surface checks in the `design-pack` job of `.github/workflows/ci-public.yml`. The project&#39;s own gate is `acceptance/programme/DESIGN-PUBLISH.toml`.&quot;,
+        &quot;assignment&quot;: &quot;Deliver to the programme owner, the Architecture Board and every outside reader the published studio design pack that makes the SPEC_V2 operating model readable and challengeable from a browser, and keep it live from the application image. This is the Phase A architecture work of a programme-level project in tranche 0, held to `docs/design/STUDIO-SPEC.md`. Recorded retrospectively on 2026-11-21: the pack was built and published by units #32, #33, #36, #37, #89, #97, #103 and #149, all closed.&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/DESIGN-PUBLISH.toml&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;The Phase A artefact set at plateau psa \u2014 stakeholder map (matrix), driver/goal/objective catalog, requirements catalog and solution concept (diagram) \u2014 with the Phase B\u2013D catalogues: business capability map, data entity catalog and technology standards. The published surfaces: `studio.html` offline, `https://conveyor.nonagentic.ai/design/` from the app image, `/design/data/snapshot.js` read from the tenant&#39;s rows, and `/design/docs/output-&lt;id&gt;.html` for every published output. Out of scope: any V2 backend aggregate, any signed-out write path, and the retired homepage mirror.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-21T17:51:55.933191+00:00&quot;,
+      &quot;id&quot;: &quot;01a1ff3c-7aad-7dda-820e-1c7d85fe70a8&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d39-7414-b43c-450de170ffe1&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 DESIGN-PUBLISH: the published studio design pack&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T17:52:06.626934+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="acceptance-criteria">Acceptance criteria</h2>
+<p>The conditions the architecture must meet to close Phase A.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-21T17:52:06.626934+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;Four, each with its check: (1) the public site renders the programme from Postgres \u2014 `data/snapshot.js` carries the programme&#39;s rows and the public sidebar names it only when the snapshot does (#470, 7d4e0d27); (2) a published output appears at its stable URL \u2014 165 committed output pages, every one named by `docs/design/docs/outputs.js` (#516, 06ba0fe3); (3) signed out there is no API request and no write control \u2014 `node docs/design/scripts/check-console.cjs`; (4) the pack&#39;s claims are checked like code \u2014 `build-coverage.py --check`, `build-docs.py --check` and the surface checks in the `design-pack` job of `.github/workflows/ci-public.yml`. The project&#39;s own gate is `acceptance/programme/DESIGN-PUBLISH.toml`.&quot;,
+        &quot;assignment&quot;: &quot;Deliver to the programme owner, the Architecture Board and every outside reader the published studio design pack that makes the SPEC_V2 operating model readable and challengeable from a browser, and keep it live from the application image. This is the Phase A architecture work of a programme-level project in tranche 0, held to `docs/design/STUDIO-SPEC.md`. Recorded retrospectively on 2026-11-21: the pack was built and published by units #32, #33, #36, #37, #89, #97, #103 and #149, all closed.&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/DESIGN-PUBLISH.toml&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;The Phase A artefact set at plateau psa \u2014 stakeholder map (matrix), driver/goal/objective catalog, requirements catalog and solution concept (diagram) \u2014 with the Phase B\u2013D catalogues: business capability map, data entity catalog and technology standards. The published surfaces: `studio.html` offline, `https://conveyor.nonagentic.ai/design/` from the app image, `/design/data/snapshot.js` read from the tenant&#39;s rows, and `/design/docs/output-&lt;id&gt;.html` for every published output. Out of scope: any V2 backend aggregate, any signed-out write path, and the retired homepage mirror.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-21T17:51:55.933191+00:00&quot;,
+      &quot;id&quot;: &quot;01a1ff3c-7aad-7dda-820e-1c7d85fe70a8&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d39-7414-b43c-450de170ffe1&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 DESIGN-PUBLISH: the published studio design pack&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T17:52:06.626934+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="contract">Contract</h2>
+<p>The contract record, its version and its approval.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-21T17:52:06.626934+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;Four, each with its check: (1) the public site renders the programme from Postgres \u2014 `data/snapshot.js` carries the programme&#39;s rows and the public sidebar names it only when the snapshot does (#470, 7d4e0d27); (2) a published output appears at its stable URL \u2014 165 committed output pages, every one named by `docs/design/docs/outputs.js` (#516, 06ba0fe3); (3) signed out there is no API request and no write control \u2014 `node docs/design/scripts/check-console.cjs`; (4) the pack&#39;s claims are checked like code \u2014 `build-coverage.py --check`, `build-docs.py --check` and the surface checks in the `design-pack` job of `.github/workflows/ci-public.yml`. The project&#39;s own gate is `acceptance/programme/DESIGN-PUBLISH.toml`.&quot;,
+        &quot;assignment&quot;: &quot;Deliver to the programme owner, the Architecture Board and every outside reader the published studio design pack that makes the SPEC_V2 operating model readable and challengeable from a browser, and keep it live from the application image. This is the Phase A architecture work of a programme-level project in tranche 0, held to `docs/design/STUDIO-SPEC.md`. Recorded retrospectively on 2026-11-21: the pack was built and published by units #32, #33, #36, #37, #89, #97, #103 and #149, all closed.&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/DESIGN-PUBLISH.toml&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;The Phase A artefact set at plateau psa \u2014 stakeholder map (matrix), driver/goal/objective catalog, requirements catalog and solution concept (diagram) \u2014 with the Phase B\u2013D catalogues: business capability map, data entity catalog and technology standards. The published surfaces: `studio.html` offline, `https://conveyor.nonagentic.ai/design/` from the app image, `/design/data/snapshot.js` read from the tenant&#39;s rows, and `/design/docs/output-&lt;id&gt;.html` for every published output. Out of scope: any V2 backend aggregate, any signed-out write path, and the retired homepage mirror.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-21T17:51:55.933191+00:00&quot;,
+      &quot;id&quot;: &quot;01a1ff3c-7aad-7dda-820e-1c7d85fe70a8&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d39-7414-b43c-450de170ffe1&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 DESIGN-PUBLISH: the published studio design pack&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T17:52:06.626934+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies/DESIGN-PUBLISH/statement-of-architecture-work.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

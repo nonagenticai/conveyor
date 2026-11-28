@@ -1,0 +1,29 @@
+{
+  "schema": "conveyor-pi-refinement-wsjf/v1",
+  "tranche": 5,
+  "tranche_id": "01a1e9e0-fe45-77e0-993a-d571fecc5ec1",
+  "cadence_id": "01a216d1-1a40-7246-ba5e-254b8c0986fe",
+  "period": "tranche-5",
+  "recorded_at": "2026-11-27",
+  "head": "c18c076d4",
+  "basis": {
+    "register": "/tmp/rework-r3.json at c18c076d4: 511 packages (0 suppressed); S06 7 (1 P1), S08 8 (1 P1), S17 9 (2 P1), T17 7 (0 P1), T7 7 (2 P1)",
+    "pi_plan": "PI plan tranche-5 (01a216d1-1bb7-7376-905e-38a776f22190) and PI objectives (01a216d1-1cbe-7297-bc1e-ee5e29ea82cc)",
+    "method": "business_value from the objective the member serves; time_criticality from the operative order (S06 first); risk_reduction from the member's open P1 count; job_size from the member's open package count."
+  },
+  "members": {
+    "S06": {"business_value": 9, "time_criticality": 13, "risk_reduction": 8, "job_size": 6, "objective": "O2"},
+    "S08": {"business_value": 6, "time_criticality": 8, "risk_reduction": 8, "job_size": 7, "objective": "O5"},
+    "S17": {"business_value": 6, "time_criticality": 8, "risk_reduction": 8, "job_size": 8, "objective": "O5"},
+    "T17": {"business_value": 6, "time_criticality": 5, "risk_reduction": 5, "job_size": 6, "objective": "O5"},
+    "T7": {"business_value": 10, "time_criticality": 9, "risk_reduction": 8, "job_size": 6, "objective": "O1"}
+  },
+  "reordered": [
+    {
+      "item": "S06 first",
+      "from": "the plan's narrative order (S08, T7, S06, S17, T17)",
+      "to": "S06, S08, S17, T17, T7",
+      "why": "S06 is the only active member and the control plane every other member's checks read."
+    }
+  ]
+}

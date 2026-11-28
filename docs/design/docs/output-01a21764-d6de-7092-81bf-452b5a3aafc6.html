@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Context Diagram — PLATFORM (retrospective, 2026-11-26) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-context-diagram" data-provenance-version="1" data-provenance-hash="7850dec1fbe39d4332ab9a1f5f51e59d2525cdcf1d04e06691e4ba00e72ac1be" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-context-diagram</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>7850dec1fbe39d4332ab9a1f5f51e59d2525cdcf1d04e06691e4ba00e72ac1be</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project Context Diagram — PLATFORM</h1>
+<h2>Context</h2>
+<p>The platform sits between the conveyor programme and the services it depends on: GitHub for
+source and CI, Cloudflare for the public window, the tailnet for private transport, and the
+estate's two sites for its nodes. The programme is its consumer; the services are its suppliers.</p>
+<h2>Affected organisation</h2>
+<p>The programme owner decides the platform's charter and the tranche gates; the platform owner
+operates the paths; the delivery projects consume them; the Architecture Board reviews the
+standards. The platform's incidents reach the programme board through the register's escalations,
+not through an informal channel.</p>
+<h2>Affected systems</h2>
+<p>The five nodes and their roles: the control plane and Postgres primary, the registry and volumes,
+the compute pool, the only CI node, and MinIO with the standby. The external systems are GitHub,
+Cloudflare and the tailnet. A change to any of them is a platform change with a decision and a
+record, not a local adjustment.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>CI, runners and platform · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

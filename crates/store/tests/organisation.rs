@@ -1062,11 +1062,11 @@ async fn an_unresolved_required_kind_refuses_publish() {
     )
     .await;
     match publish(&db, tenant, job).await {
-        Err(OrganisationStoreError::ReleaseNotReady { kind, department }) => {
+        Err(OrganisationStoreError::LayerReleaseNotReady { kind, department }) => {
             assert_eq!(kind, "compliance");
             assert_eq!(department, "delivery");
         }
-        other => panic!("expected ReleaseNotReady, got {other:?}"),
+        other => panic!("expected LayerReleaseNotReady, got {other:?}"),
     }
     let releases: i64 =
         sqlx::query_scalar("SELECT count(*) FROM job_release WHERE tenant_id = $1 AND job_id = $2")
@@ -1107,14 +1107,14 @@ async fn sibling_departments_conflict_unless_the_job_resolves() {
     )
     .await;
     match publish(&db, org.tenant, org.job).await {
-        Err(OrganisationStoreError::DepartmentConflict { kind, departments }) => {
+        Err(OrganisationStoreError::LayerDepartmentConflict { kind, departments }) => {
             assert_eq!(kind, "region");
             assert_eq!(
                 departments,
                 vec!["delivery".to_owned(), "verification".to_owned()]
             );
         }
-        other => panic!("expected DepartmentConflict, got {other:?}"),
+        other => panic!("expected LayerDepartmentConflict, got {other:?}"),
     }
 
     // The job-layer row resolves it.

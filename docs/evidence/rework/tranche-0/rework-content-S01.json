@@ -1,0 +1,767 @@
+{
+  "charter": "# Charter — S01 UI spike (retrospective, 2026-11-26)\n\n- **Project:** S01 'UI spike — Leptos CSR vs Leptos SSR', track v1, ADM phase G, plateau delivery, tranche 0, project `01a1d039-0d27-724c-9bae-af96b2d926b1`, plan `docs/plans/slices/S01-ui-spike.md` (planned). The row records `status: closed`, `meta.measured_status: built`, `meta.viability: rework`, `meta.expected_outputs: [project-brief, evidence]`, `meta.closure_outputs: []` and no linked issues. It was reopened at 2026-11-21T17:36:03Z for 'the retrospective MSP/TOGAF/SAFe rework of tranche 0 (#526)' under decision `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`.\n- **Mandate:** decide by measurement whether S12 builds conveyor's UI as Leptos CSR/WASM or Leptos SSR, and record the decision as ADR 0001 (`docs/decisions/0001-ui-stack.md`). SPEC §5.7 sets CSR as the prior: SSR is chosen only if measured interaction TTI exceeds 2 s or the auth flow forces cookie-based SSR, and a tie, or a loss on both, is CSR. The retrospective reconstitutes the MSP/TOGAF lifecycle record for that decision and re-closes the project through the one gate.\n- **Scope:** the throwaway spike and its record — one axum fixture, the board and the chat built twice from one component tree, the auth fixture, the eight-metric measurement protocol, ADR 0001, the seven Phase A–D artefacts, the delivery contract, the scope baseline and the closure record. Out of scope are the production UI (S12), the real Keycloak and the conveyor realm (S2, D13), authz beyond one logged-in gate, screens other than the board and the chat, and Dioxus.\n- **Date:** this charter is retrospective and was authored on 2026-11-26; it records the lifecycle the rework note verifies and does not authorise new work.",
+  "soaw": {
+    "title": "Statement of Architecture Work — S01 (retrospective, 2026-11-26)",
+    "body": {
+      "assignment": "Rework S01 by the reconstituted TOGAF/MSP/SAFe lifecycle: author the charter, this Statement of Architecture Work, the seven mandatory Phase A–D artefacts, the delivery contract, the WBS deliverable and the Phase-G review, and publish the project-brief and evidence outputs the closed project owes. The subject is a decision spike, not a build: both stacks were measured, ADR 0001 records the winner, and the spike was deleted. The work is retrospective and dated 2026-11-26.",
+      "scope": "The UI-stack spike and its surviving record: ADR 0001 (docs/decisions/0001-ui-stack.md) with its measured table; the axum fixture on port 8791; the board with 500 cards in 10 lists, pointer and keyboard drag and a live SSE move; the chat with token streaming, a tool-call card and 50-message history; auth-code + PKCE on CSR against HttpOnly cookie + CSRF on SSR; and the seven Phase A–D artefacts, the delivery contract and the scope baseline. Out of scope are the production UI (S12), the real Keycloak realm (S2, D13), Dioxus, and any second measurement run — the spike workspace is gone.",
+      "responsibilities": "The programme architect authors the pack under the #526 standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews the Phase A–D set. The scope baseline 01a1ff31-72ec-766e-8ad3-227d927f64ab was approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, who is distinct from the requester 01a1e607-17d9-77d3-98d3-a43a87c4633d; the live Phase-G review is 01a1ff32-159a-7028-a2d2-b4bcc1ce9eef at level compliant.",
+      "acceptance_criteria": "The plan's gate (§7), executable: ADR 0001 carries 16 measured rows (8 metrics × 2 stacks), the spike is gone, apps/web is still absent and ports 8791, 8801 and 8802 are free. The decision must be CSR unless SSR beat CSR on interaction TTI or on auth: at median n=5 the interaction TTI is CSR 5,426 ms (5,408–5,628) against SSR 5,736 ms (5,705–5,758), the ranges do not overlap, and both auth flows pass without forcing cookies, so the answer is CSR. Metrics 5–7 carry their own n: SSE→DOM is one CSR run, the memory soak was skipped and the SSR cold-build set is two runs. python3 scripts/verify-project.py --project S01 --snapshot <fresh> is green with 12 checks and 0 failures at d7293f96.",
+      "contract": "This statement 01a1ff2e-7974-74cd-be6d-377e3c0071a4 sits on the approved scope baseline 01a1ff31-72ec-766e-8ad3-227d927f64ab and is complemented by the delivery contract 01a1ff31-30fe-7003-8d62-59278699d128, whose approval 01a1ff31-4403-7988-a64b-796300ce7102 was taken by 01a1e8a7-8b23-76a9-9114-aafb95f7a545 and requested by 01a1e607-17d9-77d3-98d3-a43a87c4633d. Both instruments are retrospective and dated 2026-11-26; they bind the rework to the plan's gate and to the live review 01a1ff32-159a-7028-a2d2-b4bcc1ce9eef.",
+      "retrospective": true
+    }
+  },
+  "artifacts": [
+    {
+      "title": "Stakeholder map — UI stack",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "purpose": "Name who consumes the UI-stack decision, who decides it and what each party needs from ADR 0001.",
+      "scope": "S12 (the UI buildout), the design pack, S00's parity ids and the governance roles around the decision.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "S12 (the UI buildout)",
+          "S00 (parity ids)",
+          "readers of the published programme site"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the programme architect",
+          "axis_b": "owns the spike, ADR 0001 and this retrospective pack",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "responsible"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the Architecture Board",
+          "axis_b": "reviews the seven Phase A–D artefacts and the delivery contract",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "approve"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "the programme approver",
+          "axis_b": "approves the scope baseline, the contracts and the closure gate",
+          "value": {
+            "influence": "high",
+            "interest": "medium",
+            "engagement": "approve"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "S12 (the UI buildout)",
+          "axis_b": "builds apps/web on the recorded decision",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "S00 (parity ids)",
+          "axis_b": "supplies the parity ids the UI build consumes",
+          "value": {
+            "influence": "medium",
+            "interest": "medium",
+            "engagement": "consult"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "readers of the published programme site",
+          "axis_b": "read the decision through the published outputs",
+          "value": {
+            "influence": "low",
+            "interest": "medium",
+            "engagement": "inform"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements catalog — UI stack",
+          "kind": "dependency"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective matrix artefact for S01, authored 2026-11-26 from the slice plan, ADR 0001 and the rework note docs/evidence/rework/S01.md. Phase a, plateau psa, kind matrix. The owner is the programme architect under the #526 rework delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews and the programme approver decides the baseline and the gate.\n\n## Entries\n\nSix stakeholders on the influence, interest and engagement axes. The programme architect is responsible for the spike, the ADR and this pack; the Architecture Board approves the Phase A–D set; the programme approver holds the baseline, contract and closure decisions. S12 consumes the decision, S00 supplies the parity ids the UI build will need, and readers of the published site see the ADR through the published outputs. Each row fixes one influence and one interest so the engagement is decidable.\n\n## Links\n\nThe artefact carries one typed edge: Requirements catalog — UI stack as dependency. The edge names another artefact of this pack, so the set has no orphan, and it records that the requirements bound the actors named here; the matrix does not add a stakeholder the record does not carry.\n\n## Document\n\nPurpose: name who consumes the UI-stack decision, who decides it and what each party needs from ADR 0001. Scope: S12, the design pack, S00's parity ids and the governance roles around the decision. The map was reconstructed retrospectively on 2026-11-26 from the recorded roles rather than from a live elicitation, so it states the engagement the lifecycle implies and no meeting that did not happen."
+    },
+    {
+      "title": "Driver/goal/objective — UI stack",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "Trace why the spike exists: the CSR prior, the measured decision rule, the ADR as the durable record and the honest coverage gap.",
+      "scope": "SPEC §5.7's prior and forcing conditions, the decision rule, ADR 0001 and the metrics the record cannot complete.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "S12 (the UI buildout)",
+          "the programme office",
+          "readers of the published programme site"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "D1 SPEC §5.7 sets Leptos CSR as the prior for an authenticated app with no SEO need",
+          "axis_b": "G1 test CSR and SSR against the measured rule rather than argue the prior",
+          "value": {
+            "objective": "SSR is chosen only if measured interaction TTI exceeds 2 s or the auth flow forces cookie-based SSR; a tie, or a loss on both, is CSR"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "D2 the stack choice is a one-way door for S12",
+          "axis_b": "G2 record the decision in ADR 0001 with every measured number",
+          "value": {
+            "objective": "the ADR carries 8 metrics × 2 stacks, states the median with min–max, and names the command that produced each row"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "D3 both stacks exceed the 2 s threshold, so the threshold alone cannot decide",
+          "axis_b": "G3 apply the second half of the rule",
+          "value": {
+            "objective": "SSR's precondition is met, but the rule also requires SSR to beat CSR on TTI or on auth; it loses on both, so the decision is CSR"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "D4 the measurement window closed before all eight metric sets finished",
+          "axis_b": "G4 keep the record honest about its own coverage",
+          "value": {
+            "objective": "metrics 5–7 carry their own n and are marked not recoverable where no further run is possible; the ADR is the only durable artefact and the spike is deleted"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Stakeholder map — UI stack",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalog artefact for S01, authored 2026-11-26 from the slice plan, ADR 0001 and the rework note. Phase a, plateau psa, kind catalog. The owner is the programme architect under the #526 rework delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews the set and the programme approver decides the gate.\n\n## Entries\n\nFour driver-to-goal rows. D1 and G1 carry SPEC §5.7's prior and the two forcing conditions that can overturn it. D2 and G2 make the decision durable: ADR 0001 is the only artefact that survives the spike, so every measured number must reach it. D3 and G3 apply the second half of the rule honestly, because both stacks exceed 2 s and the threshold alone cannot decide. D4 and G4 are the rework's own driver: metrics 5–7 closed with partial sets, and the record says so instead of inventing a median.\n\n## Links\n\nThe artefact carries one typed edge: Stakeholder map — UI stack as derivation. The edge names another artefact this pack creates, so the set has no orphan, and it places each driver with the actor who holds it; the catalogue does not add a goal the plan and the ADR do not state.\n\n## Document\n\nPurpose: trace why the spike exists and what it was meant to establish. Scope: SPEC §5.7's prior and forcing conditions, the decision rule, ADR 0001 and the metrics the record cannot complete. The catalogue was written retrospectively on 2026-11-26 from the plan and the ADR; it records intent and coverage, not a claim that all eight metric sets completed."
+    },
+    {
+      "title": "Requirements catalog — UI stack",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "State the measurement requirements the spike had to meet, each with the value the ADR records and the protocol that produced it.",
+      "scope": "The eight metrics of plan §7, the decision rule and the durable-artefact requirement.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "S12 (the UI buildout)",
+          "the programme office",
+          "CI reviewers"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "R1",
+          "axis_b": "interaction TTI, throttled, is the decision number",
+          "value": {
+            "requirement": "navigationStart to the first drag that mutates list membership, 4× CPU and Slow 4G, median of five runs per stack",
+            "acceptance": "CSR 5,426 ms (5,408–5,628) against SSR 5,736 ms (5,705–5,758), median n=5; both exceed 2 s so SSR's precondition is met, but SSR still loses the TTI comparison and the ranges do not overlap"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "R2",
+          "axis_b": "bundle size is reported gzip-9 with the raw size beside it",
+          "value": {
+            "requirement": "sum the built site's wasm and js, gzip-9 each file, and record the raw total too",
+            "acceptance": "CSR 290,723 B gzip-9 (809,797 B raw) against SSR 301,017 B gzip-9 (844,826 B raw); the 9,315,696 B SSR server binary is not shipped to the browser"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "R3",
+          "axis_b": "the 500-card first render is measured all-at-once and virtualised on both stacks",
+          "value": {
+            "requirement": "navigationStart to the 500th [data-card-id]; the all-at-once mode is the decision configuration and the virtualised mode is the fallback",
+            "acceptance": "CSR 4,726 ms all-at-once and 4,726 ms virtualised (240 cards); SSR 1,444 ms and 945 ms; SSR wins first paint and the win does not survive hydration"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "R4",
+          "axis_b": "drag frames over a 2 s pointer drag",
+          "value": {
+            "requirement": "rAF deltas plus longtask observation; pass is at least 95% of frames at or below 16.7 ms with no long task over 50 ms",
+            "acceptance": "CSR p95 16.7 ms and 80.0% of frames at or below 16.7 ms; SSR p95 16.8 ms and 76.5%; both record zero long tasks over 50 ms, and the 95% threshold is missed by both stacks"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "R5",
+          "axis_b": "SSE to DOM latency over 30 events",
+          "value": {
+            "requirement": "the fixture stamps the send time, the app marks the message and a MutationObserver marks the DOM change; report p50 and p95 against a p95 ceiling of 100 ms",
+            "acceptance": "CSR one run only: p50 1.0 ms and p95 1.8 ms; SSR not measured, because the five-run set did not complete inside the time-box"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "R6",
+          "axis_b": "a five-minute memory soak on both stacks",
+          "value": {
+            "requirement": "CDP Performance.getMetrics for JSHeapUsedSize plus Memory.getDOMCounters; more than 300 MB or more than 3× the card nodes is a signal",
+            "acceptance": "not measured on either stack: the soak was skipped after the decision measurements closed"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "R7",
+          "axis_b": "a release cold build from an empty target directory",
+          "value": {
+            "requirement": "time the build from empty on both stacks; more than 10 minutes is a loop warning",
+            "acceptance": "CSR 44.41 s (35.58–54.71, n=5, frontend only); SSR 56.54 s and 79.95 s (n=2, full server plus wasm); the 10-minute warning is not crossed"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "R8",
+          "axis_b": "auth is a pass or a forcing condition, not a latency race",
+          "value": {
+            "requirement": "run auth-code + PKCE S256 on CSR and HttpOnly session + CSRF on SSR; log out and in three times and deep-link while logged out",
+            "acceptance": "CSR passes 3/3 login to board to logout cycles with the token in memory; SSR passes 3/3; neither forces SSR, and CSR's authenticated SSE needs a fetch plus ReadableStream shim, recorded as work rather than a failure"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "R9",
+          "axis_b": "the ADR is the only durable artefact and the spike is deleted",
+          "value": {
+            "requirement": "splice the measured table into the ADR before deleting spikes/web, and confirm apps/web is still absent",
+            "acceptance": "docs/decisions/0001-ui-stack.md is Accepted on 2026-11-08 with 16 measured rows; spikes/web is gone and apps/web is still absent"
+          },
+          "position": 9
+        }
+      ],
+      "links": [
+        {
+          "to": "Driver/goal/objective — UI stack",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalog artefact for S01, authored 2026-11-26 from plan §7, ADR 0001 and the rework note. Phase a, plateau psa, kind catalog. The owner is the programme architect under the #526 rework delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews and the programme approver decides the gate.\n\n## Entries\n\nNine requirements. R1 is the decision row: interaction TTI at median n=5, where CSR is 310 ms faster than SSR and the ranges do not overlap. R2 and R3 cover the bundle and the 500-card first render, where SSR's 1,444 ms first paint is real but does not survive hydration. R4 records a threshold both stacks missed, symmetrically. R5 and R6 are the partial sets the record carries as partial. R7 is context rather than a decision input, and R8 records auth as a pass on both stacks with the CSR SSE shim counted as work. R9 keeps the ADR and deletes the spike.\n\n## Links\n\nThe artefact carries one typed edge: Driver/goal/objective — UI stack as derivation. The edge names another artefact this pack creates, so the set has no orphan, and it traces each requirement back to the goal it serves; no requirement is added beyond the plan's protocol and the ADR's measured table.\n\n## Document\n\nPurpose: state the measurement requirements the spike had to meet, each with the recorded value and the protocol behind it. Scope: the eight metrics of plan §7, the decision rule and the durable-artefact requirement. The catalogue was reconstructed retrospectively on 2026-11-26; the acceptance lines quote the ADR and deliberately show the rows whose sets are incomplete rather than smoothing them."
+    },
+    {
+      "title": "Solution concept — UI stack",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "purpose": "Show how one fixture and one component tree produced two measured stacks, and which artefact survives the spike.",
+      "scope": "The fixture, the shared tree, the CSR and SSR packages, the measurement harness, ADR 0001 and the unrecoverable metric set.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "S12 (the UI buildout)",
+          "runtime operators",
+          "CI reviewers"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the fixture",
+          "axis_b": "one axum server on port 8791",
+          "value": {
+            "kind": "component",
+            "note": "500 cards in 10 lists, card.moved every 2 s honouring Last-Event-ID, a 50-message history, 80 tokens at 25 ms then a tool_call then done, and /health"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the shared component tree",
+          "axis_b": "one tree, two crates",
+          "value": {
+            "kind": "component",
+            "note": "spikes/web/shared/ui.rs is included by both packages, so the comparison is the stack and not the screen"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "the CSR package",
+          "axis_b": "spikes/web/csr on port 8801",
+          "value": {
+            "kind": "component",
+            "note": "wasm32-unknown-unknown, a static site served from the built output; the board and the chat run in the browser"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "the SSR package",
+          "axis_b": "spikes/web/ssr on port 8802",
+          "value": {
+            "kind": "component",
+            "note": "leptos_axum renders the same tree on the server and hydrates it in WASM; the built binary is run rather than a file server"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "the measurement harness",
+          "axis_b": "Playwright 1.49.1 plus CDP throttling",
+          "value": {
+            "kind": "component",
+            "note": "4× CPU and Slow 4G on every run (150 ms latency, 1638.4 kbps down, 675 kbps up); Lighthouse 12 supplies the supplementary interactive number only"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "ADR 0001",
+          "axis_b": "the surviving deliverable",
+          "value": {
+            "kind": "component",
+            "note": "docs/decisions/0001-ui-stack.md: 8 metrics × 2 stacks, each row naming the command that produced it; the spike is deleted after the table is spliced in"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "the unrecoverable set",
+          "axis_b": "metrics 5–7",
+          "value": {
+            "kind": "edge",
+            "note": "SSE→DOM is one CSR run and no SSR run, the memory soak is absent, and the SSR cold-build set is two runs; the ADR states each limit"
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements catalog — UI stack",
+          "kind": "realization"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective diagram artefact for S01, authored 2026-11-26 from the slice plan, ADR 0001 and the rework note. Phase a, plateau psa, kind diagram. The owner is the programme architect under the #526 rework delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews and the programme approver decides the gate.\n\n## Entries\n\nSeven rows: six components and one edge. The fixture is a single DB-free axum server; the shared tree is the same Rust components compiled into both packages, so the measurement compares stacks and not implementations. CSR and SSR are separate packages on separate ports, each served from its own built output. The harness is Playwright with CDP throttling, and Lighthouse is supplementary. ADR 0001 survives the spike, and the edge names the three metrics whose sets are incomplete.\n\n## Links\n\nThe artefact carries one typed edge: Requirements catalog — UI stack as realization. The edge names another artefact this pack creates, so the set has no orphan, and it records which components realise the measurement requirements; the diagram claims no component beyond the spike's own deliverables.\n\n## Document\n\nPurpose: show how one fixture and one component tree produced two measured stacks, and which artefact survives. Scope: the fixture, the shared tree, the CSR and SSR packages, the harness, ADR 0001 and the unrecoverable metric set. It was drawn retrospectively on 2026-11-26 from the plan and the ADR, not from a design session, and it records the spike as deleted rather than as available to re-run."
+    },
+    {
+      "title": "Business capability map — UI stack",
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "purpose": "Name the capabilities the spike demonstrated, their measured maturity and the evidence behind each.",
+      "scope": "The board, the chat, auth, first paint, honest evidence and the static deployment the CSR decision enables.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "S12 (the UI buildout)",
+          "the programme office",
+          "runtime operators"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Board",
+          "axis_b": "500 cards in 10 lists, pointer and keyboard drag, live SSE moves",
+          "value": {
+            "maturity": "built twice, once in CSR and once in SSR; CSR is the recorded stack",
+            "evidence": "ADR 0001 metrics 3 and 4; CSR drag p95 16.7 ms with 80.0% of frames at or below 16.7 ms"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Chat",
+          "axis_b": "streaming tokens, a tool-call card and 50-message history",
+          "value": {
+            "maturity": "built twice; SSE→DOM was measured once on CSR",
+            "evidence": "ADR 0001 metric 5 and the chat fixture contract in the plan"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Auth",
+          "axis_b": "auth-code + PKCE on CSR and HttpOnly session + CSRF on SSR",
+          "value": {
+            "maturity": "both pass and neither forces SSR",
+            "evidence": "ADR 0001 metric 8: 3/3 login to board to logout cycles per stack, with the deep link gated while logged out"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "First paint",
+          "axis_b": "500 cards in the DOM before hydration",
+          "value": {
+            "maturity": "SSR only; a real win that does not survive to interactivity",
+            "evidence": "ADR 0001 metric 3: SSR 1,444 ms against CSR 4,726 ms for the same 500 cards"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Honest evidence",
+          "axis_b": "the ADR states what it cannot support",
+          "value": {
+            "maturity": "in place; metrics 5–7 carry their own n and are marked not recoverable",
+            "evidence": "docs/decisions/0001-ui-stack.md and the rework note's residuals"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Static deployment",
+          "axis_b": "the UI ships as static assets behind the API origin",
+          "value": {
+            "maturity": "enabled by the CSR decision and not built in the spike",
+            "evidence": "ADR 0001 Consequences: no server render, no hydration path, no UI session surface"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Solution concept — UI stack",
+          "kind": "derivation"
+        },
+        {
+          "to": "Requirements catalog — UI stack",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective diagram artefact for S01, authored 2026-11-26 from ADR 0001, the slice plan and the rework note. Phase b, plateau hld, kind diagram. The owner is the programme architect under the #526 rework delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews and the programme approver decides the gate.\n\n## Entries\n\nSix capabilities. The board and the chat were each built twice, in CSR and SSR, from the shared tree; the board's first render and drag behaviour is evidenced by metrics 3 and 4, its live SSE move and the chat's streaming by metric 5. Auth passes on both stacks, so it is a capability of either stack and not a reason to choose either. First paint is recorded as an SSR capability that does not survive hydration. Honest evidence and static deployment are recorded at the maturity the record supports, with the CSR decision enabling the second and not building it in the spike.\n\n## Links\n\nThe artefact carries two typed edges: Solution concept — UI stack and Requirements catalog — UI stack, both as derivation. Both edges name other artefacts of this pack, so the set has no orphan, and they place each capability against the components that realise it and the requirements that bound it.\n\n## Document\n\nPurpose: name the capabilities the spike demonstrated, their measured maturity and the evidence behind each. Scope: the board, the chat, auth, first paint, honest evidence and the static deployment the CSR decision enables. The map is retrospective and dated 2026-11-26; it records what two builds measured and does not upgrade the spike to a production UI, which is S12's."
+    },
+    {
+      "title": "Data entity catalog — UI stack",
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Record the measured table as data: one row per metric with both stacks' values, the sample size and the key each number is identified by.",
+      "scope": "ADR 0001's eight metrics across CSR and SSR, plus the ADR itself as the surviving entity.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "S12 (the UI buildout)",
+          "auditors",
+          "CI reviewers"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "metric 1 — interaction TTI (ms), throttled",
+          "axis_b": "the decision row",
+          "value": {
+            "csr": "5,426 (5,408–5,628), n=5",
+            "ssr": "5,736 (5,705–5,758), n=5",
+            "key": "navigationStart to the first drag that mutates membership"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "metric 2 — bundle, gzip-9 bytes",
+          "axis_b": "wasm and js over the built site",
+          "value": {
+            "csr": "290,723 B gzip-9; 809,797 B raw",
+            "ssr": "301,017 B gzip-9; 844,826 B raw; the 9,315,696 B server binary is not shipped",
+            "key": "gzip-9 sum over the built site"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "metric 3 — 500-card first render (ms)",
+          "axis_b": "all-at-once and virtualised",
+          "value": {
+            "csr": "4,726 all-at-once; 4,726 virtualised (240 cards)",
+            "ssr": "1,444 all-at-once; 945 virtualised",
+            "key": "navigationStart to the 500th [data-card-id]"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "metric 4 — drag frames, 2 s pointer drag",
+          "axis_b": "rAF deltas plus longtask",
+          "value": {
+            "csr": "p95 16.7 ms; 80.0% of frames at or below 16.7 ms; 0 long tasks over 50 ms",
+            "ssr": "p95 16.8 ms; 76.5%; 0 long tasks over 50 ms",
+            "key": "frame percentage at or below 16.7 ms"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "metric 5 — SSE→DOM (ms), 30 events",
+          "axis_b": "the partial set",
+          "value": {
+            "csr": "one run only: p50 1.0 ms, p95 1.8 ms",
+            "ssr": "not measured",
+            "key": "fixture ts to sse.<id> to MutationObserver sseDom.<id>"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "metric 6 — memory, five-minute soak",
+          "axis_b": "the skipped set",
+          "value": {
+            "csr": "not measured",
+            "ssr": "not measured",
+            "key": "JSHeapUsedSize and DOM counters after 300 s"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "metric 7 — cold build (s), release",
+          "axis_b": "from an empty target directory",
+          "value": {
+            "csr": "44.41 (35.58–54.71), n=5, frontend only",
+            "ssr": "56.54 and 79.95, n=2, full server plus wasm",
+            "key": "wall time from empty target"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "metric 8 — auth",
+          "axis_b": "pass or forcing condition",
+          "value": {
+            "csr": "pass, no forcing condition; token in memory; an authenticated SSE needs a fetch plus ReadableStream shim",
+            "ssr": "pass, not forcing; HttpOnly s1_session plus CSRF; EventSource sends the cookie",
+            "key": "3/3 login to board to logout cycles; deep link gated"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "the ADR entity",
+          "axis_b": "the surviving record",
+          "value": {
+            "kind": "entity",
+            "definition": "docs/decisions/0001-ui-stack.md, Status Accepted, Date 2026-11-08, Slice S01; the only durable artefact of the spike",
+            "key": "docs/decisions/0001-ui-stack.md"
+          },
+          "position": 9
+        }
+      ],
+      "links": [
+        {
+          "to": "Business capability map — UI stack",
+          "kind": "derivation"
+        },
+        {
+          "to": "Solution concept — UI stack",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalog artefact for S01, authored 2026-11-26 from ADR 0001's measured table, the slice plan and the rework note. Phase c, plateau hld, kind catalog. The owner is the programme architect under the #526 rework delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews and the programme approver decides the gate.\n\n## Entries\n\nNine rows. Metrics 1 to 4 and 8 carry their five-run sets, with metric 1 stating the median and range that decide the stack. Metric 2 is a deterministic bundle size; metric 5 is one CSR run and no SSR run; metric 6 is absent on both stacks; metric 7 is five CSR runs against two SSR runs. Each row pairs the two stack values with the key the number is identified by, so a reader can tell a measured pair from a single value at a glance. The ninth row is ADR 0001 itself, the entity that outlives the spike and the only place these numbers are now held.\n\n## Links\n\nThe artefact carries two typed edges: Business capability map — UI stack and Solution concept — UI stack, both as derivation. Both edges name other artefacts of this pack, so the set has no orphan, and they tie each measured row to the capability it evidences and the component that produced it.\n\n## Document\n\nPurpose: record the measured table as data, with both stacks' values, the sample size and the key behind each number. Scope: ADR 0001's eight metrics across CSR and SSR, plus the ADR as the surviving entity. The catalogue was reconstructed retrospectively on 2026-11-26; it does not invent a value for a row whose set is incomplete, and it marks the partial and absent rows as the ADR does."
+    },
+    {
+      "title": "Technology standards — UI stack",
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Name the versions, tools and measurement standards the spike pinned, and where each is enforced.",
+      "scope": "Leptos 0.9.0-rc1, cargo-leptos 0.3.11, Playwright, Chrome and Lighthouse, the throttling protocol and the ADR's own standard.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "S12 (the UI buildout)",
+          "runtime operators",
+          "CI reviewers"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Leptos 0.9.0-rc1",
+          "axis_b": "one minor pinned across three crates",
+          "value": {
+            "usage": "leptos, leptos_axum and leptos_router are pinned to 0.9.0-rc1 in [workspace.dependencies]; a minor mismatch produces an opaque type error in leptos_routes"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "cargo-leptos 0.3.11",
+          "axis_b": "the build route",
+          "value": {
+            "usage": "release plus wasm-opt, never a dev build; the site is served from the built output rather than trunk serve, which injects live-reload and distorts the measurement"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "the throttling protocol",
+          "axis_b": "4× CPU and Slow 4G on every run",
+          "value": {
+            "usage": "CDP Emulation.setCPUThrottlingRate and Network.emulateNetworkConditions with 150 ms latency, 1638.4 kbps down and 675 kbps up; no unthrottled localhost number enters the record"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Lighthouse 12",
+          "axis_b": "the supplementary number only",
+          "value": {
+            "usage": "--throttling-method=simulate with the same values; interactive is CSR 5,703 ms (5,553–5,747) and SSR 5,855 ms (5,853–5,865), used as a cross-check on the in-page interaction TTI"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Chrome 156 through Playwright 1.49.1",
+          "axis_b": "the browser",
+          "value": {
+            "usage": "channel chrome, because the Playwright-pinned Chromium download was incomplete on the measurement box; the same engine family is used for every run"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "gzip-9 reporting",
+          "axis_b": "the bundle standard",
+          "value": {
+            "usage": "bundle bytes are reported gzip-9 with the raw size beside them; wasm and js are summed over the built site, never over the target directory"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "the decision-record standard",
+          "axis_b": "eight metrics across two stacks",
+          "value": {
+            "usage": "the ADR carries every metric for both stacks, the median with min–max, the command that produced it, and an explicit not-recoverable note where the set is incomplete"
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Data entity catalog — UI stack",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalog artefact for S01, authored 2026-11-26 from the slice plan's measurement protocol, ADR 0001 and the rework note. Phase d, plateau hld, kind catalog. The owner is the programme architect under the #526 rework delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews and the programme approver decides the gate.\n\n## Entries\n\nSeven standards. The version triad is a hard constraint: three Leptos crates on one minor, or the build fails with a type error that names neither crate. cargo-leptos is the build route, with release and wasm-opt and the built output served directly. The throttling protocol is what makes the numbers comparable, and Lighthouse is only a cross-check. Chrome 156 through Playwright is the browser of record. The last two standards are the report itself: gzip-9 bundle bytes, and the ADR's eight-by-two table with an explicit not-recoverable note where the set is incomplete.\n\n## Links\n\nThe artefact carries one typed edge: Data entity catalog — UI stack as derivation. The edge names another artefact this pack creates, so the set has no orphan, and it records that every measured entity is produced under one of these standards.\n\n## Document\n\nPurpose: name the versions, tools and measurement standards the spike pinned, and where each is enforced. Scope: Leptos 0.9.0-rc1, cargo-leptos 0.3.11, Playwright, Chrome and Lighthouse, the throttling protocol and the ADR's own standard. Authored retrospectively on 2026-11-26, it names only versions and settings the plan and the ADR actually record."
+    }
+  ],
+  "documents": [
+    {
+      "category": "architecture-artifact",
+      "title": "Architecture Artefact Index — S01 (retrospective, 2026-11-26)",
+      "body": "## Metadata\n\nThe artefact set for S01 is seven Phase A–D deliverables on the v1 delivery track: the stakeholder map, the driver/goal/objective catalogue, the requirements catalogue, the solution concept, the business capability map, the data entity catalogue and the technology standards catalogue. Each re-versions the approved 2026-11-22 row of the same title, so the factory updates the existing artefact instead of creating a duplicate. The owner is the programme architect under the #526 delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews.\n\n## Entries\n\nThe index lists the seven rows in the order the factory creates them: Stakeholder map — UI stack (matrix, phase a), Driver/goal/objective — UI stack (catalogue, phase a), Requirements catalog — UI stack (catalogue, phase a), Solution concept — UI stack (diagram, phase a), Business capability map — UI stack (diagram, phase b), Data entity catalog — UI stack (catalogue, phase c) and Technology standards — UI stack (catalogue, phase d). Their recorded ids from the 2026-11-22 approval are 01a20237-eac9-786c-ad3d-e68c8902565e, 01a2020e-dddf-704f-bbc9-ba7465247d9d, 01a20216-f236-79cc-8f14-e47a498a4998, 01a20232-e6ba-77ca-99f0-e0ef41d686f1, 01a20240-6ae9-7070-997c-4bc295a6f135, 01a20245-718d-7c42-bd3b-708c1e991e78 and 01a2024a-07ac-7c69-93e6-35c7a073f8b9.\n\n## Links\n\nThe artefact links are the typed edges this pack declares: the stakeholder map to the requirements catalogue as dependency; the driver/goal/objective and requirements catalogues to each other by derivation; the solution concept to the requirements catalogue as realization; the business capability map to the solution concept and the requirements catalogue as derivation; the data entity catalogue to the business capability map and the solution concept; and the technology standards catalogue to the data entity catalogue. Every edge points at another artefact of this pack, and an artefact with no link would be refused as an orphan.\n\n## Document\n\nThis index is the document the architecture-artifact package reads. Each entry above resolves to an artefact row with its body published as an architecture-artifact-instance document dated 2026-11-26, and the seven bodies carry the Metadata, Entries, Links and Document sections the standard requires. The index records the retrospective set only; the 2026-11-22 documents remain in the record as the prior versions of the same rows and are not withdrawn."
+    }
+  ],
+  "registers": {
+    "risk": [
+      {
+        "code": "S01-R1",
+        "title": "Metrics 5–7 cannot be re-established, so the measured table is narrower than the eight-metric protocol",
+        "body": "ADR 0001 records metric 5 as one CSR run (p50 1.0 ms, p95 1.8 ms over 30 events) and no SSR run, metric 6 as not measured on either stack, and metric 7 as two SSR runs stated rather than averaged. The spike workspace spikes/web was deleted after the table was spliced into the ADR, so the harness and the raw runs are gone and re-running the spike would be a new project. This retrospective row dated 2026-11-26 records the gap and does not close it.",
+        "status": "open",
+        "severity": "medium",
+        "probability": "high",
+        "impact": 3,
+        "review_at": "2026-12-15",
+        "response": "Keep the not-recoverable note in the ADR and in every output that cites the table; never present metrics 5–7 as measured.",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/decisions/0001-ui-stack.md — metrics 5–7",
+            "acceptance/programme/S01.toml"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "code": "S01-R2",
+        "title": "The drag-smoothness threshold was missed by both stacks and passes to S12 as an unmet target",
+        "body": "The plan's metric 4 threshold is at least 95% of frames at or below 16.7 ms with no long task over 50 ms. ADR 0001 records CSR at 80.0% (75.5–82.7) and SSR at 76.5% (71.8–80.4), with zero long tasks over 50 ms on both stacks. The miss is symmetric, so it does not change the stack decision, but the recorded configuration does not meet the threshold and S12 inherits drag smoothness as an open target on the chosen stack.",
+        "status": "open",
+        "severity": "medium",
+        "probability": "high",
+        "impact": 3,
+        "review_at": "2026-12-15",
+        "response": "Carry the 95% frame target into S12's acceptance for the board and measure it on the production component tree.",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/decisions/0001-ui-stack.md — metric 4",
+            "docs/plans/slices/S01-ui-spike.md §7"
+          ],
+          "decisions": []
+        }
+      }
+    ],
+    "issue": [
+      {
+        "code": "S01-I1",
+        "title": "The five-run sets for metrics 5–7 never completed inside the measurement window",
+        "body": "Plan §7 asks for five runs per stack for metrics 1–4 and 8, and ADR 0001 records that the coordinator time-box closed before metrics 5–7 finished their sets: the SSE→DOM harness first read the wrong key path and returned no pairs, the memory soak was skipped, and the SSR cold build stopped at two runs. The record states each with its own n rather than presenting a median it does not have.",
+        "status": "open",
+        "severity": "medium"
+      }
+    ],
+    "assumption": [
+      {
+        "code": "S01-A1",
+        "title": "S12 builds apps/web as Leptos CSR/WASM on ADR 0001 and does not reopen the stack question",
+        "body": "The decision rests on the measured interaction TTI (CSR 5,426 ms against SSR 5,736 ms, median n=5, non-overlapping ranges) and on auth not forcing cookies on either stack. S12 is assumed to adopt the record without a second spike. The ADR names its revisit triggers: a real-device requirement that only server rendering meets, a token unavailable to the SPA so that only an HttpOnly cookie can authenticate, or a later Leptos release reversing the measured order by more than the 5.7% seen here.",
+        "status": "open"
+      }
+    ],
+    "dependency": [
+      {
+        "code": "S01-D1",
+        "title": "S01 depends on S00 for the parity ids the UI build consumes",
+        "body": "The project brief records the dependency as S00, and the slice plan's frontmatter carries parity_ids: PENDING-S0. The spike did not need the ids because its fixture is deterministic and DB-free, but S12's UI build consumes them, so the recorded decision becomes usable at the point S00 publishes them. This retrospective row dated 2026-11-26 records the dependency and does not claim it satisfied.",
+        "status": "open"
+      }
+    ],
+    "benefit": [
+      {
+        "code": "S01-B1",
+        "title": "S12 builds the UI once on a measured stack, without an SSR hydration surface",
+        "body": "The decision is CSR/WASM: at median n=5 the first interaction is 5,426 ms against SSR's 5,736 ms, a 310 ms (5.7%) advantage with non-overlapping ranges, and auth-code + PKCE passes without forcing cookies. SSR's first-paint win (1,444 ms against 4,726 ms for 500 cards) does not survive hydration, and the ADR records what SSR would have cost: an HttpOnly session, CSRF, a server-side token exchange and a server binary to deploy. The benefit is a single UI stack with static-asset deployment and no double-render surface.",
+        "status": "open"
+      }
+    ]
+  },
+  "delivery_contract": {
+    "title": "Delivery contract — S01 (retrospective, 2026-11-26)",
+    "body": {
+      "commitments": "Decide by measurement whether S12 builds the UI as Leptos CSR/WASM or Leptos SSR and record it as ADR 0001: eight metrics per stack from building the board and the chat twice, with auth-code + PKCE on CSR and HttpOnly cookie + CSRF on SSR. The contract also commits the project to delete the spike, to publish the project-brief and evidence outputs, and to re-close through the one gate with an approver distinct from the requester. The decision is CSR because SSR lost on interaction TTI and auth did not force cookies.",
+      "compliance": "The live Phase-G review is 01a1ff32-159a-7028-a2d2-b4bcc1ce9eef at level compliant, with two findings: S01-1 records that the ADR carries the decision with the measured numbers and that SSR did not beat CSR on TTI; S01-2 records that metrics 5–7 are partially or not measured and that the record says so. No active waiver exists. The review's evidence is green at d7293f96, and the strict audit on the same snapshot carries no P0 or P1 entry for the project.",
+      "approval": "The delivery contract 01a1ff31-30fe-7003-8d62-59278699d128 is live and was approved by 01a1ff31-4403-7988-a64b-796300ce7102; the approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 is distinct from the requester 01a1e607-17d9-77d3-98d3-a43a87c4633d. The scope baseline 01a1ff31-72ec-766e-8ad3-227d927f64ab was taken and approved by the same approver on 2026-11-21, and the closure gate was decided on the same separation of duties.",
+      "capacity": "The unit is one WBS deliverable, 'The UI-stack decision record', accepted with WSJF inputs business value 3, time criticality 5, risk reduction 3 and job size 13. The work is a time-boxed measurement spike plus its retrospective reconstitution: a fixture of at most 200 lines, two builds of the same component tree, five runs per stack for the decision metrics and one ADR. The 41 acts of the rework are in transcript.jsonl.",
+      "acceptance": "Acceptance is the plan's §7 gate, executable: ADR 0001 carries 16 measured rows (8 metrics × 2 stacks), the spike is gone, apps/web is still absent and ports 8791, 8801 and 8802 are free. The decision must be CSR unless SSR beat CSR on interaction TTI or on auth; at median n=5 it did not (CSR 5,426 ms against SSR 5,736 ms), and both auth flows pass without forcing cookies. python3 scripts/verify-project.py --project S01 --snapshot <fresh> is green with 12 checks and 0 failures at d7293f96.",
+      "evidence": "The evidence route is ADR 0001 (docs/decisions/0001-ui-stack.md) with its measured table; the slice plan docs/plans/slices/S01-ui-spike.md; the rework note docs/evidence/rework/S01.md; the acceptance manifest acceptance/programme/S01.toml; and the published outputs Evidence 01a1e686-a927-7004-8b01-f80a112e430d, Project Brief 01a1ff35-e78e-7622-a878-3e76d5545189 and Closure review 01a1ff31-9ce6-76cb-8bfc-1812a99646e3. The spike workspace is deleted, so the raw runs behind metrics 5–7 are not recoverable.",
+      "manifest": "acceptance/programme/S01.toml",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "retrospective": true
+    }
+  },
+  "wbs_deliverable": {
+    "title": "The UI-stack decision record",
+    "business_value": 3,
+    "time_criticality": 5,
+    "risk_reduction": 3,
+    "job_size": 13
+  },
+  "review": {
+    "level": "compliant",
+    "findings": "This retrospective Phase-G review, dated 2026-11-26, carries the level the record supports: the live review 01a1ff32-159a-7028-a2d2-b4bcc1ce9eef on the delivery contract 01a1ff31-30fe-7003-8d62-59278699d128 is compliant and cites the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, and no active waiver exists. Its two findings are carried forward unchanged: S01-1 records that the ADR holds the decision with the measured numbers and that SSR did not beat CSR on interaction TTI; S01-2 records that metrics 5–7 are partially or not measured and that the record says so. The scope baseline 01a1ff31-72ec-766e-8ad3-227d927f64ab is approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, the closure gate was decided by an approver distinct from the requester 01a1e607-17d9-77d3-98d3-a43a87c4633d, and the activity record is 41 acts in transcript.jsonl, each write read back by programme-record.py. python3 scripts/verify-project.py --project S01 --snapshot <fresh> is green with 12 checks and 0 failures at d7293f96, and the strict audit on the same snapshot carries no P0 or P1 entry. What the review does not claim is completeness of the measurement: SSE→DOM is one CSR run and no SSR run, the memory soak is absent, the SSR cold-build set is two runs, and the plan's 95% frame threshold for drag was missed by both stacks at 80.0% and 76.5%. The decision itself is well supported — CSR 5,426 ms against SSR 5,736 ms interaction TTI, median n=5, non-overlapping ranges, and no auth forcing condition — so the level stands as compliant with those limits stated.",
+    "evidence": {
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "live_review": "01a1ff32-159a-7028-a2d2-b4bcc1ce9eef",
+      "delivery_contract": "01a1ff31-30fe-7003-8d62-59278699d128",
+      "scope_baseline": "01a1ff31-72ec-766e-8ad3-227d927f64ab",
+      "acceptance_manifest": "acceptance/programme/S01.toml",
+      "rework_note": "docs/evidence/rework/S01.md"
+    }
+  },
+  "project_brief_output": "# Project brief — S01 UI spike (retrospective, 2026-11-26)\n\n## Outcome\n\nADR 0001 decides the stack by measurement: S12 builds conveyor's UI as Leptos CSR/WASM. At median n=5 the interaction TTI is CSR 5,426 ms against SSR 5,736 ms under 4× CPU and Slow 4G, the ranges do not overlap, and neither auth flow forces cookie-based SSR, so the prior holds. SSR renders 500 cards faster (1,444 ms against 4,726 ms), but that win does not survive hydration. This brief is retrospective and dated 2026-11-26; it records the decision and the lifecycle, not a new measurement.\n\n## Boundary\n\nOut of scope: the production UI (S12), the real Keycloak and the conveyor realm (S2, D13), authz beyond one logged-in gate, styling fidelity and layout below 1,280 px, every screen other than the board and the chat, i18n, any drag-and-drop or virtual-list library, Dioxus, and any change to the workspace, apps/web or crates. The spike workspace spikes/web was deleted after the ADR, so no second run of the harness is possible and none is claimed here.\n\n## Reuse sources\n\nThe slice plan docs/plans/slices/S01-ui-spike.md; SPEC §5.7 for the CSR prior and the two forcing conditions; ADR 0001 docs/decisions/0001-ui-stack.md for the measured table; the fr frontend at 6f7c509792b3ca1fc1fb00c198aebcec83f0af29 for the board, card and chat shapes, read for requirements and not ported; template-rust-service at 0c7396a0130b3ed27904c03cce49d5415648f66f for the axum wiring behind SSR; and S00 for the parity ids the UI build consumes.\n\n## Inception units\n\nThe project row links no GitHub issues, and its expected outputs are project-brief and evidence with no declared closure outputs. The inception record is the retrospective itself: the #526 rework under decision 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, the 41 acts in transcript.jsonl, the seven Phase A–D artefacts and the one WBS deliverable, 'The UI-stack decision record', accepted with WSJF inputs 3, 5, 3 and 13.\n\n## Dependencies\n\nS01 depends on S00 for the parity ids; the plan's frontmatter carries parity_ids: PENDING-S0 and the project brief records the same dependency. The record also depends on the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 for its approvals and on the acceptance manifest acceptance/programme/S01.toml for its gate. S12 is downstream: it consumes ADR 0001 and builds apps/web on it.\n\n## Acceptance\n\nThe plan's §7 gate is executable and its criteria hold: ADR 0001 carries 16 measured rows (8 metrics × 2 stacks), the spike is gone, apps/web is still absent and ports 8791, 8801 and 8802 are free. The decision is CSR because SSR did not beat it on interaction TTI (5,426 ms against 5,736 ms, median n=5) and auth did not force cookies. Metrics 5–7 are marked not recoverable with their own n. python3 scripts/verify-project.py --project S01 --snapshot <fresh> is green with 12 checks and 0 failures at d7293f96, and the review is compliant.\n\n## Capabilities\n\nThree capabilities were built twice, in both stacks. The board loads 500 cards in 10 lists, accepts pointer and keyboard drag between lists and applies a live SSE move without losing scroll or an in-flight drag. The chat streams tokens at 25 ms, renders a tool-call card with a collapsed result and keeps 50 messages of history. Auth is auth-code + PKCE S256 on CSR and HttpOnly session + CSRF on SSR; both pass three login to board to logout cycles, and neither forces the SSR option.\n\n## Plan\n\nThe original plan ran fourteen steps from toolchain and ports through the fixture, the board and the chat in each stack, the auth fixture, five timed runs per stack and the ADR, then deleted the spike and confirmed apps/web was still absent; it was delivered on 2026-11-08. The retrospective reconstituted the lifecycle on 2026-11-21 and is re-authored here on 2026-11-26: charter, Statement of Architecture Work, seven Phase A–D artefacts, delivery contract, WBS deliverable, review and the two outputs, then closure through the one gate.",
+  "evidence_output": "# Evidence — S01 UI spike (retrospective, 2026-11-26)\n\n## Claim\n\nThe claim is that S01 decided the UI stack by measurement and recorded it as ADR 0001: Leptos CSR/WASM, because SSR lost on interaction TTI and the auth flow did not force cookie-based SSR. Eight metrics were to be taken per stack from building the board and the chat twice; five are complete, one is a single run, one was skipped and one is two runs. The project is closed and re-closes through the one gate. This evidence is retrospective and dated 2026-11-26.\n\n## Evidence\n\nThe record is ADR 0001 (docs/decisions/0001-ui-stack.md) with the measured table: interaction TTI CSR 5,426 ms (5,408–5,628) against SSR 5,736 ms (5,705–5,758), median n=5; 500-card first render CSR 4,726 ms against SSR 1,444 ms; bundle 290,723 B against 301,017 B gzip-9; drag p95 16.7 ms against 16.8 ms; auth passing on both stacks. The governance record is the Statement of Architecture Work 01a1ff2e-7974-74cd-be6d-377e3c0071a4, the scope baseline 01a1ff31-72ec-766e-8ad3-227d927f64ab, the delivery contract 01a1ff31-30fe-7003-8d62-59278699d128, the review 01a1ff32-159a-7028-a2d2-b4bcc1ce9eef and the 41 acts in transcript.jsonl.\n\n## Verification\n\npython3 scripts/verify-project.py --project S01 --snapshot <fresh> is green with 12 checks and 0 failures at d7293f96, and the strict audit on the same snapshot carries no P0 or P1 entry. The plan's §7 gate greps 16 measured rows from the ADR and confirms that the spike is gone, that apps/web is still absent and that ports 8791, 8801 and 8802 are free. The acceptance manifest's S01-decision-record check requires the published outputs to carry the not-recoverable marking, and ADR 0001 and this evidence output carry it.\n\n## Links\n\ndocs/decisions/0001-ui-stack.md is the ADR; docs/plans/slices/S01-ui-spike.md is the slice plan with the eight-metric protocol; docs/evidence/rework/S01.md is the rework note; acceptance/programme/S01.toml is the manifest the close gate reads. The published outputs are Evidence 01a1e686-a927-7004-8b01-f80a112e430d, Project Brief 01a1ff35-e78e-7622-a878-3e76d5545189 and Closure review 01a1ff31-9ce6-76cb-8bfc-1812a99646e3, and the seven artefact documents are dated 2026-11-22.\n\n## Gap\n\nMetrics 5–7 are not recoverable. Metric 5, SSE→DOM, is one CSR run (p50 1.0 ms, p95 1.8 ms over 30 events) and no SSR run; the five-run set broke on a harness key path and the fixed harness produced a single run before closure. Metric 6, the five-minute memory soak, was skipped on both stacks. Metric 7, the cold build, is two SSR runs (56.54 s and 79.95 s) against five CSR runs, so no SSR median exists. The spike workspace spikes/web was deleted, so the raw runs cannot be re-read; re-running the spike would be a new project and is not claimed here.",
+  "closure": "# Closure — S01 UI spike (retrospective, 2026-11-26)\n\nThe project S01 is closed and re-closes through the one gate on the record the snapshot carries: the approved scope baseline 01a1ff31-72ec-766e-8ad3-227d927f64ab, the Statement of Architecture Work 01a1ff2e-7974-74cd-be6d-377e3c0071a4, the delivery contract 01a1ff31-30fe-7003-8d62-59278699d128, the compliant Phase-G review 01a1ff32-159a-7028-a2d2-b4bcc1ce9eef and the 41 acts in transcript.jsonl. ADR 0001 records the decision as Leptos CSR/WASM with the measured numbers, and the record states that metrics 5–7 are not recoverable. This closure statement is retrospective and dated 2026-11-26.",
+  "closure_review": "# Closure review — S01 UI spike (retrospective, 2026-11-26)\n\n## Outcome vs acceptance\n\nThe charter's outcome is a stack decision taken by measurement and recorded as an ADR. The acceptance the plan sets is the §7 gate: 16 measured rows in the ADR (8 metrics × 2 stacks), the spike deleted, apps/web still absent and ports 8791, 8801 and 8802 free, with a CSR decision unless SSR beat CSR on TTI or on auth. The record matches: CSR 5,426 ms against SSR 5,736 ms interaction TTI at median n=5, non-overlapping ranges, both auth flows passing without forcing cookies, and the decision is CSR. python3 scripts/verify-project.py --project S01 --snapshot <fresh> is green with 12 checks and 0 failures at d7293f96.\n\n## Evidence\n\nThe evidence is ADR 0001 (docs/decisions/0001-ui-stack.md) and its measured table; the scope baseline 01a1ff31-72ec-766e-8ad3-227d927f64ab approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545; the delivery contract 01a1ff31-30fe-7003-8d62-59278699d128 approved by 01a1ff31-4403-7988-a64b-796300ce7102 and requested by 01a1e607-17d9-77d3-98d3-a43a87c4633d; the review 01a1ff32-159a-7028-a2d2-b4bcc1ce9eef at level compliant; and the 41 acts in transcript.jsonl, each write read back by programme-record.py.\n\n## Open items\n\nMetrics 5–7 are not recoverable: SSE→DOM is one CSR run and no SSR run, the memory soak was skipped and the SSR cold-build set is two runs; the spike workspace was deleted, so no further run is possible and none is claimed. The plan's 95% frame threshold for drag was missed by both stacks (CSR 80.0%, SSR 76.5%) with zero long tasks over 50 ms, so drag smoothness passes to S12 as an open target. S00's parity ids remain the recorded dependency for the UI build, and the project row declares no closure outputs, so the closure review is published as 01a1ff31-9ce6-76cb-8bfc-1812a99646e3 without being a declared output.\n\n## Decision\n\nThe retrospective decision is to close: the decision record states what is observable, marks the rest not recoverable, and the one gate was decided by an approver distinct from the requester. The level is compliant, as the live review 01a1ff32-159a-7028-a2d2-b4bcc1ce9eef records, and the closure is dated 2026-11-26. The decision does not assert that metrics 5–7 exist, that the drag threshold was met or that the spike can be re-run; it records those limits and hands the ADR to S12."
+}

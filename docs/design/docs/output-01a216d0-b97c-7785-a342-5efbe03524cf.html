@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T9 — Candidate solutions (rework, 2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="candidate-solutions" data-provenance-version="1" data-provenance-hash="b21b4253f4e1d08930ad1217e0b7b462adc740cc8469e5e32e9e1e746fc2fd1c" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>candidate-solutions</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>b21b4253f4e1d08930ad1217e0b7b462adc740cc8469e5e32e9e1e746fc2fd1c</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Candidate Solutions — T9 TOGAF ADM capability</h1>
+<h2>Candidates</h2>
+<table><thead><tr><th>Candidate</th><th>Shape</th><th>Outcome</th></tr></thead><tbody>
+<tr><td>Eleven typed tables with 26 actions</td><td>explicit ADM rows: artifacts, entries, links, profile, contracts, reviews, waivers, board, maturity, skills</td><td>adopted</td></tr>
+<tr><td>Artefacts as documents only</td><td>a published document per phase with no typed row</td><td>rejected: the gates need typed, approvable rows (§8.1, §10.3)</td></tr>
+<tr><td>Free-text compliance</td><td>the review records a prose verdict</td><td>rejected: one level per review, enforced (<code>architecture_compliance.rs</code>)</td></tr>
+<tr><td>Project-wide H enforcement</td><td>one change/kata for the whole project per review</td><td>limited: Phase H enforces per review, not project-wide (v1-p81-6)</td></tr>
+<tr><td>Draft board governs</td><td>any board row may decide</td><td>open deviation: v1-p81-4 names it; not accepted as design</td></tr>
+</tbody></table>
+<h2>Criteria</h2>
+<p>The §12 T9 gate: each phase's artefacts approved before the next; a delivery design needs a
+live contract; a compliance review records one level; a waiver names owner and review date; H
+produces exactly one governed outcome. Secondary: typed links, tenant/project consistency, and
+a board that is live before it decides.</p>
+<h2>Options rejected</h2>
+<p>The document-only and free-text shapes would let a gate pass on prose, the exact defect the
+V1 audit found (v1-p81-5). The draft-board acceptance is recorded as a deviation (v1-p81-4),
+not as chosen design; the project-wide H reading is v1-p81-6, carried as work.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>TOGAF ADM capability · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

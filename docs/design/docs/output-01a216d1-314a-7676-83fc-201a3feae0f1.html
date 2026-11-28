@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T4 — Change control (retrospective, 2026-11-24) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="change-control" data-provenance-version="1" data-provenance-hash="1e4dd6ca858a9fa5d5e2152ddd266aea4eba8c6c7129e2d9d6bb798a7027100a" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>change-control</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>1e4dd6ca858a9fa5d5e2152ddd266aea4eba8c6c7129e2d9d6bb798a7027100a</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>T4 — Change control (retrospective, 2026-11-24)</h1>
+<h2>Change requests</h2>
+<table><thead><tr><th>Change</th><th>Title</th><th>Status</th></tr></thead><tbody>
+<tr><td>CHG-T4-1</td><td>Remediate T4's four Phase-G findings</td><td>approved</td></tr>
+</tbody></table>
+<p>The 2026-11-22 Phase-G review recorded T4 non_conformant and named four findings. The remediation
+is a change against the frozen scope baseline: the coach loop's producers, the per-signature cap,
+the measured kata and the public create path.</p>
+<h2>Impact</h2>
+<ul>
+<li>Scope: no scope change; the four findings are remediated and re-reviewed.</li>
+<li>Baseline: unchanged; the single accepted deliverable stands.</li>
+<li>Contract: the delivery contract is superseded by v2, which cites each resolution.</li>
+</ul>
+<h2>Decisions</h2>
+<ul>
+<li>Approved by the distinct approver <code>01a1e8a7-8b23-76a9-9114-aafb95f7a545</code> under the published standing delegation.</li>
+<li>The resolutions the change cites:
+<ul>
+<li>v1-p6-2 — <code>coach::a_systemic_class_opens_one_measured_kata</code> (commit <code>2fe0d30c</code>)</li>
+<li>v1-p6-4 — <code>computed_set::a_distinct_signature_is_never_suppressed_by_a_card_level_count</code> (commit <code>8842195f</code>)</li>
+<li>v1-p6-5 — <code>approval_expire::a_card_scoped_gate_timeout_opens_one_interruption</code> (commit <code>fc020437</code>), plus <code>lease_sweep</code></li>
+<li>v1-p6-6 — <code>coach::a_coach_card_cannot_be_created_through_the_public_path</code> (commit <code>8842195f</code>)</li>
+</ul>
+</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Kanban coach · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

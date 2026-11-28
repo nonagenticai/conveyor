@@ -54,6 +54,7 @@ pub mod inference;
 pub mod ingest;
 pub mod integrations;
 pub mod invoke;
+
 // T5 (SPEC_V2 §6.3, §9.3–§9.4; issue #77): the kata — six Gets, the pre-registered
 // prediction and the held-out measurement, on an ordinary V2 binding.
 pub mod kata;
@@ -64,6 +65,7 @@ pub mod lesson;
 // immutable step evidence, the review/merge/deploy gates, the earned auto-merge policy and the
 // closure record.
 pub mod development;
+
 // S15: capability-bound retrieval from strata platform packs.
 pub mod knowledge;
 pub mod lock;
@@ -114,6 +116,7 @@ pub mod spec;
 pub mod spine;
 // T13 (SPEC_V2 §11.10): the job object-storage adapter — tenant-prefixed, hashed, capped.
 pub mod storage;
+pub mod storage_actions;
 // T13 (SPEC_V2 §11.3): the `tools.call` action declaration (the broker enforces it).
 pub mod tools;
 // T15 (#86, SPEC_V2 §11.3–§11.6): tool authoring and BYO — OpenAPI draft import, the
@@ -140,7 +143,8 @@ pub use registry::{
 };
 pub use spec::{
     ActionKind, ActionSpec, AgentHints, AgentTier, ApprovalTarget, Confirm, Effect, FieldError,
-    HandlerFn, HandlerFuture, HandlerOutput, HandlerRef, Schema, Scope, Tenancy, validate_input,
+    HandlerFn, HandlerFuture, HandlerOutput, HandlerRef, Schema, SchemaRef, Scope, Tenancy,
+    validate_input,
 };
 pub use views::{
     ActionManifest, ActionManifestEntry, ActionSpecView, InvocationBody, InvocationResponse, Page,

@@ -1,0 +1,832 @@
+{
+ "charter": "# Charter — S04 action registry (retrospective, 2026-11-26)\n\n- **Project:** S04 'Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest',\n  track v1, ADM phase G, tranche 3, project `01a1d039-0d28-7eb6-a62a-f420e742595c`, plan\n  `docs/plans/slices/S04-action-registry.md`. The record carries `meta.measured_status: built`,\n  `meta.expected_outputs: [project-brief, evidence]`, closed issue #3, the approved scope baseline\n  `01a20256-44d0-731d-b345-fffc5f3ac9e8` (approver `01a1e8a7-8b23-76a9-9114-aafb95f7a545`, taken 2026-11-22) and the approved charter gate\n  `01a20255-6578-7a4d-b99b-81d6d03d8880`. The rework runs under the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`.\n- **Mandate:** deliver SPEC §8 S4 — 20 actions identical over HTTP and MCP — from one declaration\n  per invocable operation, so the manifest, the OpenAPI operation, the MCP tool and the route\n  cannot diverge. The tranche-3 review `01a216d0-d634-738e-985a-00a85cfd48d9` closed the tranche on 2026-11-26 with\n  S04 still carrying its record set; this retrospective completes the MSP/TOGAF lifecycle record\n  for the slice (charter, Statement of Architecture Work, the seven mandatory Phase A–D\n  artefacts, the delivery contract, the WBS deliverable, the Phase-G review, the project-brief\n  and evidence outputs, and the closure review) rather than adding scope.\n- **Scope:** the declaration and registry, the invocation path with tenancy, idempotency,\n  deadline and transaction, the manifest and MCP projections, the OpenAPI fold and lock, the\n  external `openapi.json` ingest, and the boot assertion that fails closed. Out of scope are the\n  domain actions of S05–S11, `kind: workflow` execution (S13), the channel-`mcp` delivery rows\n  (S06) and the signed `mcp_server` channel (S06-α).\n- **Date:** this charter is retrospective and was authored on 2026-11-26; it records the slice\n  delivered under closed issue #3 — the runtime resolution work merged at `6d215982d` (#766),\n  the served registry and lock green — and does not authorise new construction.\n",
+ "soaw": {
+  "title": "Statement of Architecture Work — S04 action registry (retrospective, 2026-11-26)",
+  "body": {
+   "assignment": "Rework S04 by the reconstituted TOGAF/MSP lifecycle: author the charter, this Statement of Architecture Work, the seven mandatory Phase A–D artefacts, the delivery contract, the WBS deliverable and the Phase-G review, and re-publish the project-brief and evidence outputs. The architecture work is the action registry itself — one `ActionSpec` per invocable operation projected into the manifest, the OpenAPI document, the MCP tool list and the router, with a fail-closed consistency assertion and an invocation path that composes tenancy, idempotency, deadline and transaction around every call.",
+   "scope": "In scope: the charter and its approved gate `01a20255-6578-7a4d-b99b-81d6d03d8880`; the seven A–D artefacts and the five register kinds; the scope baseline `01a20256-44d0-731d-b345-fffc5f3ac9e8` with its approver `01a1e8a7-8b23-76a9-9114-aafb95f7a545`; the WBS deliverables recorded for the slice and their four WSJF inputs 8, 8, 13, 5; the delivery contract this pack authors at phase f; the Phase-G review citing the standing delegation; the project-brief and evidence outputs; and the closure on the closure gate `01a216d1-3255-7127-8835-a15916dcacf6`. Out of scope: the domain actions of S05–S11, workflow execution (S13), channel delivery rows (S06) and the signed MCP channel (S06-α); this rework adds no feature and re-opens no V1 slice.",
+   "responsibilities": "The programme architect authors the pack under the #526 rework delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; the Architecture Board reviews the seven A–D artefacts, which the factory records as approved. The programme owner is the approver of the delivery contract and of the closure; the scope baseline `01a20256-44d0-731d-b345-fffc5f3ac9e8` is approved by `01a1e8a7-8b23-76a9-9114-aafb95f7a545`, and the closure gate `01a216d1-3255-7127-8835-a15916dcacf6` was decided by an approver distinct from its requester. The slice's construction was delivered under closed issue #3, with the runtime resolution model merged on main at `6d215982d` and the served registry locked at `docs/design/data/actions.json`.",
+   "acceptance_criteria": "The gate is executable and was proved: twenty actions identical over HTTP and MCP (`crates/actions/tests/parity_http_mcp.rs` compares `http.body` with `mcp.structuredContent`); one `spec_hash` across manifest, resolved operation and MCP tool; duplicate names, MCP collisions and out-of-charset names fail closed at boot; a schema-invalid input returns RFC 9457 with padded `errors[]` and never a 500; two identical POSTs with one key yield one `action_invocation`; and the served lock catches drift while a breaking ingest is refused with the approved version still serving. The runtime work merged at `6d215982d` adds the imported-action proof: an approved external row is discovered, invoked over HTTP and MCP, survives a restart, and a revoked approval answers typed absent.",
+   "contract": "This statement is authored retrospectively under the delegation and is approved through the same board gate it describes; its approval is recorded by the factory from this pack, not asserted here. It is complemented by the delivery contract whose commitments, compliance, approval and capacity fields this pack authors on the approved scope baseline `01a20256-44d0-731d-b345-fffc5f3ac9e8` (kind scope, taken 2026-11-22, approved by `01a1e8a7-8b23-76a9-9114-aafb95f7a545`), and by the Phase-G review the factory records against that contract. The closure gate `01a216d1-3255-7127-8835-a15916dcacf6` and the `projects.close` approval recorded on 2026-11-26 are the gate the close reads.",
+   "retrospective": true
+  }
+ },
+ "artifacts": [
+  {
+   "title": "S04 Stakeholder Map",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "matrix",
+   "purpose": "Identify the consumers, sources, operators, external services and dependent slices whose needs and constraints shape S04.",
+   "scope": "S04's direct stakeholders; later slices are listed only where the plan makes them a dependency or boundary.",
+   "stakeholders": [],
+   "entries": [
+    {
+     "axis_a": "Consumer",
+     "axis_b": "S12/S13/S14 gates",
+     "value": {
+      "detail": "The manifest shape is fixed so consumer gates can read it; S13 supplies kind: workflow and S06-alpha supplies the signed mcp_server channel.",
+      "objective": "Assert .actions[] from ActionManifest without guessing."
+     },
+     "position": 0
+    },
+    {
+     "axis_a": "Source",
+     "axis_b": "fr registry",
+     "value": {
+      "detail": "Carry derive-{openapi,mcp,router}.ts, registry.ts, the closed effect/confirm/tenancy vocabularies, assertRegistryConsistent, served-spec.lock.json and specExempt; do not carry Zod, legacyHandler or frozen.",
+      "objective": "Carry the Capability field set and its generation approach."
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Source",
+     "axis_b": "agent runtime catalog",
+     "value": {
+      "detail": "One catalogue; a compiled row beats a stored one. Do not carry OpSource::Template.",
+      "objective": "Carry OpDef, PinnedCatalog::from_rows, effective_level and outputs."
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Operator",
+     "axis_b": "Platform operator",
+     "value": {
+      "detail": "Runs the migrate subcommand twice cleanly, --print-openapi --check-lock, and approves breaking ingest with conveyor admin actions approve.",
+      "objective": "Run migrations and guard the contract in CI."
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "External",
+     "axis_b": "External services",
+     "value": {
+      "detail": "The four fixture services are unauthenticated because a real service's credential is S09's.",
+      "objective": "Describe themselves through openapi.json."
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Tenant",
+     "axis_b": "Tenant users and roles",
+     "value": {
+      "detail": "MCP credentials fail closed: an unresolvable tenant is 401 and a JWT-shaped bearer that fails verification is never retried as a licence token.",
+      "objective": "Receive only tools their scopes permit."
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Gateway",
+     "axis_b": "nonagenticai_mcp_server",
+     "value": {
+      "detail": "The conveyor sits behind it through S06-alpha's HMAC channel (SPEC section 4.5); it is not this server.",
+      "objective": "Recognise the agent gateway as a separate server."
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "Delivery",
+     "axis_b": "S05-S11 slices",
+     "value": {
+      "detail": "They own cards.move and peers and add their own event in the same transaction; S04 declares no events.",
+      "objective": "Add domain actions without adding a surface."
+     },
+     "position": 7
+    }
+   ],
+   "links": [
+    {
+     "to": "S04 Driver, Goal and Objective Catalogue",
+     "kind": "derivation"
+    }
+   ],
+   "body": "# S04 Stakeholder Map\n\n## Metadata\n\nRetrospective matrix for S04, authored 2026-11-26 from the record's own artefact row and the slice plan `docs/plans/slices/S04-action-registry.md`. Phase a, plateau psa, kind matrix; owner the programme architect under the #526 rework delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; reviewer the Architecture Board; subject project `01a1d039-0d28-7eb6-a62a-f420e742595c`. The row this pack re-versions was authored on 2026-11-22 and carries `meta.record: #526`, so the content is the slice's own, not a restatement.\n\n## Entries\n\nThe matrix names who S04 answers to. The consumers are the S12/S13/S14 gates that read `.actions[]` from the manifest without guessing and the S05–S11 slices that add domain actions without adding a surface; the sources are fr's registry and the agent runtime catalog whose field sets the slice carries; the operators run migrations and guard the contract in CI; external services describe themselves through `openapi.json`; and the tenant's users receive only the tools their scopes permit. The rows below carry 8 entries; their `axis_a` and `axis_b` are the artefact's own vocabulary and the `value` object is the substance the §8.1 create action stores.\n\n## Links\n\nThis artefact links to **S04 Driver, Goal and Objective Catalogue** as a `derivation`. The edge is the lifecycle order the standard seeds: the stakeholder questions shape the drivers, the drivers produce the requirements, the requirements select the solution, and the solution decomposes into capabilities, data and standards. No artefact in the set is an orphan.\n\n## Document\n\nThe artefact's published document is `S04 Stakeholder Map` — its category-`architecture-artifact-instance` body carries the same four sections and is the row the mandatory-artefact standard resolves its Document section from. The factory publishes the document before it binds the artefact, so the row pins a real body from its first version and the standard's instance rule finds it.\n"
+  },
+  {
+   "title": "S04 Driver, Goal and Objective Catalogue",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "catalog",
+   "purpose": "Record why S04 exists and what it must achieve: one declaration per invocable operation, from which manifest, OpenAPI operation, MCP tool and route are generated so HTTP and MCP cannot diverge.",
+   "scope": "S04 action registry slice. It replaces the 24 node packages and fr's 88 capability declarations; later slices add actions, never a surface. Domain actions (S05-S11), kind: workflow (S13), channel-mcp delivery rows (S06) and the signed mcp_server channel (S06-alpha) are out of scope.",
+   "stakeholders": [],
+   "entries": [
+    {
+     "axis_a": "Driver",
+     "axis_b": "Four artifacts drifting",
+     "value": {
+      "detail": "fr's registry is the lesson: any projection reading a second source is the bug. S04 derives every projection from one ActionSpec.",
+      "objective": "Remove the drift surface between HTTP, MCP, manifest and OpenAPI."
+     },
+     "position": 0
+    },
+    {
+     "axis_a": "Driver",
+     "axis_b": "Legacy surface proliferation",
+     "value": {
+      "detail": "Later slices add actions, never a surface.",
+      "objective": "Replace 24 node packages and fr's 88 capability declarations with one registry."
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Goal",
+     "axis_b": "Gate SPEC section 8 S4",
+     "value": {
+      "detail": "The gate covers the 16 internal actions plus the four fixtures.* external actions.",
+      "objective": "20 actions identical over HTTP and MCP."
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Objective",
+     "axis_b": "Single declaration",
+     "value": {
+      "detail": "The attribute supplies name, version, kind, scopes, idempotent, timeout_ms, effect, confirm and tenancy.",
+      "objective": "ActionSpec plus #[action] emit the spec value and an inventory::submit! from the same tokens."
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Objective",
+     "axis_b": "Fail-closed registry",
+     "value": {
+      "detail": "It fails on a duplicate name, an MCP-form collision, an MCP name outside the charset, a handler-less internal action or an unknown Scope.",
+      "objective": "assert_registry_consistent runs in serve, worker and every test."
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Objective",
+     "axis_b": "Invocation integrity",
+     "value": {
+      "detail": "One transaction writes the mutation, action_invocation and audit_event; S04 declares no events, so it writes no outbox row.",
+      "objective": "Compose tenancy scope, idempotency claim, deadline and transaction around every call."
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Objective",
+     "axis_b": "External integration",
+     "value": {
+      "detail": "Store spec and schema_hash; refuse a breaking refresh until conveyor admin actions approve <name> --version <n>.",
+      "objective": "Ingest external OpenAPI operations as kind: external actions."
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "Objective",
+     "axis_b": "MCP parity and fail-closed access",
+     "value": {
+      "detail": "A refused tool is absent, not noisy; an unresolvable tenant is 401 and a failed JWT bearer is never retried as a licence token.",
+      "objective": "Serve MCP tools from the same Registry, scope-filtered."
+     },
+     "position": 7
+    }
+   ],
+   "links": [
+    {
+     "to": "S04 Requirements Catalogue",
+     "kind": "derivation"
+    }
+   ],
+   "body": "# S04 Driver, Goal and Objective Catalogue\n\n## Metadata\n\nRetrospective catalog for S04, authored 2026-11-26 from the record's own artefact row and the slice plan `docs/plans/slices/S04-action-registry.md`. Phase a, plateau psa, kind catalog; owner the programme architect under the #526 rework delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; reviewer the Architecture Board; subject project `01a1d039-0d28-7eb6-a62a-f420e742595c`. The row this pack re-versions was authored on 2026-11-22 and carries `meta.record: #526`, so the content is the slice's own, not a restatement.\n\n## Entries\n\nThe catalogue records why the slice exists. Two drivers — four generated artefacts drifting apart, and the legacy surface proliferation of 24 node packages plus fr's 88 capability declarations — force one goal, the SPEC §8 S4 gate of twenty actions identical over HTTP and MCP, and five objectives that reach it: a single declaration, a fail-closed registry, invocation integrity, external integration and scope-filtered MCP parity. The rows below carry 8 entries; their `axis_a` and `axis_b` are the artefact's own vocabulary and the `value` object is the substance the §8.1 create action stores.\n\n## Links\n\nThis artefact links to **S04 Requirements Catalogue** as a `derivation`. The edge is the lifecycle order the standard seeds: the stakeholder questions shape the drivers, the drivers produce the requirements, the requirements select the solution, and the solution decomposes into capabilities, data and standards. No artefact in the set is an orphan.\n\n## Document\n\nThe artefact's published document is `S04 Driver, Goal and Objective Catalogue` — its category-`architecture-artifact-instance` body carries the same four sections and is the row the mandatory-artefact standard resolves its Document section from. The factory publishes the document before it binds the artefact, so the row pins a real body from its first version and the standard's instance rule finds it.\n"
+  },
+  {
+   "title": "S04 Requirements Catalogue",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "catalog",
+   "purpose": "State the functional and non-functional requirements S04 must satisfy, with the proof each demands.",
+   "scope": "Derived from the S04 plan's declaration, invocation/MCP and OpenAPI/ingest sections; 16 internal and four external actions are in scope.",
+   "stakeholders": [],
+   "entries": [
+    {
+     "axis_a": "Functional",
+     "axis_b": "ACT-01 Action manifest",
+     "value": {
+      "detail": "ETag/If-None-Match wraps it and returns 304 on a match.",
+      "objective": "GET /api/actions returns ActionManifest {actions:[{name,version,kind,spec_hash,scopes,idempotent,timeout_ms}], generated_at}."
+     },
+     "position": 0
+    },
+    {
+     "axis_a": "Functional",
+     "axis_b": "ACT-02 Invocation route",
+     "value": {
+      "detail": "A spec_exempt fallback at /api/actions/{name}/invocations returns action-not-found.",
+      "objective": "POST /api/actions/<literal name>/invocations accepts {input} and returns {output}."
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Functional",
+     "axis_b": "ACT-03 Internal actions",
+     "value": {
+      "detail": "Each declares input/output schema, scope, idempotency and timeout.",
+      "objective": "Provide 16 internal actions: actions.list, actions.describe, me.get, tenants.get, tenants.update_settings, members.list, members.set_role, departments.list, departments.create, audit.list, jobs.list, jobs.retry, schedules.list, schedules.upsert, events.list, licences.get."
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Functional",
+     "axis_b": "ACT-04 External fixtures",
+     "value": {
+      "detail": "They are served by the external_actions.rs stub at CONVEYOR_EXTERNAL_FIXTURES_URL.",
+      "objective": "Ingest four external actions from crates/actions/tests/fixtures/external/openapi.json: fixtures.echo, fixtures.slow, fixtures.fail, fixtures.timeout."
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Non-functional",
+     "axis_b": "NFR-01 HTTP/MCP parity",
+     "value": {
+      "detail": "With request_id and duration_ms stripped, http.body equals mcp.structuredContent.",
+      "objective": "All 20 actions behave identically over HTTP and MCP."
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Non-functional",
+     "axis_b": "NFR-02 Idempotent replay",
+     "value": {
+      "detail": "Two identical POSTs with one key return the same status and body and leave one action_invocation; the loser replays the winner.",
+      "objective": "Idempotency-Key is scoped (tenant_id, action name, key) and claimed by INSERT ... ON CONFLICT DO NOTHING."
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Non-functional",
+     "axis_b": "NFR-03 Timeout isolation",
+     "value": {
+      "detail": "A timeout rolls the invocation transaction back; a separate short transaction records action_invocation(outcome='timeout') and audit_event(status='error').",
+      "objective": "SET LOCAL statement_timeout = timeout_ms plus tokio::time::timeout bound every invocation."
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "Non-functional",
+     "axis_b": "NFR-04 External failure mapping",
+     "value": {
+      "detail": "4xx becomes action-external-refused, never a 500; 5xx becomes 502 action-upstream-failed; five failures in 30 s open the breaker (503 action-circuit-open, no upstream call).",
+      "objective": "Map external outcomes to stable RFC 9457 problems."
+     },
+     "position": 7
+    }
+   ],
+   "links": [
+    {
+     "to": "S04 Solution Concept Diagram",
+     "kind": "derivation"
+    }
+   ],
+   "body": "# S04 Requirements Catalogue\n\n## Metadata\n\nRetrospective catalog for S04, authored 2026-11-26 from the record's own artefact row and the slice plan `docs/plans/slices/S04-action-registry.md`. Phase a, plateau psa, kind catalog; owner the programme architect under the #526 rework delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; reviewer the Architecture Board; subject project `01a1d039-0d28-7eb6-a62a-f420e742595c`. The row this pack re-versions was authored on 2026-11-22 and carries `meta.record: #526`, so the content is the slice's own, not a restatement.\n\n## Entries\n\nThe requirements are the gate restated as testable statements. The functional set is the manifest route, the invocation route, the sixteen internal actions and the four `fixtures.*` external actions; the non-functional set is HTTP/MCP parity, scoped idempotent replay, the deadline that bounds every invocation, and the stable RFC 9457 mapping of external failures. The rows below carry 8 entries; their `axis_a` and `axis_b` are the artefact's own vocabulary and the `value` object is the substance the §8.1 create action stores.\n\n## Links\n\nThis artefact links to **S04 Solution Concept Diagram** as a `derivation`. The edge is the lifecycle order the standard seeds: the stakeholder questions shape the drivers, the drivers produce the requirements, the requirements select the solution, and the solution decomposes into capabilities, data and standards. No artefact in the set is an orphan.\n\n## Document\n\nThe artefact's published document is `S04 Requirements Catalogue` — its category-`architecture-artifact-instance` body carries the same four sections and is the row the mandatory-artefact standard resolves its Document section from. The factory publishes the document before it binds the artefact, so the row pins a real body from its first version and the standard's instance rule finds it.\n"
+  },
+  {
+   "title": "S04 Solution Concept Diagram",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "diagram",
+   "purpose": "Show the declaration, registry, invocation, MCP, OpenAPI/ingest and persistence components and the flows between them.",
+   "scope": "The solution shape for the S04 slice only; workflow execution, signed MCP channel and domain actions belong to later slices.",
+   "stakeholders": [],
+   "entries": [
+    {
+     "axis_a": "Component",
+     "axis_b": "crates/actions-derive",
+     "value": {
+      "detail": "A 10th workspace member with proc-macro = true because a proc macro cannot live in a normal crate; a hand-written registry would name each schema twice.",
+      "objective": "Derive the spec value and inventory::submit! from #[action] tokens."
+     },
+     "position": 0
+    },
+    {
+     "axis_a": "Component",
+     "axis_b": "crates/actions Registry",
+     "value": {
+      "detail": "validate_name, from_inventory, assert_registry_consistent (six checks) and spec_hash live here.",
+      "objective": "Collect inventory once into Registry and validate it."
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Flow",
+     "axis_b": "Invocation path",
+     "value": {
+      "detail": "Tenancy scope, then idempotency claim, then deadline, then one transaction composing mutation, action_invocation and audit_event.",
+      "objective": "POST /api/actions/<name>/invocations drives the call."
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Component",
+     "axis_b": "MCP surface",
+     "value": {
+      "detail": "tools/list and tools/call read the same Registry; tools/list is scope-filtered.",
+      "objective": "rmcp streamable HTTP at /mcp, one session per tenant."
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Component",
+     "axis_b": "OpenAPI fold and lock",
+     "value": {
+      "detail": "--print-openapi --write-lock regenerates served-spec.lock.json with a per-operation sha256; --check-lock exits 1 on any added, removed or changed operation.",
+      "objective": "Fold a literal path item per action into the spec built from OpenApiRouter exports."
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Component",
+     "axis_b": "External ingester",
+     "value": {
+      "detail": "operationId maps to <resource>.<verb> where parseable, else (tag, path, method); spec and schema_hash are stored.",
+      "objective": "openapiv3 reads a service's openapi.json and derives kind: external actions."
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Data",
+     "axis_b": "action_registry",
+     "value": {
+      "detail": "The table is taken verbatim from section 2.14; kind is external or workflow; RLS is ENABLE+FORCE+policy with grants.",
+      "objective": "Persist external and workflow actions in migrations/0003_action_registry.sql."
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "Flow",
+     "axis_b": "Boot assertion",
+     "value": {
+      "detail": "Exit 1 on an approved workflow row with no handler or an external row whose service is unconfigured.",
+      "objective": "Fail startup before bind when the binary and DB disagree."
+     },
+     "position": 7
+    }
+   ],
+   "links": [
+    {
+     "to": "S04 Business Capability Map",
+     "kind": "dependency"
+    }
+   ],
+   "body": "# S04 Solution Concept Diagram\n\n## Metadata\n\nRetrospective diagram for S04, authored 2026-11-26 from the record's own artefact row and the slice plan `docs/plans/slices/S04-action-registry.md`. Phase a, plateau psa, kind diagram; owner the programme architect under the #526 rework delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; reviewer the Architecture Board; subject project `01a1d039-0d28-7eb6-a62a-f420e742595c`. The row this pack re-versions was authored on 2026-11-22 and carries `meta.record: #526`, so the content is the slice's own, not a restatement.\n\n## Entries\n\nThe solution shape has six components and two flows. `crates/actions-derive` emits the spec value and the `inventory::submit!` from one `#[action]`; the `crates/actions` `Registry` collects and validates them once; the invocation path carries every call; the MCP surface serves the same registry at `/mcp`; the OpenAPI fold and lock project a literal path item per action; and the external ingester derives `kind: external` actions. The boot assertion fails startup before bind when the binary and the database disagree. The rows below carry 8 entries; their `axis_a` and `axis_b` are the artefact's own vocabulary and the `value` object is the substance the §8.1 create action stores.\n\n## Links\n\nThis artefact links to **S04 Business Capability Map** as a `dependency`. The edge is the lifecycle order the standard seeds: the stakeholder questions shape the drivers, the drivers produce the requirements, the requirements select the solution, and the solution decomposes into capabilities, data and standards. No artefact in the set is an orphan.\n\n## Document\n\nThe artefact's published document is `S04 Solution Concept Diagram` — its category-`architecture-artifact-instance` body carries the same four sections and is the row the mandatory-artefact standard resolves its Document section from. The factory publishes the document before it binds the artefact, so the row pins a real body from its first version and the standard's instance rule finds it.\n"
+  },
+  {
+   "title": "S04 Business Capability Map",
+   "phase_code": "b",
+   "plateau": "hld",
+   "artifact_kind": "diagram",
+   "purpose": "Name the capabilities S04 establishes and the outcome each delivers.",
+   "scope": "Capabilities delivered by the action registry slice; workflow execution is recorded as deferred.",
+   "stakeholders": [],
+   "entries": [
+    {
+     "axis_a": "API contract",
+     "axis_b": "Action declaration and projection",
+     "value": {
+      "detail": "One value, three projections, proven by spec_hash equality across manifest, resolved operation and MCP tool.",
+      "objective": "One ActionSpec projects to manifest, operation, MCP tool and route."
+     },
+     "position": 0
+    },
+    {
+     "axis_a": "API contract",
+     "axis_b": "Registry consistency",
+     "value": {
+      "detail": "Compile-time registry with six checks; DB-backed external/workflow registry; one namespace with no precedence.",
+      "objective": "Keep one namespace that fails closed."
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Service operation",
+     "axis_b": "Idempotent invocation",
+     "value": {
+      "detail": "Mutation, action_invocation and audit_event share one transaction; the loser of an idempotency claim replays the winner.",
+      "objective": "Make retries safe and auditable."
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Integration",
+     "axis_b": "External action ingest",
+     "value": {
+      "detail": "Hash-pinned specs, refresh diffs, automatic approval of added-optional changes and refusal of breaking changes.",
+      "objective": "Bring external OpenAPI operations under the same invocation contract."
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Integration",
+     "axis_b": "Outbound resilience",
+     "value": {
+      "detail": "Per-action circuit breaker at five failures in 30 s; timeout, 4xx and 5xx map to RFC 9457 problems.",
+      "objective": "Contain external failures."
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Interfaces",
+     "axis_b": "MCP parity",
+     "value": {
+      "detail": "rmcp at /mcp with tenant sessions, scope-filtered tools/list and HTTP/MCP behavioural equality.",
+      "objective": "Expose the same actions to MCP clients."
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Governance",
+     "axis_b": "OpenAPI lock",
+     "value": {
+      "detail": "Per-operation sha256 lock; --check-lock exits 1 naming the changed operation.",
+      "objective": "Catch contract drift before release."
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "Deferred",
+     "axis_b": "Workflow actions",
+     "value": {
+      "detail": "kind: workflow returns 501 until S13.",
+      "objective": "Keep the enum, defer the engine."
+     },
+     "position": 7
+    }
+   ],
+   "links": [
+    {
+     "to": "S04 Data Entity Catalogue",
+     "kind": "dependency"
+    }
+   ],
+   "body": "# S04 Business Capability Map\n\n## Metadata\n\nRetrospective diagram for S04, authored 2026-11-26 from the record's own artefact row and the slice plan `docs/plans/slices/S04-action-registry.md`. Phase b, plateau hld, kind diagram; owner the programme architect under the #526 rework delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; reviewer the Architecture Board; subject project `01a1d039-0d28-7eb6-a62a-f420e742595c`. The row this pack re-versions was authored on 2026-11-22 and carries `meta.record: #526`, so the content is the slice's own, not a restatement.\n\n## Entries\n\nThe capability map states what the slice leaves behind. The action declaration and its projections, a registry that fails closed, idempotent invocation, external action ingest under the same contract, contained outbound failures, MCP parity and an OpenAPI lock that catches drift before release. Workflow actions stay declared and deferred: the enum carries the kind, the engine belongs to S13. The rows below carry 8 entries; their `axis_a` and `axis_b` are the artefact's own vocabulary and the `value` object is the substance the §8.1 create action stores.\n\n## Links\n\nThis artefact links to **S04 Data Entity Catalogue** as a `dependency`. The edge is the lifecycle order the standard seeds: the stakeholder questions shape the drivers, the drivers produce the requirements, the requirements select the solution, and the solution decomposes into capabilities, data and standards. No artefact in the set is an orphan.\n\n## Document\n\nThe artefact's published document is `S04 Business Capability Map` — its category-`architecture-artifact-instance` body carries the same four sections and is the row the mandatory-artefact standard resolves its Document section from. The factory publishes the document before it binds the artefact, so the row pins a real body from its first version and the standard's instance rule finds it.\n"
+  },
+  {
+   "title": "S04 Data Entity Catalogue",
+   "phase_code": "c",
+   "plateau": "hld",
+   "artifact_kind": "catalog",
+   "purpose": "List the declarations, projections, tables and artefacts S04 creates or relies on.",
+   "scope": "S04 persistence and derived artefacts; the event table exists from S02 but S04 writes no event row.",
+   "stakeholders": [],
+   "entries": [
+    {
+     "axis_a": "Declaration",
+     "axis_b": "ActionSpec",
+     "value": {
+      "detail": "Fields: name, version, kind, input/output schema functions, scopes, idempotent, timeout_ms, effect, confirm, tenancy, handler.",
+      "objective": "Define every invocable operation once."
+     },
+     "position": 0
+    },
+    {
+     "axis_a": "Projection",
+     "axis_b": "ActionManifest",
+     "value": {
+      "detail": "{actions:[{name,version,kind,spec_hash,scopes,idempotent,timeout_ms}], generated_at}.",
+      "objective": "Expose the consumer-facing action list."
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Table",
+     "axis_b": "action_registry",
+     "value": {
+      "detail": "Verbatim from section 2.14; kind is external or workflow; spec_version and schema_hash pin ingest; timeout_ms and idempotent override it; enable/disable is approved_at.",
+      "objective": "Persist external and workflow actions."
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Table",
+     "axis_b": "idempotency_key",
+     "value": {
+      "detail": "Scoped (tenant_id, action name, key) and claimed by INSERT ... ON CONFLICT DO NOTHING.",
+      "objective": "Make invocation retries replay-safe."
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Table",
+     "axis_b": "action_invocation",
+     "value": {
+      "detail": "The timeout case is written by a separate short transaction with outcome='timeout'.",
+      "objective": "Record every invocation outcome."
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Table",
+     "axis_b": "audit_event",
+     "value": {
+      "detail": "Written in the same transaction as the mutation and invocation; the timeout record carries status='error'.",
+      "objective": "Audit every mutation and failed invocation."
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Artefact",
+     "axis_b": "served-spec.lock.json",
+     "value": {
+      "detail": "Stores a per-operation sha256 of the $ref-resolved operation; regenerated by --write-lock, checked by --check-lock.",
+      "objective": "Lock the served OpenAPI contract."
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "External",
+     "axis_b": "External spec record",
+     "value": {
+      "detail": "Stores spec and schema_hash; a refresh writes an unapproved row alongside the approved spec_version; the highest approved version serves.",
+      "objective": "Pin ingested external contracts."
+     },
+     "position": 7
+    }
+   ],
+   "links": [
+    {
+     "to": "S04 Technology Standards Catalogue",
+     "kind": "dependency"
+    }
+   ],
+   "body": "# S04 Data Entity Catalogue\n\n## Metadata\n\nRetrospective catalog for S04, authored 2026-11-26 from the record's own artefact row and the slice plan `docs/plans/slices/S04-action-registry.md`. Phase c, plateau hld, kind catalog; owner the programme architect under the #526 rework delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; reviewer the Architecture Board; subject project `01a1d039-0d28-7eb6-a62a-f420e742595c`. The row this pack re-versions was authored on 2026-11-22 and carries `meta.record: #526`, so the content is the slice's own, not a restatement.\n\n## Entries\n\nThe catalogue lists the record S04 owns or relies on. The declaration is `ActionSpec`; the projection is `ActionManifest`; the tables are `action_registry`, `idempotency_key`, `action_invocation` and the S02 `audit_event`; the derived artefact is `served-spec.lock.json`; and the ingested external specification is pinned as its own record. S04 writes no event row; the outbox is S02's. The rows below carry 8 entries; their `axis_a` and `axis_b` are the artefact's own vocabulary and the `value` object is the substance the §8.1 create action stores.\n\n## Links\n\nThis artefact links to **S04 Technology Standards Catalogue** as a `dependency`. The edge is the lifecycle order the standard seeds: the stakeholder questions shape the drivers, the drivers produce the requirements, the requirements select the solution, and the solution decomposes into capabilities, data and standards. No artefact in the set is an orphan.\n\n## Document\n\nThe artefact's published document is `S04 Data Entity Catalogue` — its category-`architecture-artifact-instance` body carries the same four sections and is the row the mandatory-artefact standard resolves its Document section from. The factory publishes the document before it binds the artefact, so the row pins a real body from its first version and the standard's instance rule finds it.\n"
+  },
+  {
+   "title": "S04 Technology Standards Catalogue",
+   "phase_code": "d",
+   "plateau": "hld",
+   "artifact_kind": "catalog",
+   "purpose": "Record the technologies and standards S04 standardises on, drawn from the plan's deliverables, traps and build order.",
+   "scope": "Standards used by the S04 slice; versions and pins are those stated in the plan.",
+   "stakeholders": [],
+   "entries": [
+    {
+     "axis_a": "Language",
+     "axis_b": "Rust workspace",
+     "value": {
+      "detail": "crates/actions-derive is a 10th member (proc-macro = true, CONTRACT section 1); the build order inspects generated code with expand -p conveyor-actions.",
+      "objective": "Build the slice as a Rust workspace member set."
+     },
+     "position": 0
+    },
+    {
+     "axis_a": "Schema",
+     "axis_b": "schemars",
+     "value": {
+      "detail": "ActionSpec input and output are schema functions; a hand-written registry naming each schema twice is the drift surface.",
+      "objective": "Declare input and output schemas once."
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Schema",
+     "axis_b": "JSON Schema",
+     "value": {
+      "detail": "spec_hash equality is asserted across manifest, resolved operation and MCP tool.",
+      "objective": "Keep manifest, OpenAPI and MCP schemas identical."
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Protocol",
+     "axis_b": "rmcp streamable HTTP",
+     "value": {
+      "detail": "One session per tenant; tools/list and tools/call come from the same Registry.",
+      "objective": "Serve MCP at /mcp."
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Protocol",
+     "axis_b": "openapiv3 and OpenApiRouter",
+     "value": {
+      "detail": "Only OpenApiRouter::merge is allowed because Router::merge drops the second crate's paths from the spec.",
+      "objective": "Fold and ingest OpenAPI."
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Errors",
+     "axis_b": "RFC 9457 problem details",
+     "value": {
+      "detail": "Used for schema-invalid input and for action-external-refused, action-upstream-failed, action-circuit-open and action-recursion-limit.",
+      "objective": "Return uniform machine-readable errors."
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Database",
+     "axis_b": "PostgreSQL with RLS",
+     "value": {
+      "detail": "migrations/0003_action_registry.sql uses RLS ENABLE+FORCE+policy and grants; the migrate subcommand must run twice cleanly.",
+      "objective": "Persist action_registry and invocation state."
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "Quality",
+     "axis_b": "Workspace quality gate",
+     "value": {
+      "detail": "Preflight the workspace tests; finish with clippy --workspace --all-targets -- -D warnings and a --check-lock run.",
+      "objective": "Gate the slice with the workspace test suite and clippy."
+     },
+     "position": 7
+    }
+   ],
+   "links": [
+    {
+     "to": "S04 Stakeholder Map",
+     "kind": "reuse"
+    }
+   ],
+   "body": "# S04 Technology Standards Catalogue\n\n## Metadata\n\nRetrospective catalog for S04, authored 2026-11-26 from the record's own artefact row and the slice plan `docs/plans/slices/S04-action-registry.md`. Phase d, plateau hld, kind catalog; owner the programme architect under the #526 rework delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; reviewer the Architecture Board; subject project `01a1d039-0d28-7eb6-a62a-f420e742595c`. The row this pack re-versions was authored on 2026-11-22 and carries `meta.record: #526`, so the content is the slice's own, not a restatement.\n\n## Entries\n\nThe standards are those the plan pins. The Rust workspace and the `schemars`/JSON Schema pair keep one declaration and one schema; `rmcp` streamable HTTP is the MCP transport; `openapiv3` with `OpenApiRouter` folds and ingests OpenAPI; RFC 9457 problem details are the only error shape; PostgreSQL with row-level security holds the registry and the invocation state; and the workspace quality gate is the slice's own preflight. The rows below carry 8 entries; their `axis_a` and `axis_b` are the artefact's own vocabulary and the `value` object is the substance the §8.1 create action stores.\n\n## Links\n\nThis artefact links to **S04 Stakeholder Map** as a `reuse`. The edge is the lifecycle order the standard seeds: the stakeholder questions shape the drivers, the drivers produce the requirements, the requirements select the solution, and the solution decomposes into capabilities, data and standards. No artefact in the set is an orphan.\n\n## Document\n\nThe artefact's published document is `S04 Technology Standards Catalogue` — its category-`architecture-artifact-instance` body carries the same four sections and is the row the mandatory-artefact standard resolves its Document section from. The factory publishes the document before it binds the artefact, so the row pins a real body from its first version and the standard's instance rule finds it.\n"
+  }
+ ],
+ "documents": [
+  {
+   "category": "architecture-artifact",
+   "title": "Architecture Artefact Index — S04 (retrospective, 2026-11-26)",
+   "body": "# Architecture Artefact Index — S04 (retrospective, 2026-11-26)\n\n## Metadata\n\nThe artefact set for S04 is the seven mandatory Phase A–D artefacts on the delivery track: the\nStakeholder map, the Driver/goal/objective catalogue, the Requirements catalogue and the Solution\nconcept at phase a, plateau psa; the Business capability map at phase b, plateau hld; and the Data\nentity catalogue and Technology standards catalogue at phases c and d. Each carries an authored\nbody authored on 2026-11-26 and an entry set from the slice's own artefact rows; the owner is the\nprogramme architect under the #526 rework delegation, the reviewer is the Architecture Board, and\nthe subject is project `01a1d039-0d28-7eb6-a62a-f420e742595c`.\n\n## Entries\n\nThe set is seven rows in the order the standard seeds them: Stakeholder map (matrix), Driver/goal/\nobjective (catalog), Requirements (catalog), Solution concept (diagram), Business capability map\n(diagram), Data entity catalogue (catalog), Technology standards (catalog). Each row carries the\nentries listed in its own artefact, from eight stakeholder rows through eight requirements and\neight technology standards; the factory re-versions the artefact rows this index names and binds\nthem to their instance documents.\n\n## Links\n\nThe artefacts link in lifecycle order: stakeholder map → driver/goal/objective as a derivation,\ndriver → requirements as a derivation, requirements → solution concept as a derivation, solution →\ncapability map as a dependency, capability → data entity as a dependency, data → technology\nstandards as a dependency, and technology standards → stakeholder map as a reuse edge. Every\nartefact in the set carries at least one link, so the standard's orphan rule finds no orphan.\n\n## Document\n\nThis index is itself published as the category-`architecture-artifact` document for S04 and is\ncomposed from the rows above. The per-artefact bodies are published as\ncategory-`architecture-artifact-instance` documents, one per artefact, and it is those instance\ndocuments the mandatory-artefact standard resolves its Document section from. The index is\nregenerated by the factory from the same pack, so the two cannot diverge.\n"
+  }
+ ],
+ "registers": {
+  "risk": [
+   {
+    "title": "A projection reads a second source and the four surfaces drift apart",
+    "code": "R-S04-01",
+    "body": "The failure mode the slice exists to prevent: once manifest, OpenAPI, MCP and router read anything other than the one `ActionSpec`, a change to one surface silently diverges from the others. The controls are `assert_registry_consistent` at boot, the single `spec_hash` per action and the served lock check; the retrospective review keeps them named so a later projection cannot be added outside the registry.",
+    "status": "open",
+    "severity": "high",
+    "probability": "low",
+    "impact": 5,
+    "review_at": "2027-01-31",
+    "meta": {
+     "owner": "the programme architect under the #526 rework delegation"
+    },
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/slices/S04-action-registry.md#8 — trap 1, four artifacts drifting",
+      "crates/actions/tests/parity_http_mcp.rs"
+     ],
+     "decisions": []
+    }
+   },
+   {
+    "title": "An approved imported action is executable by a tenant that should not see it",
+    "code": "R-S04-02",
+    "body": "Resolution reads the tenant's approved `action_registry` row, so the approval gate — not a compiled-in allowlist — is the access control. The risk is a row approved for one tenant being resolved for another, or a revoked approval still serving. The controls are the scoped read in `resolve_action`, the typed `action-unavailable` refusal after revocation and the restart proof in `action_resolution.rs`.",
+    "status": "open",
+    "severity": "medium",
+    "probability": "low",
+    "impact": 4,
+    "review_at": "2027-01-31",
+    "meta": {
+     "owner": "the programme architect under the #526 rework delegation"
+    },
+    "links": {
+     "cards": [],
+     "requirements": [
+      "crates/actions/tests/action_resolution.rs — the revocation and restart proof",
+      "crates/actions/src/resolve.rs — the tenant-scoped resolution read"
+     ],
+     "decisions": []
+    }
+   }
+  ],
+  "issue": [
+   {
+    "title": "The parity contract does not yet name S04's actions",
+    "code": "I-S04-01",
+    "body": "`parity/parity.yaml` and `parity/native.tsv` from S00 still carry `parity_ids: PENDING-S0` for this slice: the S00 trace obligation has not been closed for S04. It is not a gap in the S04 gate (HTTP/MCP identity), which the parity test proves, but it is an open record item and is carried as one rather than repaired by editing S00's contract from here.",
+    "status": "open",
+    "severity": "low",
+    "probability": "certain",
+    "impact": 2,
+    "review_at": "2027-01-31"
+   },
+   {
+    "title": "The pre-rework receipt was red on the delivery contract and the artefact set",
+    "code": "I-S04-02",
+    "body": "Before this pack, `docs/evidence/rework/S04.json` was red: the mandatory delivery-contract artefact was absent (P1) and seven standard artefacts were partial (P2). The pack supplies the contract and re-versions the artefacts; the receipt after the factory run is the statement of what changed, and the issue stays recorded so the red state is not hidden.",
+    "status": "open",
+    "severity": "low",
+    "probability": "certain",
+    "impact": 2,
+    "review_at": "2027-01-31"
+   }
+  ],
+  "assumption": [
+   {
+    "title": "The record's own artefact rows are the slice's content of record",
+    "code": "A-S04-01",
+    "body": "The seven artefacts authored on 2026-11-22 are treated as the slice's own architecture content; this rework re-versions them with their own entries and adds the authored bodies and links the standard requires, rather than re-deriving the architecture from the plan. The assumption holds because the rows carry `meta.record: #526` and their entries cite the plan's own traps, components and standards.",
+    "status": "open",
+    "severity": "medium",
+    "probability": "likely",
+    "impact": 3,
+    "review_at": "2027-01-31"
+   },
+   {
+    "title": "The library gate remains the slice's only construction proof",
+    "code": "A-S04-02",
+    "body": "S04's gate is proved by the workspace test suite and the lock check, not by a live deployment of its own. The slice is consumed by S05–S11 through the same registry, so a regression that only a live consumer could see is not covered here; that coverage belongs to the consumer slices' acceptance.",
+    "status": "open",
+    "severity": "medium",
+    "probability": "possible",
+    "impact": 3,
+    "review_at": "2027-01-31"
+   }
+  ],
+  "dependency": [
+   {
+    "title": "S02 supplies the tenancy, audit and idempotency spine S04 invokes through",
+    "code": "D-S04-01",
+    "body": "The invocation path composes the S02 `begin_scoped` transaction, the `audit_event` writer and the `idempotency_key` claim. A change to any of them changes S04's contract; the dependency is recorded as `needs` on the project record and is why S04 sits in tranche 3 after S02 and S03.",
+    "status": "open",
+    "severity": "high",
+    "probability": "certain",
+    "impact": 4,
+    "review_at": "2027-01-31"
+   },
+   {
+    "title": "Every later slice adds actions through this registry, never a surface",
+    "code": "D-S04-02",
+    "body": "S05–S11 declare their domain actions against `crates/actions`; the registry is therefore a downstream dependency of the whole product spine. The control is that a second source is forbidden — a slice that needs a new operation adds a declaration, and the projections follow from it.",
+    "status": "open",
+    "severity": "high",
+    "probability": "certain",
+    "impact": 5,
+    "review_at": "2027-01-31"
+   }
+  ],
+  "benefit": [
+   {
+    "title": "One declaration means a surface cannot silently diverge",
+    "code": "B-S04-01",
+    "body": "Every consumer reads the same `ActionSpec`: the manifest, the OpenAPI document, the MCP tool list and the router are projections of one value with one `spec_hash`. The benefit is structural — a change that would have needed four edits now needs one, and the lock check turns an accidental drift into a red build before release.",
+    "status": "open",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/slices/S04-action-registry.md#7"
+     ],
+     "decisions": []
+    }
+   },
+   {
+    "title": "Retries are safe and auditable at the invocation boundary",
+    "code": "B-S04-02",
+    "body": "The scoped idempotency claim means two identical POSTs with one key produce one `action_invocation` and the same response, and the deadline plus transaction bound every call so a retry replays a committed outcome rather than half of one. Operators can answer what ran, for whom, and with what result from the record alone.",
+    "status": "open",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/slices/S04-action-registry.md#7"
+     ],
+     "decisions": []
+    }
+   }
+  ]
+ },
+ "delivery_contract": {
+  "title": "Delivery contract — S04 action registry (retrospective, 2026-11-26)",
+  "body": {
+   "commitments": "Deliver SPEC §8 S4 as one governed slice: one `ActionSpec` per invocable operation projected into the manifest, the OpenAPI document, the MCP tool list and the router; a fail-closed registry consistency assertion at boot; an invocation path composing tenancy, idempotency, deadline and transaction; the external OpenAPI ingest whose breaking changes are held for approval; and the served lock that catches drift. The slice adds no surface and no second registry.",
+   "compliance": "The Phase-G review the factory records from this pack carries the level compliant against this contract: it cites the standing delegation, the approved scope baseline, the closure gate decided by a distinct approver, the closed issue #3 and the evidence the gate actually produced — the parity test, the lock check, the ingest diff and the runtime resolution proof merged at `6d215982d`. A failing gate is recorded as non-conformant, never softened.",
+   "approval": "The scope baseline `01a20256-44d0-731d-b345-fffc5f3ac9e8` is the approved baseline this contract rests on; its approver is `01a1e8a7-8b23-76a9-9114-aafb95f7a545` and the charter gate `01a20255-6578-7a4d-b99b-81d6d03d8880` is approved. The contract itself is requested and approved through the board gate the factory drives, and the closure gate `01a216d1-3255-7127-8835-a15916dcacf6` and the `projects.close` approval recorded on 2026-11-26 are the gate the close reads.",
+   "capacity": "The unit is the slice's accepted WBS deliverables — the ActionSpec derive crate and the registry and spec vocabularies — with the sixteen internal actions and the invocation, manifest, MCP, OpenAPI and boot work packages. The WBS carries WSJF 8, 8, 13, 5, and no work package outside the slice's scope is carried by this contract.",
+   "acceptance": "Acceptance is executable: `cargo test -p conveyor-actions` over the parity, invocation, idempotency, ingest-diff, timeout and runtime-resolution targets; the served lock check exits 0; a duplicate registration exits 1 before bind; and a schema-invalid request returns RFC 9457 with populated `errors[]`. The manifest `acceptance/programme/S04.toml` executes the same properties against the record.",
+   "evidence": "The evidence route is the committed proof: `crates/actions/tests/parity_http_mcp.rs` for the HTTP/MCP identity, `served-spec.lock.json` for the contract, `crates/actions/tests/action_resolution.rs` for the imported-action round trip, and `docs/design/data/actions.json` for the served registry. The registry this slice declares is live at 593 actions, 569 internal and 24 external, with the four `fixtures.*` external actions the gate names.",
+   "manifest": "acceptance/programme/S04.toml",
+   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+   "retrospective": true
+  }
+ },
+ "wbs_deliverable": {
+  "title": "The action registry and its execution contract",
+  "business_value": 8,
+  "time_criticality": 8,
+  "risk_reduction": 13,
+  "job_size": 5
+ },
+ "review": {
+  "level": "compliant",
+  "findings": "This retrospective Phase-G review, dated 2026-11-26, records the level compliant against the delivery contract created from this pack. The slice is recorded as built under closed issue #3: the scope baseline `01a20256-44d0-731d-b345-fffc5f3ac9e8` is approved by `01a1e8a7-8b23-76a9-9114-aafb95f7a545`, the charter gate `01a20255-6578-7a4d-b99b-81d6d03d8880` is approved, the closure gate `01a216d1-3255-7127-8835-a15916dcacf6` was decided by an approver distinct from its requester, the WBS deliverables carry WSJF 8, 8, 13, 5, both accepted deliverables carry demo credits, and no open P0 product finding remains. The construction itself was delivered twice over: the V1 slice proved the compiled registry and its four projections, and the runtime resolution model merged on main at `6d215982d` (#766) proved an imported approved action resolving through the same surfaces, over HTTP and MCP, across a restart and after revocation, with the path/query bindings and the tenant bearer. The pre-rework receipt `docs/evidence/rework/S04.json` was red: the mandatory delivery-contract artefact was absent and seven standard artefacts were partial. This pack supplies the authored record and the factory writes it as live rows, so the review records compliant on the completed record while keeping the pre-rework gap visible.",
+  "evidence": {
+   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+   "scope_baseline": "01a20256-44d0-731d-b345-fffc5f3ac9e8",
+   "baseline_approver": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+   "project": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+   "acceptance_manifest": "acceptance/programme/S04.toml",
+   "rework_receipt": "docs/evidence/rework/S04.json",
+   "tranche_review": "01a216d0-d634-738e-985a-00a85cfd48d9",
+   "issue": "https://github.com/nonagenticai/conveyor/issues/3"
+  }
+ },
+ "project_brief_output": "# Project Brief — S04 Action registry (retrospective, 2026-11-26)\n\n## Outcome\n\nOne declaration per invocable operation, projected into the manifest, the OpenAPI document, the\nMCP tool list and the router, so HTTP and MCP cannot diverge. The slice's gate is twenty actions\nidentical over HTTP and MCP, proved by the parity test over the sixteen internal and four\n`fixtures.*` external actions, with one `spec_hash` across all four projections.\n\n## Boundary\n\nIn: the `ActionSpec` declaration and `#[action]` derive, the compile-time registry and its boot\nassertion, `GET /api/actions`, `POST /api/actions/{name}/invocations` with idempotency, deadline,\naudit and transaction, `rmcp` at `/mcp`, the OpenAPI fold and lock, the `openapiv3` ingest, and\n`migrations/0003_action_registry.sql`. Out: domain actions (S05–S11), workflow execution (S13),\nchannel-`mcp` delivery rows (S06) and the signed `mcp_server` channel (S06-α).\n\n## Reuse sources\n\nThe fr registry's `Capability` field set and generation approach; the agent runtime catalog's\n`OpDef`, `PinnedCatalog::from_rows`, `effective_level` and outputs. The slice carries the field\nset and the closed `effect`/`confirm`/`tenancy` vocabularies, not Zod, not a legacy handler.\n\n## Inception units\n\nThe sixteen internal actions and the four external fixtures, the invocation path, the manifest\nand MCP projections, the OpenAPI fold and lock, the ingest diff and the boot assertion — the\nwork packages recorded in the project WBS.\n\n## Dependencies\n\nS02 supplies the tenancy, audit and idempotency spine; S03 the domain aggregates and transitions\nthe domain actions build on. Every later slice adds actions through this registry, never a\nsurface.\n\n## Acceptance\n\n`cargo test -p conveyor-actions` over the parity, invocation, idempotency, ingest, timeout and\nruntime-resolution targets; the served lock check exits 0; a duplicate registration exits 1\nbefore bind; schema-invalid input returns RFC 9457 with populated `errors[]`; and the imported\naction round trip serves over HTTP and MCP across a restart.\n\n## Capabilities\n\nAction declaration and projection, a fail-closed registry, idempotent invocation, external action\ningest under the same contract, contained outbound failures, MCP parity and the OpenAPI lock.\n\n## Plan\n\n`docs/plans/slices/S04-action-registry.md`; programme project tier 1 of tranche 3; the runtime\nresolution follow-up merged at `6d215982d`.\n",
+ "evidence_output": "# Evidence — S04 Action registry (retrospective, 2026-11-26)\n\n## Claim\n\nThe slice's gate holds: twenty actions behave identically over HTTP and MCP; the manifest,\nresolved operation and MCP tool share one `spec_hash`; a duplicate or out-of-charset name fails\nclosed before bind; a schema-invalid input returns RFC 9457 with populated `errors[]`; an\nidempotent replay yields one `action_invocation`; and the served lock catches drift while a\nbreaking ingest is refused. An approved imported action resolves through the same surfaces,\nsurvives a restart, and a revoked approval answers typed unavailable.\n\n## Evidence\n\n`crates/actions/tests/parity_http_mcp.rs` compares `http.body` with `mcp.structuredContent` for\nall twenty actions. `crates/actions/tests/action_resolution.rs` proves the imported round trip\nover HTTP and MCP with path/query bindings and the tenant bearer, across a restart and after\nrevocation. `docs/design/data/actions.json` is the served registry at 593 actions (569 internal,\n24 external) and `served-spec.lock.json` is the locked contract. The project record carries the\napproved scope baseline, the approved charter gate and the closure gate decided by a distinct\napprover.\n\n## Verification\n\nThe commands are the slice's own: `cargo test -p conveyor-actions`, the server's\n`--print-openapi --check-lock`, a duplicate-registration serve that exits 1, and the manifest\n`acceptance/programme/S04.toml` executed by `scripts/verify-project.py`. The rework receipt\n`docs/evidence/rework/S04.json` is the statement of the record before and after this pack.\n\n## Links\n\nPlan `docs/plans/slices/S04-action-registry.md`; project `01a1d039-0d28-7eb6-a62a-f420e742595c`;\nissue #3 closed, runtime merge `6d215982d`; tranche-3 review\n`01a216d0-d634-738e-985a-00a85cfd48d9`.\n\n## Gap\n\nThe parity contract from S00 does not yet name this slice's actions (`parity_ids:\nPENDING-S0`). It is an S00 trace obligation, not a gap in the S04 gate, and it is carried as an\nopen register item rather than edited from here.\n",
+ "closure": "# Closure — S04 action registry (retrospective, 2026-11-26)\n\nS04 re-closes on the record the snapshot carries: the approved scope baseline\n`01a20256-44d0-731d-b345-fffc5f3ac9e8`, the approved charter gate, the closure gate\n`01a216d1-3255-7127-8835-a15916dcacf6` decided by an approver distinct from its requester, closed\nissue #3, and the published outputs of 2026-11-26 — the project brief, evidence, architecture\nartefact index, project registers, project WBS and closure review. The rework adds the record the\naudit found missing — the live delivery contract and the artefact set re-versioned with authored\nbodies — and re-records the closure on them. It keeps one item visible rather than closed: the\npre-rework receipt was red on the delivery contract and seven partial artefacts, and the receipt\nafter the factory run is the statement of what changed.\n",
+ "closure_review": "# Closure review — S04 action registry (retrospective, 2026-11-26)\n\n## Outcome vs acceptance\n\nThe outcome the charter records is SPEC §8 S4: twenty actions identical over HTTP and MCP from\none declaration. The record supports it — the slice is recorded as built under closed issue #3,\nthe scope baseline is approved by `01a1e8a7-8b23-76a9-9114-aafb95f7a545`, the closure gate was\ndecided by an approver distinct from its requester, the charter gate is approved, the WBS\ndeliverables carry WSJF 8, 8, 13, 5, both accepted deliverables carry demo credits, and the\ndeclared outputs project-brief and evidence are published. The runtime resolution model merged\nat `6d215982d` extends the same contract to imported external actions. Against that, the\npre-rework receipt was red on the delivery contract and seven partial artefacts; this pack\nsupplies the rows those checks read, so the acceptance is met on the completed record rather than\non the earlier red one.\n\n## Evidence\n\nThe evidence is the snapshot record: project `01a1d039-0d28-7eb6-a62a-f420e742595c`, the approved\nscope baseline `01a20256-44d0-731d-b345-fffc5f3ac9e8` with its approver, closed issue #3, the\ntranche-3 review `01a216d0-d634-738e-985a-00a85cfd48d9`, and the published outputs of\n2026-11-26 — project brief, evidence, architecture artefact index, project registers, project WBS\nand closure review. The seven A–D artefacts, the five register kinds, the delivery contract and\nthe WBS deliverable are the records this pack authors and the factory writes; the parity,\nresolution and lock tests are the construction proof they cite.\n\n## Open items\n\nTwo items remain visible. First, the slice's parity contract from S00 still carries\n`parity_ids: PENDING-S0`; the S04 gate does not depend on it, but it is an open S00 trace\nobligation and is recorded as such rather than repaired from here. Second, the record is\nreconstructed from the snapshot facts and the existing receipt; it evidences the lifecycle and\nits gate decisions rather than replaying every construction step. Neither item is a scope gap and\nneither is waived.\n\n## Decision\n\nThe retrospective decision is to close S04 on the record the rework completes, at the level\ncompliant that the Phase-G review records against the delivery contract this pack authors, with\nthe pre-rework red receipt and the S00 trace obligation named rather than hidden. The decision is\ndated 2026-11-26 and rests on the approved baseline, the distinct closure approver, closed issue\n#3 and the published outputs; it does not add scope, does not reclassify any earlier row, and\ndoes not assert a re-measurement of the slice's original construction.\n"
+}

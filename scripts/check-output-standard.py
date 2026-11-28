@@ -9,6 +9,9 @@ The frozen `seed/programme.json` carries each project's `meta.expected_outputs` 
   * a class with no facts, an empty set, or a repeated category;
   * a category with no template, an empty or duplicate required heading, a required heading
     absent from the skeleton, or a URL in a skeleton;
+  * a mandatory template with no source or no document category;
+  * a SPEC_V2 §8.1, §8.2 or §8.3 named artefact with no category or template, or one of the
+    stream's new categories missing;
   * a template without its standard, level, subject kind, mandatory flag or spec clause.
 
 The comparisons this gate used to carry — a document's category membership, the seed's recorded
@@ -37,8 +40,89 @@ ON_DEMAND = "decision"
 DEFAULT_ON_DEMAND = [ON_DEMAND]
 STANDARDS = {"MSP", "TOGAF", "SAFe", "PMP", "SPEC", "Delivery"}
 LEVELS = {"portfolio", "programme", "project", "work_package"}
-SUBJECT_KINDS = {"programme", "project", "tranche", "benefit", "capability", "phase", "card"}
-SOURCE_KINDS = {"rows", "documents", "computed", "register"}
+SUBJECT_KINDS = {"programme", "project", "tranche", "benefit", "capability", "phase", "artifact", "card"}
+SOURCE_KINDS = {"rows", "documents", "computed", "register", "absence"}
+# SPEC_V2 §8.1, §8.2 and §8.3 name the artefacts each standard requires. The prose is not a
+# parser (the programme seed follows the same rule), so the named lists are data: every named
+# artefact must resolve to a category, and the category must have a template.
+SPEC_ARTEFACT_CATEGORIES = {
+    "§8.1": (
+        "architecture-principles",
+        "adm-profile",
+        "artifact-standard",
+        "architecture-capability",
+        "architecture-governance-log",
+        "waiver",
+        "maturity-assessment",
+        "skills-assessment",
+        "phase-preliminary",
+        "phase-a",
+        "phase-b",
+        "phase-c",
+        "phase-d",
+        "phase-e",
+        "phase-f",
+        "phase-g",
+        "phase-h",
+        "statement-of-architecture-work",
+        "requirements-catalog",
+        "compliance-review",
+        "gap-analysis",
+        "candidate-solutions",
+        "project-context-diagram",
+        "benefits-diagram",
+        "architecture-artifact",
+        "architecture-artifact-instance",
+        "delivery-contract",
+        "statement-of-intent",
+        "request-for-architecture-work",
+        "adr-register",
+    ),
+    "§8.2": (
+        "safe-portfolio",
+        "safe-art",
+        "safe-cadence",
+        "pi-plan",
+        "pi-objectives",
+        "system-demo",
+        "inspect-adapt",
+    ),
+    "§8.3": (
+        "mandate",
+        "programme-brief",
+        "blueprint",
+        "business-case",
+        "benefit-profile",
+        "benefits-map",
+        "benefits-registry",
+        "benefit-evaluation",
+        "benefits-strategy",
+        "realization-plan",
+        "projects-dossier",
+        "programme-plan",
+        "tranche-plan",
+        "tranche-review",
+        "refined-vision",
+        "programme-baselines",
+        "programme-strategies",
+        "programme-risk-register",
+        "stakeholder-profiles",
+        "benefit-transition",
+    ),
+}
+# The operated registers, the programme mandate, benefits registry and evaluation, and TOGAF
+# phase E's named artefacts: the categories this standard used to omit.
+NEW_CATEGORIES = {
+    "programme-risk-register",
+    "adr-register",
+    "benefits-registry",
+    "benefit-evaluation",
+    "mandate",
+    "candidate-solutions",
+    "project-context-diagram",
+    "benefits-diagram",
+    "gap-analysis",
+}
 FENCE = re.compile(r"^\s*(```+|~~~+)")
 ATX = re.compile(r"^(#{1,6})\s+(.*?)\s*#*\s*$")
 
@@ -159,6 +243,10 @@ def validate(std: dict) -> list[str]:
         if not isinstance(template, dict):
             errors.append(f"category {category!r} has no template")
             continue
+        # The document category the generator falls back to when a template's rows are empty.
+        # Bind it before the source checks: a mandatory template without it can never be
+        # satisfied, and a self-document heading check reads it below.
+        document_category = template.get("document_category")
         required = template.get("required")
         optional = template.get("optional", [])
         if not isinstance(required, list) or not required:
@@ -241,6 +329,58 @@ def validate(std: dict) -> list[str]:
                     errors.append(
                         f"template {category!r} section {heading!r} computed source has no name"
                     )
+                if source["kind"] == "absence":
+                    if not isinstance(source.get("record"), str) or not source["record"].strip():
+                        errors.append(
+                            f"template {category!r} section {heading!r} absence source has no record"
+                        )
+                    if "fallback" in source and not isinstance(source["fallback"], bool):
+                        errors.append(
+                            f"template {category!r} section {heading!r} absence fallback must be a boolean"
+                        )
+            # A heading that cites only the artefact's own document is a heading without facts
+            # unless the template declares its body authored. The 23 authored templates declare
+            # it; a template that loses the declaration is refused.
+            active = [s for s in source_list if isinstance(s, dict) and not s.get("optional")]
+            if (
+                document_category
+                and active
+                and template.get("document_authored") is not True
+                and all(
+                    s.get("kind") == "documents"
+                    and str((s.get("match") or {}).get("category", "$category"))
+                    in {str(document_category), "$category"}
+                    for s in active
+                )
+            ):
+                errors.append(
+                    f"template {category!r} section {heading!r} cites only its own "
+                    f"document category {document_category!r}; declare document_authored"
+                )
+        if template.get("mandatory") is True:
+            # A mandatory artefact must be resolvable: at least one named source, and the
+            # document category the generator falls back to when its rows are empty. Without
+            # either, the artefact is permanently absent and no record can satisfy it.
+            if not sources:
+                errors.append(f"mandatory template {category!r} has no sources")
+            if not isinstance(document_category, str) or not document_category:
+                errors.append(f"mandatory template {category!r} has no document_category")
+
+    for clause, named in SPEC_ARTEFACT_CATEGORIES.items():
+        for category in named:
+            if category not in categories:
+                errors.append(
+                    f"SPEC_V2 {clause} names artefact category {category!r}, which does not exist"
+                )
+            elif category not in templates:
+                errors.append(
+                    f"SPEC_V2 {clause} names artefact category {category!r}, which has no template"
+                )
+    for category in sorted(NEW_CATEGORIES):
+        if category not in categories:
+            errors.append(f"new category {category!r} is missing from categories")
+        elif category not in templates:
+            errors.append(f"new category {category!r} has no template")
 
     return errors
 
@@ -303,8 +443,33 @@ def self_test(std: dict) -> int:
     cases.append(("an invalid source kind", bad))
 
     bad = copy.deepcopy(std)
+    first_heading = bad["templates"]["vision"]["required"][0]
+    bad["templates"]["vision"]["sources"] = {first_heading: [{"kind": "absence"}]}
+    cases.append(("an absence source without a record", bad))
+
+    bad = copy.deepcopy(std)
+    bad["templates"]["vision"].pop("document_authored", None)
+    cases.append(("a self-document template without document_authored", bad))
+
+    bad = copy.deepcopy(std)
     bad["templates"]["benefit-profile"].pop("subject_kind", None)
     cases.append(("a template without a subject kind", bad))
+
+    bad = copy.deepcopy(std)
+    bad["templates"]["tranche-review"].pop("sources", None)
+    cases.append(("a mandatory template without sources", bad))
+
+    bad = copy.deepcopy(std)
+    bad["templates"]["tranche-review"].pop("document_category", None)
+    cases.append(("a mandatory template without a document category", bad))
+
+    bad = copy.deepcopy(std)
+    bad["templates"].pop("programme-risk-register", None)
+    cases.append(("a new category without a template", bad))
+
+    bad = copy.deepcopy(std)
+    bad["templates"].pop("safe-portfolio", None)
+    cases.append(("a SPEC_V2 named artefact without a template", bad))
 
     failures = 0
     for label, case_std in cases:

@@ -1,0 +1,8 @@
+{
+ "title": "T16 \u2014 Architecture artefact index (TOGAF, retrospective)",
+ "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+ "category": "architecture-artifact",
+ "body": "# T16 \u2014 Architecture artefact index (TOGAF, retrospective)\n\n## Metadata\n\nProject T16, phases A\u2013D per the adopted profile `conveyor-software-delivery`, on the live delivery\ncontract v2. Each row below is an approved `architecture_artifact` with its entries.\n\n## Entries\n\n| Type | Phase | Plateau | Kind | Status | Id |\n|---|---|---|---|---|---|\n| stakeholder_map | a | psa | matrix | approved | `01a20a9a-d84d-70c0-8a32-59ad4e87a2be` |\n| driver_goal_objective | a | psa | catalog | approved | `01a20a9a-d900-7e31-bfcd-56bc4d511a64` |\n| requirements_catalog | a | psa | catalog | approved | `01a20a9a-d9ad-72d6-8100-4fe73c23e514` |\n| solution_concept | a | psa | diagram | approved | `01a20a9a-da5c-708c-b0fe-f3037efd1552` |\n| business_capability_map | b | hld | diagram | approved | `01a20a9a-db1c-78f2-b48e-e18d91e80581` |\n| data_entity_catalog | c | hld | catalog | approved | `01a20a9a-dbd0-7217-bcbf-73995013de2a` |\n| technology_standards | d | hld | catalog | approved | `01a20a9a-dc85-7007-bcc2-fe396f0cd9d4` |\n\n## Links\n\n- Delivery contract v2 \u2014 live, board-approved by a distinct approver.\n- Statement of Architecture Work \u2014 published document.\n- Phase-G compliance review \u2014 compliant; cites the published standing delegation.\n\n## Document\n\nThis page is the `architecture-artifact` category document for T16. The artefact rows and their\nentries are the sources; the document is the published view.\n",
+ "publishable": true,
+ "unit": "T16"
+}

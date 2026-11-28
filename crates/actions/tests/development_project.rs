@@ -47,6 +47,7 @@ fn request(actor: Uuid, action: &str, input: Value) -> InvokeRequest {
         role: Role::Admin,
         policy: Default::default(),
         authority: conveyor_actions::Authority::Role,
+        credential_alias: None,
         request_id: Some(format!("rid-{action}")),
         trace_id: Some(format!("trace-{action}")),
         depth: 0,

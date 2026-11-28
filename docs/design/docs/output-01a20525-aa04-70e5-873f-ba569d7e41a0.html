@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T13 — Candidate solutions (rework, 2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="candidate-solutions" data-provenance-version="2" data-provenance-hash="5262b1357688cb0eae61f329c679ac68e393b6b48faa3b342e772c512901cbf4" data-provenance-status="active" data-provenance-owner="FR Test" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>candidate-solutions</dd></div><div><dt>Version</dt><dd>2</dd></div><div><dt>SHA-256</dt><dd>5262b1357688cb0eae61f329c679ac68e393b6b48faa3b342e772c512901cbf4</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>FR Test</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Candidate Solutions — T13 Tool platform</h1>
+<p>The options were assessed against the tool spine's criteria in the inception analysis; the
+selected option is the one the architecture design implements.</p>
+<h2>Candidates</h2>
+<ul>
+<li><strong>A — A broker-mediated tool spine.</strong> Four tables (<code>tool</code>, <code>toolkit</code>, <code>tool_binding</code>,
+<code>tool_call</code>), one <code>tools.*</code> action family, and seven broker steps: resolve binding → pinned
+version → ceiling → schema → dispatch → ledger → event.</li>
+<li><strong>B — Keep V1's eight external actions and wrap them.</strong> Each action keeps its direct dispatch
+and gains a thin audit wrapper.</li>
+<li><strong>C — Adopt <code>nonagenticai_mcp_server</code> as the runtime tool plane.</strong> Bind jobs to the MCP server's
+tools and let it own dispatch.</li>
+<li><strong>D — Per-job integrations.</strong> Each job calls its backend with its own client and credentials.</li>
+</ul>
+<h2>Criteria</h2>
+<ol>
+<li>One control plane: no path to a backend bypasses the binding, the ceiling and the ledger.</li>
+<li>The effect ceiling is data, narrowed by the binding, never raised by the caller.</li>
+<li>Credentials are sealed and named by alias; no key, token or URL enters the compiled prompt.</li>
+<li>Input validation is closed (<code>additionalProperties:false</code> plus pattern and bounds) before dispatch.</li>
+<li>Object storage is tenant-prefixed and content-hashed, with no bucket administration.</li>
+<li>The path is guardable: a test can prove no handler calls a service directly.</li>
+<li>Migration cost is bounded: the V1 targets move in the same change, forward-only.</li>
+</ol>
+<h2>Options rejected</h2>
+<ul>
+<li><strong>B (wrapper)</strong> — fails criterion 1: the direct dispatch remains a second control plane; the
+wrapper observes but cannot refuse. Rejected for the bypass risk the inception analysis records.</li>
+<li><strong>C (MCP runtime)</strong> — fails criteria 1–3 and D44: the server owns dispatch and credentials, the
+conveyor cannot write one ledger row per call or enforce its binding ceiling, and it would be a
+runtime dependency the programme forbids. It stays reference only.</li>
+<li><strong>D (per-job)</strong> — fails criteria 1–5: no pinned version, no ceiling, no shared ledger, credentials
+per job, and every integration is a new unaudited path. Rejected.</li>
+</ul>
+<p><strong>Selected: A.</strong> Its seven steps are the architecture design's "seven broker steps"; its scenarios
+are the T13 acceptance table (<code>tool_platform.rs</code>), including the direct-handler guard and the
+no-S3-key prompt check.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Tool platform · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -50,6 +50,11 @@ impl Model {
         let failures = Arc::new(AtomicUsize::new(0));
         let app = Router::new()
             .route("/api/chat/completions", post(answer))
+            // A readiness route: a bound listener's backlog accepts SYNs before the serve loop
+            // polls, so `start` must prove the loop actually answers before a test's first model
+            // call (under load the connect succeeds but the request is not served, and the
+            // action records a transport error instead of the stub's answer).
+            .route("/health", axum::routing::get(|| async { "ok" }))
             .with_state((queue.clone(), hits.clone(), failures.clone()));
         // Its own runtime on its own thread: CPU saturation in the test's runtime cannot starve
         // the accept/serve path, which is what made this stub nondeterministic (#476).
@@ -70,8 +75,26 @@ impl Model {
             });
         });
         let addr = address.recv().expect("the stub address");
+        let base = format!("http://{addr}");
+        // Prove the serve loop answers before returning: a SYN is queued from the moment the
+        // listener binds, but the first HTTP request can outrun the accept loop on a loaded box.
+        let client = reqwest::Client::new();
+        let mut serving = false;
+        for _ in 0..200 {
+            match client.get(format!("{base}/health")).send().await {
+                Ok(response) if response.status().is_success() => {
+                    serving = true;
+                    break;
+                }
+                _ => tokio::time::sleep(std::time::Duration::from_millis(10)).await,
+            }
+        }
+        assert!(
+            serving,
+            "the model stub's serve loop did not answer /health"
+        );
         Model {
-            base: format!("http://{addr}"),
+            base,
             queue,
             hits,
             failures,

@@ -1,0 +1,87 @@
+{
+  "body_sha256": "2c6535df9ed6399660fcc79ec7d914d1b2f69e0fafdde9fee563d4aeb6e7e829",
+  "category": "project-baseline",
+  "headings": [
+    {
+      "heading": "Scope",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-baseline",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/project_baselines"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Schedule",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-baseline",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/project_baselines"
+        },
+        {
+          "category": "project-baseline",
+          "count": 0,
+          "file": "",
+          "kind": "absence",
+          "pointer": ""
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Cost",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-baseline",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/project_baselines"
+        },
+        {
+          "category": "project-baseline",
+          "count": 0,
+          "file": "",
+          "kind": "absence",
+          "pointer": ""
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Approval",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-baseline",
+          "count": 3,
+          "file": "work.json",
+          "kind": "rows",
+          "pointer": "/approvals"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "867f2ff6871888a0419142381b8cf4e10506ee1da0017d3e5d6776613f6eb7db",
+  "spec": "\u00a78.4",
+  "standard": "PMP",
+  "subject": {
+    "id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+    "key": "S02",
+    "kind": "project",
+    "title": "Skeleton \u2014 workspace, tenancy, auth, jobs, SSE"
+  },
+  "title": "Project Baseline \u2014 Skeleton \u2014 workspace, tenancy, auth, jobs, SSE"
+}

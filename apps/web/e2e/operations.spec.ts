@@ -1,6 +1,6 @@
 import { expect, test, type APIRequestContext, type Page } from "./fixture";
 
-import { invoke, isDevAuth } from "./helpers";
+import { answerWaiverPrompt, FIXTURE_EVIDENCE_WAIVER, invoke, isDevAuth } from "./helpers";
 
 const baseURL = process.env.BASE_URL ?? "http://127.0.0.1:8931";
 
@@ -52,6 +52,10 @@ function notice(page: Page) {
 
 test("a destructive write needs the approvals", async ({ page, request }) => {
   await setPolicy(request, "ops.flag_flip", "required", "forbidden");
+  // SPEC_V2 §5.4: a destructive gate refuses to open with no typed evidence. This fixture's
+  // subject is the gate, not a document, so the console's bridge records the explicit waiver
+  // reason and the gate opens — the write is still blocked behind it.
+  answerWaiverPrompt(page, [FIXTURE_EVIDENCE_WAIVER]);
   const before = (await pendingGates(request)).filter((gate) => gate.gate === "ops.flag_flip");
 
   await page.goto("/operations");

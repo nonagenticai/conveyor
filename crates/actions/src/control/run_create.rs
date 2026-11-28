@@ -13,7 +13,8 @@ use conveyor_store::run::{NewRun, RunRecord};
 use sqlx::PgConnection;
 use uuid::Uuid;
 
-use crate::invoke::{ActionError, HandlerCtx};
+use crate::capability::readiness::ensure_run_start_ready_tx;
+use crate::invoke::{ActionError, HandlerCtx, ensure_binding_budget};
 
 use super::runs::{emit_run_event, read_record, run_out};
 use super::views::RunOut;
@@ -89,15 +90,62 @@ pub(crate) async fn create_bound_run_tx(
 
     ensure_andon_tx(&mut *tx, ctx.tenant, action).await?;
 
+    // S15's run wiring: a plain run executes under the capability its card's type binds — the
+    // same resolution `process_runs.start` uses. A card type that binds nothing is the
+    // explicit-input path. The shared readiness guard runs before the run row, so a required
+    // pack nobody published refuses `409 capability_not_ready` with zero run rows.
+    let capability =
+        store::capability::capability_for_card_type_tx(&mut *tx, ctx.tenant, card.card_type_id)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, action, "resolve the card type's capability");
+                ActionError::internal()
+            })?;
+    let (capability_id, mut capability_agent_id) = match capability {
+        Some(capability) => {
+            let agents =
+                store::capability::list_agents_tx(&mut *tx, ctx.tenant, Some(capability.id), 100)
+                    .await
+                    .map_err(|error| {
+                        tracing::error!(%error, action, "list the capability's executors");
+                        ActionError::internal()
+                    })?;
+            let active: Vec<_> = agents
+                .into_iter()
+                .filter(|agent| agent.status == "active")
+                .collect();
+            let agent_id = (active.len() == 1).then(|| active[0].id);
+            (Some(capability.id), agent_id)
+        }
+        None => (None, None),
+    };
+    let bound_agents: Vec<Uuid> = capability_agent_id.into_iter().collect();
+    ensure_run_start_ready_tx(&mut *tx, ctx.tenant, capability_id, &bound_agents, action).await?;
+
     let attempt = store::run::next_attempt_for_card_tx(&mut *tx, ctx.tenant, card.id)
         .await
         .map_err(|error| store_error(error, action))?;
 
-    // #526: an internal-agent binding must declare its spend ceiling before any run starts.
+    // v1-w1a-5 (SPEC_V2 §4.4): the kind comes from the run's claim. A request that names (or
+    // inherits) a binding, or claims a release pin, is a job run; a plain request with neither is
+    // the typed project run and keeps the plain-run path. A release claim with no binding is a
+    // job run with no pin, which the store refuses `422 binding_required` before the INSERT.
+    let kind = if job_binding_id.is_some() || release_hash.is_some() {
+        store::run::RunKind::Job
+    } else {
+        store::run::RunKind::Project
+    };
+
+    // v1-p44-1 (SPEC_V2 §4.4): a ROOT run's executor is the agent its binding pins.
     if let Some(binding_id) = job_binding_id {
-        // The run's declaration is the `inputs` this caller passed, never `Null` (which made
-        // every run look undeclared).
-        crate::invoke::ensure_binding_budget(&mut *tx, ctx.tenant, binding_id, &inputs).await?;
+        let binding = store::organisation::job_binding_get_tx(&mut *tx, ctx.tenant, binding_id)
+            .await
+            .map_err(|error| run_error(store::RunStoreError::from(error), action))?;
+        capability_agent_id = binding.capability_agent_id;
+        // #526 / D45: an internal-agent binding must itself declare the ceiling, or the run
+        // must declare one; the run's declaration is the `inputs` this caller passed, never
+        // `Null` (which made every run look undeclared).
+        ensure_binding_budget(&mut *tx, ctx.tenant, binding_id, &inputs).await?;
     }
 
     let run = store::run::insert_run_tx(
@@ -110,14 +158,15 @@ pub(crate) async fn create_bound_run_tx(
             correlation_id,
             process_id: None,
             inputs,
-            capability_id: None,
-            capability_agent_id: None,
+            capability_id,
+            capability_agent_id,
             // A root run has no parent, no step and pins no process.
             parent_run_id: None,
             step_id: None,
             workflow_step_id: None,
             depth: 0,
             process_version: 1,
+            kind,
             job_binding_id,
             release_hash,
         },

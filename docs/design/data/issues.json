@@ -7342,7 +7342,7 @@
     },
     {
       "number": 21,
-      "title": "CI capacity: measure the arc-large CPU ceiling and correct the stale hp1 doc",
+      "title": "CI capacity: measure the arc-large CPU ceiling and correct the stale compute-1 doc",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/21",
       "updatedAt": "2026-11-13T06:32:13Z",

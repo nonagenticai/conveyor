@@ -17,6 +17,7 @@
       .std-meta dd { margin:.15rem 0 0; }
       .std-state { font-size:.75rem; text-transform:uppercase; letter-spacing:.06em; opacity:.7; }
       .std-absent { border-left:3px solid #b45309; padding:.35rem .75rem; background:#fff7ed; }
+      .std-intent { max-width:68ch; }
       .std-source { font-size:.85rem; opacity:.8; }
       .std-index { list-style:none; padding:0; }
       .std-index li { border-top:1px solid var(--line, #e5e5e5); padding:.5rem 0; }
@@ -40,20 +41,38 @@
         <div><dt>SPEC</dt><dd>§8.1</dd></div>
         <div><dt>Gate</dt><dd>live</dd></div>
         <div><dt>Package</dt><dd><code>std-togaf-delivery-contract-t13:T13</code></dd></div>
-        <div><dt>Provenance</dt><dd>2026-11-26T21:15:00Z · 34753fa35fc2</dd></div>
+        <div><dt>Provenance</dt><dd>2026-11-27T12:10:18.740973+00:00 · 17f470d5c621</dd></div>
       </dl>
       <h2>Commitments</h2>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 1 row(s)</p>
+<p class="std-intent">The record the section derives from, or an explicit absence.</p>
+<p class="std-source">Source: <code>contract_field</code> — 1 row(s)</p>
 <ul>
-<li>Delivery contract — T13 Tool platform (retrospective, 2026-11-22) <span class="std-state">live</span></li>
+<li>commitments: Deliver the tool platform of SPEC_V2 §12: the broker tools.call as the only path from a conveyor-internal run to a job backend; the tool, toolkit, tool_binding and tool_call tables; effect classes read, write, destructive and spend with tenant-configured approvals; binding-scoped credential aliases over sealed secrets; the direct MinIO storage adapter under tenant/&lt;tenant_id&gt;/; the coding toolkit and one kag-era toolkit; V1&#x27;s external actions migrated; and the six gate proofs, each asserting on the wire through a counting HTTP stub.</li>
+</ul>
+<p class="std-source">Source: <code>architecture.json#/contracts</code> — 2 row(s)</p>
+<ul>
+<li>Delivery contract — T13 Tool platform (retrospective, 2026-11-22) <span class="std-state">superseded</span></li>
+<li>Delivery contract — T13 tool platform (retrospective, 2026-11-26) <span class="std-state">live</span></li>
 </ul><h2>Compliance method</h2>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 1 row(s)</p>
+<p class="std-intent">The record the section derives from, or an explicit absence.</p>
+<p class="std-source">Source: <code>contract_field</code> — 1 row(s)</p>
 <ul>
-<li>Delivery contract — T13 Tool platform (retrospective, 2026-11-22) <span class="std-state">live</span></li>
+<li>compliance: The Phase-G review 01a2027a-6502-72a6-9ef8-4c1582dbdf36 records the level compliant against this contract and the review 01a216d0-f1b9-78c6-854b-8da02cacd819 records it against the Statement of Architecture Work. The contract&#x27;s own terms are the SPEC_V2 §12 gate, executed as the named tests in crates/actions/tests/tool_platform.rs, 17 of 17 passed at lane head 582e2dc6 on 2026-11-22 against a fresh Postgres 18. No waiver is recorded; the open packages are carried as open items, not as compliance.</li>
+</ul>
+<p class="std-source">Source: <code>architecture.json#/contracts</code> — 2 row(s)</p>
+<ul>
+<li>Delivery contract — T13 Tool platform (retrospective, 2026-11-22) <span class="std-state">superseded</span></li>
+<li>Delivery contract — T13 tool platform (retrospective, 2026-11-26) <span class="std-state">live</span></li>
 </ul><h2>Approval</h2>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 1 row(s)</p>
+<p class="std-intent">The record the section derives from, or an explicit absence.</p>
+<p class="std-source">Source: <code>contract_approval</code> — 1 row(s)</p>
 <ul>
-<li>Delivery contract — T13 Tool platform (retrospective, 2026-11-22) <span class="std-state">live</span></li>
+<li>approval 01a219d5-a230-77a2-9118-e93d1ef8c4ff — approved <span class="std-state">approved</span></li>
+</ul>
+<p class="std-source">Source: <code>architecture.json#/contracts</code> — 2 row(s)</p>
+<ul>
+<li>Delivery contract — T13 Tool platform (retrospective, 2026-11-22) <span class="std-state">superseded</span></li>
+<li>Delivery contract — T13 tool platform (retrospective, 2026-11-26) <span class="std-state">live</span></li>
 </ul>
     </main>
   </body>

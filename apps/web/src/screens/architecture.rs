@@ -15,14 +15,15 @@ use serde::Deserialize;
 use serde_json::{Value, json};
 
 use crate::api::{ApiError, InvokeOptions, Page};
-use crate::components::{Empty, ErrorPanel, StatusPill};
+use crate::components::{Empty, ErrorPanel, Planned, StatusPill};
 use crate::state::AppCtx;
 
-const TABS: [(&str, &str); 4] = [
+const TABS: [(&str, &str); 5] = [
     ("capability", "Capability"),
     ("phases", "ADM phases"),
     ("artefacts", "Artefact repository"),
     ("board", "Board & compliance"),
+    ("decisions", "Decisions"),
 ];
 
 /// The Board's stable key: one default Architecture Board per tenant.
@@ -170,6 +171,40 @@ struct ContractRow {
     status: String,
 }
 
+/// One decision record as `decisions.list` returns it: the register row, with its meta.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[allow(dead_code)]
+struct DecisionRow {
+    #[serde(default)]
+    key: String,
+    #[serde(default)]
+    title: String,
+    #[serde(default)]
+    status: String,
+    #[serde(default)]
+    supersedes_id: Option<String>,
+    #[serde(default)]
+    superseded_by_id: Option<String>,
+    #[serde(default)]
+    meta: Value,
+}
+
+/// A string (or array of strings) from the decision's meta, for the register's columns.
+fn meta_text(meta: &Value, key: &str) -> Option<String> {
+    match meta.get(key) {
+        Some(Value::String(text)) if !text.is_empty() => Some(text.clone()),
+        Some(Value::Array(items)) if !items.is_empty() => Some(
+            items
+                .iter()
+                .filter_map(Value::as_str)
+                .collect::<Vec<_>>()
+                .join(", "),
+        ),
+        Some(Value::Number(number)) => Some(number.to_string()),
+        _ => None,
+    }
+}
+
 #[component]
 pub fn ArchitectureScreen() -> impl IntoView {
     let ctx = expect_context::<AppCtx>();
@@ -311,6 +346,28 @@ pub fn ArchitectureScreen() -> impl IntoView {
                     .await?
                     .output,
                 "the artefact repository",
+            )
+            .map(|page| page.items)
+        }
+    });
+
+    // The architecture decision register: every ADR is a governed asset; this is the read the
+    // tranche review and the compliance review cite (R10's screen test).
+    let decisions = LocalResource::new(move || {
+        let _tenant = ctx.tenant.get();
+        let _ = refresh.get();
+        let client = ctx.client();
+        async move {
+            parse::<Page<DecisionRow>>(
+                client
+                    .invoke(
+                        "decisions.list",
+                        json!({"limit": 200}),
+                        InvokeOptions::default(),
+                    )
+                    .await?
+                    .output,
+                "the decision register",
             )
             .map(|page| page.items)
         }
@@ -746,6 +803,72 @@ pub fn ArchitectureScreen() -> impl IntoView {
                                 contract; a compliance review records exactly one of the six levels,
                                 and a waiver needs an accepting owner and a reassessment date."
                             </p>
+                        </div>
+                    }.into_any()
+                }
+                "decisions" => {
+                    if !ctx.has_action("decisions.list") {
+                        return view! {
+                            <Planned
+                                title="The decision register is planned".to_owned()
+                                detail="decisions.list is not in this role's manifest — the register appears when the action lands.".to_owned()
+                            />
+                        }
+                        .into_any();
+                    }
+                    view! {
+                        <div class="panel">
+                            <h2>"The architecture decision register"</h2>
+                            <p class="muted">
+                                "Every ADR is a governed asset: the number, the status, the decision
+                                and its supersession chain are rows; a decision's approval is a
+                                gate, not this read. The tr3 tranche review cites this register."
+                            </p>
+                            {move || match decisions.get() {
+                                None => view! { <p class="muted">"Reading the register…"</p> }.into_any(),
+                                Some(Err(error)) => view! {
+                                    <ErrorPanel error=error on_retry=Callback::new(move |_| decisions.refetch())/>
+                                }.into_any(),
+                                Some(Ok(rows)) if rows.is_empty() => view! {
+                                    <Empty message="No decision recorded — an ADR is created by `decisions.create`.".to_owned()/>
+                                }.into_any(),
+                                Some(Ok(rows)) => view! {
+                                    <div class="tablewrap">
+                                        <table class="table">
+                                            <thead><tr>
+                                                <th>"Number"</th><th>"Decision"</th><th>"Status"</th>
+                                                <th>"Decided at"</th><th>"Deciders"</th><th>"Supersedes"</th>
+                                            </tr></thead>
+                                            <tbody>
+                                                {rows.into_iter().map(|row| {
+                                                    let number = meta_text(&row.meta, "number")
+                                                        .filter(|text| !text.is_empty())
+                                                        .unwrap_or_else(|| row.key.clone());
+                                                    let decided = meta_text(&row.meta, "decided_at")
+                                                        .unwrap_or_else(|| "—".to_owned());
+                                                    let deciders = meta_text(&row.meta, "deciders")
+                                                        .unwrap_or_else(|| "—".to_owned());
+                                                    let supersedes = row
+                                                        .supersedes_id
+                                                        .as_deref()
+                                                        .map(|id| id.chars().take(8).collect::<String>())
+                                                        .unwrap_or_else(|| "—".to_owned());
+                                                    view! {
+                                                        <tr>
+                                                            <td class="mono">{number}</td>
+                                                            <td>{row.title.clone()}</td>
+                                                            <td><StatusPill status=row.status.clone()/></td>
+                                                            <td>{decided}</td>
+                                                            <td>{deciders}</td>
+                                                            <td class="mono">{supersedes}</td>
+                                                        </tr>
+                                                    }
+                                                }).collect_view()}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }.into_any(),
+                            }}
                         </div>
                     }.into_any()
                 }

@@ -1,0 +1,28 @@
+{
+ "contract_id": "01a20ae2-30eb-7f69-812e-e98009182041",
+ "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+ "evidence": {
+  "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+  "manifest": "acceptance/programme/T7.toml",
+  "tests": [
+   "crates/actions/tests/ops.rs",
+   "crates/actions/tests/ops_write.rs",
+   "crates/actions/tests/ops_read.rs",
+   "crates/actions/tests/ops_host.rs"
+  ],
+  "transcript": "/tmp/u5a-r9/evidence/T7-acceptance.md"
+ },
+ "findings": {
+  "met": [
+   "An incident is triaged with no write; the runbook is a governed document and a systemic finding opens exactly one kata.",
+   "An approved mitigation sets mitigated_at with a read-back; an incident resolves with a linked postmortem.",
+   "A destructive call without the tenant's configured approvals is refused; an approval for another target is refused; a dry run makes no write; a caller without the scope is refused.",
+   "restart, scale, rollback and flag-flip are callable and read back; an undeclared verb is refused."
+  ],
+  "open": [
+   "The cluster live proof is deploy-bound (operator CLI absent on the build box)."
+  ]
+ },
+ "level": "compliant",
+ "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e"
+}

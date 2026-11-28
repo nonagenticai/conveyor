@@ -378,6 +378,23 @@ async fn one_licence_principal_task_creates_reads_decides_and_closes() {
         .collect();
     assert!(ids.contains(&approval_id.as_str()), "{listed}");
 
+    // SPEC_V2 §5.4: a machine decides only a gate the tenant declares non-governance. This
+    // tenant declares its design question agent-decidable; the one decision writer reads this
+    // row, so the test exercises the real authorisation rather than bypassing it.
+    let mut tx = begin_scoped(&pg.owner, seeded.tenant)
+        .await
+        .expect("scope the gate-policy write");
+    sqlx::query(
+        "INSERT INTO approval_policy (tenant_id, action, approval, self_approval, approver_kind)
+         VALUES ($1, 'design_choice', 'required', 'forbidden', 'agent')
+         ON CONFLICT (tenant_id, action) DO UPDATE SET approver_kind = 'agent'",
+    )
+    .bind(seeded.tenant_id)
+    .execute(&mut *tx)
+    .await
+    .expect("declare the design gate agent-decidable");
+    tx.commit().await.expect("commit the gate policy");
+
     // 4. Decide, as the agent (property e).
     let decided = mcp
         .call(
@@ -414,21 +431,28 @@ async fn one_licence_principal_task_creates_reads_decides_and_closes() {
 
     // #282/#283: `projects.close` is destructive and `/mcp` carries no approval id (the MCP
     // invoke path passes `approval_id: None`). This test is the licence-authenticated task
-    // flow, not the gate, so the tenant waives that one action — written straight to the
-    // policy table, because this server authenticates licences only and a dev bearer is refused.
+    // flow, not the gate, so the fixture seeds D34's earned waiver — an `auto` approver with
+    // typed conditions and a future expiry — straight into the policy table, because this
+    // server authenticates licences only and a dev bearer is refused.
     let mut tx = conveyor_store::begin_scoped(&pg.owner, seeded.tenant)
         .await
         .expect("scope the policy write");
     sqlx::query(
-        "INSERT INTO approval_policy (tenant_id, action, approval, self_approval)
-         VALUES ($1, 'projects.close', 'waived', 'forbidden')
-         ON CONFLICT (tenant_id, action) DO UPDATE SET approval = 'waived'",
+        "INSERT INTO approval_policy
+             (tenant_id, action, approval, self_approval, approver_kind, conditions, expires_at)
+         VALUES ($1, 'projects.close', 'waived', 'forbidden', 'auto',
+                 '{\"max_reverts\": 0}'::jsonb, now() + interval '1 day')
+         ON CONFLICT (tenant_id, action) DO UPDATE
+            SET approval = 'waived',
+                approver_kind = 'auto',
+                conditions = '{\"max_reverts\": 0}'::jsonb,
+                expires_at = now() + interval '1 day'",
     )
     .bind(seeded.tenant_id)
     .execute(&mut *tx)
     .await
-    .expect("waive projects.close");
-    tx.commit().await.expect("commit the waiver");
+    .expect("seed the earned waiver for projects.close");
+    tx.commit().await.expect("commit the earned waiver");
 
     // 5. Close.
     let closed = mcp

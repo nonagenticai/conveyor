@@ -1,0 +1,88 @@
+{
+ "action": "cadences.update",
+ "change": "write meta.refinement.wsjf_inputs for the ten tranche-4 members; send the full union meta because the store replaces meta (coalesce on NULL)",
+ "inputs": {
+  "S05": {
+   "business_value": 10,
+   "job_size": 5,
+   "risk_reduction": 10,
+   "time_criticality": 8
+  },
+  "S07": {
+   "business_value": 10,
+   "job_size": 8,
+   "risk_reduction": 10,
+   "time_criticality": 8
+  },
+  "S09": {
+   "business_value": 10,
+   "job_size": 5,
+   "risk_reduction": 10,
+   "time_criticality": 8
+  },
+  "T10": {
+   "business_value": 10,
+   "job_size": 8,
+   "risk_reduction": 10,
+   "time_criticality": 13
+  },
+  "T14": {
+   "business_value": 10,
+   "job_size": 8,
+   "risk_reduction": 10,
+   "time_criticality": 9
+  },
+  "T16": {
+   "business_value": 10,
+   "job_size": 8,
+   "risk_reduction": 7,
+   "time_criticality": 8
+  },
+  "T18": {
+   "business_value": 9,
+   "job_size": 5,
+   "risk_reduction": 10,
+   "time_criticality": 7
+  },
+  "T19": {
+   "business_value": 10,
+   "job_size": 13,
+   "risk_reduction": 10,
+   "time_criticality": 8
+  },
+  "T4": {
+   "business_value": 10,
+   "job_size": 13,
+   "risk_reduction": 9,
+   "time_criticality": 8
+  },
+  "T9": {
+   "business_value": 10,
+   "job_size": 8,
+   "risk_reduction": 10,
+   "time_criticality": 13
+  }
+ },
+ "pre_state": {
+  "meta": {
+   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+   "tranche_id": "01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce",
+   "tranche_number": 4
+  },
+  "state": "planned",
+  "version": 1
+ },
+ "read_back": {
+  "action": "cadences.list",
+  "match": "id=01a202a2-2705-7392-a2d1-03ca2b3a174e",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac"
+ },
+ "schema": "conveyor-record-act/v1",
+ "source": "docs/evidence/rework/tranche-4/refinement-wsjf.json",
+ "subject": {
+  "cadence_id": "01a202a2-2705-7392-a2d1-03ca2b3a174e",
+  "kind": "refinement",
+  "period": "tranche-4",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac"
+ }
+}

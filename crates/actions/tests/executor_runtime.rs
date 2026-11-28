@@ -289,7 +289,31 @@ async fn an_unbound_run_keeps_the_start_hook() {
     let (pg, seeded, running) = fixture().await;
     let (board, lane) = board_and_lane(&running).await;
     let card = create_card(&running, &board, &lane).await;
-    let run = run_id(&start_run(&running, &card, None).await);
+    let card_id = Uuid::parse_str(&card).expect("a card id");
+
+    // The unbound hook is a non-job run's path, so the seeded row declares its kind explicitly:
+    // a `RunKind::Project` run with no binding is exactly what the hook has to start.
+    let run = {
+        let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
+            .await
+            .expect("scope");
+        let project_id: Uuid = sqlx::query_scalar(
+            "SELECT b.project_id FROM card c JOIN board b ON b.id = c.board_id \
+              WHERE c.tenant_id = $1 AND c.id = $2",
+        )
+        .bind(seeded.tenant.as_uuid())
+        .bind(card_id)
+        .fetch_one(&mut *tx)
+        .await
+        .expect("the card's project");
+        let mut input = store::run::NewRun::new(project_id, Some(card_id));
+        input.kind = store::run::RunKind::Project;
+        let run = store::run::insert_run_tx(&mut tx, seeded.tenant, &input)
+            .await
+            .expect("insert a project run");
+        tx.commit().await.expect("commit");
+        run.id
+    };
 
     execute(&pg, &seeded, run).await;
 

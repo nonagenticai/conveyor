@@ -25,8 +25,8 @@ use conveyor_auth::Session;
 use conveyor_store as store;
 use rmcp::model::{
     ElicitRequest, ElicitRequestParams, ElicitationSchema, EnumSchema, ErrorData as McpError,
-    GetTaskResult, InputRequest, MetaObject, PrimitiveSchemaDefinition, Task, TaskPayload,
-    TaskStatus,
+    GetTaskResult, InputRequest, MetaObject, PrimitiveSchemaDefinition, RequestMetaObject, Task,
+    TaskPayload, TaskStatus,
 };
 use serde_json::{Map, Value, json};
 use sqlx::PgPool;
@@ -134,28 +134,70 @@ async fn load(
     Ok((row, approvals))
 }
 
-/// One pending gate as an elicitation request: the human picks approved/rejected and may
-/// explain why. Keyed by the approval id on the wire.
+/// One pending gate as an elicitation request: keyed by the approval id on the wire.
+///
+/// A gate marked `meta.requires_answer` is a free-text question. Accepting it IS the answer,
+/// so its schema asks for a required `answer` instead of a yes/no decision, and its message
+/// carries the question and says an answer is required. A yes/no gate keeps the
+/// decision/reason shape. Both carry `_meta["ai.nonagentic/conveyor"]`, so a client can tell
+/// the two kinds apart without parsing prose.
 fn input_request(record: &store::approval::ApprovalRecord) -> Result<InputRequest, McpError> {
     let approval = &record.approval;
-    let schema = ElicitationSchema::builder()
-        .property(
-            "decision",
-            PrimitiveSchemaDefinition::Enum(
-                EnumSchema::builder(vec!["approved".to_owned(), "rejected".to_owned()]).build(),
-            ),
+    let requires_answer = record
+        .meta
+        .get("requires_answer")
+        .and_then(Value::as_bool)
+        .unwrap_or(false);
+    let question = record
+        .meta
+        .get("description")
+        .and_then(Value::as_str)
+        .map(str::trim)
+        .filter(|text| !text.is_empty());
+    let ask = match question {
+        Some(question) => format!(
+            "Approval required: {} ({}) — {question}",
+            approval.gate, approval.kind
+        ),
+        None => format!("Approval required: {} ({})", approval.gate, approval.kind),
+    };
+    let (message, schema) = if requires_answer {
+        (
+            format!("{ask} — answer the question; an answer is required"),
+            ElicitationSchema::builder()
+                .required_string_with("answer", |field| {
+                    field.description("The answer recorded as this decision's note")
+                })
+                .optional_string("comment"),
         )
-        .optional_string("reason")
-        .optional_string("comment")
-        .build()
-        .map_err(|_| internal("elicitation schema"))?;
+    } else {
+        (
+            format!("{ask} — approve or reject, and give a reason when rejecting"),
+            ElicitationSchema::builder()
+                .property(
+                    "decision",
+                    PrimitiveSchemaDefinition::Enum(
+                        EnumSchema::builder(vec!["approved".to_owned(), "rejected".to_owned()])
+                            .build(),
+                    ),
+                )
+                .optional_string("reason")
+                .optional_string("comment"),
+        )
+    };
+    let schema = schema.build().map_err(|_| internal("elicitation schema"))?;
+    let mut conveyor = Map::new();
+    conveyor.insert("approval_id".to_owned(), json!(approval.id));
+    conveyor.insert("requires_answer".to_owned(), json!(requires_answer));
+    if let Some(question) = question {
+        conveyor.insert("description".to_owned(), json!(question));
+    }
+    let mut meta = Map::new();
+    meta.insert("ai.nonagentic/conveyor".to_owned(), Value::Object(conveyor));
     Ok(InputRequest::Elicitation(ElicitRequest::new(
         ElicitRequestParams::FormElicitationParams {
-            meta: None,
-            message: format!(
-                "Approval required: {} ({}) — approve or reject, and give a reason when rejecting",
-                approval.gate, approval.kind
-            ),
+            meta: Some(RequestMetaObject(MetaObject(meta))),
+            message,
             requested_schema: schema,
         },
     )))
@@ -303,17 +345,75 @@ fn response_reason(value: &Value) -> String {
         .to_owned()
 }
 
+/// The free-text answer an input response carries (trimmed), when it carries one.
+///
+/// A present `answer` IS the approval: accepting a question with an answer is the owner's
+/// delegated act, and the answer becomes the decision's note. A blank answer is still
+/// forwarded — the store's one decision writer refuses it on a `requires_answer` gate, and
+/// that 422 is the caller's to fix.
+fn response_answer(value: &Value) -> Option<String> {
+    if value.get("action").and_then(Value::as_str)? != "accept" {
+        return None;
+    }
+    value
+        .get("content")
+        .and_then(|content| content.get("answer"))
+        .and_then(Value::as_str)
+        .map(|text| text.trim().to_owned())
+}
+
+/// The delegation an agent platform brokers in `_meta.delegation_ref`.
+///
+/// Only a uuid is forwarded: `approvals.decide` validates that it names a published `decision`
+/// document in this tenant and records the decision as a rule acting under it. A missing or
+/// malformed reference leaves the caller's own kind untouched — a delegation is never invented,
+/// and a uuid that names nothing is refused by the engine rather than silently downgraded.
+fn delegation_ref(meta: &rmcp::model::RequestMetaObject) -> Option<Uuid> {
+    let raw = meta.get("delegation_ref")?.as_str()?;
+    Uuid::parse_str(raw).ok()
+}
+
+/// The message a refused `approvals.decide` outcome body carries.
+///
+/// A `422` puts the reason in `errors[].detail`; the problem document's own `detail` is the
+/// generic schema sentence. The answer-required refusal is read from the field error when
+/// there is one, so the client sees why the answer was refused.
+fn refusal_detail(body: &Value) -> String {
+    body.get("errors")
+        .and_then(Value::as_array)
+        .and_then(|errors| errors.first())
+        .and_then(|error| error.get("detail"))
+        .and_then(Value::as_str)
+        .or_else(|| body.get("detail").and_then(Value::as_str))
+        .unwrap_or("the decision was refused")
+        .to_owned()
+}
+
+/// The same reason for an `ActionError`, whose `detail` is generic on a `422`.
+fn error_detail(error: crate::invoke::ActionError) -> String {
+    error
+        .errors
+        .first()
+        .map(|field| field.detail.clone())
+        .unwrap_or(error.detail)
+}
+
 /// `tasks/update` — answer the outstanding input requests.
 ///
-/// Every key is an approval id; an unknown key is ignored. A rejection without a non-blank
-/// reason leaves the gate open (S06c §7 g). The decision itself is the ordinary
-/// `approvals.decide` invocation, so a repeat is a replay.
+/// Every key is an approval id; an unknown key is ignored. An `answer` is the approval on a
+/// question gate and the decision's `note` on any gate; a rejection without a non-blank reason
+/// leaves the gate open (S06c §7 g). The decision itself is the ordinary `approvals.decide`
+/// invocation, so a repeat is a replay.
+///
+/// `_meta.delegation_ref` — the published owner decision an agent platform answers under —
+/// rides that invocation unchanged, so the answer is recorded as a `rule` decision with the
+/// reference in `via`. Without a well-formed reference the caller's own kind stands.
 pub async fn update(
     pool: &PgPool,
     session: &Session,
     task_id: &str,
     responses: &BTreeMap<String, Value>,
-    _meta: Option<rmcp::model::RequestMetaObject>,
+    meta: &rmcp::model::RequestMetaObject,
 ) -> Result<(), McpError> {
     let (row, approvals) = load(pool, session, task_id).await?;
     if matches!(
@@ -326,6 +426,7 @@ pub async fn update(
         return Ok(());
     }
     let tenant = session.tenant;
+    let delegation = delegation_ref(meta);
     for (key, value) in responses {
         let Ok(approval_id) = Uuid::parse_str(key) else {
             continue;
@@ -336,11 +437,17 @@ pub async fn update(
         {
             continue;
         }
-        let Some(decision) = response_decision(value) else {
-            continue;
+        let (decision, note) = match response_answer(value) {
+            // The answer is the approval; it is also the decision's note.
+            Some(answer) => ("approve", answer),
+            None => {
+                let Some(decision) = response_decision(value) else {
+                    continue;
+                };
+                (decision, response_reason(value))
+            }
         };
-        let reason = response_reason(value);
-        if decision == "reject" && reason.is_empty() {
+        if decision == "reject" && note.is_empty() {
             // The gate stays open; the next `tasks/get` still shows it as input_required.
             continue;
         }
@@ -356,13 +463,18 @@ pub async fn update(
                 continue;
             }
         }
+        let mut input = json!({
+            "approval_id": approval_id,
+            "decision": decision,
+            "note": note,
+        });
+        if let Some(reference) = delegation {
+            input["delegation_ref"] = json!(reference.to_string());
+        }
         let request = InvokeRequest {
+            credential_alias: None,
             action: "approvals.decide".to_owned(),
-            input: json!({
-                "approval_id": approval_id,
-                "decision": decision,
-                "note": reason,
-            }),
+            input,
             precondition: None,
             idempotency_key: Some(format!("mcp-task:{task_id}:{approval_id}")),
             approval_id: None,
@@ -381,16 +493,14 @@ pub async fn update(
             Ok(outcome) if (200..300).contains(&outcome.status) => {}
             Ok(outcome) if outcome.status == 409 => {}
             Ok(outcome) => {
-                let detail = outcome
-                    .body
-                    .get("detail")
-                    .and_then(Value::as_str)
-                    .unwrap_or("the decision was refused");
-                return Err(McpError::invalid_params(detail.to_owned(), None));
+                return Err(McpError::invalid_params(
+                    refusal_detail(&outcome.body),
+                    None,
+                ));
             }
             Err(error) if error.status == 409 => {}
             Err(error) => {
-                return Err(McpError::invalid_params(error.detail, None));
+                return Err(McpError::invalid_params(error_detail(error), None));
             }
         }
     }
@@ -410,6 +520,7 @@ pub async fn cancel(pool: &PgPool, session: &Session, task_id: &str) -> Result<(
         return Ok(());
     }
     let request = InvokeRequest {
+        credential_alias: None,
         action: "runs.cancel".to_owned(),
         input: json!({
             "id": row.run.id,

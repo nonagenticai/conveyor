@@ -135,6 +135,7 @@ pub async fn seal_lean4_token(pg: &Pg, tenant: TenantId, token: &[u8]) {
 /// A well-formed engine request, with the fields a certificate path cares about.
 pub fn request(action: &str, user_id: Uuid, input: Value, key: Option<&str>) -> InvokeRequest {
     InvokeRequest {
+        credential_alias: None,
         action: action.to_owned(),
         input,
         precondition: None,

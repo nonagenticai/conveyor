@@ -188,8 +188,8 @@ pub fn model_b() -> ModelSnapshot {
     ModelSnapshot {
         model: model(id(0xC0), "archimate", "3.2", "Delivery platform"),
         elements: vec![
-            element(host, "node", "strato-worker3", ""),
-            element(worker, "node", "hp2", ""),
+            element(host, "node", "strato-registry-1", ""),
+            element(worker, "node", "ci-1", ""),
             element(container, "system_software", "containerd", ""),
             element(registry, "technology_service", "Registry API", ""),
             element(image, "artifact", "conveyor-server image", ""),

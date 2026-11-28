@@ -64,6 +64,34 @@ async fn approvals_decide(
     input: ApprovalDecideIn,
 ) -> Result<ApprovalOut, ActionError> {
     let kind = parse_decision(&input.decision)?;
+    // A delegation names a PUBLISHED decision document in this tenant. It is validated here, so
+    // a decision can never cite a delegation that does not exist, is unpublished, or is not a
+    // decision. The caller does not thereby become a human: the decision is recorded as a rule
+    // acting under that document, and a gate that requires a person accepts it only by name.
+    let delegation = match input.delegation_ref {
+        Some(reference) => {
+            let found: Option<i32> = sqlx::query_scalar(
+                "SELECT 1 FROM document
+                  WHERE tenant_id = $1 AND id = $2
+                    AND status = 'active' AND published_at IS NOT NULL
+                    AND category = 'decision'",
+            )
+            .bind(ctx.tenant.as_uuid())
+            .bind(reference)
+            .fetch_optional(&mut *tx)
+            .await
+            .map_err(|_| ActionError::internal())?;
+            if found.is_none() {
+                return Err(invalid(
+                    "delegation_ref",
+                    "invalid_value",
+                    "the delegation must name a published decision document in this tenant",
+                ));
+            }
+            Some(reference)
+        }
+        None => None,
+    };
     // The transport is DERIVED from the authenticated authority, never from the input
     // (S06 decision 8, extended by S06d). `ctx.channel` is `Some` only for a machine connector;
     // a human session records `web`, and the engine records `internal`. The sender reference is
@@ -80,11 +108,21 @@ async fn approvals_decide(
             "channel": if ctx.actor_kind == "user" { "web" } else { "internal" }
         }),
     };
+    let mut via = via;
+    if let Some(reference) = delegation {
+        via["delegation_ref"] = serde_json::Value::String(reference.to_string());
+    }
+    let decided_by_kind = if delegation.is_some() {
+        // Delegated, not human: the audit says a rule acted under a named owner decision.
+        DeciderKind::Rule
+    } else {
+        decider_kind(&ctx.actor_kind)
+    };
     let decision = Decision {
         approver_id: ctx.actor_id,
         kind,
         note: input.note.unwrap_or_default(),
-        decided_by_kind: decider_kind(&ctx.actor_kind),
+        decided_by_kind,
         via: Some(via),
         item_decisions: input.item_decisions,
     };
@@ -113,6 +151,14 @@ async fn approvals_decide(
             .map_err(|error| decide_error(error, "approvals.decide"))?
             .ok_or_else(ActionError::internal)?;
         crate::pm::apply_gate_effect_tx(&mut *tx, ctx.tenant, &record, ctx.actor_id).await?;
+        // v1-p44-2: an approved `job_binding` gate is the only thing that flips the binding it
+        // names to `active` (SPEC_V2 §4.4). The effect rides the decision's transaction, so a
+        // failed flip rolls the decision back.
+        crate::organisation::apply_binding_gate_effect_tx(&mut *tx, ctx.tenant, &record).await?;
+        // v1-w1a-4: an approved `job_activation` gate is the only thing that flips the job it
+        // names from draft to active (SPEC_V2 §4.3). It rides the same transaction.
+        crate::organisation::apply_job_activation_gate_effect_tx(&mut *tx, ctx.tenant, &record)
+            .await?;
     }
 
     // Only a gate that actually resolved announces it: a first approve under a two-person
@@ -224,7 +270,10 @@ async fn approvals_decide(
                             card_id: approval.card_id,
                             question: "Apply the generated draft?".to_owned(),
                             answer: "approved".to_owned(),
+                            option_set_id: None,
                             option_set_version: None,
+                            option_set_hash: None,
+                            option_refinement_hashes: Vec::new(),
                             probabilities: serde_json::json!({}),
                             confidence: None,
                             input_hash: None,
@@ -234,6 +283,9 @@ async fn approvals_decide(
                             refinement_version: None,
                             laya_config_id: None,
                             laya_config_version: None,
+                            laya_invocation_id: None,
+                            laya_request_hash: None,
+                            laya_response_hash: None,
                             actor_kind: ctx.actor_kind.clone(),
                             actor_id: Some(ctx.actor_id),
                             approval_id: Some(approval.id),
@@ -418,7 +470,24 @@ async fn approvals_request(
     if kind.is_empty() {
         return Err(invalid("kind", "missing", "a gate kind is required"));
     }
-    let required_decisions = input.required_decisions.unwrap_or(1);
+    // The tenant's policy row is the quorum FLOOR (SPEC_V2 §5.4, §6.7). `pm::open_gate` applies
+    // the same rule to the project gates; `approvals.request` is the other door that opens a
+    // named gate, and it must not become the way the stored floor is bypassed. An unreadable row
+    // is a configuration fault, never a licence to fall back to one.
+    let floor = match store::approval_policy::get(&mut *tx, ctx.tenant, gate).await {
+        Ok(Some(policy)) => policy.required_decisions,
+        Ok(None) => 1,
+        Err(store::approval_policy::ApprovalPolicyStoreError::Database(error)) => {
+            tracing::error!(%error, "approvals: read the gate policy");
+            return Err(ActionError::internal());
+        }
+        Err(other) => {
+            tracing::error!(%other, gate, "approvals: unreadable gate policy");
+            return Err(ActionError::internal());
+        }
+    };
+    // ⛔ A caller may raise the quorum, never lower the tenant's floor.
+    let required_decisions = input.required_decisions.unwrap_or(floor).max(floor);
     // The same bound the process gate parser applies (`process/step.rs`): a quorum above 255
     // cannot be reached in practice, so it is a typo or an attempt to make a gate undecidable.
     // Zero already had its own refusal; the type (`u16`) left 256..=65535 open.
@@ -471,6 +540,7 @@ async fn approvals_request(
         ("description", input.description),
         ("proposed_answer", input.proposed_answer),
         ("target", target),
+        ("change_id", input.change_id.map(|id| id.to_string())),
     ] {
         if let Some(value) = value {
             meta.insert(key.to_owned(), Value::String(value));
@@ -478,6 +548,9 @@ async fn approvals_request(
     }
     if let Some(allowed) = input.allowed_decisions {
         meta.insert("allowed_decisions".to_owned(), allowed);
+    }
+    if input.requires_answer == Some(true) {
+        meta.insert("requires_answer".to_owned(), Value::Bool(true));
     }
     if let Some(proposed) = input.proposed_input {
         meta.insert("proposed_input".to_owned(), proposed);
@@ -492,17 +565,44 @@ async fn approvals_request(
     }
     // T3: a gate resolves its typed evidence before it is opened, so an absent, draft,
     // superseded or non-typed reference never becomes a pending gate.
+    //
+    // §5.4: a gate for a destructive action always names evidence. The action spec is
+    // authoritative — `Effect::Destructive` makes evidence mandatory whether or not the tenant
+    // has stored a policy row for it — and `require_evidence` can add the requirement, never
+    // remove it.
+    let destructive = crate::registry::registry()
+        .get(gate)
+        .is_some_and(|spec| spec.effect == crate::spec::Effect::Destructive);
+    let require = input.require_evidence || destructive;
+    // The one override is an explicit reason, never a flag: a non-empty reason opens an
+    // evidence-less gate and is stored on the row (`meta.evidence_waiver`) where the governance
+    // audit reads it. An empty or whitespace-only reason is not a waiver. A reason supplied
+    // alongside real evidence is ignored — there is nothing to waive.
+    let waiver = input
+        .evidence_waiver_reason
+        .as_deref()
+        .map(str::trim)
+        .filter(|reason| !reason.is_empty());
     let evidence = crate::pm::resolve_evidence(
         &mut *tx,
         ctx.tenant,
         &input.evidence,
-        input.require_evidence,
+        require && !(input.evidence.is_empty() && waiver.is_some()),
         &input.required_kinds,
         input.pinned_spec_sha256.as_deref(),
     )
     .await?;
     if !evidence.is_empty() {
         meta.insert("evidence".to_owned(), Value::Array(evidence));
+    }
+    if require
+        && input.evidence.is_empty()
+        && let Some(reason) = waiver
+    {
+        meta.insert(
+            "evidence_waiver".to_owned(),
+            Value::String(reason.to_owned()),
+        );
     }
 
     let new = store::approval::NewApproval {
@@ -606,7 +706,126 @@ pub async fn require_approval_tx(
             format!("approval {id} authorises {approved_target:?}, not {target:?}"),
         ));
     }
+    // T7 / v1-w1b-4: the four cluster writes and the incident mitigation carry SPEC_V2 §6.5's
+    // human dual control. The tenant policy may raise the floor; it may never lower this one.
+    // The dry-run half of the rule is checked at the invoke boundary, where the input is known.
+    if OPS_CONTROLLED.contains(&action) {
+        if record.approval.required_decisions < 2 {
+            return Err(ActionError::new(
+                403,
+                "dual_control_required",
+                format!(
+                    "{action} needs an approval with at least two decisions; approval {id} has {}",
+                    record.approval.required_decisions
+                ),
+            ));
+        }
+        let decisions =
+            store::approval::list_decisions_for_approvals_tx(&mut *tx, ctx.tenant, &[id])
+                .await
+                .map_err(|error| approval_error(error, action))?;
+        let approvers: std::collections::BTreeSet<_> = decisions
+            .iter()
+            .filter(|decision| decision.decision == "approve")
+            .map(|decision| decision.approver_id)
+            .collect();
+        if approvers.len() < 2 {
+            return Err(ActionError::new(
+                403,
+                "dual_control_not_met",
+                format!(
+                    "{action} needs two distinct approvers; approval {id} has {}",
+                    approvers.len()
+                ),
+            ));
+        }
+    }
     Ok(id)
+}
+
+/// The destructive ops actions that carry §6.5's dual control and dry-run rule.
+///
+/// The four cluster writes and the incident mitigation wrapper. `ops.host_restart_unit` is a
+/// host-unit verb outside §6.5's four; it keeps the single-approval `require_approval_tx` path.
+const OPS_CONTROLLED: &[&str] = &[
+    "ops.restart",
+    "ops.scale",
+    "ops.rollback",
+    "ops.flag_flip",
+    "ops.mitigate",
+];
+
+/// Whether `action` is one of the ops actions SPEC_V2 §6.5 puts under human dual control.
+///
+/// The invoke boundary refuses such a call unless its approval carries a two-decision quorum and
+/// two distinct human approvers. Every creator of that gate — the console flow, a copilot
+/// proposal — must open it with the quorum, or the approved call could never run.
+pub fn requires_dual_control(action: &str) -> bool {
+    OPS_CONTROLLED.contains(&action)
+}
+
+/// The dry-run half of §6.5: the real call must follow a recorded dry run of the same action
+/// and input.
+///
+/// The dry run is an `action_invocation` row with `outcome = 'ok'` whose `input_hash` is the
+/// engine's canonical hash of the same input with `dry_run: true`. A dry run needs no
+/// predecessor; `ops.mitigate` proves its inner verb (the write it executes), and a no-action
+/// mitigation performs no write and needs no dry run.
+async fn require_ops_dry_run_tx(
+    tx: &mut PgConnection,
+    ctx: &HandlerCtx,
+    action: &str,
+    input: &Value,
+) -> Result<(), ActionError> {
+    if input.get("dry_run").and_then(Value::as_bool) == Some(true) {
+        return Ok(());
+    }
+    let (dry_action, dry_input) = if action == "ops.mitigate" {
+        if input.get("no_action_required").and_then(Value::as_bool) == Some(true) {
+            return Ok(());
+        }
+        let inner_action = input
+            .get("action")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
+        if !inner_action.starts_with("ops.") {
+            return Err(ActionError::new(
+                403,
+                "dry_run_required",
+                "the mitigation's inner action is not an ops write, so no dry run can authorise it",
+            ));
+        }
+        let inner = input.get("input").cloned().unwrap_or(Value::Null);
+        (inner_action.to_owned(), with_dry_run(inner))
+    } else {
+        (action.to_owned(), with_dry_run(input.clone()))
+    };
+    let hash = conveyor_store::idempotency::request_hash(&dry_input);
+    let found =
+        store::actions::has_ok_invocation_with_hash_tx(&mut *tx, ctx.tenant, &dry_action, &hash)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "read the dry-run invocation");
+                ActionError::internal()
+            })?;
+    if !found {
+        return Err(ActionError::new(
+            403,
+            "dry_run_required",
+            format!(
+                "{dry_action} has no recorded dry run for this target; dry-run it before the real call"
+            ),
+        ));
+    }
+    Ok(())
+}
+
+/// The same input with `dry_run: true`, the body a dry run records.
+fn with_dry_run(mut input: Value) -> Value {
+    if let Some(map) = input.as_object_mut() {
+        map.insert("dry_run".to_owned(), Value::Bool(true));
+    }
+    input
 }
 
 /// The target a gate will authorise, computed the way the invoke boundary will compute it.
@@ -696,18 +915,20 @@ pub async fn enforce_destructive_gate(
             detail: format!("this action declares no approval target for this input: {detail}"),
         }])
     })?;
-    let waived = store::approval_policy::waives(&mut *tx, ctx.tenant, spec.name)
+    let waived = store::approval_policy::waives(&mut *tx, ctx.tenant, &spec.name)
         .await
         .map_err(|error| {
-            tracing::error!(%error, action = spec.name, "read approval policy");
+            tracing::error!(%error, action = %spec.name, "read approval policy");
             ActionError::internal()
         })?;
     if waived {
         return Ok(());
     }
-    require_approval_tx(tx, ctx, spec.name, &target, ctx.approval_id)
-        .await
-        .map(|_| ())
+    require_approval_tx(tx, ctx, spec.static_name(), &target, ctx.approval_id).await?;
+    if OPS_CONTROLLED.contains(&spec.static_name()) {
+        require_ops_dry_run_tx(tx, ctx, spec.static_name(), input).await?;
+    }
+    Ok(())
 }
 
 fn parse_decision(raw: &str) -> Result<DecisionKind, ActionError> {
@@ -916,6 +1137,13 @@ pub fn approval_out(record: &store::approval::ApprovalRecord) -> ApprovalOut {
             .get("proposed_answer")
             .and_then(Value::as_str)
             .map(str::to_owned),
+        // The store's writer reads `meta->>'requires_answer' = 'true'` (text), so the projection
+        // accepts the string form too: a screen and the writer must never disagree about whether
+        // the gate needs an answer, or the screen invites a decision the writer refuses.
+        requires_answer: record
+            .meta
+            .get("requires_answer")
+            .is_some_and(|value| value.as_bool() == Some(true) || value.as_str() == Some("true")),
         allowed_decisions: record.meta.get("allowed_decisions").cloned(),
         proposed_input: record.meta.get("proposed_input").cloned(),
         evidence: record

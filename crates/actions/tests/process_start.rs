@@ -17,6 +17,8 @@
 
 mod support;
 
+use std::sync::{Arc, Mutex};
+
 use serde_json::{Value, json};
 use uuid::Uuid;
 
@@ -810,4 +812,353 @@ async fn start_refuses_a_card_on_a_blocked_project() {
     )
     .await;
     assert!(status == 200 || status == 201, "{body}");
+}
+
+/// One active capability with the named process agents active under it. Each agent pins the
+/// catalogue's seeded `agent@1` prompt, so a positive start can actually execute its step.
+async fn seed_capability_agents(
+    pg: &support::Pg,
+    tenant: conveyor_domain::TenantId,
+    code: &str,
+    keys: &[&str],
+) -> (Uuid, Vec<Uuid>) {
+    let mut tx = conveyor_store::begin_scoped(&pg.runtime, tenant)
+        .await
+        .expect("scope");
+    let (capability_id,): (Uuid,) = sqlx::query_as(
+        "INSERT INTO capability (tenant_id, code, label, status)
+         VALUES ($1, $2, 'Binding executor', 'active') RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(code)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("capability");
+    let mut agents = Vec::new();
+    for &key in keys {
+        let (id,): (Uuid,) = sqlx::query_as(
+            "INSERT INTO capability_agent
+                 (tenant_id, capability_id, key, role, process_key, status, model_ref, prompt_ref,
+                  allowed_actions, max_iterations, timeout_secs)
+             VALUES ($1, $2, $3, 'process_agent', $3, 'active', 'test-model', 'agent@1',
+                     ARRAY['cards.claim'], 1, 30)
+             RETURNING id",
+        )
+        .bind(tenant.as_uuid())
+        .bind(capability_id)
+        .bind(key)
+        .fetch_one(&mut *tx)
+        .await
+        .expect("agent");
+        agents.push(id);
+    }
+    tx.commit().await.expect("commit");
+    (capability_id, agents)
+}
+
+/// An `internal_agent` job binding pinning `agent` for `process`, with the minimal catalogue rows
+/// the run store's pin resolver reads. Raw SQL: this test is about the run's executor resolution,
+/// not `job_bindings.create`'s own validation.
+async fn seed_internal_agent_binding(
+    pg: &support::Pg,
+    tenant: conveyor_domain::TenantId,
+    capability_id: Uuid,
+    process: &str,
+    agent: Uuid,
+) -> Uuid {
+    let industry: Uuid = sqlx::query_scalar(
+        "INSERT INTO industry (tenant_id, key, name)
+         VALUES ($1, 'software', 'Software')
+         ON CONFLICT (tenant_id, key) DO UPDATE SET name = excluded.name
+         RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("industry");
+    let job: Uuid = sqlx::query_scalar(
+        "INSERT INTO job_catalogue (tenant_id, job_key, industry_id, title)
+         VALUES ($1, $2, $3, 'Binding executor job') RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(format!("binding_job_{}", Uuid::now_v7().simple()))
+    .bind(industry)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("job");
+    let release_hash = "a".repeat(64);
+    let release: Uuid = sqlx::query_scalar(
+        "INSERT INTO job_release (tenant_id, job_id, release_hash, release_snapshot)
+         VALUES ($1, $2, $3, '{}'::jsonb) RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(job)
+    .bind(&release_hash)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("release");
+    sqlx::query_scalar(
+        "INSERT INTO job_binding
+             (tenant_id, job_id, release_id, release_hash, release_snapshot,
+              capability_id, process_id, capability_agent_id, executor_kind, status)
+         VALUES ($1, $2, $3, $4, '{}'::jsonb, $5, $6, $7, 'internal_agent', 'active')
+         RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(job)
+    .bind(release)
+    .bind(&release_hash)
+    .bind(capability_id)
+    .bind(Uuid::parse_str(process).expect("process id"))
+    .bind(agent)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("binding")
+}
+
+/// A stub that records every request body and answers text (the process executor's inference URL).
+async fn stub_router() -> (String, Arc<Mutex<Vec<Value>>>) {
+    let bodies: Arc<Mutex<Vec<Value>>> = Arc::new(Mutex::new(Vec::new()));
+    let state = bodies.clone();
+    let app = axum::Router::new().route(
+        "/api/chat/completions",
+        axum::routing::post(move |axum::Json(body): axum::Json<Value>| {
+            let state = state.clone();
+            async move {
+                state.lock().expect("bodies").push(body);
+                axum::Json(json!({
+                    "id": "chatcmpl-binding",
+                    "choices": [{
+                        "index": 0,
+                        "message": {"role": "assistant", "content": "binding answer"},
+                        "finish_reason": "stop"
+                    }],
+                    "usage": {"total_tokens": 9}
+                }))
+            }
+        }),
+    );
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+        .await
+        .expect("bind stub");
+    let base = format!("http://{}", listener.local_addr().expect("addr"));
+    tokio::spawn(async move {
+        let _ = axum::serve(listener, app).await;
+    });
+    (base, bodies)
+}
+
+/// v1-p44-1 (SPEC_V2 §4.4): a job binding pins the run's executor. The binding names agent A and
+/// the process resolves B — from its step's `process_agent_id`, or from the capability's single
+/// active agent — so the start is refused `409 job_binding_executor_mismatch` and no run row is
+/// written. Recording A's binding while executing B is exactly what this closes.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_job_binding_whose_executor_differs_from_the_process_is_refused() {
+    let (pg, running, seeded) = fixture().await;
+    let sop = support::publish_sop(&running, "process-binding-mismatch-sop").await;
+    let (board, lane) = board_and_lane(&running).await;
+
+    // The step path: the binding pins agent A, the step names agent B.
+    let (capability, agents) = seed_capability_agents(
+        &pg,
+        seeded.tenant,
+        "cap.binding.step",
+        &["binding-agent-a", "binding-agent-b"],
+    )
+    .await;
+    let (agent_a, agent_b) = (agents[0], agents[1]);
+
+    let card = create_card(&running, &board, &lane, "feature").await;
+    let (status, process, body) = create_process(
+        &running,
+        "dev-binding-step",
+        &sop,
+        None,
+        json!([{
+            "kind": "agent",
+            "actor": "process_agent",
+            "process_agent_id": agent_b,
+            "input_template": {"messages": [{"role": "user", "content": "go"}]},
+        }]),
+    )
+    .await;
+    assert_eq!(status, 201, "{body}");
+    bind_capability(&pg, seeded.tenant, capability, &process).await;
+    publish(&running, &process).await;
+    let binding =
+        seed_internal_agent_binding(&pg, seeded.tenant, capability, &process, agent_a).await;
+
+    let (status, _, refusal) = start(
+        &running,
+        json!({
+            "card_id": card,
+            "process_key": "dev-binding-step",
+            "job_binding_id": binding,
+            "inputs": {"limits": {"cost_budget_usd": 5.0}},
+        }),
+        None,
+    )
+    .await;
+    assert_eq!(status, 409, "{refusal}");
+    assert_eq!(slug(&refusal), "job_binding_executor_mismatch", "{refusal}");
+    assert!(
+        refusal["detail"]
+            .as_str()
+            .unwrap_or_default()
+            .contains(&agent_b.to_string()),
+        "the refusal names the agent the process resolves: {refusal}"
+    );
+    assert_eq!(
+        sqlx::query_scalar::<_, i64>("SELECT count(*) FROM run WHERE tenant_id = $1")
+            .bind(seeded.tenant_id)
+            .fetch_one(&pg.super_pool)
+            .await
+            .expect("run count"),
+        0,
+        "a refused binding start writes no run"
+    );
+
+    // The capability path: a computed-only process whose capability has one active agent, B2,
+    // while the binding pins A.
+    let (capability2, agents2) = seed_capability_agents(
+        &pg,
+        seeded.tenant,
+        "cap.binding.capability",
+        &["binding-agent-b2"],
+    )
+    .await;
+    let agent_b2 = agents2[0];
+    let card2 = create_card(&running, &board, &lane, "feature").await;
+    let (status, process2, body) =
+        create_process(&running, "dev-binding-capability", &sop, None, two_steps()).await;
+    assert_eq!(status, 201, "{body}");
+    bind_capability(&pg, seeded.tenant, capability2, &process2).await;
+    publish(&running, &process2).await;
+    let binding2 =
+        seed_internal_agent_binding(&pg, seeded.tenant, capability2, &process2, agent_a).await;
+
+    let (status, _, refusal) = start(
+        &running,
+        json!({
+            "card_id": card2,
+            "process_key": "dev-binding-capability",
+            "job_binding_id": binding2,
+            "inputs": {"limits": {"cost_budget_usd": 5.0}},
+        }),
+        None,
+    )
+    .await;
+    assert_eq!(status, 409, "{refusal}");
+    assert_eq!(slug(&refusal), "job_binding_executor_mismatch", "{refusal}");
+    assert!(
+        refusal["detail"]
+            .as_str()
+            .unwrap_or_default()
+            .contains(&agent_b2.to_string()),
+        "the refusal names the capability's active agent: {refusal}"
+    );
+}
+
+/// v1-p44-1 (SPEC_V2 §4.4): a matching pin is not merely recorded — the agent the binding names
+/// is the agent that dispatches the step. The run row carries the binding's executor, and the
+/// model receives the prompt compiled for that agent (its key is in the executor section).
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_job_bindings_pinned_agent_is_the_agent_that_dispatches() {
+    let (pg, running, seeded) = fixture().await;
+    let (base, bodies) = stub_router().await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
+    let sop = support::publish_sop(&running, "process-binding-dispatch-sop").await;
+    let (board, lane) = board_and_lane(&running).await;
+
+    let (capability, agents) = seed_capability_agents(
+        &pg,
+        seeded.tenant,
+        "cap.binding.dispatch",
+        &["binding-agent-a"],
+    )
+    .await;
+    let agent = agents[0];
+    let card = create_card(&running, &board, &lane, "feature").await;
+    let (status, process, body) = create_process(
+        &running,
+        "dev-binding-dispatch",
+        &sop,
+        None,
+        json!([{
+            "kind": "agent",
+            "actor": "process_agent",
+            "process_agent_id": agent,
+            "input_template": {"messages": [{"role": "user", "content": "go"}]},
+        }]),
+    )
+    .await;
+    assert_eq!(status, 201, "{body}");
+    bind_capability(&pg, seeded.tenant, capability, &process).await;
+    publish(&running, &process).await;
+    let binding =
+        seed_internal_agent_binding(&pg, seeded.tenant, capability, &process, agent).await;
+
+    let (status, _, started) = start(
+        &running,
+        json!({
+            "card_id": card,
+            "process_key": "dev-binding-dispatch",
+            "job_binding_id": binding,
+            "inputs": {"limits": {"cost_budget_usd": 5.0}},
+        }),
+        None,
+    )
+    .await;
+    assert_eq!(status, 201, "{started}");
+    let run_id = Uuid::parse_str(&text(output(&started), "id")).expect("run id");
+    let (recorded_agent, recorded_binding): (Option<Uuid>, Option<Uuid>) = sqlx::query_as(
+        "SELECT capability_agent_id, job_binding_id FROM run WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(seeded.tenant_id)
+    .bind(run_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the run row");
+    assert_eq!(
+        recorded_agent,
+        Some(agent),
+        "the run records the binding's executor, not a second resolution"
+    );
+    assert_eq!(recorded_binding, Some(binding));
+
+    conveyor_actions::process::step::execute_step(
+        &pg.runtime,
+        seeded.tenant,
+        "conveyor",
+        run_id,
+        1,
+        1,
+    )
+    .await
+    .unwrap_or_else(|failure| panic!("step failed: {}", failure.message));
+
+    let (status, error): (String, Option<String>) = sqlx::query_as(
+        "SELECT status, error FROM run_step
+          WHERE tenant_id = $1 AND run_id = $2 AND position = 1 AND attempt = 1",
+    )
+    .bind(seeded.tenant_id)
+    .bind(run_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("step row");
+    assert_eq!(status, "succeeded", "{error:?}");
+
+    let sent = bodies.lock().expect("bodies").clone();
+    assert_eq!(sent.len(), 1, "one model call: {sent:?}");
+    let system = sent[0]["messages"]
+        .as_array()
+        .expect("messages")
+        .iter()
+        .find(|message| message["role"] == "system")
+        .and_then(|message| message["content"].as_str())
+        .unwrap_or_default();
+    assert!(
+        system.contains("executor: binding-agent-a"),
+        "the model ran under the binding's agent: {system}"
+    );
 }

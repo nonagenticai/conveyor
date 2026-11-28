@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Compliance Review — Tool platform · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="compliance-review" data-provenance-version="1" data-provenance-hash="8e8cd8a0e7daa0dca5a41f8c6b350153d3ca7fb90065d45cf844dadafb2e2248" data-provenance-status="active" data-provenance-owner="georgiedekker" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>compliance-review</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>8e8cd8a0e7daa0dca5a41f8c6b350153d3ca7fb90065d45cf844dadafb2e2248</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>georgiedekker</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Compliance Review — Tool platform</h1>
+<h2>Relationship</h2>
+<p>Exactly one of irrelevant, consistent, compliant, conformant, fully conformant or non-conformant.</p>
+<pre><code class="language-json">{
+  "category": "compliance-review",
+  "count": 3,
+  "rows": [
+    {
+      "contract_id": "01a20277-2d08-7c91-bce6-1a8326add30c",
+      "created_at": "2026-11-22T08:58:24.4119+00:00",
+      "evidence": {
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "manifest": "acceptance/programme/T13.toml",
+        "retrospective": true,
+        "run": "tool_platform 17/17 passed at lane head 582e2dc6 (2026-11-22): the six \u00a712 gate proofs plus the ceiling, write-verification, idempotency and sealed-credential tests, against a fresh Postgres 18 and a counting HTTP stub",
+        "sha": "582e2dc67e5882eb63f40de67c129f8c2863c376",
+        "suite": "crates/actions/tests/tool_platform.rs"
+      },
+      "findings": "This retrospective Phase-G review records the compliance level compliant for T13 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. It names the five findings this batch admitted and what each leaves undone.\n\nT13-R1 \u2014 The six gate proofs exist as named tests in crates/actions/tests/tool_platform.rs, but no gate-run output is recorded. Acceptance is evidenced by source, not by a passing run.\nT13-R2 \u2014 The tests insert tool, toolkit and tool_binding rows directly; the header states the slice ships no catalogue actions and the estate import is T14. Gap ledger v1-p111-1 also says the tool binding has no writer, so a bound job is proved with a seeded binding, not a production binding path.\nT13-R3 \u2014 The destructive test proves only the missing-approval refusal (403 approval_required, zero destination hits, no ledger row). It does not evidence the approval, dry-run and dual-control execution path \u00a711.4 requires.\nT13-R4 \u2014 The round-trip test uses the in-memory store that Pg::fresh configures when no endpoint is set, and gap ledger v1-p1110-1 says JobStorage is test-only. No live MinIO path is evidenced.\nT13-R5 \u2014 The \u00a712 row's coding toolkit and one kag-era toolkit plus V1 external-action migration is only partly evidenced: the tests use a coding fixture and a fixtures toolkit, and exercise no kag-era toolkit or V1 migration. Long operations, redaction, output_schema and BYO are open in the ledger (v1-w4a-5, v1-p111-3, v1-p118-2, v1-w4a-6).\n\nThe proving suite was re-run at the lane head for this review: tool_platform 17/17 passed at lane head 582e2dc6 (2026-11-22): the six \u00a712 gate proofs plus the ceiling, write-verification, idempotency and sealed-credential tests, against a fresh Postgres 18 and a counting HTTP stub. The six \u00a712 clauses are therefore evidenced by a passing wire-level suite, not only by source; the findings above are carried as named deviations and the closure is withheld until they are executed or waived.",
+      "id": "01a2027a-6502-72a6-9ef8-4c1582dbdf36",
+      "level": "compliant",
+      "outcome": null,
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "reviewed_at": "2026-11-22T08:58:24.4119+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-22T08:58:24.4119+00:00",
+      "version": 1
+    },
+    {
+      "contract_id": "01a20271-2a37-7329-b159-28031ddcb966",
+      "created_at": "2026-11-26T07:45:21.842998+00:00",
+      "evidence": {
+        "closure_review": "01a2051f-afd8-7749-9087-e99d1116edeb",
+        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85",
+        "manifest": "acceptance/programme/T13.toml"
+      },
+      "findings": [
+        {
+          "statement": "The T13 Statement of Architecture Work is delivered as written: its scope items are the project's approved artefacts and its approach is the lifecycle the retrospective closure review records; the contract is live and approved by a distinct approver, with no deviation a waiver would cover.",
+          "verdict": "pass"
+        }
+      ],
+      "id": "01a216d0-f1b9-78c6-854b-8da02cacd819",
+      "level": "compliant",
+      "outcome": null,
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "reviewed_at": "2026-11-26T07:45:21.842998+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-26T07:45:21.842998+00:00",
+      "version": 1
+    },
+    {
+      "contract_id": "01a219d5-a19d-714d-96a0-78f45aa4b696",
+      "created_at": "2026-11-26T21:49:28.404822+00:00",
+      "evidence": {
+        "acceptance_manifest": "acceptance/programme/T13.toml",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "delivery_contract": "01a20277-2d08-7c91-bce6-1a8326add30c",
+        "live_review": "01a2027a-6502-72a6-9ef8-4c1582dbdf36",
+        "manifest": "acceptance/programme/T13.toml",
+        "rework_note": "docs/evidence/rework/T13/transcript.jsonl",
+        "scope_baseline": "01a20279-854d-79f6-a751-a34d51be7589",
+        "sha": "a47b569674d3afc2e9b4d1d7f62e1f5ad52a01de",
+        "soaw_review": "01a216d0-f1b9-78c6-854b-8da02cacd819",
+        "statement_of_architecture_work": "01a20271-2a37-7329-b159-28031ddcb966"
+      },
+      "findings": "This retrospective Phase-G review, dated 2026-11-26, carries the level the record supports: the delivery contract 01a20277-2d08-7c91-bce6-1a8326add30c is approved under approval 01a20277-4be1-78c6-8516-728eb4d6068b by 01a1e8a7-8b23-76a9-9114-aafb95f7a545 rather than the requester 01a1e607-17d9-77d3-98d3-a43a87c4633d; the Statement of Architecture Work 01a20271-2a37-7329-b159-28031ddcb966 is approved under 01a20273-4f0f-77e6-8005-9744d1e3a574; both scope baselines 01a20277-9131-7ee2-acad-7e40ffa8f947 and 01a20279-854d-79f6-a751-a34d51be7589 are approved; and the Phase-G reviews 01a216d0-f1b9-78c6-854b-8da02cacd819 and 01a2027a-6502-72a6-9ef8-4c1582dbdf36 both record compliant. The six SPEC_V2 \u00a712 clauses are proved by named wire-level tests in crates/actions/tests/tool_platform.rs, 17 of 17 passed at lane head 582e2dc6 on 2026-11-22 against a fresh Postgres 18 and a counting HTTP stub. This rework batch closes the governance-record gaps the receipt names \u2014 the twelve mandatory artefact packages, including the seven A\u2013D artefact instances, the project registers and the baseline evidence \u2014 by authoring them in this pack. The P1 package the earlier receipt listed as unresolved, v1-p116-1 (a missing operation dead-ends instead of opening a tool request), is resolved at commit 68a38449a: `procedures.ingest_sop` opens a `tool_request` card naming the operation, the process and its steps, `procedures.validate` resolves each request against the tenant's published tools and reports the pinned version, and `crates/actions/tests/sop_ingestion.rs::a_missing_operation_opens_a_tool_request_and_binds_once_published` proves the round trip (sop_ingestion 13/13). Against that, the review refuses to waive what is still open: the five Phase-G findings \u2014 no production tool_binding writer (v1-p111-1), a storage round trip that uses the in-memory store when no endpoint is configured (v1-p1110-1), a destructive execution path proved only for its refusal, the unexercised kag-era toolkit and V1 migration, and the sub-features of v1-w4a-5, v1-p111-3, v1-p118-2 and v1-w4a-6 \u2014 are recorded as open items with owners.",
+      "id": "01a219d5-bfdc-77e4-b2e5-5ca0a6db651f",
+      "level": "compliant",
+      "outcome": null,
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "reviewed_at": "2026-11-26T21:49:28.404822+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-26T21:49:28.404822+00:00",
+      "version": 1
+    }
+  ],
+  "source": "architecture.json#/compliance_reviews"
+}
+</code></pre>
+<h2>Findings</h2>
+<p>The evidence for each finding, against the contract.</p>
+<pre><code class="language-json">{
+  "category": "compliance-review",
+  "count": 3,
+  "rows": [
+    {
+      "contract_id": "01a20277-2d08-7c91-bce6-1a8326add30c",
+      "created_at": "2026-11-22T08:58:24.4119+00:00",
+      "evidence": {
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "manifest": "acceptance/programme/T13.toml",
+        "retrospective": true,
+        "run": "tool_platform 17/17 passed at lane head 582e2dc6 (2026-11-22): the six \u00a712 gate proofs plus the ceiling, write-verification, idempotency and sealed-credential tests, against a fresh Postgres 18 and a counting HTTP stub",
+        "sha": "582e2dc67e5882eb63f40de67c129f8c2863c376",
+        "suite": "crates/actions/tests/tool_platform.rs"
+      },
+      "findings": "This retrospective Phase-G review records the compliance level compliant for T13 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. It names the five findings this batch admitted and what each leaves undone.\n\nT13-R1 \u2014 The six gate proofs exist as named tests in crates/actions/tests/tool_platform.rs, but no gate-run output is recorded. Acceptance is evidenced by source, not by a passing run.\nT13-R2 \u2014 The tests insert tool, toolkit and tool_binding rows directly; the header states the slice ships no catalogue actions and the estate import is T14. Gap ledger v1-p111-1 also says the tool binding has no writer, so a bound job is proved with a seeded binding, not a production binding path.\nT13-R3 \u2014 The destructive test proves only the missing-approval refusal (403 approval_required, zero destination hits, no ledger row). It does not evidence the approval, dry-run and dual-control execution path \u00a711.4 requires.\nT13-R4 \u2014 The round-trip test uses the in-memory store that Pg::fresh configures when no endpoint is set, and gap ledger v1-p1110-1 says JobStorage is test-only. No live MinIO path is evidenced.\nT13-R5 \u2014 The \u00a712 row's coding toolkit and one kag-era toolkit plus V1 external-action migration is only partly evidenced: the tests use a coding fixture and a fixtures toolkit, and exercise no kag-era toolkit or V1 migration. Long operations, redaction, output_schema and BYO are open in the ledger (v1-w4a-5, v1-p111-3, v1-p118-2, v1-w4a-6).\n\nThe proving suite was re-run at the lane head for this review: tool_platform 17/17 passed at lane head 582e2dc6 (2026-11-22): the six \u00a712 gate proofs plus the ceiling, write-verification, idempotency and sealed-credential tests, against a fresh Postgres 18 and a counting HTTP stub. The six \u00a712 clauses are therefore evidenced by a passing wire-level suite, not only by source; the findings above are carried as named deviations and the closure is withheld until they are executed or waived.",
+      "id": "01a2027a-6502-72a6-9ef8-4c1582dbdf36",
+      "level": "compliant",
+      "outcome": null,
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "reviewed_at": "2026-11-22T08:58:24.4119+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-22T08:58:24.4119+00:00",
+      "version": 1
+    },
+    {
+      "contract_id": "01a20271-2a37-7329-b159-28031ddcb966",
+      "created_at": "2026-11-26T07:45:21.842998+00:00",
+      "evidence": {
+        "closure_review": "01a2051f-afd8-7749-9087-e99d1116edeb",
+        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85",
+        "manifest": "acceptance/programme/T13.toml"
+      },
+      "findings": [
+        {
+          "statement": "The T13 Statement of Architecture Work is delivered as written: its scope items are the project's approved artefacts and its approach is the lifecycle the retrospective closure review records; the contract is live and approved by a distinct approver, with no deviation a waiver would cover.",
+          "verdict": "pass"
+        }
+      ],
+      "id": "01a216d0-f1b9-78c6-854b-8da02cacd819",
+      "level": "compliant",
+      "outcome": null,
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "reviewed_at": "2026-11-26T07:45:21.842998+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-26T07:45:21.842998+00:00",
+      "version": 1
+    },
+    {
+      "contract_id": "01a219d5-a19d-714d-96a0-78f45aa4b696",
+      "created_at": "2026-11-26T21:49:28.404822+00:00",
+      "evidence": {
+        "acceptance_manifest": "acceptance/programme/T13.toml",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "delivery_contract": "01a20277-2d08-7c91-bce6-1a8326add30c",
+        "live_review": "01a2027a-6502-72a6-9ef8-4c1582dbdf36",
+        "manifest": "acceptance/programme/T13.toml",
+        "rework_note": "docs/evidence/rework/T13/transcript.jsonl",
+        "scope_baseline": "01a20279-854d-79f6-a751-a34d51be7589",
+        "sha": "a47b569674d3afc2e9b4d1d7f62e1f5ad52a01de",
+        "soaw_review": "01a216d0-f1b9-78c6-854b-8da02cacd819",
+        "statement_of_architecture_work": "01a20271-2a37-7329-b159-28031ddcb966"
+      },
+      "findings": "This retrospective Phase-G review, dated 2026-11-26, carries the level the record supports: the delivery contract 01a20277-2d08-7c91-bce6-1a8326add30c is approved under approval 01a20277-4be1-78c6-8516-728eb4d6068b by 01a1e8a7-8b23-76a9-9114-aafb95f7a545 rather than the requester 01a1e607-17d9-77d3-98d3-a43a87c4633d; the Statement of Architecture Work 01a20271-2a37-7329-b159-28031ddcb966 is approved under 01a20273-4f0f-77e6-8005-9744d1e3a574; both scope baselines 01a20277-9131-7ee2-acad-7e40ffa8f947 and 01a20279-854d-79f6-a751-a34d51be7589 are approved; and the Phase-G reviews 01a216d0-f1b9-78c6-854b-8da02cacd819 and 01a2027a-6502-72a6-9ef8-4c1582dbdf36 both record compliant. The six SPEC_V2 \u00a712 clauses are proved by named wire-level tests in crates/actions/tests/tool_platform.rs, 17 of 17 passed at lane head 582e2dc6 on 2026-11-22 against a fresh Postgres 18 and a counting HTTP stub. This rework batch closes the governance-record gaps the receipt names \u2014 the twelve mandatory artefact packages, including the seven A\u2013D artefact instances, the project registers and the baseline evidence \u2014 by authoring them in this pack. The P1 package the earlier receipt listed as unresolved, v1-p116-1 (a missing operation dead-ends instead of opening a tool request), is resolved at commit 68a38449a: `procedures.ingest_sop` opens a `tool_request` card naming the operation, the process and its steps, `procedures.validate` resolves each request against the tenant's published tools and reports the pinned version, and `crates/actions/tests/sop_ingestion.rs::a_missing_operation_opens_a_tool_request_and_binds_once_published` proves the round trip (sop_ingestion 13/13). Against that, the review refuses to waive what is still open: the five Phase-G findings \u2014 no production tool_binding writer (v1-p111-1), a storage round trip that uses the in-memory store when no endpoint is configured (v1-p1110-1), a destructive execution path proved only for its refusal, the unexercised kag-era toolkit and V1 migration, and the sub-features of v1-w4a-5, v1-p111-3, v1-p118-2 and v1-w4a-6 \u2014 are recorded as open items with owners.",
+      "id": "01a219d5-bfdc-77e4-b2e5-5ca0a6db651f",
+      "level": "compliant",
+      "outcome": null,
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "reviewed_at": "2026-11-26T21:49:28.404822+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-26T21:49:28.404822+00:00",
+      "version": 1
+    }
+  ],
+  "source": "architecture.json#/compliance_reviews"
+}
+</code></pre>
+<h2>Waivers</h2>
+<p>Each accepted deviation with its owner, reason, cost, risk and reassessment date.</p>
+<pre><code class="language-json">{
+  "category": "compliance-review",
+  "count": 1,
+  "rows": [
+    {
+      "kind": "waiver_status",
+      "title": "None recorded \u2014 0 waivers for this project",
+      "waivers": 0
+    }
+  ],
+  "source": "computed:waiver_status"
+}
+</code></pre>
+<h2>Decision</h2>
+<p>The outcome and the conditions that attach to it.</p>
+<pre><code class="language-json">{
+  "category": "compliance-review",
+  "count": 1,
+  "rows": [
+    {
+      "conditions": "none recorded",
+      "decision": "compliant",
+      "findings": "This retrospective Phase-G review, dated 2026-11-26, carries the level the record supports: the delivery contract 01a20277-2d08-7c91-bce6-1a8326add30c is approved under approval 01a20277-4be1-78c6-8516-728eb4d6068b by 01a1e8a7-8b23-76a9-9114-aafb95f7a545 rather than the requester 01a1e607-17d9-77d3-98d3-a43a87c4633d; the Statement of Architecture Work 01a20271-2a37-7329-b159-28031ddcb966 is approved under 01a20273-4f0f-77e6-8005-9744d1e3a574; both scope baselines 01a20277-9131-7ee2-acad-7e40ffa8f947 and 01a20279-854d-79f6-a751-a34d51be7589 are approved; and the Phase-G reviews 01a216d0-f1b9-78c6-854b-8da02cacd819 and 01a2027a-6502-72a6-9ef8-4c1582dbdf36 both record compliant. The six SPEC_V2 \u00a712 clauses are proved by named wire-level tests in crates/actions/tests/tool_platform.rs, 17 of 17 passed at lane head 582e2dc6 on 2026-11-22 against a fresh Postgres 18 and a counting HTTP stub. This rework batch closes the governance-record gaps the receipt names \u2014 the twelve mandatory artefact packages, including the seven A\u2013D artefact instances, the project registers and the baseline evidence \u2014 by authoring them in this pack. The P1 package the earlier receipt listed as unresolved, v1-p116-1 (a missing operation dead-ends instead of opening a tool request), is resolved at commit 68a38449a: `procedures.ingest_sop` opens a `tool_request` card naming the operation, the process and its steps, `procedures.validate` resolves each request against the tenant's published tools and reports the pinned version, and `crates/actions/tests/sop_ingestion.rs::a_missing_operation_opens_a_tool_request_and_binds_once_published` proves the round trip (sop_ingestion 13/13). Against that, the review refuses to waive what is still open: the five Phase-G findings \u2014 no production tool_binding writer (v1-p111-1), a storage round trip that uses the in-memory store when no endpoint is configured (v1-p1110-1), a destructive execution path proved only for its refusal, the unexercised kag-era toolkit and V1 migration, and the sub-features of v1-w4a-5, v1-p111-3, v1-p118-2 and v1-w4a-6 \u2014 are recorded as open items with owners.",
+      "id": "01a219d5-bfdc-77e4-b2e5-5ca0a6db651f",
+      "kind": "governing_review",
+      "level": "compliant",
+      "phase_h_outcome": null,
+      "reviewed_at": "2026-11-26T21:49:28.404822+00:00",
+      "reviewed_by_name": "conveyor-approver",
+      "title": "governing review 01a219d5-bfdc-77e4-b2e5-5ca0a6db651f: compliant governs; phase-H outcome not recorded (a phase-G decision is its level)"
+    }
+  ],
+  "source": "computed:governing_review"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Tool platform · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

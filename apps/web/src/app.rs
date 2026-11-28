@@ -188,6 +188,10 @@ fn Shell() -> impl IntoView {
                             <Route path=path!("/settings/inference") view=InferenceEndpoint/>
                             <Route path=path!("/settings/admin") view=AdminScreen/>
                             <Route path=path!("/copilot") view=CopilotScreen/>
+                            <Route path=path!("/procedures") view=ProceduresScreen/>
+                            <Route path=path!("/authoring") view=Authoring/>
+                            <Route path=path!("/improve") view=Improve/>
+                            <Route path=path!("/operations") view=Operations/>
                             <Route path=path!("/platform") view=Platform/>
                             <Route path=path!("/portfolio") view=PortfolioScreen/>
                             <Route path=path!("/portfolio/:programme_id") view=PortfolioScreen/>
@@ -197,9 +201,7 @@ fn Shell() -> impl IntoView {
                             <Route path=path!("/agents") view=AgentsScreen/>
                             <Route path=path!("/decisions") view=DecisionInboxScreen/>
                             <Route path=path!("/project-types") view=ProjectTypesScreen/>
-                            <Route path=path!("/procedures") view=ProceduresScreen/>
                             <Route path=path!("/execution") view=ExecutionScreen/>
-                            <Route path=path!("/authoring") view=Authoring/>
                             <Route path=path!("/plan") view=PlanScreen/>
                             <Route path=path!("/meetings") view=MeetingsScreen/>
                             <Route path=path!("/meetings/:id") view=MeetingRoomScreen/>
@@ -321,6 +323,21 @@ fn Sidebar() -> impl IntoView {
                 })}
                 <li><A href="/boards"><span class="nav-item">"Board"</span></A></li>
                 <li><A href="/runs"><span class="nav-item">"Runs"</span></A></li>
+                {move || ctx.has_action("industries.list").then(|| view! {
+                    <li><A href="/organisation"><span class="nav-item">"Organisation"</span></A></li>
+                })}
+                {move || ctx.has_action("procedures.list").then(|| view! {
+                    <li><A href="/procedures"><span class="nav-item">"Procedures"</span></A></li>
+                })}
+                {move || ctx.has_action("authoring.assets").then(|| view! {
+                    <li><A href="/authoring"><span class="nav-item">"Authoring"</span></A></li>
+                })}
+                {move || ctx.has_action("metrics.flow").then(|| view! {
+                    <li><A href="/improve"><span class="nav-item">"Improve"</span></A></li>
+                })}
+                {move || ctx.has_action("workers.list").then(|| view! {
+                    <li><A href="/operations"><span class="nav-item">"Operations"</span></A></li>
+                })}
                 {move || ctx.has_action("runs.list").then(|| view! {
                     <li><A href="/execution"><span class="nav-item">"Execution room"</span></A></li>
                 })}

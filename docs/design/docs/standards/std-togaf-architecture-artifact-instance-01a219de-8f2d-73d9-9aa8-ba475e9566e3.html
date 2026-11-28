@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor generate-standards.py" />
+    <meta name="description" content="TOGAF artefact generated from the published record." />
+    <title>Architecture Artifact Instance — Technology Standards Catalog — T18 The real V2 UI (Phase D) · conveyor standards</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+    <style>
+      .std-meta { display:grid; grid-template-columns:repeat(auto-fit,minmax(11rem,1fr)); gap:.5rem 1.5rem; margin:1rem 0 2rem; }
+      .std-meta div { border-top:1px solid var(--line, #d8d8d8); padding-top:.35rem; }
+      .std-meta dt { font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; opacity:.65; }
+      .std-meta dd { margin:.15rem 0 0; }
+      .std-state { font-size:.75rem; text-transform:uppercase; letter-spacing:.06em; opacity:.7; }
+      .std-absent { border-left:3px solid #b45309; padding:.35rem .75rem; background:#fff7ed; }
+      .std-intent { max-width:68ch; }
+      .std-source { font-size:.85rem; opacity:.8; }
+      .std-index { list-style:none; padding:0; }
+      .std-index li { border-top:1px solid var(--line, #e5e5e5); padding:.5rem 0; }
+    </style>
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"><span class="doc-mark">C</span> conveyor</a>
+      <span class="doc-sep">/</span>
+      <a href="index.html">Standards</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="../../data/standards.json">data</a>
+    </header>
+    <main class="doc-body">
+      <h1>Architecture Artifact Instance — Technology Standards Catalog — T18 The real V2 UI (Phase D)</h1>
+      <dl class="std-meta">
+        <div><dt>Standard</dt><dd>TOGAF</dd></div>
+        <div><dt>Level</dt><dd>project</dd></div>
+        <div><dt>Subject</dt><dd>Technology Standards Catalog — T18 The real V2 UI (Phase D)</dd></div>
+        <div><dt>Status</dt><dd>evidenced</dd></div>
+        <div><dt>SPEC</dt><dd>§8.1</dd></div>
+        <div><dt>Gate</dt><dd>approved</dd></div>
+        <div><dt>Package</dt><dd><code>std-togaf-architecture-artifact-instance-01a219de-8f2d-73d9-9aa8-ba475e9566e3:T18</code></dd></div>
+        <div><dt>Provenance</dt><dd>2026-11-27T12:10:18.740973+00:00 · 17f470d5c621</dd></div>
+      </dl>
+      <h2>Metadata</h2>
+<p class="std-intent">The artefact&#x27;s type, title, version, status, phase, plateau and related change initiative. A reviewer can tell what it is and whether it has been approved without opening the document.</p>
+<p class="std-source">Source: <code>artifact_metadata</code> — 1 row(s)</p>
+<ul>
+<li>Technology Standards Catalog — T18 The real V2 UI (Phase D) <span class="std-state">approved</span></li>
+</ul><h2>Entries</h2>
+<p class="std-intent">The catalogue items (one axis) or matrix cells (two axes) the artefact carries. A catalog is queryable and a matrix is joinable because these are rows, not a picture.</p>
+<p class="std-source">Source: <code>artifact_entries</code> — 10 row(s)</p>
+<ul>
+<li>ADR 0001 and ADR 0009; no SSR, no second frontend</li>
+<li>POST /api/actions/{name}/invocations with If-Match, Idempotency-Key and the approval id where the action is gated (SPEC_V2 §10.5.4)</li>
+<li>reads are documented GETs; the app never reads docs/evidence as its data source and never invents a server function</li>
+<li>auth.rs; signed-out deep link is a sign-in gate and a forbidden route is a permission gate</li>
+<li>each spec asserts empty, error, happy and one refusal</li>
+<li>the workflow runs on apps/web/**; a local compile is not the verdict</li>
+<li>scripts/build-v2-coverage.py: exists requires a route in app.rs and a present spec; a *Gate is extend naming its owner</li>
+<li>docs/design remains the public programme site at /design/ and the reviewed reference (D64); it is never the operator surface</li>
+<li>no screen renders mock data; an unwired destination says not yet live and names its slice</li>
+<li>route-level rendering and the web.yml budget are the guard; the V2 screens add WASM and table weight</li>
+</ul><h2>Links</h2>
+<p class="std-intent">What this artefact derives from, realizes, reuses or depends on. These edges are the architecture repository&#x27;s trace; an artefact with no link is an orphan.</p>
+<p class="std-source">Source: <code>artifact_links</code> — 3 row(s)</p>
+<ul>
+<li>dependency: 01a219de-8a94-7f11-bd8f-cfa0e0f30dd9 → 01a219de-8f2d-73d9-9aa8-ba475e9566e3</li>
+<li>dependency: 01a219de-8ce1-729d-94ad-f3373dc5f751 → 01a219de-8f2d-73d9-9aa8-ba475e9566e3</li>
+<li>dependency: 01a219de-8f2d-73d9-9aa8-ba475e9566e3 → 01a219de-8ce1-729d-94ad-f3373dc5f751</li>
+</ul><h2>Document</h2>
+<p class="std-intent">The published document or contract the artefact sits under. A typed artefact without a document is metadata about something a reader cannot inspect.</p>
+<p class="std-source">Source: <code>artifact_document</code> — 1 row(s)</p>
+<ul>
+<li>Technology Standards Catalog — T18 The real V2 UI (Phase D)</li>
+</ul>
+    </main>
+  </body>
+</html>

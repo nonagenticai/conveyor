@@ -1,0 +1,8 @@
+{
+ "title": "T3 \u2014 Architecture artefact index",
+ "project_id": "01a1d039-0d33-7915-8833-75f4dc31cc07",
+ "category": "architecture-artifact",
+ "body": "# T3 \u2014 Architecture artefact index\n\n## Metadata\n\nSeven typed artefacts, all approved: stakeholder map, driver/goal/objective catalogue, requirements\ncatalogue, solution concept, business capability map, data entity catalogue, technology standards.\n\n## Entries\n\n- Stakeholder Map `01a20532-49f5-74a5-bfef-28ce553303b9` (matrix, phase A, PSA).\n- Driver/Goal/Objective Catalogue `01a20532-4a4d-77c5-b6c0-05103c70874e` (catalog, phase A, PSA).\n- Requirements Catalogue `01a20532-4aa4-791c-bc95-e21f0c2475cf` (catalog, phase A, PSA).\n- Solution Concept Diagram `01a20532-4afa-742b-aa54-d1065964e5e2` (diagram, phase A, PSA).\n- Business Capability Map `01a20532-4b52-7c4c-a85a-88289e2ac6a4` (diagram, phase B, HLD).\n- Data Entity Catalogue `01a20532-4ba9-7314-9a58-3d04c2eb66f1` (catalog, phase C, HLD).\n- Technology Standards Catalogue `01a20532-4bfe-767b-9ad4-bf3f1dcda1e0` (catalog, phase D, HLD).\n\n## Links\n\nThe artefacts rest on the ADR register (adr-0001..adr-0012) and cite the delivery contract `01a2052f-29da-76c4-9bda-e45e0f408fe8`.\n\n## Document\n\nThis index is the document an entry links to; each artefact row carries its own purpose and scope\nin the repository.\n",
+ "publishable": true,
+ "unit": "T3"
+}

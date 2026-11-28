@@ -1,0 +1,185 @@
+{
+  "checks": [
+    {
+      "check": "project",
+      "description": "S04 is closed against its record",
+      "detail": "project S04 is closed",
+      "id": "S04-project",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "project_baseline",
+      "description": "the scope baseline is approved; the close gate reads the approved row",
+      "detail": "baseline 01a20256-44d0-731d-b345-fffc5f3ac9e8 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
+      "id": "S04-baseline",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d28-7eb6-a62a-f420e742595c\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
+      "description": "the charter asset exists and the charter gate is approved",
+      "detail": "exit 0",
+      "exit": 0,
+      "id": "S04-charter",
+      "kind": "command",
+      "result": "pass",
+      "severity": "P0",
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "check": "closure_outputs",
+      "description": "the declared closure outputs are declared and published",
+      "detail": "1 closure outputs published",
+      "id": "S04-closure-outputs",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "contract",
+      "description": "a live board-approved delivery contract exists",
+      "detail": "contract 01a20256-6ede-7d70-aae8-5dbfe681a1b7 approved by board decision 01a20256-80ac-72f0-a310-d114488f1d7c about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "id": "S04-contract",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "review",
+      "description": "the Phase-G review cites a published standing delegation",
+      "detail": "review 01a219c5-f29b-7273-9220-3a1bfd2d95b2 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "id": "S04-review",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "closure_gate",
+      "description": "the closure gate was decided by an approver other than its requester",
+      "detail": "latest closure gate 01a216d1-3255-7127-8835-a15916dcacf6 decided by a distinct approver",
+      "id": "S04-closure-gate",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "waivers",
+      "description": "no active waiver is expired or owned by its reviewer",
+      "detail": "0 active waiver(s), all dated and distinct from the reviewer",
+      "id": "S04-waivers",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_cadence",
+      "description": "the project's PI has a cadence row and a backlog-refinement row",
+      "detail": "PI cadence 01a20280-a739-7bb9-823f-232f34b32aaa and refinement 01a20280-d52b-7791-a9b1-ebc2a10b5c3d for tranche-3",
+      "id": "S04-pi-cadence",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_plan",
+      "description": "the project tranche's PI plan is published",
+      "detail": "the tranche-3 PI plan is published",
+      "id": "S04-pi-plan",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_objectives",
+      "description": "the project tranche's PI objectives are published",
+      "detail": "the tranche-3 PI objectives are published",
+      "id": "S04-pi-objectives",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "lessons",
+      "description": "the tranche retro produced at least one lesson",
+      "detail": "lesson 01a216d0-d273-76e3-981f-989be9f580f1 carries a statement and evidence from the tranche-3 retro",
+      "id": "S04-lessons",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P1"
+    },
+    {
+      "check": "wsjf",
+      "description": "every WBS deliverable of the project carries the four typed WSJF inputs",
+      "detail": "11 WBS node(s) carry the four WSJF inputs",
+      "id": "S04-wsjf",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "demo_credits",
+      "description": "every accepted deliverable has a demo credit carrying its evidence",
+      "detail": "2 accepted deliverable(s), each with a demo credit",
+      "id": "S04-demo-credits",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "product_findings",
+      "description": "no open P0 product finding remains for the project",
+      "detail": "no open P0 package for this project",
+      "id": "S04-product",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "artefact_standard",
+      "description": "every mandatory standard artefact this project owns is evidenced",
+      "detail": "no open standard artefact package for this project",
+      "id": "S04-artefact-standard",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P1"
+    },
+    {
+      "check": "rework_resolution",
+      "description": "no unresolved P0/P1 rework package remains for the project",
+      "detail": "no unresolved P0/P1 package for this project",
+      "id": "S04-rework",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "description": "the declared gate is discharged by executable checks",
+      "detail": "gate discharged by executable checks: S04-project, S04-baseline, S04-charter, S04-closure-outputs, S04-contract, S04-review, S04-closure-gate, S04-waivers, S04-pi-cadence, S04-pi-plan, S04-pi-objectives, S04-lessons, S04-wsjf, S04-demo-credits, S04-product, S04-artefact-standard, S04-rework",
+      "id": "gate",
+      "kind": "manifest",
+      "result": "pass",
+      "severity": "P0"
+    }
+  ],
+  "failures": [],
+  "gate": "20 actions identical over HTTP and MCP \u2014 one value in three projections, duplicates fail closed, schema-invalid input returns RFC 9457 with populated `errors[]` and never a 500, an idempotent replay yields one `action_invocation`, and the lock catches drift while breaking ingest is refused",
+  "generated_at": "2026-11-26T21:32:36.838588+00:00",
+  "kind": "all",
+  "manifest": "acceptance/programme/S04.toml",
+  "name": "Action registry \u2014 derive, manifest, OpenAPI, MCP, invocation, external ingest",
+  "project": "S04",
+  "schema": "project-acceptance/v1",
+  "snapshot": {
+    "generated_at": "2026-11-26T21:32:09.836752+00:00",
+    "git_sha": "8111c984",
+    "path": "retained-snapshot/8111c984"
+  },
+  "verdict": "green",
+  "warnings": []
+}

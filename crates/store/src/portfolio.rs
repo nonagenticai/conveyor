@@ -72,6 +72,9 @@ pub enum PortfolioStoreError {
     /// A referenced parent does not exist in this tenant.
     #[error(transparent)]
     Parent(#[from] ParentError),
+    /// The programme's closure gate refused the write.
+    #[error(transparent)]
+    Closure(#[from] crate::spine::PlanStoreError),
     /// The database refused the statement.
     #[error(transparent)]
     Database(#[from] sqlx::Error),
@@ -179,6 +182,9 @@ pub struct ProgrammeRecord {
     pub status: String,
     /// The accountable user.
     pub owner_user_id: Option<Uuid>,
+    /// The programme's shared values and the keys it locks against per-project override
+    /// (`{ "values": {...}, "locked": [...] }`; a flat object is values with no locks).
+    pub shared_config: Value,
     /// The optimistic-concurrency version (`ETag`).
     pub version: Version,
     /// When the row was created.
@@ -196,6 +202,8 @@ pub struct NewProgrammeRow {
     pub status: Option<String>,
     /// The accountable user.
     pub owner_user_id: Option<Uuid>,
+    /// The programme's shared values and locked keys; `{}` when absent.
+    pub shared_config: Value,
 }
 
 /// The editable fields of a programme. `None` leaves the column unchanged.
@@ -207,6 +215,8 @@ pub struct ProgrammePatch {
     pub status: Option<String>,
     /// The new accountable user.
     pub owner_user_id: Option<Uuid>,
+    /// The new shared configuration; `None` leaves the column unchanged.
+    pub shared_config: Option<Value>,
 }
 
 #[derive(Debug, sqlx::FromRow)]
@@ -215,6 +225,7 @@ struct ProgrammeRow {
     name: String,
     status: String,
     owner_user_id: Option<Uuid>,
+    shared_config: Value,
     version: i64,
     created_at: DateTime<Utc>,
     updated_at: DateTime<Utc>,
@@ -227,6 +238,7 @@ impl From<ProgrammeRow> for ProgrammeRecord {
             name: row.name,
             status: row.status,
             owner_user_id: row.owner_user_id,
+            shared_config: row.shared_config,
             version: version_of(row.version),
             created_at: row.created_at,
             updated_at: row.updated_at,
@@ -234,7 +246,53 @@ impl From<ProgrammeRow> for ProgrammeRecord {
     }
 }
 
-const PROGRAMME_COLUMNS: &str = "id, name, status, owner_user_id, version, created_at, updated_at";
+/// Resolve a programme's shared configuration against one project's overrides.
+///
+/// The stored shape is `{ "values": { key: value }, "locked": [key, ...] }`; a flat object is
+/// read as the values with no locks, so an older caller that stored `{ "pi": 8 }` still
+/// resolves. A **locked** key keeps the programme's value — a project override of a locked key
+/// is ignored, not an error, because the programme is the authority (SPEC_V2 §8.2). Every other
+/// key takes the override when supplied. The result always carries both `values` and `locked`,
+/// so a reader never branches on which shape was written.
+pub fn resolve_shared_config(programme: &Value, overrides: &Value) -> Value {
+    let (mut values, locked) = shared_config_parts(programme);
+    if let (Some(target), Some(source)) = (values.as_object_mut(), overrides.as_object()) {
+        for (key, value) in source {
+            if locked.iter().any(|locked_key| locked_key == key) {
+                continue;
+            }
+            target.insert(key.clone(), value.clone());
+        }
+    }
+    serde_json::json!({ "values": values, "locked": locked })
+}
+
+/// Split a stored shared configuration into its values object and its locked keys.
+fn shared_config_parts(config: &Value) -> (Value, Vec<String>) {
+    let object = config.as_object();
+    let values = match object {
+        Some(object) => match object.get("values") {
+            Some(values) if values.is_object() => values.clone(),
+            Some(_) => serde_json::json!({}),
+            None => config.clone(),
+        },
+        None => serde_json::json!({}),
+    };
+    let locked = object
+        .and_then(|object| object.get("locked"))
+        .and_then(Value::as_array)
+        .map(|keys| {
+            keys.iter()
+                .filter_map(Value::as_str)
+                .map(str::to_owned)
+                .collect()
+        })
+        .unwrap_or_default();
+    (values, locked)
+}
+
+const PROGRAMME_COLUMNS: &str =
+    "id, name, status, owner_user_id, shared_config, version, created_at, updated_at";
 
 /// Insert a programme inside the caller's transaction.
 pub async fn create_programme_tx(
@@ -244,8 +302,8 @@ pub async fn create_programme_tx(
 ) -> Result<ProgrammeRecord, PortfolioStoreError> {
     ensure_optional_parent_tx(&mut *conn, tenant, Parent::AppUser, input.owner_user_id).await?;
     let sql = format!(
-        "INSERT INTO programme (tenant_id, name, status, owner_user_id)
-         VALUES ($1, $2, coalesce($3, 'active'), $4)
+        "INSERT INTO programme (tenant_id, name, status, owner_user_id, shared_config)
+         VALUES ($1, $2, coalesce($3, 'active'), $4, $5)
          RETURNING {PROGRAMME_COLUMNS}"
     );
     let row: ProgrammeRow = sqlx::query_as(sqlx::AssertSqlSafe(sql))
@@ -253,6 +311,7 @@ pub async fn create_programme_tx(
         .bind(&input.name)
         .bind(&input.status)
         .bind(input.owner_user_id)
+        .bind(&input.shared_config)
         .fetch_one(&mut *conn)
         .await?;
     let record: ProgrammeRecord = row.into();
@@ -297,11 +356,19 @@ pub async fn update_programme_tx(
             current: current.version,
         });
     }
+    // A `closed` status is a transition, not an editable field: the same closure conditions the
+    // dedicated close runs must hold before the status can move, and the refusal writes nothing.
+    if patch.status.as_deref() == Some("closed") {
+        crate::spine::assert_programme_can_close_tx(&mut *conn, tenant, id)
+            .await
+            .map_err(PortfolioStoreError::Closure)?;
+    }
     let sql = format!(
         "UPDATE programme
             SET name = COALESCE($3, name),
                 status = COALESCE($4, status),
                 owner_user_id = COALESCE($5, owner_user_id),
+                shared_config = COALESCE($6, shared_config),
                 version = version + 1,
                 updated_at = now()
           WHERE tenant_id = $1 AND id = $2
@@ -313,6 +380,7 @@ pub async fn update_programme_tx(
         .bind(patch.name.as_deref())
         .bind(patch.status.as_deref())
         .bind(patch.owner_user_id)
+        .bind(patch.shared_config.as_ref())
         .fetch_optional(&mut *conn)
         .await?;
     let record: ProgrammeRecord = row.ok_or(PortfolioStoreError::NotFound)?.into();

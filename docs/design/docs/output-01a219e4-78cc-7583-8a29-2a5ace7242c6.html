@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Compliance Review — The real V2 UI · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="compliance-review" data-provenance-version="1" data-provenance-hash="b666b479f9b5b4e72ff8a0842b532bf180703d97c61a1ae2344709f3bcfea4ac" data-provenance-status="active" data-provenance-owner="georgiedekker" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>compliance-review</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>b666b479f9b5b4e72ff8a0842b532bf180703d97c61a1ae2344709f3bcfea4ac</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>georgiedekker</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Compliance Review — The real V2 UI</h1>
+<h2>Relationship</h2>
+<p>Exactly one of irrelevant, consistent, compliant, conformant, fully conformant or non-conformant.</p>
+<pre><code class="language-json">{
+  "category": "compliance-review",
+  "count": 1,
+  "rows": [
+    {
+      "contract_id": "01a219de-96f5-743b-803d-2002a4b7c2af",
+      "created_at": "2026-11-26T21:59:14.733778+00:00",
+      "evidence": {
+        "acceptance_manifest": "acceptance/programme/T18.toml",
+        "coverage_record": "docs/evidence/v2-coverage.json (stale; build-v2-coverage.py --check exits 1)",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "e2e_specs": "apps/web/e2e/",
+        "manifest": "acceptance/programme/T18.toml",
+        "old_review": "docs/evidence/rework/T18.json (verdict red, generated 2026-11-24T21:07:28Z)",
+        "route_table": "apps/web/src/app.rs",
+        "sha": "df4a511718af8c52f04ab30f7f4a66c5ff4b1b06",
+        "snapshot": "/tmp/conv526-w1-snap/data"
+      },
+      "findings": "This retrospective Phase-G review records the level consistent for T18 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The project has no prior Phase-G review row in the snapshot, so the old verdict is the project-acceptance record docs/evidence/rework/T18.json generated 2026-11-24T21:07:28Z, verdict red: its fifteen-check manifest acceptance/programme/T18.toml failed on the baseline, contract, review, WSJF, demo-credit, product-finding, coverage, artefact-standard and rework-resolution checks and passed only the project-active, waiver, PI-cadence, PI-plan, PI-objective and lessons checks. That red record measures the pre-rework state and is the reason this pack exists; it is not evidence that the delivered screens are wrong. The delivered construction is real: apps/web/src/app.rs registers /portfolio, /portfolio/:programme_id, /programme, /organisation, /procedures, /authoring, /plan, /improve, /operations, /execution, /design/adm and /tools, with /tools and /design/adm rendering ToolsGate and AdmGate; apps/web/e2e carries shell, portfolio, programme, organisation, procedures, authoring, plan, improve, operations, execution and admin specs; and issues #559, #562, #563, #564 and #629 are closed. The remaining limits are explicit: issue #565 (T18-4) and issue #566 (T18-5) are open and issue #630 (T18-3c) is blocked; Tools has no destination spec and the architecture destination has no `adm.spec.ts` (the existing `admin.spec.ts` covers /settings/admin, not the ADM rail); docs/evidence/v2-coverage.json is stale, reporting seven destination rows as exists and four as extend (Architecture, Improve, Operations, Tools) while build-v2-coverage.py --check exits 1; the T12 organisation loop has no spec; and no project baseline, delivery contract, Phase-G review, project-brief, inception-analysis, architecture-design or evidence output was published before this pack. The level is consistent, not compliant or conformant: the evidence supports that the project is active and its construction has advanced, but it does not support the \u00a712 gate, which is why this pack supplies the governance record and closes nothing.",
+      "id": "01a219de-b233-7c79-9cf9-5c16a4f05765",
+      "level": "consistent",
+      "outcome": null,
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "reviewed_at": "2026-11-26T21:59:14.733778+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-26T21:59:14.733778+00:00",
+      "version": 1
+    }
+  ],
+  "source": "architecture.json#/compliance_reviews"
+}
+</code></pre>
+<h2>Findings</h2>
+<p>The evidence for each finding, against the contract.</p>
+<pre><code class="language-json">{
+  "category": "compliance-review",
+  "count": 1,
+  "rows": [
+    {
+      "contract_id": "01a219de-96f5-743b-803d-2002a4b7c2af",
+      "created_at": "2026-11-26T21:59:14.733778+00:00",
+      "evidence": {
+        "acceptance_manifest": "acceptance/programme/T18.toml",
+        "coverage_record": "docs/evidence/v2-coverage.json (stale; build-v2-coverage.py --check exits 1)",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "e2e_specs": "apps/web/e2e/",
+        "manifest": "acceptance/programme/T18.toml",
+        "old_review": "docs/evidence/rework/T18.json (verdict red, generated 2026-11-24T21:07:28Z)",
+        "route_table": "apps/web/src/app.rs",
+        "sha": "df4a511718af8c52f04ab30f7f4a66c5ff4b1b06",
+        "snapshot": "/tmp/conv526-w1-snap/data"
+      },
+      "findings": "This retrospective Phase-G review records the level consistent for T18 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The project has no prior Phase-G review row in the snapshot, so the old verdict is the project-acceptance record docs/evidence/rework/T18.json generated 2026-11-24T21:07:28Z, verdict red: its fifteen-check manifest acceptance/programme/T18.toml failed on the baseline, contract, review, WSJF, demo-credit, product-finding, coverage, artefact-standard and rework-resolution checks and passed only the project-active, waiver, PI-cadence, PI-plan, PI-objective and lessons checks. That red record measures the pre-rework state and is the reason this pack exists; it is not evidence that the delivered screens are wrong. The delivered construction is real: apps/web/src/app.rs registers /portfolio, /portfolio/:programme_id, /programme, /organisation, /procedures, /authoring, /plan, /improve, /operations, /execution, /design/adm and /tools, with /tools and /design/adm rendering ToolsGate and AdmGate; apps/web/e2e carries shell, portfolio, programme, organisation, procedures, authoring, plan, improve, operations, execution and admin specs; and issues #559, #562, #563, #564 and #629 are closed. The remaining limits are explicit: issue #565 (T18-4) and issue #566 (T18-5) are open and issue #630 (T18-3c) is blocked; Tools has no destination spec and the architecture destination has no `adm.spec.ts` (the existing `admin.spec.ts` covers /settings/admin, not the ADM rail); docs/evidence/v2-coverage.json is stale, reporting seven destination rows as exists and four as extend (Architecture, Improve, Operations, Tools) while build-v2-coverage.py --check exits 1; the T12 organisation loop has no spec; and no project baseline, delivery contract, Phase-G review, project-brief, inception-analysis, architecture-design or evidence output was published before this pack. The level is consistent, not compliant or conformant: the evidence supports that the project is active and its construction has advanced, but it does not support the \u00a712 gate, which is why this pack supplies the governance record and closes nothing.",
+      "id": "01a219de-b233-7c79-9cf9-5c16a4f05765",
+      "level": "consistent",
+      "outcome": null,
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "reviewed_at": "2026-11-26T21:59:14.733778+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-26T21:59:14.733778+00:00",
+      "version": 1
+    }
+  ],
+  "source": "architecture.json#/compliance_reviews"
+}
+</code></pre>
+<h2>Waivers</h2>
+<p>Each accepted deviation with its owner, reason, cost, risk and reassessment date.</p>
+<pre><code class="language-json">{
+  "category": "compliance-review",
+  "count": 1,
+  "rows": [
+    {
+      "kind": "waiver_status",
+      "title": "None recorded \u2014 0 waivers for this project",
+      "waivers": 0
+    }
+  ],
+  "source": "computed:waiver_status"
+}
+</code></pre>
+<h2>Decision</h2>
+<p>The outcome and the conditions that attach to it.</p>
+<pre><code class="language-json">{
+  "category": "compliance-review",
+  "count": 1,
+  "rows": [
+    {
+      "conditions": "none recorded",
+      "decision": "consistent",
+      "findings": "This retrospective Phase-G review records the level consistent for T18 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The project has no prior Phase-G review row in the snapshot, so the old verdict is the project-acceptance record docs/evidence/rework/T18.json generated 2026-11-24T21:07:28Z, verdict red: its fifteen-check manifest acceptance/programme/T18.toml failed on the baseline, contract, review, WSJF, demo-credit, product-finding, coverage, artefact-standard and rework-resolution checks and passed only the project-active, waiver, PI-cadence, PI-plan, PI-objective and lessons checks. That red record measures the pre-rework state and is the reason this pack exists; it is not evidence that the delivered screens are wrong. The delivered construction is real: apps/web/src/app.rs registers /portfolio, /portfolio/:programme_id, /programme, /organisation, /procedures, /authoring, /plan, /improve, /operations, /execution, /design/adm and /tools, with /tools and /design/adm rendering ToolsGate and AdmGate; apps/web/e2e carries shell, portfolio, programme, organisation, procedures, authoring, plan, improve, operations, execution and admin specs; and issues #559, #562, #563, #564 and #629 are closed. The remaining limits are explicit: issue #565 (T18-4) and issue #566 (T18-5) are open and issue #630 (T18-3c) is blocked; Tools has no destination spec and the architecture destination has no `adm.spec.ts` (the existing `admin.spec.ts` covers /settings/admin, not the ADM rail); docs/evidence/v2-coverage.json is stale, reporting seven destination rows as exists and four as extend (Architecture, Improve, Operations, Tools) while build-v2-coverage.py --check exits 1; the T12 organisation loop has no spec; and no project baseline, delivery contract, Phase-G review, project-brief, inception-analysis, architecture-design or evidence output was published before this pack. The level is consistent, not compliant or conformant: the evidence supports that the project is active and its construction has advanced, but it does not support the \u00a712 gate, which is why this pack supplies the governance record and closes nothing.",
+      "id": "01a219de-b233-7c79-9cf9-5c16a4f05765",
+      "kind": "governing_review",
+      "level": "consistent",
+      "phase_h_outcome": null,
+      "reviewed_at": "2026-11-26T21:59:14.733778+00:00",
+      "reviewed_by_name": "conveyor-approver",
+      "title": "governing review 01a219de-b233-7c79-9cf9-5c16a4f05765: consistent governs; phase-H outcome not recorded (a phase-G decision is its level)"
+    }
+  ],
+  "source": "computed:governing_review"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>The real V2 UI · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

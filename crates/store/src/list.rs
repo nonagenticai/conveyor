@@ -295,6 +295,44 @@ pub async fn list_of_kind_tx(
     row.map(ListRecord::try_from).transpose()
 }
 
+/// The board's first lane in board order — where a system-opened record is born.
+pub async fn first_list_id_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    board_id: Uuid,
+) -> Result<Option<Uuid>, sqlx::Error> {
+    sqlx::query_scalar(
+        "SELECT id FROM list
+          WHERE tenant_id = $1 AND board_id = $2
+          ORDER BY position, id
+          LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(board_id)
+    .fetch_optional(&mut *conn)
+    .await
+}
+
+/// The board's first lane of a lifecycle kind, when it has one.
+pub async fn list_id_of_kind_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    board_id: Uuid,
+    kind: ListKind,
+) -> Result<Option<Uuid>, sqlx::Error> {
+    sqlx::query_scalar(
+        "SELECT id FROM list
+          WHERE tenant_id = $1 AND board_id = $2 AND kind = $3
+          ORDER BY position, id
+          LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(board_id)
+    .bind(kind.as_str())
+    .fetch_optional(&mut *conn)
+    .await
+}
+
 /// How many stamped cards sit in a lane.
 ///
 /// Used before a `kind` edit: a lane that holds stamped cards can only stay an archive lane,

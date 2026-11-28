@@ -45,6 +45,9 @@ pub mod webhooks;
 
 pub use views::*;
 
+/// The approval gate a card type's Definition of Done resolves to (SPEC_V2 §5.4).
+pub(crate) const CARD_DONE_GATE: &str = "card_done";
+
 /// A store failure: a unique violation is `409`, everything else a scrubbed `500`.
 pub(crate) fn store_error(error: sqlx::Error, action: &str) -> ActionError {
     if let Some(database) = error.as_database_error()

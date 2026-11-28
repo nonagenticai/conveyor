@@ -17,7 +17,7 @@ use std::sync::OnceLock;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
-use crate::spec::HandlerRef;
+use crate::spec::{Effect, HandlerRef};
 
 /// Every embedded manifest, in call order (the toolkits a job may use first).
 const RAW: &[(&str, &str)] = &[
@@ -98,13 +98,33 @@ pub struct ToolManifest {
     /// Absent is `optional`; a write or destructive tool must declare `required`.
     #[serde(default)]
     pub idempotency: Option<String>,
-    /// The result fields the broker redacts.
-    #[serde(default)]
+    /// Response fields the broker replaces with `[redacted]` (SPEC_V2 §11.3).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub redact: Vec<String>,
     /// The sibling tool key that reads the written object back. Required for a write or
     /// destructive tool; the named sibling must be a `read` action.
     #[serde(default)]
     pub verification: Option<String>,
+    /// How the broker proves the write happened; absent only on non-writing tools (§11.3).
+    /// The richer declaration (verdict + checks, or read_back); `verification` above is the
+    /// sibling-key form. A write tool declares at least one of the two.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub verify: Option<VerifyManifest>,
+}
+
+/// The verification path a write tool declares (SPEC_V2 §11.3).
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct VerifyManifest {
+    /// The response member carrying a pass/fail verdict (synchronous writes).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub verdict: Option<String>,
+    /// The response member carrying read-back `checks[]` (synchronous writes).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub checks: Option<String>,
+    /// The tool key of a read-back tool in THIS toolkit (asynchronous writes).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub read_back: Option<String>,
 }
 
 /// Why a manifest cannot be published.
@@ -165,6 +185,30 @@ pub enum ManifestError {
         actual: String,
         /// The service the toolkit declares.
         declared: String,
+    },
+    /// A writing tool that declares no verification path would be publishable but unprovable.
+    #[error(
+        "toolkit {toolkit:?} tool {tool:?} is a {effect} tool with no verification path; declare verification, verify.verdict + verify.checks, or verify.read_back"
+    )]
+    UnverifiedWrite {
+        /// The toolkit.
+        toolkit: String,
+        /// The tool key inside the toolkit.
+        tool: String,
+        /// The registry effect that made verification mandatory.
+        effect: String,
+    },
+    /// A write's `read_back` points at a tool that is absent or does not read.
+    #[error(
+        "toolkit {toolkit:?} tool {tool:?} names read_back {read_back:?}, which is not a read tool in this toolkit"
+    )]
+    InvalidReadBack {
+        /// The toolkit.
+        toolkit: String,
+        /// The tool key inside the toolkit.
+        tool: String,
+        /// The read-back tool key the manifest named.
+        read_back: String,
     },
     /// The idempotency rule is not one of the three the column accepts.
     #[error("{tool:?} has idempotency {value:?}, not required|optional|forbidden")]
@@ -235,6 +279,9 @@ fn validate(manifest: &ToolkitManifest) -> Result<(), ManifestError> {
         });
     }
     let mut tools: BTreeSet<&str> = BTreeSet::new();
+    // Each tool's effect is needed twice — to decide whether it needs a verification path, and
+    // to resolve another tool's `read_back` — so it is collected while the actions are checked.
+    let mut effects: Vec<(&ToolManifest, Effect)> = Vec::with_capacity(manifest.tools.len());
     for tool in &manifest.tools {
         if !tools.insert(tool.key.as_str()) {
             return Err(ManifestError::DuplicateTool {
@@ -252,18 +299,19 @@ fn validate(manifest: &ToolkitManifest) -> Result<(), ManifestError> {
             .ok_or_else(|| ManifestError::UnknownAction {
                 action: tool.action.clone(),
             })?;
-        let HandlerRef::External { service, .. } = spec.handler else {
+        let HandlerRef::External { service, .. } = &spec.handler else {
             return Err(ManifestError::NotExternal {
                 action: tool.action.clone(),
             });
         };
-        if service != manifest.service {
+        if service.as_ref() != manifest.service.as_str() {
             return Err(ManifestError::ServiceMismatch {
                 action: tool.action.clone(),
-                actual: service.to_owned(),
+                actual: service.to_string(),
                 declared: manifest.service.clone(),
             });
         }
+        effects.push((tool, spec.effect));
         if let Some(idempotency) = tool.idempotency.as_deref()
             && !matches!(idempotency, "required" | "optional" | "forbidden")
         {
@@ -271,6 +319,15 @@ fn validate(manifest: &ToolkitManifest) -> Result<(), ManifestError> {
                 tool: tool.key.clone(),
                 value: idempotency.to_owned(),
             });
+        }
+    }
+    // A write with no verification path cannot be published (§11.3). Two shapes are accepted:
+    // the sibling read-tool key (`verification`) and the declared block (`verify`), whose
+    // `read_back` names another tool in this same manifest. They are resolved only after every
+    // action above is known good.
+    for (tool, effect) in &effects {
+        if !matches!(*effect, Effect::Write | Effect::Destructive) {
+            continue;
         }
         if let Some(verification) = tool.verification.as_deref() {
             let sibling = manifest
@@ -293,6 +350,34 @@ fn validate(manifest: &ToolkitManifest) -> Result<(), ManifestError> {
                 });
             }
         }
+        if let Some(verify) = &tool.verify {
+            if let Some(read_back) = &verify.read_back {
+                let resolves = effects.iter().any(|(candidate, candidate_effect)| {
+                    candidate.key == *read_back && *candidate_effect == Effect::Read
+                });
+                if !resolves {
+                    return Err(ManifestError::InvalidReadBack {
+                        toolkit: manifest.key.clone(),
+                        tool: tool.key.clone(),
+                        read_back: read_back.clone(),
+                    });
+                }
+            } else if verify.verdict.is_none() || verify.checks.is_none() {
+                // Synchronous writes need both halves: a verdict says pass/fail, `checks[]` says
+                // what was read back. Either one alone is not a verification path.
+                return Err(ManifestError::UnverifiedWrite {
+                    toolkit: manifest.key.clone(),
+                    tool: tool.key.clone(),
+                    effect: effect.as_str().to_owned(),
+                });
+            }
+        } else if tool.verification.is_none() {
+            return Err(ManifestError::UnverifiedWrite {
+                toolkit: manifest.key.clone(),
+                tool: tool.key.clone(),
+                effect: effect.as_str().to_owned(),
+            });
+        }
     }
     Ok(())
 }
@@ -307,9 +392,10 @@ fn key_shape(key: &str) -> bool {
 /// The content hash of one manifest, as published.
 ///
 /// Covers everything a caller could observe changing: the identity fields, the destination, the
-/// status, and per tool the action, its effect class, its timeout and a digest of the input
-/// schema copied from the registry. Two publishes of the same content therefore no-op; any
-/// change — including a schema change in the action itself — inserts a new version.
+/// status, and per tool the action, its redaction rule, its verification declaration, its effect
+/// class, its timeout and a digest of the input schema copied from the registry. Two publishes of
+/// the same content therefore no-op; any change — including a schema change in the action itself
+/// — inserts a new version.
 pub fn content_hash(manifest: &ToolkitManifest) -> String {
     let mut hasher = Sha256::new();
     hasher.update(b"conveyor.toolkit.v2\0");
@@ -331,17 +417,31 @@ pub fn content_hash(manifest: &ToolkitManifest) -> String {
         hasher.update([0u8]);
         hasher.update(tool.action.as_bytes());
         hasher.update([0u8]);
+        // Only a declared rule is content: a tool that never carried one hashes exactly as it did
+        // before this field existed, so the first publish after the upgrade bumps only the tools
+        // whose declarations changed.
+        if !tool.redact.is_empty() {
+            hasher.update(serde_json::to_vec(&tool.redact).unwrap_or_default());
+            hasher.update([0u8]);
+        }
+        // Only a declared path is content: a tool that never carried one hashes exactly as it did
+        // before this field existed, so the first publish after the upgrade bumps only the
+        // toolkits whose tools gained a declaration.
+        if let Some(verify) = &tool.verify {
+            hasher.update(serde_json::to_vec(verify).unwrap_or_default());
+            hasher.update([0u8]);
+        }
         if let Some(spec) = crate::registry::registry().get(tool.action.as_str()) {
             hasher.update(spec.effect.as_str().as_bytes());
             hasher.update([0u8]);
             hasher.update(spec.timeout_ms.to_string().as_bytes());
             hasher.update([0u8]);
-            let input = serde_json::to_vec(&(spec.input)()).unwrap_or_default();
+            let input = serde_json::to_vec(&spec.input_schema()).unwrap_or_default();
             hasher.update(Sha256::digest(&input));
             hasher.update([0u8]);
             // The output schema is copied from the action at publish time; hashing it here makes
             // a registry schema change a new version, exactly like the input schema.
-            let output = serde_json::to_vec(&(spec.output)()).unwrap_or_default();
+            let output = serde_json::to_vec(&spec.output_schema()).unwrap_or_default();
             hasher.update(Sha256::digest(&output));
             hasher.update([0u8]);
         }
@@ -392,6 +492,113 @@ mod tests {
         assert!(!key_shape("Coding"));
         assert!(!key_shape("coding.x"));
         assert!(!key_shape(""));
+    }
+
+    /// A minimal toolkit whose one tool is the real external write `coding_jobs.create`, so the
+    /// registry's effect — not the test — decides whether verification is mandatory.
+    fn coding_manifest(verify: Option<VerifyManifest>) -> ToolkitManifest {
+        ToolkitManifest {
+            key: "coding".to_owned(),
+            service: "coding".to_owned(),
+            title: "Coding fleet".to_owned(),
+            owner: "platform".to_owned(),
+            auth_adapter: "none".to_owned(),
+            licence_app: None,
+            status: "published".to_owned(),
+            health_path: "/health".to_owned(),
+            tools: vec![ToolManifest {
+                key: "jobs_create".to_owned(),
+                action: "coding_jobs.create".to_owned(),
+                idempotency: None,
+                redact: Vec::new(),
+                verification: None,
+                verify,
+            }],
+        }
+    }
+
+    #[test]
+    fn an_unverified_write_tool_is_refused() {
+        assert_eq!(
+            validate(&coding_manifest(None)),
+            Err(ManifestError::UnverifiedWrite {
+                toolkit: "coding".to_owned(),
+                tool: "jobs_create".to_owned(),
+                effect: "write".to_owned(),
+            })
+        );
+    }
+
+    #[test]
+    fn a_read_back_naming_a_missing_tool_is_refused() {
+        let verify = VerifyManifest {
+            verdict: None,
+            checks: None,
+            read_back: Some("jobs_absent".to_owned()),
+        };
+        assert_eq!(
+            validate(&coding_manifest(Some(verify))),
+            Err(ManifestError::InvalidReadBack {
+                toolkit: "coding".to_owned(),
+                tool: "jobs_create".to_owned(),
+                read_back: "jobs_absent".to_owned(),
+            })
+        );
+    }
+
+    #[test]
+    fn a_synchronous_verdict_and_checks_declaration_is_accepted() {
+        let verify = VerifyManifest {
+            verdict: Some("verdict".to_owned()),
+            checks: Some("checks".to_owned()),
+            read_back: None,
+        };
+        assert_eq!(validate(&coding_manifest(Some(verify))), Ok(()));
+    }
+
+    /// The verification declaration is part of what "the same manifest" means: a verify-only
+    /// edit must insert the next version rather than answer `unchanged` (§11.3).
+    #[test]
+    fn a_verify_only_change_moves_the_content_hash() {
+        let unverified = ToolkitManifest {
+            tools: vec![
+                ToolManifest {
+                    key: "jobs_create".to_owned(),
+                    action: "coding_jobs.create".to_owned(),
+                    idempotency: None,
+                    redact: Vec::new(),
+                    verification: None,
+                    verify: None,
+                },
+                ToolManifest {
+                    key: "jobs_get".to_owned(),
+                    action: "coding_jobs.get".to_owned(),
+                    idempotency: None,
+                    redact: Vec::new(),
+                    verification: None,
+                    verify: None,
+                },
+            ],
+            ..coding_manifest(None)
+        };
+        let mut verified = unverified.clone();
+        verified.tools[0].verify = Some(VerifyManifest {
+            verdict: None,
+            checks: None,
+            read_back: Some("jobs_get".to_owned()),
+        });
+        assert_ne!(content_hash(&unverified), content_hash(&verified));
+    }
+
+    /// Redaction is part of the tool declaration; changing it is a new manifest hash.
+    #[test]
+    fn a_redact_only_change_moves_the_content_hash() {
+        let mut redacted = coding_manifest(None);
+        redacted.tools[0].redact = vec!["token".to_owned()];
+        assert_ne!(
+            content_hash(&redacted),
+            content_hash(&coding_manifest(None))
+        );
     }
 
     #[test]

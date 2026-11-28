@@ -65,7 +65,7 @@ Verify: #87's scenarios (`crates/actions/tests/authoring.rs`, `asset_review.rs`,
 - Self-publication → `self_approval` default forbidden (migration 0050); refusal test at `crates/actions/tests/asset_review.rs` (to create).
 - Tool-grant widening → a policy draft waives its own gate; refusal test at `asset_review.rs` (to create).
 - Unordered publication → job references an unpublished department; `depends_on` refusal test at `authoring.rs::a_draft_that_references_an_unpublished_asset_is_refused` (to create).
-- T16 or T13 slip → the gate is unmeetable; check `git grep pko_release` and `CREATE TABLE tool_binding` on main.
+- T16 or T13 slip → the gate is unmeetable; check `procedures.draft` in `docs/design/data/actions.json` (the re-scoped T16 surface) and `CREATE TABLE tool_binding` on main.
 - Orphan assets inflate the catalogue → zero-use report.
 - Public leak → P9 scan before publication.
 

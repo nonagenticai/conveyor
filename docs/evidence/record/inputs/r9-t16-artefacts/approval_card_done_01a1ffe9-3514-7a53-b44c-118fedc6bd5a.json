@@ -1,0 +1,13 @@
+{
+ "card_id": "01a1ffe9-3514-7a53-b44c-118fedc6bd5a",
+ "description": "The Definition of Done is met. (1) The closure review is published (`01a20a8d-74f2-74ee-ad40-04c63fbdfa83`); (2) the live audit at snapshot v15 (/tmp/u5a-v15/data, git_sha 2d62cd78, manifest_sha256 1c3f16de\u2026) rebuilds the register with no closed_without_closure_review package for T16 \u2014 `--rework-check closed_without_closure_review:T16` reports that it matches no open package; the project is active with the review published. Acceptance evidence: `01a20a8d-73fb-74f6-849a-d0fb1a535179`; T16 acceptance 25/25 at the head.",
+ "evidence": [
+  {
+   "id": "01a20a8d-75fd-7aff-aa62-59aa568157d0",
+   "kind": "governed_asset"
+  }
+ ],
+ "gate": "card_done",
+ "kind": "card_dod",
+ "require_evidence": true
+}

@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Statement Of Architecture Work — Domain and schema — aggregates, state machines, baseline domain migration · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-2/S03-bodies/S03/statement-of-architecture-work.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="statement-of-architecture-work--domain-and-schema--aggregates-state-machines-baseline-domain-migration">Statement Of Architecture Work — Domain and schema — aggregates, state machines, baseline domain migration</h1>
+<h2 id="assignment">Assignment</h2>
+<p>What the architecture work is asked to deliver and for whom.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a20061-d19f-7269-9f5c-113f3aeb0001&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-21T23:12:26.539242+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The SPEC \u00a78 S3 gate: proptest on transitions and schema review. Property (a) \u2014 no transition leaves list.kind and archived_at contradictory, proved by board.rs::archived_implies_the_card_sits_in_an_archive_list and ::restore_off_a_non_archive_list_is_an_error. Property (b) \u2014 claim not granted twice without release or expiry, proved as tested by claim_race.rs::thirty_two_racers_get_exactly_one_grant_and_the_fence_is_monotonic, with the lease-exclusivity half recorded as the P1 package v1-s03-1. Property (c) \u2014 one pending approval per (run, gate), proved by approval_race.rs::sixteen_racers_create_exactly_one_pending_approval. Property (d) \u2014 terminal run and dense revision, proved by transitions.rs::a_terminal_run_rejects_every_transition_and_a_revision_is_dense. Tenant isolation is proved by rls_domain.rs::the_fourteen_domain_tables_isolate_runtime_owner_and_superuser. The schema review against data-arch \u00a72.3/\u00a72.4 admits the P2 package v1-s03-2. The rework&#39;s acceptance instrument is acceptance/programme/S03.toml; the closure gate is decided by an approver other than its requester.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V1 slice S03 (SPEC \u00a76, \u00a78 S3) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter and the delivery contract, take the project baseline with the one WBS deliverable, record the Phase-G compliance review, publish the project&#39;s expected outputs (`project-brief`, `evidence`) and the closure review, and re-close through the one gate on the P0-only gate.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the baseline domain of SPEC \u00a75.3 and \u00a76: the fourteen tables of migrations/0002_domain.sql (programme, project, board, list, card_type, card, run, approval, approval_decision, governed_asset, trace_link, catalogue_entry, revision, andon_state), the may_move matrix and the run/approval/asset state machines, the store `_tx` modules with TenantId, and the catalogue_entry.kind vocabulary. Out of scope: every route and action (S04\u2013S06), the board satellites (S05), channels and delivery (S06), outlines, quality and project_request (S07), models, views and portfolio registers (S08), documents and secrets (S09), conversations (S10), procedures (S11), workflow (S13) and the capability columns (S15).&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-21T23:12:15.079018+00:00&quot;,
+      &quot;id&quot;: &quot;01a20061-bd73-7a89-b08c-bd8b867eb061&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d28-743b-86c7-0d0698ed69c1&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 S03 Domain and schema (retrospective, 2026-11-21)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T23:12:26.539242+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="scope">Scope</h2>
+<p>The boundaries, the artefacts expected and the phase set.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a20061-d19f-7269-9f5c-113f3aeb0001&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-21T23:12:26.539242+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The SPEC \u00a78 S3 gate: proptest on transitions and schema review. Property (a) \u2014 no transition leaves list.kind and archived_at contradictory, proved by board.rs::archived_implies_the_card_sits_in_an_archive_list and ::restore_off_a_non_archive_list_is_an_error. Property (b) \u2014 claim not granted twice without release or expiry, proved as tested by claim_race.rs::thirty_two_racers_get_exactly_one_grant_and_the_fence_is_monotonic, with the lease-exclusivity half recorded as the P1 package v1-s03-1. Property (c) \u2014 one pending approval per (run, gate), proved by approval_race.rs::sixteen_racers_create_exactly_one_pending_approval. Property (d) \u2014 terminal run and dense revision, proved by transitions.rs::a_terminal_run_rejects_every_transition_and_a_revision_is_dense. Tenant isolation is proved by rls_domain.rs::the_fourteen_domain_tables_isolate_runtime_owner_and_superuser. The schema review against data-arch \u00a72.3/\u00a72.4 admits the P2 package v1-s03-2. The rework&#39;s acceptance instrument is acceptance/programme/S03.toml; the closure gate is decided by an approver other than its requester.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V1 slice S03 (SPEC \u00a76, \u00a78 S3) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter and the delivery contract, take the project baseline with the one WBS deliverable, record the Phase-G compliance review, publish the project&#39;s expected outputs (`project-brief`, `evidence`) and the closure review, and re-close through the one gate on the P0-only gate.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the baseline domain of SPEC \u00a75.3 and \u00a76: the fourteen tables of migrations/0002_domain.sql (programme, project, board, list, card_type, card, run, approval, approval_decision, governed_asset, trace_link, catalogue_entry, revision, andon_state), the may_move matrix and the run/approval/asset state machines, the store `_tx` modules with TenantId, and the catalogue_entry.kind vocabulary. Out of scope: every route and action (S04\u2013S06), the board satellites (S05), channels and delivery (S06), outlines, quality and project_request (S07), models, views and portfolio registers (S08), documents and secrets (S09), conversations (S10), procedures (S11), workflow (S13) and the capability columns (S15).&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-21T23:12:15.079018+00:00&quot;,
+      &quot;id&quot;: &quot;01a20061-bd73-7a89-b08c-bd8b867eb061&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d28-743b-86c7-0d0698ed69c1&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 S03 Domain and schema (retrospective, 2026-11-21)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T23:12:26.539242+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="responsibilities">Responsibilities</h2>
+<p>Who does the work and who accepts it.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a20061-d19f-7269-9f5c-113f3aeb0001&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-21T23:12:26.539242+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The SPEC \u00a78 S3 gate: proptest on transitions and schema review. Property (a) \u2014 no transition leaves list.kind and archived_at contradictory, proved by board.rs::archived_implies_the_card_sits_in_an_archive_list and ::restore_off_a_non_archive_list_is_an_error. Property (b) \u2014 claim not granted twice without release or expiry, proved as tested by claim_race.rs::thirty_two_racers_get_exactly_one_grant_and_the_fence_is_monotonic, with the lease-exclusivity half recorded as the P1 package v1-s03-1. Property (c) \u2014 one pending approval per (run, gate), proved by approval_race.rs::sixteen_racers_create_exactly_one_pending_approval. Property (d) \u2014 terminal run and dense revision, proved by transitions.rs::a_terminal_run_rejects_every_transition_and_a_revision_is_dense. Tenant isolation is proved by rls_domain.rs::the_fourteen_domain_tables_isolate_runtime_owner_and_superuser. The schema review against data-arch \u00a72.3/\u00a72.4 admits the P2 package v1-s03-2. The rework&#39;s acceptance instrument is acceptance/programme/S03.toml; the closure gate is decided by an approver other than its requester.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V1 slice S03 (SPEC \u00a76, \u00a78 S3) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter and the delivery contract, take the project baseline with the one WBS deliverable, record the Phase-G compliance review, publish the project&#39;s expected outputs (`project-brief`, `evidence`) and the closure review, and re-close through the one gate on the P0-only gate.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the baseline domain of SPEC \u00a75.3 and \u00a76: the fourteen tables of migrations/0002_domain.sql (programme, project, board, list, card_type, card, run, approval, approval_decision, governed_asset, trace_link, catalogue_entry, revision, andon_state), the may_move matrix and the run/approval/asset state machines, the store `_tx` modules with TenantId, and the catalogue_entry.kind vocabulary. Out of scope: every route and action (S04\u2013S06), the board satellites (S05), channels and delivery (S06), outlines, quality and project_request (S07), models, views and portfolio registers (S08), documents and secrets (S09), conversations (S10), procedures (S11), workflow (S13) and the capability columns (S15).&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-21T23:12:15.079018+00:00&quot;,
+      &quot;id&quot;: &quot;01a20061-bd73-7a89-b08c-bd8b867eb061&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d28-743b-86c7-0d0698ed69c1&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 S03 Domain and schema (retrospective, 2026-11-21)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T23:12:26.539242+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="acceptance-criteria">Acceptance criteria</h2>
+<p>The conditions the architecture must meet to close Phase A.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a20061-d19f-7269-9f5c-113f3aeb0001&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-21T23:12:26.539242+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The SPEC \u00a78 S3 gate: proptest on transitions and schema review. Property (a) \u2014 no transition leaves list.kind and archived_at contradictory, proved by board.rs::archived_implies_the_card_sits_in_an_archive_list and ::restore_off_a_non_archive_list_is_an_error. Property (b) \u2014 claim not granted twice without release or expiry, proved as tested by claim_race.rs::thirty_two_racers_get_exactly_one_grant_and_the_fence_is_monotonic, with the lease-exclusivity half recorded as the P1 package v1-s03-1. Property (c) \u2014 one pending approval per (run, gate), proved by approval_race.rs::sixteen_racers_create_exactly_one_pending_approval. Property (d) \u2014 terminal run and dense revision, proved by transitions.rs::a_terminal_run_rejects_every_transition_and_a_revision_is_dense. Tenant isolation is proved by rls_domain.rs::the_fourteen_domain_tables_isolate_runtime_owner_and_superuser. The schema review against data-arch \u00a72.3/\u00a72.4 admits the P2 package v1-s03-2. The rework&#39;s acceptance instrument is acceptance/programme/S03.toml; the closure gate is decided by an approver other than its requester.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V1 slice S03 (SPEC \u00a76, \u00a78 S3) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter and the delivery contract, take the project baseline with the one WBS deliverable, record the Phase-G compliance review, publish the project&#39;s expected outputs (`project-brief`, `evidence`) and the closure review, and re-close through the one gate on the P0-only gate.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the baseline domain of SPEC \u00a75.3 and \u00a76: the fourteen tables of migrations/0002_domain.sql (programme, project, board, list, card_type, card, run, approval, approval_decision, governed_asset, trace_link, catalogue_entry, revision, andon_state), the may_move matrix and the run/approval/asset state machines, the store `_tx` modules with TenantId, and the catalogue_entry.kind vocabulary. Out of scope: every route and action (S04\u2013S06), the board satellites (S05), channels and delivery (S06), outlines, quality and project_request (S07), models, views and portfolio registers (S08), documents and secrets (S09), conversations (S10), procedures (S11), workflow (S13) and the capability columns (S15).&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-21T23:12:15.079018+00:00&quot;,
+      &quot;id&quot;: &quot;01a20061-bd73-7a89-b08c-bd8b867eb061&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d28-743b-86c7-0d0698ed69c1&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 S03 Domain and schema (retrospective, 2026-11-21)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T23:12:26.539242+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="contract">Contract</h2>
+<p>The contract record, its version and its approval.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a20061-d19f-7269-9f5c-113f3aeb0001&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-21T23:12:26.539242+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The SPEC \u00a78 S3 gate: proptest on transitions and schema review. Property (a) \u2014 no transition leaves list.kind and archived_at contradictory, proved by board.rs::archived_implies_the_card_sits_in_an_archive_list and ::restore_off_a_non_archive_list_is_an_error. Property (b) \u2014 claim not granted twice without release or expiry, proved as tested by claim_race.rs::thirty_two_racers_get_exactly_one_grant_and_the_fence_is_monotonic, with the lease-exclusivity half recorded as the P1 package v1-s03-1. Property (c) \u2014 one pending approval per (run, gate), proved by approval_race.rs::sixteen_racers_create_exactly_one_pending_approval. Property (d) \u2014 terminal run and dense revision, proved by transitions.rs::a_terminal_run_rejects_every_transition_and_a_revision_is_dense. Tenant isolation is proved by rls_domain.rs::the_fourteen_domain_tables_isolate_runtime_owner_and_superuser. The schema review against data-arch \u00a72.3/\u00a72.4 admits the P2 package v1-s03-2. The rework&#39;s acceptance instrument is acceptance/programme/S03.toml; the closure gate is decided by an approver other than its requester.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V1 slice S03 (SPEC \u00a76, \u00a78 S3) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter and the delivery contract, take the project baseline with the one WBS deliverable, record the Phase-G compliance review, publish the project&#39;s expected outputs (`project-brief`, `evidence`) and the closure review, and re-close through the one gate on the P0-only gate.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the baseline domain of SPEC \u00a75.3 and \u00a76: the fourteen tables of migrations/0002_domain.sql (programme, project, board, list, card_type, card, run, approval, approval_decision, governed_asset, trace_link, catalogue_entry, revision, andon_state), the may_move matrix and the run/approval/asset state machines, the store `_tx` modules with TenantId, and the catalogue_entry.kind vocabulary. Out of scope: every route and action (S04\u2013S06), the board satellites (S05), channels and delivery (S06), outlines, quality and project_request (S07), models, views and portfolio registers (S08), documents and secrets (S09), conversations (S10), procedures (S11), workflow (S13) and the capability columns (S15).&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-21T23:12:15.079018+00:00&quot;,
+      &quot;id&quot;: &quot;01a20061-bd73-7a89-b08c-bd8b867eb061&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d28-743b-86c7-0d0698ed69c1&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 S03 Domain and schema (retrospective, 2026-11-21)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T23:12:26.539242+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-2/S03-bodies/S03/statement-of-architecture-work.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

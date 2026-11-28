@@ -72,7 +72,7 @@ crates/actions/tests/copilot_coverage.rs
 |---|---|
 | `PROJECT_AGENT_ACTIONS` | `agent_surface(principal)` = registry actions where `scopes ⊆ principal.scopes` ∧ `kind ∈ {internal, external}` ∧ `tenancy` satisfiable |
 | `PROJECT_AGENT_CORE` / `SEARCHABLE` | `AgentHints.tier`, a defaulted `ActionSpec` field declared with the action |
-| `PROJECT_BINDING` / `SurfaceRefusal` | the projection **omits**; `/mcp` answers `action-not-found`, never `403` (S04-D6) |
+| `PROJECT_BINDING` / `SurfaceRefusal` | the projection **omits** the action from both surfaces; calling a known-but-omitted name is `403 action-forbidden` (S04-D6 — the omission is the guarantee, not indistinguishability), and a name outside the registry is `-32602` |
 | `rbac.ts` | the S04 `Scope` check — no copilot authorization module |
 | `coverage-check.ts` | `crates/actions/tests/copilot_coverage.rs`: every mutating UI operation resolves to an action name or the declared transport exemption. |
 
@@ -110,7 +110,7 @@ A tool call whose action has `effect = destructive`, `confirm != none`, or `Agen
 
 The `/mcp` surface this slice completes (S04's transport, S10's agent-surface projection) serves machine consumers **by principal**. The `agent` app is one of them: it calls this surface with a licence bearer and acts as `app_user(kind='agent')` (SPEC D19, slice S06b). There is one MCP surface; do not build a second agent-facing gateway.
 
-The conveyor does not absorb `inference-router` (D14). `completions.create` is `kind: external` (`scopes: [models:invoke]`, 60 s timeout, per-action circuit breaker, tenant licence token). If it is down, times out, or the breaker is open, the turn ends `failed` with an RFC 9457 problem and **zero** tool invocations: the assistant never emits a fabricated tool call or a heuristic substitute. **S16 adds one declaration to this action** — `captures_usage = true` — and the engine then writes an `inference_call` row with `caller_kind='copilot'` and `conversation_turn_id` in the same transaction as the invocation's bookkeeping (CONTRACT §18). No handler parses `usage`, and nothing in the turn runner changes.
+The conveyor does not absorb `inference-router` (D14). `completions.create` is `kind: external` (`scopes: [model:write]`, 60 s timeout, per-action circuit breaker, tenant licence token). If it is down, times out, or the breaker is open, the turn ends `failed` with an RFC 9457 problem and **zero** tool invocations: the assistant never emits a fabricated tool call or a heuristic substitute. **S16 adds one declaration to this action** — `captures_usage = true` — and the engine then writes an `inference_call` row with `caller_kind='copilot'` and `conversation_turn_id` in the same transaction as the invocation's bookkeeping (CONTRACT §18). No handler parses `usage`, and nothing in the turn runner changes. The scope vocabulary admits `model:write`; `models:invoke` in this plan's earlier text was never an admitted scope (`crates/actions/src/spec.rs` is authoritative).
 
 ### 5.6 AG-UI wire contract
 
@@ -153,7 +153,7 @@ cargo clippy --workspace --all-targets -- -D warnings
 | b | approval gates execution | approve as an authorized member → exactly one `action_invocation`, card moved, turn `outcome='completed'` with `tool_calls[0].invocation_id` |
 | c | approving twice | second `approvals.decide` is a no-op/`409`; invocation count 1; key replay returns the first body |
 | d | replay | disconnect after the user turn, reconnect with `Last-Event-ID`: the turn arrives once, no duplicate `seq` or invocation |
-| e | scope-absent tool | low-scope principal's `/api/copilot/actions` **and** `/mcp` `tools/list` both omit it; calling it is `action-not-found`, not `403` |
+| e | scope-absent tool | low-scope principal's `/api/copilot/actions` **and** `/mcp` `tools/list` both omit it; calling the omitted action is `403 action-forbidden` on the HTTP invocation route and an `isError` tool result with the same problem on `/mcp` (S04-D6); a name outside the registry is `-32602` |
 | f | inference outage | breaker open ⇒ `503` problem+json, turn `failed`, zero `action_invocation`, no `cards.move` |
 | g | coverage | every mutating UI operation maps to an action or the declared exemption; an injected unmapped operation fails by name |
 

@@ -37,6 +37,13 @@ async function seedMeeting(request: APIRequestContext, title: string): Promise<M
     project_id: board.projectId,
     kind: "risk",
     title: `${title} risk`,
+    // §8.4: a managed risk is probability, impact, owner, review date and at least one link. A
+    // register row missing one is a note, and the engine refuses it `422 risk_incomplete`.
+    probability: "medium",
+    impact: 2,
+    review_at: "2027-01-15",
+    meta: { owner: "delivery lead" },
+    links: { cards: [board.card.id], requirements: [], decisions: [] },
   });
   await invoke(request, "meetings.agenda_add", {
     meeting_id: meeting.id,

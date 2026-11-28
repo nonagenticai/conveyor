@@ -36,6 +36,11 @@ async fn board(f: &meetings::Fixture, key: &str) -> Uuid {
             "key": key,
             "name": format!("{key} board"),
             "meeting_type_key": key,
+            // A board that can decide carries its charter, its commissioning authority and its
+            // members; `architecture.board_decide` refuses a body that lacks them.
+            "charter": "Approve the delivery contracts",
+            "commissioning_authority": "P0 programme board",
+            "members": [{"user_id": f.seeded.user_id.to_string(), "role": "chief architect"}],
         }),
         None,
     )
@@ -253,6 +258,9 @@ async fn the_direct_board_decide_path_still_works() {
             "kind": "architecture_board",
             "key": "direct_board",
             "name": "Direct Board",
+            "charter": "Approve the delivery contracts",
+            "commissioning_authority": "P0 programme board",
+            "members": [{"user_id": f.seeded.user_id.to_string(), "role": "chief architect"}],
         }),
         None,
     )

@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Project Registers — Decision ladder · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-2/T2-bodies/T2/project-registers.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="project-registers--decision-ladder">Project Registers — Decision ladder</h1>
+<h2 id="risks">Risks</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;`documents.compose` accepts `card_id` and `meta.generated = true` and attaches the document to the card with no gate, so a generated L2 draft can reach a card on the create path although `ladder.apply_draft` and `documents.update` refuse it (v1-t2-1, P0). Until the create path runs the same human `draft.apply` gate, the fourth clause of the \u00a712 T2 gate holds only on the update path.&quot;,
+      &quot;code&quot;: &quot;R-T2-01&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T13:07:42.588778+00:00&quot;,
+      &quot;id&quot;: &quot;01a217f8-0f7f-7a54-bbd3-874d788e3a53&quot;,
+      &quot;impact&quot;: 5,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;R5 P4.1 (create path)&quot;,
+          &quot;R4 P4.1/P4.2&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the head of platform in the T2 sponsoring group&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;high&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7282-b7b0-6dde32c38ab1&quot;,
+      &quot;response&quot;: &quot;mitigate: route `documents.compose` through `human_approved_gate_tx` before any generated document is attached to a card&quot;,
+      &quot;review_at&quot;: &quot;2026-12-10&quot;,
+      &quot;severity&quot;: &quot;P0&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The create path attaches a generated draft without the gate&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:07:42.588778+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;`ladder.record` accepts any approved approval for the human rung instead of the approval its own gate produced (v1-t2-6). The requester and the approver are distinct identities under the standing delegation, but without a gate-identity check a requester can attach a third party&#39;s approval, or one borrowed from another case, and the self-approval refusal rests on convention rather than on the record.&quot;,
+      &quot;code&quot;: &quot;R-T2-02&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T13:07:42.71969+00:00&quot;,
+      &quot;id&quot;: &quot;01a217f8-1002-7ea0-b3fc-702a9aaf0d2a&quot;,
+      &quot;impact&quot;: 4,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;R6 P1.1 (human)&quot;,
+          &quot;R7 P1.1 (gate identity)&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;medium&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7282-b7b0-6dde32c38ab1&quot;,
+      &quot;response&quot;: &quot;mitigate: require the decision&#39;s `approval_id` to equal the gate approval for the same case and card&quot;,
+      &quot;review_at&quot;: &quot;2026-12-10&quot;,
+      &quot;severity&quot;: &quot;P1&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;A human decision cites an approval that did not gate it&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:07:42.71969+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The L1 rung is recorded but never calls laya (v1-t2-2), so a middle-rung decision can be written without the laya answer and latency the audit shape pins. The three rungs still share one row shape, but an L1 row that skipped laya cannot be compared with a rule or human row on the evidence the gate names.&quot;,
+      &quot;code&quot;: &quot;R-T2-03&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T13:07:42.852105+00:00&quot;,
+      &quot;id&quot;: &quot;01a217f8-1086-7f7e-9f7e-2686762c7d1e&quot;,
+      &quot;impact&quot;: 3,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;R11 \u00a77.2 (laya)&quot;,
+          &quot;R2 P2.1&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the laya owner on the Architecture Board&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;medium&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7282-b7b0-6dde32c38ab1&quot;,
+      &quot;response&quot;: &quot;mitigate: call the laya contract from `ladder.evaluate` on the L1 rung and refuse a decision whose pin set is incomplete&quot;,
+      &quot;review_at&quot;: &quot;2026-12-10&quot;,
+      &quot;severity&quot;: &quot;P2&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;L1 records a decision without asking laya&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:07:42.852105+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="issues">Issues</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Closed in an unauthorised tranche before the tranche review; accepted by the delegate as a retrospective exception under the standing delegation. The project is reworked in its batch and re-closed through the gates.&quot;,
+      &quot;code&quot;: &quot;U3-EXC-T2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T01:16:00.361572+00:00&quot;,
+      &quot;id&quot;: &quot;01a1fbac-aeb9-7dea-a079-bf159140344a&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7282-b7b0-6dde32c38ab1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;P0&quot;,
+      &quot;status&quot;: &quot;accepted&quot;,
+      &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (T2)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T01:16:00.361572+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The publish action accepts a refinement that changes an approval threshold with no gated approval recorded (v1-t2-3). A tenant can therefore move a threshold the ladder&#39;s policy pins without the human decision the gate requires, and the audit shape records the new version as if it had been approved.&quot;,
+      &quot;code&quot;: &quot;I-T2-01&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T13:09:09.790589+00:00&quot;,
+      &quot;id&quot;: &quot;01a217f9-6422-7517-834f-afc4b037ea52&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;R3 P3.1&quot;,
+          &quot;R10 \u00a77.2 (gated refinement)&quot;
+        ]
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7282-b7b0-6dde32c38ab1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;P1&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;`refinements.publish` changes a threshold without the gate&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:09:09.790589+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Options and questions are carried as free text inside a prompt rather than as authored `decision_option` rows (v1-t2-4), so an option-set version cannot be pinned and a decision cannot be reproduced after the prompt or its options change.&quot;,
+      &quot;code&quot;: &quot;I-T2-02&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T13:09:09.936312+00:00&quot;,
+      &quot;id&quot;: &quot;01a217f9-64b3-759c-b8f0-688ceecc3243&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;R8 \u00a77.2 (options)&quot;,
+          &quot;R9 \u00a77.2 (questions)&quot;
+        ]
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7282-b7b0-6dde32c38ab1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;P2&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Options and questions are inline free text&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:09:09.936312+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="assumptions">Assumptions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The retrospective rework acts under the delegation published on 2026-11-22, and the requester `conveyor-e2e` and the approver `conveyor-approver` stay distinct identities for every approval the ladder records. If the delegation lapses, the A-D artefacts and the delivery contract lose the authority they were approved under.&quot;,
+      &quot;code&quot;: &quot;A-T2-01&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T13:09:10.079958+00:00&quot;,
+      &quot;id&quot;: &quot;01a217f9-6542-7fbb-b565-c542de8721b1&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;R7 P1.1 (gate identity)&quot;
+        ]
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7282-b7b0-6dde32c38ab1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The standing delegation remains the authority for this rework&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:09:10.079958+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The L0 rule, the L1 laya choice and the L3 human decision stay separate rungs with separate actors, and no rung is collapsed into another. The audit-shape test compares the three rows on one column set, and that comparison only means something while the rung and actor CHECKs keep the rows distinct.&quot;,
+      &quot;code&quot;: &quot;A-T2-02&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T13:09:10.223041+00:00&quot;,
+      &quot;id&quot;: &quot;01a217f9-65d2-70b4-895a-874d20b6e945&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;R1 P1.1&quot;
+        ]
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7282-b7b0-6dde32c38ab1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The ladder keeps three distinct rungs and actors&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:09:10.223041+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="dependencies">Dependencies</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;T2 carries a declared `needs` dependency on T1 and reuses the five decision tables and the approval primitive T0 shipped as contracts in `migrations/0040_organisation.sql`. A schema break upstream would strand the rung, answer and version-pin columns that 0046 adds to `decision`.&quot;,
+      &quot;code&quot;: &quot;D-T2-01&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T13:09:10.364272+00:00&quot;,
+      &quot;id&quot;: &quot;01a217f9-665f-7e6e-b20f-c0c84deb3918&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;R1 P1.1&quot;,
+          &quot;R4 P4.1/P4.2&quot;
+        ]
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7282-b7b0-6dde32c38ab1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;T1 and the T0 decision-table contracts hold&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:09:10.364272+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The tenant-scoped decision rows rely on the FORCE ROW LEVEL SECURITY and the forward-only migration discipline that `migrations/0040_organisation.sql` and `0046_decision_ladder.sql` establish. A store that does not enforce the same policies would break the tenant isolation the decision tables and their audit event depend on.&quot;,
+      &quot;code&quot;: &quot;D-T2-02&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T13:09:10.507434+00:00&quot;,
+      &quot;id&quot;: &quot;01a217f9-66ee-7bc6-a669-5de9160c3498&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;R13&quot;
+        ]
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7282-b7b0-6dde32c38ab1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Postgres 18 with FORCE RLS stays the only store&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:09:10.507434+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="benefits">Benefits</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;A rule, a laya and a human decision are recorded through one `decision` row with the policy, refinement and laya-config versions pinned, so an auditor compares the three rungs on the same columns instead of translating three record families.&quot;,
+      &quot;code&quot;: &quot;B-T2-01&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T13:09:10.645867+00:00&quot;,
+      &quot;id&quot;: &quot;01a217f9-6778-7aad-a3de-83a6f402d0aa&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;R1 P1.1&quot;
+        ]
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7282-b7b0-6dde32c38ab1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Every rung reads as one audit shape&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:09:10.645867+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;A published refinement changes a decision threshold for one tenant without a code change or a deploy, because `ladder.evaluate` reads the pinned refinement version rather than a compiled constant. The same row records which refinement version answered, so the change is reproducible.&quot;,
+      &quot;code&quot;: &quot;B-T2-02&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T13:09:10.788242+00:00&quot;,
+      &quot;id&quot;: &quot;01a217f9-6807-7d1c-8e32-9608422940bc&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;R3 P3.1&quot;,
+          &quot;R10 \u00a77.2 (gated refinement)&quot;
+        ]
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7282-b7b0-6dde32c38ab1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;A tenant threshold changes without a build&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:09:10.788242+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Once the gate-identity check lands, the human rung requires the approval its own gate produced, and the requester is never the approver under the standing delegation. A self-approval, or an approval borrowed from another case, is refused, so the ladder&#39;s escalation path becomes an audit fact rather than a convention.&quot;,
+      &quot;code&quot;: &quot;B-T2-03&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T13:09:10.930885+00:00&quot;,
+      &quot;id&quot;: &quot;01a217f9-6896-7192-aee3-2652da40773d&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;R6 P1.1 (human)&quot;,
+          &quot;R7 P1.1 (gate identity)&quot;
+        ]
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7282-b7b0-6dde32c38ab1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;No decision passes without its own gate approval&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:09:10.930885+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="changes">Changes</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: &quot;01a2005c-5a4f-7eb5-a004-ccb5545eb6fb&quot;,
+      &quot;body&quot;: &quot;Change request: rebuild T2&#39;s record under the owner&#39;s 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project&#39;s record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner&#39;s standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.&quot;,
+      &quot;code&quot;: &quot;U5-CHG-T2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-22T07:34:55.786488+00:00&quot;,
+      &quot;id&quot;: &quot;01a2022d-f9a0-785a-be03-30a658a59468&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;change&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          {
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;number&quot;: 526
+          },
+          {
+            &quot;id&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+            &quot;kind&quot;: &quot;delegation&quot;
+          }
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;change_request&quot;: &quot;the retrospective rework of T2 under #526&quot;,
+        &quot;decision&quot;: {
+          &quot;decided_at&quot;: &quot;2026-11-21&quot;,
+          &quot;decided_by&quot;: &quot;the programme owner&#39;s standing delegation&quot;,
+          &quot;decision&quot;: &quot;accepted&quot;,
+          &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+          &quot;record&quot;: &quot;#526&quot;
+        },
+        &quot;impact&quot;: {
+          &quot;cost&quot;: &quot;no separate cost baseline; inside the existing tranche&quot;,
+          &quot;quality&quot;: &quot;every owned finding executed or waived; manifest re-run at the closing head&quot;,
+          &quot;schedule&quot;: &quot;no change to the delivery tranche&quot;,
+          &quot;scope&quot;: &quot;the record and declared outputs are rebuilt and republished&quot;
+        }
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7282-b7b0-6dde32c38ab1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;accepted&quot;,
+      &quot;title&quot;: &quot;Retrospective MSP/TOGAF/SAFe rework of T2 under the #526 scope change&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-22T07:34:55.786488+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-2/T2-bodies/T2/project-registers.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

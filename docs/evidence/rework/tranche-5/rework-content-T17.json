@@ -1,0 +1,784 @@
+{
+  "charter": "# Charter — T17 Tenant Asset Authoring (retrospective, 2026-11-27)\n\n- **Project:** T17 'Tenant asset authoring', track v2, ADM phase G, capability plateau, tranche 5, project `01a1d039-0d38-7db1-b685-d76bd4cebf47`, plan `docs/SPEC_V2.md#12` (plan_status draft), inception set `docs/plans/inception/T17/`, evidence `docs/plans/T17/evidence.md`. At the 2026-11-27 rework snapshot the project row is `status: closed`, version 12, with `meta.track: v2`, `meta.tranche: 5`, `meta.viability: rework`, `meta.measured_status: built`, `meta.expected_outputs: [project-brief, evidence]`, `meta.closure_outputs: [closure-review]`, and issues #87, #629 and #655 linked. The manifest expects active; this rework reopens the project and keeps it active, and the tranche review decides the final closure. This rework is retrospective and does not attest contemporaneous intent.\n- **Mandate:** a tenant's short brief plus its documents become a reviewed catalogue of departments, jobs, procedures and policies that a person published; no authored asset can publish itself or widen a tool grant.\n- **Scope:** the authoring lifecycle — intake a brief and documents, draft organisation/department/job/procedure/policy assets with their sources, review each, and publish through the target's own publish action — with the draft store, the review record and the templates. The two authoring tables are `authoring_intake` and `authoring_asset` (migration 0064), with the `draft → reviewed | rejected → published` lifecycle, the human `authoring.review` gate, the published-dependency check and the one-published-row-per-`(kind, key)` index. Out of scope: writing the target tables, a second converter for SOP/RDF/BPMN (T16), tools and bindings (T13; T17 may request, never grant), a fork of `governed_asset`, and a new template table except `asset_template`.\n- **Expected outputs:** `project-brief`, `evidence`. The `closure-review` output is recorded, but the project stays active.\n- **Acceptance:** the project gate — a tenant supplies a short brief plus documents, a reviewed catalogue publishes, no asset publishes itself and none widens a tool grant — carried by `acceptance/programme/T17.toml` with 15 checks. The behaviour evidence is `crates/actions/tests/authoring.rs`, `asset_review.rs` and `authoring_standard.rs`, plus `apps/web/e2e/authoring.spec.ts`.\n- **Measured delivery:** the delivery landed on main through PR #632 (`c29c7f52d939`), PR #659 (`38334552e9b8`) and PR #687 (`ca392a97d7d8`); `docs/evidence/v2-coverage.md` reports `actions:authoring` = `exists`. The published evidence document (`docs/plans/T17/evidence.md`) and the published closure-review document (`docs/plans/T17/closure-review.md`) record the acceptance and its open items.\n- **Dependencies:** T16 (live ingestion and the SOP human gate), T3 (the decision ladder) and P0. All three are closed; the live procedure/policy ingestion remains T16's capability, and T17 proves the linked drafts and the refusals.\n- **Tranche and governance:** tranche 5 (`01a1e9e0-fe45-77e0-993a-d571fecc5ec1`) is `state: authorised`, authorised at 2026-11-26T22:54:06Z by review `01a21a10-ecb6-70e7-87d5-daa40f5154ac`. The PI plan `01a216d1-1bb7-7376-905e-38a776f22190`, its objectives `01a216d1-1cbe-7297-bc1e-ee5e29ea82cc`, the cadence `01a216d1-1913-70dd-8f69-c8ad230f2364` and the refinement `01a216d1-1a40-7246-ba5e-254b8c0986fe` govern the planning inputs; the refinement records WSJF 6/5/5/6 for T17. The rework runs under standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`.\n",
+  "soaw": {
+    "title": "Statement of Architecture Work — T17 Tenant Asset Authoring (retrospective, 2026-11-27)",
+    "body": {
+      "assignment": "The programme architect (conveyor-e2e) is assigned the T17 slice: the authoring lifecycle over two tables, a human review gate, a published-dependency check and a publish-through-the-target rule. The assignment is recorded retrospectively for the 2026-11-27 rework and is bounded by the T17 inception set and SPEC_V2 §5.7/§10.4–§10.5.",
+      "scope": "In scope are intake, drafting, review and publication of organisation/department/job/procedure/policy assets, the two authoring tables, the state machine, the review gate, the published-dependency refusal and the Authoring screen. Out of scope are writing the target tables, the SOP/RDF/BPMN converter (T16), tools and bindings (T13), a governed_asset fork and a new template table except asset_template; each exclusion is named in the inception brief's Boundary.",
+      "responsibilities": "The programme architect owns the slice and the acceptance instrument; the Architecture Board approves the Phase A–D set and the contract; T3 supplies the decision ladder and the approval primitives; T16 owns live ingestion and the SOP human gate; T13 owns tools and bindings; the web team owns the Authoring screen and the E2E; the tenant authors and reviewers take the human decisions; the SRO is accountable for the tranche outcome.",
+      "acceptance_criteria": "The T17 gate: a brief plus documents draft the catalogue; documents yield linked procedure and policy drafts; an unpublished dependency is refused; a reviewed catalogue publishes with its decisions; no asset publishes itself; a non-human decision cannot complete a gate; no asset widens a tool grant; and the real-app E2E creates a draft and sees the row render.",
+      "retrospective": "This Statement of Architecture Work is authored by the 2026-11-27 rework from the inception set, the evidence and closure-review documents and the record's project row. It records the assignment and the acceptance the delivery was measured against; it does not claim that a contemporaneous board approved this text, and it carries that limitation into the Phase-G review.",
+      "constraints": "The build must not write the target tables, must not let an asset publish itself, must not let a non-human decision complete a gate, must not widen a tool grant, must not duplicate the governed_asset lifecycle and must not refuse the dependency order later than the draft attempt. These constraints are the inception brief's risks and are carried into the contract."
+    }
+  },
+  "artifacts": [
+    {
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "title": "Stakeholder Map — T17 Tenant Asset Authoring (Phase A)",
+      "entries": [
+        {
+          "axis_a": "Sponsoring group",
+          "axis_b": "tranche-5 authorisation, the rework decision and the T17 record posture",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "SRO",
+          "axis_b": "accountable for the authoring capability and the tranche outcome",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "accountable"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Programme architect (conveyor-e2e)",
+          "axis_b": "owns the T17 slice, the Phase A–D set and the acceptance instrument",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "responsible"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Architecture Board",
+          "axis_b": "approves the Phase A–D set and the delivery contract",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "approve"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "T3 delivery team",
+          "axis_b": "owns the decision ladder and the approval primitives the review gate reuses",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "T16 delivery team",
+          "axis_b": "owns the live procedure/policy ingestion and the SOP human gate",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "T13 delivery team",
+          "axis_b": "owns tools and bindings; T17 may request a grant, never widen one",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "Web/Authoring screen team",
+          "axis_b": "owns the catalogue screen and the Playwright authoring spec",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "Tenant authors and reviewers",
+          "axis_b": "supply the brief and documents and take the human review decision",
+          "value": {
+            "influence": "low",
+            "interest": "high",
+            "engagement": "inform"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "Catalogue consumers",
+          "axis_b": "read the published departments, jobs, procedures and policies",
+          "value": {
+            "influence": "low",
+            "interest": "high",
+            "engagement": "inform"
+          },
+          "position": 10
+        }
+      ],
+      "links": [
+        {
+          "to": "Business Capability Map — T17 Tenant Asset Authoring (Phase B)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Stakeholder Map — T17 Tenant Asset Authoring (Phase A)\n\n## Metadata\n\nType matrix; phase a; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-27; project 01a1d039-0d38-7db1-b685-d76bd4cebf47; tranche 5; retrospective under standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the 2026-11-27 retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nThe artefact carries 10 entries. Sponsoring group — tranche-5 authorisation, the rework decision and the T17 record posture; SRO — accountable for the authoring capability and the tranche outcome; Programme architect (conveyor-e2e) — owns the T17 slice, the Phase A–D set and the acceptance instrument; Architecture Board — approves the Phase A–D set and the delivery contract; T3 delivery team — owns the decision ladder and the approval primitives the review gate reuses; T16 delivery team — owns the live procedure/policy ingestion and the SOP human gate; T13 delivery team — owns tools and bindings; T17 may request a grant, never widen one; Web/Authoring screen team — owns the catalogue screen and the Playwright authoring spec; Tenant authors and reviewers — supply the brief and documents and take the human review decision; Catalogue consumers — read the published departments, jobs, procedures and policies. The entries are the set the factory writes through architecture.artifacts_create; each carries axis_a, an optional axis_b value and a position, and the action ignores any field outside that schema.\n\n## Links\n\nThe artefact is not an orphan: Business Capability Map — T17 Tenant Asset Authoring (Phase B) (dependency). The link kinds are the four §8.1 kinds (derivation, realization, reuse, dependency) and both ends of every edge are artefacts of this pack, so the factory's architecture.artifacts_link read-back resolves.\n\n## Document\n\nThe document records the Stakeholder Map — T17 Tenant Asset Authoring (Phase A) for T17. It is anchored in the inception set, the published evidence document and the merged delivery: the two authoring tables, the five actions, the human review gate, the dependency and tool-grant refusals and the real-app E2E are the build the record now governs. The artefact is authored for the retrospective active state; where the published record and the plan differ, the published record is carried and the difference is named in the Phase-G review.\n"
+    },
+    {
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "title": "Driver/Goal/Objective Catalog — T17 Tenant Asset Authoring (Phase A)",
+      "entries": [
+        {
+          "axis_a": "D1",
+          "axis_b": "One owning table per kind; a draft and a published row never diverge",
+          "value": {
+            "goal": "G1",
+            "priority": "must"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "D2",
+          "axis_b": "No asset publishes itself; a human review decision completes the gate",
+          "value": {
+            "goal": "G2",
+            "priority": "must"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "D3",
+          "axis_b": "No authored asset widens a tool grant; it may request, never grant",
+          "value": {
+            "goal": "G3",
+            "priority": "must"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "D4",
+          "axis_b": "The dependency order is refused at the draft attempt",
+          "value": {
+            "goal": "G4",
+            "priority": "must"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "D5",
+          "axis_b": "The target publishes itself through its own publish action; T17 drafts, it does not write the target tables",
+          "value": {
+            "goal": "G5",
+            "priority": "must"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "D6",
+          "axis_b": "The live ingestion of procedures and policies is T16's capability",
+          "value": {
+            "goal": "G6",
+            "priority": "should"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "G1",
+          "axis_b": "Each kind has one owning table and one publication row",
+          "value": {
+            "driver": "D1",
+            "measure": "one-published-row-per-(kind,key) index"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "G2",
+          "axis_b": "The authoring job cannot publish its own asset",
+          "value": {
+            "driver": "D2",
+            "measure": "asset_review self-publication refusal"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "G3",
+          "axis_b": "A policy draft that waives its own gate is refused",
+          "value": {
+            "driver": "D3",
+            "measure": "asset_review tool-grant refusal"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "G4",
+          "axis_b": "A draft that references an unpublished asset is refused",
+          "value": {
+            "driver": "D4",
+            "measure": "authoring dependency refusal"
+          },
+          "position": 10
+        },
+        {
+          "axis_a": "G5",
+          "axis_b": "A reviewed catalogue publishes through the target's own action with its decisions",
+          "value": {
+            "driver": "D5",
+            "measure": "publish-with-decisions test"
+          },
+          "position": 11
+        },
+        {
+          "axis_a": "G6",
+          "axis_b": "The linked drafts are proven without claiming live ingestion",
+          "value": {
+            "driver": "D6",
+            "measure": "T17 evidence's Gap"
+          },
+          "position": 12
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements Catalog — T17 Tenant Asset Authoring (Phase A)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Driver/Goal/Objective Catalog — T17 Tenant Asset Authoring (Phase A)\n\n## Metadata\n\nType catalog; phase a; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-27; project 01a1d039-0d38-7db1-b685-d76bd4cebf47; tranche 5; retrospective under standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the 2026-11-27 retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nThe artefact carries 12 entries. D1 — One owning table per kind; a draft and a published row never diverge; D2 — No asset publishes itself; a human review decision completes the gate; D3 — No authored asset widens a tool grant; it may request, never grant; D4 — The dependency order is refused at the draft attempt; D5 — The target publishes itself through its own publish action; T17 drafts, it does not write the target tables; D6 — The live ingestion of procedures and policies is T16's capability; G1 — Each kind has one owning table and one publication row; G2 — The authoring job cannot publish its own asset; G3 — A policy draft that waives its own gate is refused; G4 — A draft that references an unpublished asset is refused; G5 — A reviewed catalogue publishes through the target's own action with its decisions; G6 — The linked drafts are proven without claiming live ingestion. The entries are the set the factory writes through architecture.artifacts_create; each carries axis_a, an optional axis_b value and a position, and the action ignores any field outside that schema.\n\n## Links\n\nThe artefact is not an orphan: Requirements Catalog — T17 Tenant Asset Authoring (Phase A) (derivation). The link kinds are the four §8.1 kinds (derivation, realization, reuse, dependency) and both ends of every edge are artefacts of this pack, so the factory's architecture.artifacts_link read-back resolves.\n\n## Document\n\nThe document records the Driver/Goal/Objective Catalog — T17 Tenant Asset Authoring (Phase A) for T17. It is anchored in the inception set, the published evidence document and the merged delivery: the two authoring tables, the five actions, the human review gate, the dependency and tool-grant refusals and the real-app E2E are the build the record now governs. The artefact is authored for the retrospective active state; where the published record and the plan differ, the published record is carried and the difference is named in the Phase-G review.\n"
+    },
+    {
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "title": "Requirements Catalog — T17 Tenant Asset Authoring (Phase A)",
+      "entries": [
+        {
+          "axis_a": "R1",
+          "axis_b": "A chat brief drafts the organisation and job catalogue",
+          "value": {
+            "acceptance": "authoring.rs::a_chat_brief_drafts_the_org_and_job_catalogue"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "R2",
+          "axis_b": "Documents yield linked procedure and policy drafts",
+          "value": {
+            "acceptance": "authoring.rs::documents_yield_linked_procedure_and_policy_drafts"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "R3",
+          "axis_b": "A draft that references an unpublished asset is refused",
+          "value": {
+            "acceptance": "authoring.rs::a_draft_that_references_an_unpublished_asset_is_refused"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "R4",
+          "axis_b": "A reviewed catalogue publishes with its decisions",
+          "value": {
+            "acceptance": "authoring.rs::a_reviewed_catalogue_publishes_with_its_decisions"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "R5",
+          "axis_b": "The authoring job cannot publish its own asset",
+          "value": {
+            "acceptance": "asset_review.rs::the_authoring_job_cannot_publish_its_own_asset"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "R6",
+          "axis_b": "A non-human decision cannot complete an asset gate",
+          "value": {
+            "acceptance": "asset_review.rs::a_non_human_decision_cannot_complete_an_asset_gate"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "R7",
+          "axis_b": "An asset never widens a tool grant",
+          "value": {
+            "acceptance": "asset_review.rs::an_asset_never_widens_a_tool_grant"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "R8",
+          "axis_b": "The real app creates a draft through the actions and renders the row",
+          "value": {
+            "acceptance": "apps/web/e2e/authoring.spec.ts"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "R9",
+          "axis_b": "The output standard is checked over the authored catalogue",
+          "value": {
+            "acceptance": "authoring_standard.rs"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "R10",
+          "axis_b": "The delivery is on main and coverage reports actions:authoring exists",
+          "value": {
+            "acceptance": "docs/evidence/v2-coverage.md"
+          },
+          "position": 10
+        }
+      ],
+      "links": [
+        {
+          "to": "Solution Concept Diagram — T17 Tenant Asset Authoring (Phase A)",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Requirements Catalog — T17 Tenant Asset Authoring (Phase A)\n\n## Metadata\n\nType catalog; phase a; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-27; project 01a1d039-0d38-7db1-b685-d76bd4cebf47; tranche 5; retrospective under standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the 2026-11-27 retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nThe artefact carries 10 entries. R1 — A chat brief drafts the organisation and job catalogue; R2 — Documents yield linked procedure and policy drafts; R3 — A draft that references an unpublished asset is refused; R4 — A reviewed catalogue publishes with its decisions; R5 — The authoring job cannot publish its own asset; R6 — A non-human decision cannot complete an asset gate; R7 — An asset never widens a tool grant; R8 — The real app creates a draft through the actions and renders the row; R9 — The output standard is checked over the authored catalogue; R10 — The delivery is on main and coverage reports actions:authoring exists. The entries are the set the factory writes through architecture.artifacts_create; each carries axis_a, an optional axis_b value and a position, and the action ignores any field outside that schema.\n\n## Links\n\nThe artefact is not an orphan: Solution Concept Diagram — T17 Tenant Asset Authoring (Phase A) (realization). The link kinds are the four §8.1 kinds (derivation, realization, reuse, dependency) and both ends of every edge are artefacts of this pack, so the factory's architecture.artifacts_link read-back resolves.\n\n## Document\n\nThe document records the Requirements Catalog — T17 Tenant Asset Authoring (Phase A) for T17. It is anchored in the inception set, the published evidence document and the merged delivery: the two authoring tables, the five actions, the human review gate, the dependency and tool-grant refusals and the real-app E2E are the build the record now governs. The artefact is authored for the retrospective active state; where the published record and the plan differ, the published record is carried and the difference is named in the Phase-G review.\n"
+    },
+    {
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "title": "Solution Concept Diagram — T17 Tenant Asset Authoring (Phase A)",
+      "entries": [
+        {
+          "axis_a": "Intake",
+          "axis_b": "a short brief or documents enter the authoring intake",
+          "value": {
+            "channel": "authoring.intake",
+            "outcome": "an intake row"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Draft",
+          "axis_b": "organisation, department, job, procedure and policy drafts are created with their sources",
+          "value": {
+            "channel": "authoring.draft",
+            "outcome": "authoring_asset rows"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Review",
+          "axis_b": "a human reviewer decides each draft; a non-human decision is refused",
+          "value": {
+            "channel": "authoring.review",
+            "outcome": "a reviewed asset"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Publish",
+          "axis_b": "the target's own publish action publishes the reviewed asset with its decisions",
+          "value": {
+            "channel": "authoring.publish + the target action",
+            "outcome": "a published row"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Refuse",
+          "axis_b": "an unpublished dependency, a self-publication and a tool-grant widening are refused",
+          "value": {
+            "channel": "store and review checks",
+            "outcome": "a typed refusal"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Read",
+          "axis_b": "the Authoring screen reads the catalogue and the status tiles",
+          "value": {
+            "channel": "authoring.assets + the web screen",
+            "outcome": "the live catalogue"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Prove",
+          "axis_b": "the E2E creates its own draft through the real actions and asserts the row renders",
+          "value": {
+            "channel": "Playwright",
+            "outcome": "an end-to-end proof"
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Business Capability Map — T17 Tenant Asset Authoring (Phase B)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Solution Concept Diagram — T17 Tenant Asset Authoring (Phase A)\n\n## Metadata\n\nType diagram; phase a; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-27; project 01a1d039-0d38-7db1-b685-d76bd4cebf47; tranche 5; retrospective under standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the 2026-11-27 retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nThe artefact carries 7 entries. Intake — a short brief or documents enter the authoring intake; Draft — organisation, department, job, procedure and policy drafts are created with their sources; Review — a human reviewer decides each draft; a non-human decision is refused; Publish — the target's own publish action publishes the reviewed asset with its decisions; Refuse — an unpublished dependency, a self-publication and a tool-grant widening are refused; Read — the Authoring screen reads the catalogue and the status tiles; Prove — the E2E creates its own draft through the real actions and asserts the row renders. The entries are the set the factory writes through architecture.artifacts_create; each carries axis_a, an optional axis_b value and a position, and the action ignores any field outside that schema.\n\n## Links\n\nThe artefact is not an orphan: Business Capability Map — T17 Tenant Asset Authoring (Phase B) (dependency). The link kinds are the four §8.1 kinds (derivation, realization, reuse, dependency) and both ends of every edge are artefacts of this pack, so the factory's architecture.artifacts_link read-back resolves.\n\n## Document\n\nThe document records the Solution Concept Diagram — T17 Tenant Asset Authoring (Phase A) for T17. It is anchored in the inception set, the published evidence document and the merged delivery: the two authoring tables, the five actions, the human review gate, the dependency and tool-grant refusals and the real-app E2E are the build the record now governs. The artefact is authored for the retrospective active state; where the published record and the plan differ, the published record is carried and the difference is named in the Phase-G review.\n"
+    },
+    {
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "title": "Business Capability Map — T17 Tenant Asset Authoring (Phase B)",
+      "entries": [
+        {
+          "axis_a": "Intake",
+          "axis_b": "accept a tenant brief and documents",
+          "value": {
+            "maturity": "built",
+            "actions": "authoring.intake"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Drafting",
+          "axis_b": "draft the organisation, job, procedure and policy assets with sources",
+          "value": {
+            "maturity": "built",
+            "actions": "authoring.draft"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Review",
+          "axis_b": "a human review gate per asset, refusing self-publication and non-human decisions",
+          "value": {
+            "maturity": "built",
+            "actions": "authoring.review"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Publication",
+          "axis_b": "publish through the target's own action with its decisions",
+          "value": {
+            "maturity": "built",
+            "actions": "authoring.publish"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Catalogue",
+          "axis_b": "read the published assets for the Authoring screen",
+          "value": {
+            "maturity": "built",
+            "actions": "authoring.assets"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Live proof",
+          "axis_b": "the real-app authoring E2E",
+          "value": {
+            "maturity": "built",
+            "actions": "apps/web/e2e/authoring.spec.ts"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Data Entity/Data Component Catalog — T17 Tenant Asset Authoring (Phase C)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Business Capability Map — T17 Tenant Asset Authoring (Phase B)\n\n## Metadata\n\nType diagram; phase b; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-27; project 01a1d039-0d38-7db1-b685-d76bd4cebf47; tranche 5; retrospective under standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the 2026-11-27 retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nThe artefact carries 6 entries. Intake — accept a tenant brief and documents; Drafting — draft the organisation, job, procedure and policy assets with sources; Review — a human review gate per asset, refusing self-publication and non-human decisions; Publication — publish through the target's own action with its decisions; Catalogue — read the published assets for the Authoring screen; Live proof — the real-app authoring E2E. The entries are the set the factory writes through architecture.artifacts_create; each carries axis_a, an optional axis_b value and a position, and the action ignores any field outside that schema.\n\n## Links\n\nThe artefact is not an orphan: Data Entity/Data Component Catalog — T17 Tenant Asset Authoring (Phase C) (dependency). The link kinds are the four §8.1 kinds (derivation, realization, reuse, dependency) and both ends of every edge are artefacts of this pack, so the factory's architecture.artifacts_link read-back resolves.\n\n## Document\n\nThe document records the Business Capability Map — T17 Tenant Asset Authoring (Phase B) for T17. It is anchored in the inception set, the published evidence document and the merged delivery: the two authoring tables, the five actions, the human review gate, the dependency and tool-grant refusals and the real-app E2E are the build the record now governs. The artefact is authored for the retrospective active state; where the published record and the plan differ, the published record is carried and the difference is named in the Phase-G review.\n"
+    },
+    {
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "title": "Data Entity/Data Component Catalog — T17 Tenant Asset Authoring (Phase C)",
+      "entries": [
+        {
+          "axis_a": "authoring_intake",
+          "axis_b": "the brief and documents that enter the lifecycle",
+          "value": {
+            "owner": "T17 ships",
+            "used_by": "authoring.intake"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "authoring_asset",
+          "axis_b": "the draft/reviewed/published lifecycle, payload authority CHECKs and the one-published-row index",
+          "value": {
+            "owner": "T17 ships",
+            "used_by": "authoring.draft/review/publish/assets"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "governed_asset, document",
+          "axis_b": "the published asset owns its lifecycle; the document model owns the source",
+          "value": {
+            "owner": "reused",
+            "used_by": "the target publish action"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "department, job, procedure, policy",
+          "axis_b": "the target tables; T17 drafts them, the target publishes them",
+          "value": {
+            "owner": "reused",
+            "used_by": "the target publish action"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "approval, approval_decision",
+          "axis_b": "the review gate reuses T3's decision ladder",
+          "value": {
+            "owner": "T3",
+            "used_by": "authoring.review"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "tool_binding, tool grant",
+          "axis_b": "T13 owns the tools; T17 may request, never widen",
+          "value": {
+            "owner": "T13",
+            "used_by": "the asset's request"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "migrations/0064_authoring.sql",
+          "axis_b": "the two authoring tables",
+          "value": {
+            "owner": "T17 ships",
+            "used_by": "the store"
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Technology Standards Catalog — T17 Tenant Asset Authoring (Phase D)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Data Entity/Data Component Catalog — T17 Tenant Asset Authoring (Phase C)\n\n## Metadata\n\nType catalog; phase c; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-27; project 01a1d039-0d38-7db1-b685-d76bd4cebf47; tranche 5; retrospective under standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the 2026-11-27 retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nThe artefact carries 7 entries. authoring_intake — the brief and documents that enter the lifecycle; authoring_asset — the draft/reviewed/published lifecycle, payload authority CHECKs and the one-published-row index; governed_asset, document — the published asset owns its lifecycle; the document model owns the source; department, job, procedure, policy — the target tables; T17 drafts them, the target publishes them; approval, approval_decision — the review gate reuses T3's decision ladder; tool_binding, tool grant — T13 owns the tools; T17 may request, never widen; migrations/0064_authoring.sql — the two authoring tables. The entries are the set the factory writes through architecture.artifacts_create; each carries axis_a, an optional axis_b value and a position, and the action ignores any field outside that schema.\n\n## Links\n\nThe artefact is not an orphan: Technology Standards Catalog — T17 Tenant Asset Authoring (Phase D) (dependency). The link kinds are the four §8.1 kinds (derivation, realization, reuse, dependency) and both ends of every edge are artefacts of this pack, so the factory's architecture.artifacts_link read-back resolves.\n\n## Document\n\nThe document records the Data Entity/Data Component Catalog — T17 Tenant Asset Authoring (Phase C) for T17. It is anchored in the inception set, the published evidence document and the merged delivery: the two authoring tables, the five actions, the human review gate, the dependency and tool-grant refusals and the real-app E2E are the build the record now governs. The artefact is authored for the retrospective active state; where the published record and the plan differ, the published record is carried and the difference is named in the Phase-G review.\n"
+    },
+    {
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "title": "Technology Standards Catalog — T17 Tenant Asset Authoring (Phase D)",
+      "entries": [
+        {
+          "axis_a": "Language",
+          "axis_b": "Rust for the store, the five actions and the web screen; the E2E is Playwright",
+          "value": {
+            "kind": "standard",
+            "version": "workspace toolchain"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Registry",
+          "axis_b": "five authoring actions in the ActionSpec registry with parity samples; EXPECTED 513 → 518",
+          "value": {
+            "kind": "registry",
+            "version": "served-spec.lock.json"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "RLS",
+          "axis_b": "both authoring tables carry tenant RLS",
+          "value": {
+            "kind": "security",
+            "version": "0064"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Lifecycle",
+          "axis_b": "draft → reviewed|rejected → published, one published row per (kind, key)",
+          "value": {
+            "kind": "state machine",
+            "version": "0064"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Review gate",
+          "axis_b": "a human authoring.review decision; self-approval forbidden by the T3 policy",
+          "value": {
+            "kind": "governance",
+            "version": "T3"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Payload authority",
+          "axis_b": "the store-side CHECKs refuse a payload that would widen a tool grant",
+          "value": {
+            "kind": "security",
+            "version": "crates/store/src/authoring.rs"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Web",
+          "axis_b": "the /authoring route, four status tiles and kind/status filters",
+          "value": {
+            "kind": "ui",
+            "version": "apps/web/src/screens/authoring.rs"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "Evidence",
+          "axis_b": "the tests and the merges c29c7f52d, 38334552e, ca392a97d; actions:authoring = exists",
+          "value": {
+            "kind": "coverage",
+            "version": "v2-coverage.md"
+          },
+          "position": 8
+        }
+      ],
+      "links": [
+        {
+          "to": "Stakeholder Map — T17 Tenant Asset Authoring (Phase A)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Technology Standards Catalog — T17 Tenant Asset Authoring (Phase D)\n\n## Metadata\n\nType catalog; phase d; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-27; project 01a1d039-0d38-7db1-b685-d76bd4cebf47; tranche 5; retrospective under standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the 2026-11-27 retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nThe artefact carries 8 entries. Language — Rust for the store, the five actions and the web screen; the E2E is Playwright; Registry — five authoring actions in the ActionSpec registry with parity samples; EXPECTED 513 → 518; RLS — both authoring tables carry tenant RLS; Lifecycle — draft → reviewed|rejected → published, one published row per (kind, key); Review gate — a human authoring.review decision; self-approval forbidden by the T3 policy; Payload authority — the store-side CHECKs refuse a payload that would widen a tool grant; Web — the /authoring route, four status tiles and kind/status filters; Evidence — the tests and the merges c29c7f52d, 38334552e, ca392a97d; actions:authoring = exists. The entries are the set the factory writes through architecture.artifacts_create; each carries axis_a, an optional axis_b value and a position, and the action ignores any field outside that schema.\n\n## Links\n\nThe artefact is not an orphan: Stakeholder Map — T17 Tenant Asset Authoring (Phase A) (dependency). The link kinds are the four §8.1 kinds (derivation, realization, reuse, dependency) and both ends of every edge are artefacts of this pack, so the factory's architecture.artifacts_link read-back resolves.\n\n## Document\n\nThe document records the Technology Standards Catalog — T17 Tenant Asset Authoring (Phase D) for T17. It is anchored in the inception set, the published evidence document and the merged delivery: the two authoring tables, the five actions, the human review gate, the dependency and tool-grant refusals and the real-app E2E are the build the record now governs. The artefact is authored for the retrospective active state; where the published record and the plan differ, the published record is carried and the difference is named in the Phase-G review.\n"
+    }
+  ],
+  "registers": {
+    "risk": [
+      {
+        "code": "T17-R1",
+        "title": "The dependency order is refused at the draft attempt, not at publish",
+        "body": "The inception brief and the closure review both record the scoped refusal: a draft that references an unpublished asset is refused when it is attempted, but no publish-time check is claimed. A caller that creates a legal draft and later publishes it against a dependency that has since been withdrawn is not blocked by a publish-time check. The gap is named in the evidence document and is not presented as a publish guarantee.",
+        "probability": "medium",
+        "impact": 2,
+        "review_at": "2026-12-15",
+        "severity": "medium",
+        "status": "open",
+        "response": "If a publish-time dependency check is required, add it to the target publish action with a named test; do not claim the guarantee before the check exists.",
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "R3 Unpublished dependency refused",
+            "R4 Reviewed catalogue publishes"
+          ],
+          "decisions": [
+            "D4 The dependency order is refused at the draft attempt"
+          ]
+        }
+      },
+      {
+        "code": "T17-R2",
+        "title": "The live procedure/policy ingestion is T16's capability, not T17's",
+        "body": "T17 proves the linked drafts, the review gate and the refusals; the live ingestion of procedures and policies is T16's capability. A reader who sees a published catalogue could mistake the authored rows for ingested ones, or expect T17 to ingest a document it only drafts. The evidence document names the boundary; the risk is misreading the capability, not a missing implementation.",
+        "probability": "low",
+        "impact": 2,
+        "review_at": "2026-12-15",
+        "severity": "low",
+        "status": "open",
+        "response": "Keep the boundary in the Authoring screen's copy and the evidence document; if live ingestion is claimed, cite T16's tests and receipt, not T17's drafts.",
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "R2 Linked procedure/policy drafts",
+            "R10 Coverage"
+          ],
+          "decisions": [
+            "D6 Live ingestion is T16's"
+          ]
+        }
+      }
+    ],
+    "issue": [
+      {
+        "code": "T17-I1",
+        "title": "The record claimed built and closed but carried no lifecycle set",
+        "body": "At the 2026-11-27 rework snapshot the T17 project row is closed at version 12 with no baseline, charter, contract, Phase A–D artefact set, Phase-G compliance review or gate receipt; its published evidence and closure-review documents exist, but the lifecycle rows do not. This pack supplies the missing lifecycle set and the Phase-G review retrospectively; the project stays active, and the receipt at a fresh snapshot is the acceptance the active state names.",
+        "severity": "high",
+        "status": "closed",
+        "response": "Supplied by this rework: the seven artefacts, the charter, the Statement of Architecture Work, the delivery contract, the Phase-G review and the outputs; re-verified by verify-project.py --project T17 at a fresh snapshot."
+      }
+    ],
+    "assumption": [
+      {
+        "code": "T17-A1",
+        "title": "The 2026-11-27 rework snapshot is the authoritative record for T17",
+        "body": "The rework reads the project row, the inception set, the evidence and closure-review documents at the 2026-11-27 snapshot. It assumes that snapshot is the authoritative lifecycle state and that no contemporaneous T17 approval or publication exists outside it. The assumption is stated so a later reader can challenge it: if a contemporaneous record is found, the retrospective review must be re-read against it rather than silently overwritten.",
+        "status": "open"
+      }
+    ],
+    "dependency": [
+      {
+        "code": "T17-D1",
+        "title": "T17 depends on T16, T3 and P0",
+        "body": "T17 depends on T16 for the live procedure/policy ingestion and the SOP human gate, on T3 for the decision ladder and the approval primitives, and on P0 for the programme definition. All three are closed; the dependency is one-way and T17 ships no duplicate of those surfaces.",
+        "status": "open"
+      }
+    ],
+    "benefit": [
+      {
+        "code": "T17-B1",
+        "title": "One reviewed catalogue per tenant with no self-publication and no tool-grant widening",
+        "body": "The charter's mandate and the Driver/Goal/Objective Catalog's D1/G1, D2/G2 and D3/G3 record the benefit: one owning table per kind, a human review gate that an authoring job cannot complete itself, and a published catalogue that can request a tool grant but never widen one. The benefit is declared in the record and carried by the authoring, asset_review and authoring_standard tests; live ingestion remains T16's.",
+        "status": "open"
+      }
+    ]
+  },
+  "delivery_contract": {
+    "title": "Delivery contract — T17 Tenant Asset Authoring (retrospective, 2026-11-27)",
+    "body": {
+      "manifest": "acceptance/programme/T17.toml",
+      "commitments": "The delivery commits to the 15-check acceptance manifest, the seven Phase A–D artefacts, the authoring lifecycle tests, the asset-review refusals, the output-standard checks and the real-app authoring E2E. Each commitment is executable: the manifest names the check and the tests are the named scenarios in `crates/actions/tests/authoring.rs`, `asset_review.rs`, `authoring_standard.rs` and `apps/web/e2e/authoring.spec.ts`.",
+      "compliance": "Compliance is assessed at the retrospective Phase-G review: the implementation landed on main through PRs #632, #659 and #687; `docs/evidence/v2-coverage.md` reports `actions:authoring` = `exists`; the record set is supplied by this rework. The dependency order is refused at the draft attempt, not at publish, and that scoped refusal is named rather than rounded up. T17 stays active; the tranche review decides the final closure.",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "acceptance_at": "2026-11-27",
+      "approval": "The Architecture Board approves the Phase A–D set and this contract under the standing delegation; the programme architect prepares the evidence and the recommendation, and the Board's approval is recorded as the contract's gate rather than asserted by the builder.",
+      "retrospective": "This contract is retrospective. It binds the rework's record set and the acceptance manifest, not a contemporaneous commitment. Its evidence is the fresh snapshot receipt and the published evidence/closure-review documents; where the two differ, the receipt wins and the difference is recorded."
+    }
+  },
+  "wbs_deliverable": {
+    "title": "T17 tenant asset authoring — the retrospective active record",
+    "business_value": 6,
+    "time_criticality": 5,
+    "risk_reduction": 5,
+    "job_size": 6
+  },
+  "review": {
+    "level": "compliant",
+    "findings": "This retrospective Phase-G review records the level compliant for the record set it assesses under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the delivery was measured and merged, but no contemporaneous lifecycle review exists, and that absence is carried as the project's open record item rather than as non-conformance. At the 2026-11-27 snapshot the project row is status closed at version 12 (track v2, ADM phase G, capability plateau, tranche 5) with meta.measured_status built and issues #87, #629 and #655 linked; before this run it had no charter, no Statement of Architecture Work, no delivery contract, no Phase A–D artefact set, no Phase-G compliance review and no gate receipt. The delivery evidence is the merged PRs #632 (c29c7f52d939), #659 (38334552e9b8) and #687 (ca392a97d7d8), the authoring/asset_review/authoring_standard tests and the real-app authoring E2E; docs/evidence/v2-coverage.md reports actions:authoring = exists. The published evidence document and closure-review document record the acceptance and name the open items. The open items are the scoped refusal of the dependency order at the draft attempt (not at publish) and the boundary that live ingestion is T16's; neither is presented as a publish guarantee. The project stays active because its manifest expects active and the prior closure was recorded on a red receipt; the tranche review decides the final closure. This content supplies the seven A–D artefacts, the charter, the Statement of Architecture Work, the delivery contract, this review and the project-brief/evidence outputs. A non-conformant level would require a waiver the programme forbids; the honest residue is the two named risks.",
+    "evidence": {
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "acceptance_manifest": "acceptance/programme/T17.toml",
+      "build_record": "docs/plans/T17/evidence.md and docs/plans/T17/closure-review.md (PRs #632, #659, #687)"
+    }
+  },
+  "project_brief_output": "# Project brief — T17 Tenant Asset Authoring (retrospective, 2026-11-27)\n\n## Outcome\n\nT17 delivers tenant asset authoring: a tenant's short brief plus its documents become a reviewed catalogue of departments, jobs, procedures and policies that a person published, and no authored asset can publish itself or widen a tool grant. The outcome the record closes on is the acceptance manifest at a fresh snapshot plus the published evidence document, not the built status alone.\n\n## Boundary\n\nIn scope are the authoring lifecycle (intake, draft, review, publish-through-the-target), the two authoring tables, the state machine, the review gate, the published-dependency refusal and the Authoring screen. Out of scope are writing the target tables, the SOP/RDF/BPMN converter (T16), tools and bindings (T13), a governed_asset fork and a new template table except asset_template. The boundary is the inception brief's, restated so a later reader can see the exclusions are deliberate.\n\n## Reuse sources\n\nT17 reuses the existing table and action surfaces (the target tables publish themselves), the governed_asset and document model (the published asset and its source), T3's approval and decision ladder (the review gate), T13's tools (request, never grant) and the workspace crates. It ships two authoring tables and five actions, not a second catalogue.\n\n## Inception units\n\nThe inception set is published: the project brief, the inception analysis (`01a1ee42-312b-770c-bdae-36a1b077d2e6`) and the architecture design (`01a1ee42-3aca-7179-867c-000d986a865e`), plus the evidence and closure-review documents. The delivery unit is #87, merged through PRs #632, #659 and #687; the Authoring screen and the E2E are part of the delivery.\n\n## Dependencies\n\nT17 depends on T16 (live ingestion and the SOP human gate), T3 (the decision ladder) and P0 (the programme definition). All three are closed; the live procedure/policy ingestion remains T16's, and T17 proves the linked drafts and the refusals.\n\n## Acceptance\n\nThe acceptance is `acceptance/programme/T17.toml` with 15 checks, backed by the authoring lifecycle tests, the asset-review refusals, the output-standard checks and the real-app authoring E2E. The gate is the inception brief's: a brief plus documents draft the catalogue; a reviewed catalogue publishes with its decisions; no asset publishes itself; no asset widens a tool grant.\n\n## Capabilities\n\nThe built capability set is sixfold: intake (accept a brief and documents), drafting (organisation, job, procedure and policy assets with sources), review (a human gate refusing self-publication and non-human decisions), publication (through the target's own action with its decisions), the catalogue read (the Authoring screen) and the real-app E2E proof.\n\n## Plan\n\nThe plan is SPEC_V2 §5.7/§10.4–§10.5 and §12 T17, delivered through #87 and its follow-ups #629 and #655. This rework does not rebuild it: it supplies the lifecycle record the delivery did not leave behind, re-runs the acceptance at a fresh snapshot and keeps T17 active. The remaining work is a publish-time dependency check if the programme wants that guarantee, and T16's live ingestion.\n",
+  "evidence_output": "# Evidence — T17 Tenant Asset Authoring (retrospective, 2026-11-27)\n\n## Claim\n\nT17 is built and its acceptance is proven by `acceptance/programme/T17.toml`: a brief plus documents draft the catalogue, documents yield linked procedure and policy drafts, an unpublished dependency is refused, a reviewed catalogue publishes with its decisions, no asset publishes itself, a non-human decision cannot complete a gate, no asset widens a tool grant, and the real-app E2E creates a draft and sees it render.\n\n## Evidence\n\nThe evidence is `crates/actions/tests/authoring.rs` (P1.1–P1.4), `asset_review.rs` (P2.1–P2.3), `authoring_standard.rs`, `apps/web/e2e/authoring.spec.ts`, the merged PRs #632 (c29c7f52d939), #659 (38334552e9b8) and #687 (ca392a97d7d8), the published `docs/plans/T17/evidence.md` and `docs/plans/T17/closure-review.md`, and `actions:authoring = exists` in `docs/evidence/v2-coverage.md`.\n\n## Verification\n\nVerification is `verify-project.py --project T17` at a fresh snapshot: 15 checks plus the gate, 0 failures. The behaviour commands are `cargo test -p conveyor-actions --test authoring --test asset_review --test authoring_standard` and the Playwright authoring spec; the CI equivalent is the PRs' preflight, ci-public and web runs at the merge commits.\n\n## Links\n\nThe links are the inception set (`docs/plans/inception/T17/`), the evidence and closure-review documents, the acceptance manifest, the seven A–D artefacts and the architecture-artefact index, the delivery contract and the Phase-G review. Issues #87, #629 and #655; PRs #632, #659 and #687.\n\n## Gap\n\nThe gap is the dependency order: it is refused at the draft attempt, not at publish, and no publish-time check is claimed. The live procedure/policy ingestion is T16's capability; T17 proves the linked drafts and the refusals. Neither gap is a non-conformance; both are named risks T17-R1 and T17-R2.\n",
+  "documents": [
+    {
+      "category": "architecture-artifact",
+      "title": "Architecture Artefact Index — T17 (retrospective, 2026-11-27)",
+      "body": "# Architecture Artefact Index — T17 (retrospective, 2026-11-27)\n\n## Metadata\n\nThe artefact set for T17 is the seven mandatory Phase A–D artefacts on the delivery track: the Stakeholder Map, Driver/Goal/Objective Catalog, Requirements Catalog and Solution Concept Diagram at phase A; the Business Capability Map at phase B; the Data Entity/Data Component Catalog at phase C; and the Technology Standards Catalog at phase D. All seven are authored under the 2026-11-27 retrospective rework for project 01a1d039-0d38-7db1-b685-d76bd4cebf47 (track v2), tranche 5, under standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. T17 stays active after this rework; its manifest expects active, and the tranche review decides the final closure.\n\n## Entries\n\nThe index names each artefact and its role: the stakeholder map fixes who decides and who is consulted; the driver/goal catalogue fixes the six decisions and six goals that bound the authoring lifecycle; the requirements catalogue carries ten executable requirements; the solution concept shows the intake-draft-review-publish-refuse-read-prove path; the capability map records six built capabilities; the data catalogue records the two authoring tables and the reused target tables; the technology catalogue names Rust, the registry, RLS, the state machine and the review gate.\n\n## Links\n\nEach artefact links to another artefact of this pack, so the set has no orphan: the stakeholder map depends on the capability map, the driver catalogue derives the requirements catalogue, the requirements realise the solution concept, and the capability, data and technology catalogues form the dependency chain back to the stakeholder map. These are the same edges the factory writes through architecture.artifacts_link.\n\n## Document\n\nThis index is itself an architecture-artifact document, composed and published in the architecture-artifact category. It carries the retrospective provenance: T17's implementation landed on main through PRs #632, #659 and #687 (merges c29c7f52d, 38334552e, ca392a97d), and docs/evidence/v2-coverage.md reports actions:authoring = exists; the record carried no lifecycle set; this rework authored the seven artefacts, the charter, the Statement of Architecture Work, the delivery contract and the Phase-G review so the active state rests on evidence rather than on a status claim. The index does not attest contemporaneous intent.\n"
+    }
+  ]
+}

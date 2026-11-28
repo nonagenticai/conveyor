@@ -5,7 +5,7 @@ status: built
 depends_on: [S09, S11, S13, S15, S16, T2, T13]
 spec_sections: ["§3 D27", "§8 S21", "§4.4", "§4.5", "§7.7", "§10.2", "§11.1", "§11.4"]
 adds_tables: [prompt, prompt_section, decision_option_set, decision_option_set_option, organisation_layer]
-adds_actions: [prompt_recipes.create, prompt_recipes.list, prompt_recipes.get, prompt_recipes.activate, prompt_recipes.retire, cards.assign, ladder.case, ladder.precheck, decision_option_sets.set, decision_option_sets.get, organisation_layers.set, organisation_layers.list]
+adds_actions: [prompt_recipes.create, prompt_recipes.list, prompt_recipes.get, prompt_recipes.activate, prompt_recipes.retire, cards.assign, ladder.prepare, laya.classify, decision_options.create, decision_options.get, organisation_layers.set, organisation_layers.list]
 adds_modules: [prompt, memory, knowledge, executor]
 parity_ids: PENDING-S0
 ---
@@ -39,6 +39,11 @@ release compiles its knowledge layers or refuses) is **built and merged, #697/PR
 `docs/evidence/S21-EXECUTION.md` and `docs/evidence/T0-RELEASE-LAYERS.md`.
 **Depends on:** S15 (capability/knowledge), S16 (prompt audit), S13 (agent.run), S11 (procedure steps),
 S09 (`retrieval.query` / `strata` packs).
+**Action names (amended 2026-11-24 by the ladder unification, #526):** the L1 path shipped as
+`ladder.prepare` (builds the case), `laya.classify` (the external call) and `ladder.evaluate`
+(records the decision against the invocation), and the option sets as `decision_options.*`.
+The earlier `ladder.case` / `ladder.precheck` / `decision_option_sets.*` names below in §22 are
+the pre-unification design and are kept as history.
 **Owner ruling:** George, 2026-11-09 — *a prompt is a run-time compilation from the procedure and the
 other system/tenant/project sources, stored in Postgres; prompt-engineering is 2024, context-engineering
 2025.*

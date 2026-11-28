@@ -1,0 +1,11 @@
+{
+ "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+ "baseline_id": "01a20280-71de-7b06-9086-ae0158bfd36f",
+ "title": "Complete T9's retrospective lifecycle record",
+ "body": "The retrospective rework records the lifecycle T9 already lived: charter, frozen scope baseline, the seven A-D artefacts, the Statement of Architecture Work and delivery contract, the Phase-G compliance review, the twelve declared outputs and the closure review. It changes no table, action or contract; it names the out-of-sequence closure (U3-EXC-T9) and the six open findings the review carries.",
+ "impact": {
+  "scope": "none: no capability code changes; the record is completed",
+  "schedule": "none: the frozen baseline's dates stand",
+  "risk": "the record now supports the out-of-sequence closure (U3-EXC-T9) instead of leaving it implicit"
+ }
+}

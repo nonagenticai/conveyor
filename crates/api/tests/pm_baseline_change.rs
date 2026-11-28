@@ -202,6 +202,16 @@ async fn baseline_rows(
     .expect("the baseline rows")
 }
 
+/// The project's WBS row count, as a refused re-plan must leave it.
+async fn wbs_count(pg: &support::Pg, tenant_id: Uuid, project_id: Uuid) -> i64 {
+    sqlx::query_scalar("SELECT count(*) FROM wbs_node WHERE tenant_id = $1 AND project_id = $2")
+        .bind(tenant_id)
+        .bind(project_id)
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("the WBS rows")
+}
+
 /// P3.1 — advancing an approved baseline without a change request is refused, and the approved
 /// row is unchanged.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
@@ -265,7 +275,7 @@ async fn approved_change_request_advances_the_baseline() {
                 "baseline_id": baseline_id,
                 "title": "Add a hardening phase",
                 "body": "Add a hardening phase; the impact block names the schedule cost.",
-                "impact": 5,
+                "impact": {"scope": "one hardening phase is added to the plan"},
             }),
             None,
             None,
@@ -295,7 +305,16 @@ async fn approved_change_request_advances_the_baseline() {
         baseline_id.to_string(),
         "{body}"
     );
-    assert_eq!(output(&body)["impact"], 5, "{body}");
+    // The §5.5 block lives in `meta`; the register's numeric `impact` column stays empty.
+    assert!(
+        output(&body)["impact"].is_null(),
+        "a change carries its impact as a block, not a number: {body}"
+    );
+    assert_eq!(
+        output(&body)["meta"]["impact"],
+        json!({"scope": "one hardening phase is added to the plan"}),
+        "the impact block did not round-trip through the register: {body}"
+    );
 
     // ── the second principal approves the change gate ───────────────────────────────────
     let (status, body) = decide(&running, change_gate, "approve").await;
@@ -395,6 +414,142 @@ async fn approved_change_request_advances_the_baseline() {
         change["baseline_ref"],
         baseline_id.to_string(),
         "the change must still name the baseline it replaced: {change}"
+    );
+
+    running.shutdown().await;
+}
+
+/// v1-p61-1 (§6.1) — `pm.plan` cannot replace an approved baseline without a change request,
+/// and the refusal lands before any WBS write.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn plan_without_a_change_request_is_refused() {
+    let (pg, running, seeded, bindings) = fixture().await;
+    let (project_id, baseline_id) = approved_baseline(&running, bindings.pm).await;
+    let before = wbs_count(&pg, seeded.tenant_id, project_id).await;
+    assert_eq!(before, 2, "the fixture did not leave two WBS nodes");
+
+    let (status, body) = running
+        .invoke(
+            "pm.plan",
+            PM,
+            json!({
+                "job_binding_id": bindings.pm,
+                "project_id": project_id,
+                "wbs": [
+                    {"kind": "phase", "title": "Discovery"},
+                    {"kind": "deliverable", "title": "Charter and plan", "parent_index": 0},
+                    {"kind": "phase", "title": "Hardening"},
+                ],
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 409, "{body}");
+    assert_eq!(body["type"], "change_request_required", "{body}");
+    assert!(
+        body["detail"]
+            .as_str()
+            .unwrap_or_default()
+            .contains(&baseline_id.to_string()),
+        "the refusal must name the approved baseline it protects: {body}"
+    );
+
+    // The guard ran before the inserts: no duplicate WBS rows, no second baseline.
+    assert_eq!(
+        wbs_count(&pg, seeded.tenant_id, project_id).await,
+        before,
+        "a refused re-plan wrote WBS rows"
+    );
+    let rows = baseline_rows(&pg, seeded.tenant_id, project_id).await;
+    assert_eq!(rows.len(), 1, "a refused re-plan wrote a baseline");
+
+    running.shutdown().await;
+}
+
+/// v1-p61-1 (§6.1) — a named, approved change request lets `pm.plan` advance the plan, and the
+/// new baseline cites the change.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn plan_with_an_approved_change_advances() {
+    let (pg, running, seeded, bindings) = fixture().await;
+    let (project_id, baseline_id) = approved_baseline(&running, bindings.pm).await;
+    let before = wbs_count(&pg, seeded.tenant_id, project_id).await;
+
+    // ── the change request and the second principal's approval ─────────────────────────
+    let (status, body) = running
+        .invoke(
+            "changes.request",
+            PM,
+            json!({
+                "job_binding_id": bindings.pm,
+                "project_id": project_id,
+                "baseline_id": baseline_id,
+                "title": "Add a hardening phase",
+                "body": "Add a hardening phase; the impact block names the scope cost.",
+                "impact": {"scope": "one hardening phase is added to the plan"},
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "changes.request: {body}");
+    let change_id = id_of(output(&body), "change_id");
+    let change_gate = id_of(output(&body), "approval_id");
+    let (status, body) = decide(&running, change_gate, "approve").await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(output(&body)["status"], "approved", "{body}");
+
+    // ── the plan names the approved change and advances the baseline ───────────────────
+    let (status, body) = running
+        .invoke(
+            "pm.plan",
+            PM,
+            json!({
+                "job_binding_id": bindings.pm,
+                "project_id": project_id,
+                "change_id": change_id,
+                "wbs": [
+                    {"kind": "phase", "title": "Discovery"},
+                    {"kind": "deliverable", "title": "Charter and plan", "parent_index": 0},
+                    {"kind": "phase", "title": "Hardening"},
+                ],
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(
+        status, 201,
+        "the approved change must let the plan advance: {body}"
+    );
+    let new_baseline = id_of(output(&body), "baseline_id");
+    assert_ne!(
+        new_baseline, baseline_id,
+        "a re-plan must take a new baseline"
+    );
+    assert_eq!(
+        wbs_count(&pg, seeded.tenant_id, project_id).await,
+        before + 3,
+        "the re-plan inserts the three nodes it names (the action appends to the tree)"
+    );
+
+    let rows = baseline_rows(&pg, seeded.tenant_id, project_id).await;
+    assert_eq!(
+        rows.len(),
+        2,
+        "the re-plan did not add exactly one baseline"
+    );
+    let new_row = rows
+        .iter()
+        .find(|row| row.0 == new_baseline)
+        .unwrap_or_else(|| panic!("the new baseline {new_baseline} is absent from the rows"));
+    assert_eq!(
+        new_row.2,
+        Some(change_id),
+        "the new baseline does not cite the approved change"
     );
 
     running.shutdown().await;

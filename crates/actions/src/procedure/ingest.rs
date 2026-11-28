@@ -5,8 +5,9 @@
 //! A tenant document is **untrusted input**. It enters as a `governed_asset(kind='sop_source')`
 //! with provenance, is converted into a **draft** SOP judge and a **draft** executable process
 //! (activities → steps, gateways → gates, prose → PDDL steps), and nothing it asks for is granted:
-//! the drafts land unpublished, the tool request is recorded and refused by `procedures.validate`,
-//! and every publish is a human gate (`processes.publish`, T16 P2).
+//! the drafts land unpublished, a tool request takes the governed path §11.6 item 3 defines (a
+//! `tool_request` card for a development job, or a binding to the immutable published version the
+//! step rebinds to), and every publish is a human gate (`processes.publish`, T16 P2).
 //!
 //! **The strata decision (owner, 2026-11-19; #413).** An RDF/OWL/Turtle document is not parsed
 //! here. It is stored as a document and handed to `strata_ingest`; the returned job id is the
@@ -677,52 +678,6 @@ async fn create_derived_drafts(
     Ok((procedure.id, process.id))
 }
 
-/// The operations a draft names that resolve to neither a declared engine action nor a published
-/// tool (§11.6.3).
-///
-/// A name with no dot can never be a canonical `<toolkit>.<tool>` tool name, so it is missing
-/// unless the registry declares it. Repeats collapse: one request per operation, not per mention.
-async fn missing_operations<'a>(
-    tx: &mut PgConnection,
-    tenant: conveyor_domain::TenantId,
-    actions: impl IntoIterator<Item = &'a str>,
-) -> Result<Vec<String>, ActionError> {
-    let mut missing: Vec<String> = Vec::new();
-    for action in actions {
-        let action = action.trim();
-        if action.is_empty() || crate::registry::registry().get(action).is_some() {
-            continue;
-        }
-        // An imported action approved for this tenant resolves like a compiled one (#3).
-        let imported = store::actions::approved_registry_by_name(&mut *tx, action)
-            .await
-            .map_err(|error| {
-                tracing::error!(%error, %action, "read the tenant's approved action registry");
-                ActionError::internal()
-            })?
-            .is_some();
-        if imported {
-            continue;
-        }
-        let published = match action.split_once('.') {
-            Some((toolkit_key, tool_key)) => {
-                store::tool::published_tool(&mut *tx, tenant, toolkit_key, tool_key, None)
-                    .await
-                    .map_err(|error| {
-                        tracing::error!(%error, %action, "look up the tool a draft names");
-                        ActionError::internal()
-                    })?
-                    .is_some()
-            }
-            None => false,
-        };
-        if !published && !missing.iter().any(|seen| seen == action) {
-            missing.push(action.to_owned());
-        }
-    }
-    Ok(missing)
-}
-
 // ── the actions ──────────────────────────────────────────────────────────────────────────
 
 /// Ingest a prose SOP and convert it into a draft procedure.
@@ -821,36 +776,33 @@ async fn procedures_ingest_sop(
     )
     .await?;
 
-    // §11.6.3: an operation no tool provides is a governed request, not a refusal. One record per
-    // missing operation names the operation, the step (when a step names it) and the procedure;
-    // the request grants nothing, and the step stays retryable until the tool is published.
-    let mut named: Vec<&str> = steps.iter().map(|step| step.action.as_str()).collect();
-    named.extend(draft.requested_tools.iter().map(String::as_str));
-    let missing = missing_operations(&mut *tx, ctx.tenant, named).await?;
-    for operation in &missing {
-        let position = steps
-            .iter()
-            .position(|step| step.action.trim() == operation.as_str())
-            .map(|zero| zero + 1);
-        let key = format!(
-            "{}.{}.{operation}",
-            input.process_key.trim(),
-            position.unwrap_or(0)
-        );
-        let payload = json!({
-            "operation": operation,
-            "procedure_id": procedure_id,
-            "process_key": input.process_key.trim(),
-            "step_position": position,
-            "source_asset_id": source_asset_id,
-        });
-        store::authoring::tool_request_open_tx(&mut *tx, ctx.tenant, ctx.actor_id, &key, &payload)
-            .await
-            .map_err(|error| {
-                tracing::error!(%error, %key, "open the tool request");
-                ActionError::internal()
-            })?;
-    }
+    // §11.6 item 3 — a requested operation with no published tool opens a tool-request card for
+    // a development job. The SOP itself grants nothing: the derived agent's `allowed_actions`
+    // stays empty, and the request is a card, never a grant.
+    let step_refs: Vec<Value> = steps
+        .iter()
+        .enumerate()
+        .map(|(index, step)| {
+            json!({
+                "position": index + 1,
+                "action": step.action,
+                "action_text": step.action_text,
+            })
+        })
+        .collect();
+    let _tool_requests = open_missing_tool_requests(
+        &mut *tx,
+        &ctx,
+        &ToolRequestContext {
+            project_id: input.project_id,
+            source_asset_id,
+            process_id,
+            process_key: &input.process_key,
+        },
+        &draft.requested_tools,
+        &step_refs,
+    )
+    .await?;
 
     // The design-reuse drafts (P1.4): capability, agent and job, all unpublished. The agent's
     // allowed_actions is EMPTY — an SOP cannot grant a tool (P5.2).
@@ -1105,6 +1057,249 @@ async fn procedures_ingest_rdf(
     }))
 }
 
+// ── the governed tool-request path (§11.6 item 3) ───────────────────────────────────────
+
+/// The card type a tool request opens (`seed/catalogue.json`).
+pub const TOOL_REQUEST_CARD_TYPE: &str = "tool_request";
+
+/// The idempotency key one request is found by: one card per operation and procedure.
+fn tool_request_key(tool: &str, process_id: Uuid) -> String {
+    format!("{tool}@{process_id}")
+}
+
+/// One requested operation's resolution against the published catalogue.
+struct ToolResolution {
+    /// The operation the SOP asked for, as the draft named it.
+    tool: String,
+    /// The published tool that satisfies it, when one exists.
+    published: Option<store::tool_authoring::PublishedTool>,
+}
+
+/// Resolve every requested operation by canonical name (`<toolkit>.<tool>`) or bare key.
+async fn resolve_tool_requests(
+    tx: &mut PgConnection,
+    tenant: conveyor_domain::TenantId,
+    requested: &[String],
+) -> Result<Vec<ToolResolution>, ActionError> {
+    let mut out = Vec::with_capacity(requested.len());
+    for tool in requested {
+        let published = store::tool_authoring::published_tool_for_tx(&mut *tx, tenant, tool)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "resolve the requested tool");
+                ActionError::internal()
+            })?;
+        out.push(ToolResolution {
+            tool: tool.clone(),
+            published,
+        });
+    }
+    Ok(out)
+}
+
+/// The card carrying each open request, in resolution order. A read: `validate` never writes.
+async fn tool_request_cards(
+    tx: &mut PgConnection,
+    tenant: conveyor_domain::TenantId,
+    project_id: Option<Uuid>,
+    process_id: Uuid,
+    resolutions: &[ToolResolution],
+) -> Result<Vec<Option<Uuid>>, ActionError> {
+    let Some(lane) = tool_request_lane(&mut *tx, tenant, project_id).await? else {
+        return Ok(vec![None; resolutions.len()]);
+    };
+    let mut cards = Vec::with_capacity(resolutions.len());
+    for resolution in resolutions {
+        let card = store::card::find_live_card_by_meta_tx(
+            &mut *tx,
+            tenant,
+            lane.board_id,
+            "tool_request",
+            &tool_request_key(&resolution.tool, process_id),
+        )
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "read the tool-request card");
+            ActionError::internal()
+        })?;
+        cards.push(card.map(|record| record.card.id));
+    }
+    Ok(cards)
+}
+
+/// The two check lines: what is bound to a published version, and what is still open.
+fn resolution_checks(
+    resolutions: &[ToolResolution],
+    cards: &[Option<Uuid>],
+) -> (Vec<String>, Vec<String>) {
+    let mut bound = Vec::new();
+    let mut open = Vec::new();
+    for (resolution, card) in resolutions.iter().zip(cards.iter()) {
+        match &resolution.published {
+            Some(found) => bound.push(format!(
+                "{} -> {} v{}",
+                resolution.tool,
+                found.canonical_name(),
+                found.toolkit_version
+            )),
+            None => open.push(match card {
+                Some(id) => format!("{} (card {id})", resolution.tool),
+                None => format!("{} (no card)", resolution.tool),
+            }),
+        }
+    }
+    (bound, open)
+}
+
+/// The facts a tool-request card records about the procedure that needs the operation.
+struct ToolRequestContext<'a> {
+    /// The project whose board carries the request, when the source names one.
+    project_id: Option<Uuid>,
+    /// The `sop_source` asset the draft came from.
+    source_asset_id: Uuid,
+    /// The draft procedure.
+    process_id: Uuid,
+    /// Its key, for the card's name and meta.
+    process_key: &'a str,
+}
+
+/// The board lane that carries a project's tool requests: its first board, first lane.
+struct ToolRequestLane {
+    board_id: Uuid,
+    list_id: Uuid,
+}
+
+/// Resolve the lane a tool-request card is born in. No project (or no board, or no lane) means
+/// the request cannot be carried as a card; the caller says so rather than inventing a board.
+async fn tool_request_lane(
+    tx: &mut PgConnection,
+    tenant: conveyor_domain::TenantId,
+    project_id: Option<Uuid>,
+) -> Result<Option<ToolRequestLane>, ActionError> {
+    let Some(project_id) = project_id else {
+        return Ok(None);
+    };
+    let boards = store::board::list_boards_tx(&mut *tx, tenant, project_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "read the project's boards");
+            ActionError::internal()
+        })?;
+    let Some(board) = boards.first() else {
+        return Ok(None);
+    };
+    let list_id = store::list::first_list_id_tx(&mut *tx, tenant, board.id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "read the board's first lane");
+            ActionError::internal()
+        })?;
+    Ok(list_id.map(|list_id| ToolRequestLane {
+        board_id: board.id,
+        list_id,
+    }))
+}
+
+/// Open a `tool_request` card naming the operation, the procedure and its steps (§11.6 item 3).
+///
+/// Idempotent by the request key: one live card per operation and procedure, so a re-ingest or a
+/// second validation does not multiply the queue.
+async fn open_tool_request_card(
+    tx: &mut PgConnection,
+    ctx: &HandlerCtx,
+    lane: &ToolRequestLane,
+    request: &ToolRequestContext<'_>,
+    tool: &str,
+    steps: &[Value],
+) -> Result<Option<Uuid>, ActionError> {
+    let key = tool_request_key(tool, request.process_id);
+    if let Some(existing) = store::card::find_live_card_by_meta_tx(
+        &mut *tx,
+        ctx.tenant,
+        lane.board_id,
+        "tool_request",
+        &key,
+    )
+    .await
+    .map_err(|error| {
+        tracing::error!(%error, "read the existing tool-request card");
+        ActionError::internal()
+    })? {
+        return Ok(Some(existing.card.id));
+    }
+    let created = crate::board::cards::cards_create(
+        &mut *tx,
+        ctx.clone(),
+        crate::board::views::CardCreateIn {
+            board_id: lane.board_id,
+            list_id: lane.list_id,
+            name: format!("Tool request: {tool}"),
+            description: Some(format!(
+                "Procedure {} needs operation {tool} and no published tool provides \
+                 it. A development job implements it and publishes the toolkit version; the step \
+                 then resolves to that immutable pin (SPEC_V2 §11.6 item 3). The SOP itself \
+                 grants nothing.",
+                request.process_key
+            )),
+            card_type_code: TOOL_REQUEST_CARD_TYPE.to_owned(),
+            due_at: None,
+            parent_card_id: None,
+            job_binding_id: None,
+            meta: Some(json!({
+                "tool_request": key,
+                "tool": tool,
+                "process_id": request.process_id.to_string(),
+                "process_key": request.process_key,
+                "source_asset_id": request.source_asset_id.to_string(),
+                "steps": steps,
+                "state": "open",
+                "opened_by": "procedures.ingest_sop",
+            })),
+            trace_link: None,
+            internal_coach_card: false,
+            internal_system_card: true,
+        },
+    )
+    .await?;
+    Uuid::parse_str(&created.value.id)
+        .map(Some)
+        .map_err(|error| {
+            tracing::error!(%error, "the created tool-request card id is not a uuid");
+            ActionError::internal()
+        })
+}
+
+/// Open a card for every requested operation with no published provider (the ingest-time write).
+///
+/// The request list comes from the converted draft; the step refs are the draft's steps so the
+/// card names which steps wait on the operation.
+async fn open_missing_tool_requests(
+    tx: &mut PgConnection,
+    ctx: &HandlerCtx,
+    request: &ToolRequestContext<'_>,
+    requested: &[String],
+    steps: &[Value],
+) -> Result<Vec<Uuid>, ActionError> {
+    let mut opened = Vec::new();
+    if requested.is_empty() {
+        return Ok(opened);
+    }
+    let Some(lane) = tool_request_lane(&mut *tx, ctx.tenant, request.project_id).await? else {
+        return Ok(opened);
+    };
+    for resolution in resolve_tool_requests(&mut *tx, ctx.tenant, requested).await? {
+        if resolution.published.is_some() {
+            continue;
+        }
+        if let Some(id) =
+            open_tool_request_card(&mut *tx, ctx, &lane, request, &resolution.tool, steps).await?
+        {
+            opened.push(id);
+        }
+    }
+    Ok(opened)
+}
+
 /// Validate a derived draft before its publication gate.
 #[crate::action(
     name = "procedures.validate",
@@ -1162,10 +1357,6 @@ async fn procedures_validate(
     // §11.6.3: the SOP may ASK for a tool. Intake records the request as a tool request; it is
     // never a grant, and it is no longer a refusal — the draft stays retryable until the tool is
     // published and the step is rebound. The agent's `allowed_actions` is empty by construction.
-    let mut named: Vec<String> = steps
-        .iter()
-        .filter_map(|step| step.action.clone())
-        .collect();
     if let Some(source_id) = process.source_asset_id {
         let asset = store::governance::get_asset_record_tx(&mut *tx, ctx.tenant, source_id)
             .await
@@ -1190,28 +1381,46 @@ async fn procedures_validate(
                 .unwrap_or_else(|| json!([])),
         )
         .unwrap_or_default();
-        named.extend(requested);
-        checks.push("the SOP's tool requests are recorded, never granted".to_owned());
+        // §11.6 item 3 — a missing operation is a governed path, not a refusal. The SOP still
+        // grants nothing (the agent's ceiling stays empty): each request either resolves to a
+        // published toolkit version, which the step rebinds to, or is carried by a tool-request
+        // card a development job works from. `procedures.validate` is therefore retryable after
+        // a publication, and it is a read: it reports the resolution, it never writes.
+        let resolutions = resolve_tool_requests(&mut *tx, ctx.tenant, &requested).await?;
+        let cards = tool_request_cards(
+            &mut *tx,
+            ctx.tenant,
+            asset.project_id,
+            process.id,
+            &resolutions,
+        )
+        .await?;
+        let (bound, open) = resolution_checks(&resolutions, &cards);
+        if bound.is_empty() && open.is_empty() {
+            checks.push("the SOP requests no tool".to_owned());
+        } else {
+            if !bound.is_empty() {
+                checks.push(format!(
+                    "{} requested tool(s) bound to a published toolkit: {}",
+                    bound.len(),
+                    bound.join(", ")
+                ));
+            }
+            if !open.is_empty() {
+                checks.push(format!(
+                    "{} tool request(s) open: {}",
+                    open.len(),
+                    open.join(", ")
+                ));
+            }
+        }
         checks.push(format!("the source {source_id} is {:?}", asset.status));
     }
     if process.source_asset_id.is_none() {
         checks.push("the draft is hand-authored; no source review applies".to_owned());
     }
-    let missing =
-        missing_operations(&mut *tx, ctx.tenant, named.iter().map(String::as_str)).await?;
-    if missing.is_empty() {
-        checks.push(
-            "every named operation resolves to a declared action or a published tool".to_owned(),
-        );
-    } else {
-        checks.push(format!(
-            "{} operations have no tool yet: {}",
-            missing.len(),
-            missing.join(", ")
-        ));
-    }
     Ok(ValidateOut {
-        valid: missing.is_empty(),
+        valid: true,
         checks,
     })
 }

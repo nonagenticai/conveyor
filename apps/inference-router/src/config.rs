@@ -68,7 +68,8 @@ pub struct Config {
     /// `INFERENCE_ROUTER_METERING_COSTS_STREAM` (the reference default; the live deployment sets
     /// `billing:costs`).
     pub metering_costs_stream: String,
-    /// `INFERENCE_ROUTER_BUDGET_GATE_MODE` — `off` makes no call at all.
+    /// `INFERENCE_ROUTER_BUDGET_GATE_MODE` — `off` makes no call at all; **absent means
+    /// `enforce`**, so an unbudgeted deploy is refused rather than silently allowed (§7.5).
     pub budget_gate_mode: GateMode,
     /// `INFERENCE_ROUTER_BUDGET_GATE_BILLING_BASE_URL` — billing's `/api/budget/reserve` origin.
     pub budget_gate_billing_base_url: String,
@@ -318,7 +319,10 @@ impl Config {
 
         let budget_gate_mode = match non_empty(lookup("INFERENCE_ROUTER_BUDGET_GATE_MODE")) {
             Some(raw) => GateMode::parse(&raw).ok_or(ConfigError::InvalidBudgetGateMode(raw))?,
-            None => GateMode::Off,
+            // SPEC_V2 §7.5: a budget is enforced by default. `off` is an explicit operator
+            // rollback (`INFERENCE_ROUTER_BUDGET_GATE_MODE=off`), never the absent-value state:
+            // a deploy that forgets the variable must not silently run unbudgeted.
+            None => GateMode::Enforce,
         };
         let budget_gate_billing_base_url = non_empty(lookup(
             "INFERENCE_ROUTER_BUDGET_GATE_BILLING_BASE_URL",
@@ -786,12 +790,19 @@ mod tests {
     }
 
     #[test]
-    fn write_path_defaults_match_the_reference() {
+    fn write_path_defaults_are_the_fail_closed_rules() {
         let config = parse(&[]).expect("defaults parse");
         assert_eq!(config.metering_redis_url, None);
         assert!(config.metering_costs_enabled);
         assert_eq!(config.metering_costs_stream, "improvement-loop:costs");
-        assert_eq!(config.budget_gate_mode, GateMode::Off);
+        // SPEC_V2 §7.5: absent is enforce, not off. An explicit `off` is the rollback.
+        assert_eq!(config.budget_gate_mode, GateMode::Enforce);
+        assert_eq!(
+            parse(&[("INFERENCE_ROUTER_BUDGET_GATE_MODE", "off")])
+                .expect("explicit off")
+                .budget_gate_mode,
+            GateMode::Off
+        );
         assert_eq!(
             config.budget_gate_billing_base_url,
             "http://billing-service.billing.svc.cluster.local:8157"

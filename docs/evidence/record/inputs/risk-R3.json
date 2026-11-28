@@ -1,0 +1,22 @@
+{
+ "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+ "kind": "risk",
+ "code": "R3",
+ "title": "Instrument self-deception: a check passes by construction",
+ "probability": "M",
+ "impact": 3,
+ "owner_job_id": "01a1db6b-4f1b-7180-86f8-f991cb9b78d0",
+ "links": {
+  "cards": [],
+  "requirements": [
+   {
+    "kind": "relates_to",
+    "target": "benefit/B1"
+   }
+  ],
+  "decisions": []
+ },
+ "review_at": "2026-11-29",
+ "severity": "medium",
+ "status": "open"
+}

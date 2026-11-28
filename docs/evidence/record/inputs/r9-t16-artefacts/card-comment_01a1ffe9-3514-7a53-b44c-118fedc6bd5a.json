@@ -1,0 +1,4 @@
+{
+ "body": "Resolved by the record, 2026-11-23. The closure review is published (`01a20a8d-74f2-74ee-ad40-04c63fbdfa83`) and the close gate was approved by a distinct approver after the acceptance ran 25/25 at the lane head. The card's condition \u2014 a closed project without a closure review \u2014 no longer holds; the next audit re-derives it and drops the package.",
+ "id": "01a1ffe9-3514-7a53-b44c-118fedc6bd5a"
+}

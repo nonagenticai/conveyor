@@ -1,0 +1,1421 @@
+{
+  "charter": "# Charter — P0 programme definition (retrospective, 2026-11-26)\n\n- **Project:** P0 · programme track · ADM phase Preliminary · tranche 0 · project `01a1dcb8-d24b-76de-b901-56fd56e001bc`,\n  issues #120, #121 and #122. The row records `status: closed` and 21 declared output\n  categories; it was reopened on 2026-11-21 for the retrospective MSP/TOGAF/SAFe rework of\n  tranche 0 (#526) under the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`.\n- **Mandate:** define the programme that delivers the full conveyor — the mandate, programme\n  brief, blueprint, business case, benefit profiles and benefits map, projects dossier,\n  programme plan and tranches, governance, stakeholder profiles, benefits strategy and\n  realization plan, reuse map, project briefs, the architecture and analysis pack, and the\n  architecture capability baseline — and publish it as the 21 categories the output\n  standard declares.\n- **Scope:** the definition set and the governance records that close it: the 15-artefact\n  TOGAF set (A–H), the four Phase-E category documents, the five register kinds, the delivery\n  contract, the WBS deliverable, the Phase-G review and the closure review. Out of scope is\n  the delivery projects' own records and the U6 realization transition, which depend on this\n  set rather than belong to it.\n- **Date:** this charter is retrospective and was authored on 2026-11-26; it records the\n  lifecycle, it does not authorise new delivery work.",
+  "soaw": {
+    "title": "Statement of Architecture Work — P0 programme definition (retrospective, 2026-11-26)",
+    "body": {
+      "assignment": "Rework P0 by the reconstituted TOGAF and MSP lifecycle: author the 15 mandatory artefacts (the seven A–D rows the record already carries and the eight E–H rows this rework adds), the four Phase-E category documents, the five register kinds, the delivery contract, the WBS deliverable and the Phase-G review, then re-close the project through the one gate and republish the 21 declared outputs. The work is retrospective and dated 2026-11-26.",
+      "scope": "The definition set on the programme record: 21 output categories, the 15-artefact architecture set, the benefits map and the seven benefit profiles, the tranche plan and the governance records. The record already carries the SoAW `01a1fdd2-5041-7f80-8032-3305751d498c`, the delivery contract `01a1fdd4-ab0f-7802-b7a7-2541a2902e6b`, the approved scope baseline `01a1fbb1-b05c-76b6-a5ac-7186fb859dcc` and the compliant review `01a1fdd7-8227-7441-8f43-385bd3e186fa`; the rework adds the E–H set and the documents and registers the standard requires.",
+      "responsibilities": "The programme architect authors the set under the #526 delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; the Architecture Board reviews the A–D artefacts and the delivery contract. The requester `01a1e607-17d9-77d3-98d3-a43a87c4633d` and the approver `01a1e8a7-8b23-76a9-9114-aafb95f7a545` are distinct, and the closure gate `01a1fdd5-b773-78c3-87d1-8f3c5ae9eeda` is decided by an approver other than its requester.",
+      "acceptance_criteria": "scripts/verify-project.py --project P0 on a fresh snapshot is green with zero failures, the strict conformance audit carries no P0/P1 entry for P0, the closure gate `01a1fdd5-b773-78c3-87d1-8f3c5ae9eeda` is decided by a distinct approver, and every one of the 21 declared outputs is published.",
+      "contract": "Built on the approved scope baseline `01a1fbb1-b05c-76b6-a5ac-7186fb859dcc` and complemented by the delivery contract `01a1fdd4-ab0f-7802-b7a7-2541a2902e6b` approved by board decision `01a1fdd4-cac3-7767-9b0f-4c15d064d6f6`. It is retrospective, dated 2026-11-26, and it does not restate a delivery project's contract.",
+      "retrospective": true
+    }
+  },
+  "artifacts": [
+    {
+      "title": "Stakeholder Map — P0 (retrospective, 2026-11-26)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "purpose": "Name the groups the programme definition serves and the engagement each requires.",
+      "scope": "The stakeholder groups of the P0 definition set and the tranche-0 authorisation.",
+      "stakeholders": {
+        "owner": "the programme architect",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the programme office",
+          "delivery teams of T1–T19"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the sponsoring group",
+          "axis_b": "approves the mandate and decides continue, pause or stop at each tranche review",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the senior responsible owner (SRO)",
+          "axis_b": "owns the programme's delivery of the definition gate",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "manage closely"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "the programme board",
+          "axis_b": "holds the decision ladder and the assurance of the definition set",
+          "value": {
+            "influence": "high",
+            "interest": "medium",
+            "engagement": "manage closely"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "the programme architect",
+          "axis_b": "authors the definition set at the ADM Preliminary phase",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "manage closely"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "the benefit owner (BCM)",
+          "axis_b": "owns the benefit profiles and the measurement they depend on",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "keep informed"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "the programme office",
+          "axis_b": "maintains the issue ledger and the unit protocol",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "keep informed"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "delivery teams of T1–T19",
+          "axis_b": "consume the briefs and the blueprint; their projects are blocked by P0",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "keep informed"
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements Catalog — P0 (retrospective, 2026-11-26)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective matrix artefact for P0, authored 2026-11-26 from the P0 facts brief and docs/plans/P0-programme-definition.md. Phase a, plateau psa, kind matrix. The owner is the programme architect; the Architecture Board reviews. The live row records P0 at ADM phase Preliminary, tranche 0 and status closed, with the scope baseline 01a1fbb1-b05c-76b6-a5ac-7186fb859dcc taken 2026-11-21T01:21:28.099656+00:00 and the programme 01a1d039-0d24-7d16-ae52-4841e96ccfac.\n\n## Entries\n\nThe matrix carries seven rows across the roles the plan names in its governance section. The sponsoring group approves the mandate and takes the continue, pause or stop decision at every tranche review; the senior responsible owner and the programme board hold the decision ladder and assurance; the programme architect authors the definition set; the benefit owner (BCM) holds the profiles; and the programme office and the delivery teams of T1–T19 consume the briefs and the issue ledger. Each row fixes influence, interest and engagement so that the engagement is decidable rather than merely asserted.\n\n## Links\n\nThe artefact carries one typed edge: Requirements Catalog — P0 (retrospective, 2026-11-26) as dependency, because each group's concern becomes a requirement the definition set must meet. The edge names another artefact of this pack, so the set has no orphan, and it is the entry point through which the actors connect to the rest of the graph.\n\n## Document\n\nPurpose: name the groups the programme definition serves and the engagement each requires. Scope: the stakeholder groups of the P0 definition set and the tranche-0 authorisation. It is retrospective and dated 2026-11-26; the rows are reconstructed from the roles the P0 plan names, and the map does not claim a live elicitation that the record never held. The groups are placed against the definition gate, not against delivery work, because P0 closes before T1–T19 are unblocked."
+    },
+    {
+      "title": "Driver / Goal / Objective Catalog — P0 (retrospective, 2026-11-26)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "Trace why the programme is defined and what the definition must achieve.",
+      "scope": "The drivers, goals and objectives of the P0 definition set.",
+      "stakeholders": {
+        "owner": "the programme architect",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the programme office",
+          "delivery teams of T1–T19"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "D1 V1 is far implemented but neither SPEC_V2 nor SPEC.md is a programme plan",
+          "axis_b": "G1 produce the plan that adopts them",
+          "value": {
+            "objective": "the programme plan lists 50 projects (P0 + 49) with tranches and dependencies"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "D2 the seed carries 47 projects and no programme-definition project",
+          "axis_b": "G2 define the programme before delivery starts",
+          "value": {
+            "objective": "T1–T19 carry blocked_by [P0], and no delivery project starts before the first tranche is authorised"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "D3 the programme is judged on benefits operations realises after the projects close, not on the capabilities it delivers",
+          "axis_b": "G3 give every benefit a measured profile and a map path",
+          "value": {
+            "objective": "every benefit carries a six-group profile with baseline, target, method and owner, and at least one path to a strategic objective"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "D4 the definition set is counted in 21 output categories",
+          "axis_b": "G4 publish the set on P0 and on the design site",
+          "value": {
+            "objective": "20 of 21 categories were published at the 2026-11-17 measurement; tranche-review is the sponsoring group's act, and the published-output list carries it at 01a1eb18-6752-72ff-9c28-cd4a94217de7 published 2026-11-17T20:00:13.495168+00:00"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Stakeholder Map — P0 (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalog artefact for P0, authored 2026-11-26 from the P0 facts brief and docs/plans/P0-programme-definition.md. Phase a, plateau psa, kind catalog. The owner is the programme architect; the Architecture Board reviews. The row is closed at tranche 0, and the contracts that frame these drivers are live: statement of architecture work 01a1fdd2-5041-7f80-8032-3305751d498c and delivery contract 01a1fdd4-ab0f-7802-b7a7-2541a2902e6b.\n\n## Entries\n\nThe catalog carries four driver-to-goal rows. D1 records that V1 is far implemented while neither SPEC_V2 nor SPEC.md is a programme plan, and G1 produces the plan that adopts them. D2 records a seed of 47 projects with no programme-definition project, and G2 defines the programme before delivery starts. D3 records that the programme is judged on benefits operations realises, and G3 requires a measured profile and a map path per benefit. D4 counts the definition set in 21 categories, and G4 publishes it on P0 and the design site.\n\n## Links\n\nThe artefact carries one typed edge: Stakeholder Map — P0 (retrospective, 2026-11-26) as derivation, because each driver is held by one of the actors the map names. The edge joins this catalog to the rest of the graph and leaves no artefact of the pack unconnected.\n\n## Document\n\nPurpose: trace why the programme is defined and what the definition must achieve. Scope: the drivers, goals and objectives of the P0 definition set as the plan and the live record carry them. It is retrospective and dated 2026-11-26. The objectives are the plan's own acceptance lines, so the catalog states what the definition was held to rather than a later interpretation of it, and D4 records both the plan's 2026-11-17 count and the later publication of the twenty-first category."
+    },
+    {
+      "title": "Requirements Catalog — P0 (retrospective, 2026-11-26)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "State the requirements the definition set and its governance records must meet.",
+      "scope": "Publication, plan, benefits, tranche and architecture-capability requirements.",
+      "stakeholders": {
+        "owner": "the programme architect",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "the sponsoring group",
+          "delivery teams of T1–T19"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "R1",
+          "axis_b": "publish the definition set on P0",
+          "value": {
+            "requirement": "the definition set is published as documents on P0 across the P0 class's 21 categories; 20 of 21 were published at the 2026-11-17 measurement and tranche-review is the sponsoring group's act",
+            "acceptance": "seed/output-standard.json carries the 21 categories (#221/#262); the published-output list carries tranche-review 01a1eb18-6752-72ff-9c28-cd4a94217de7 published 2026-11-17T20:00:13.495168+00:00"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "R2",
+          "axis_b": "list the programme in full",
+          "value": {
+            "requirement": "the programme plan lists 50 projects (P0 + 49) with tranches and dependencies",
+            "acceptance": "the plan's acceptance line; the projects-dossier output 01a1e9e0-b03b-74e4-a6ff-1dd89a76ecc9 is titled the 48 projects and published 2026-11-18T08:17:55.923469+00:00, so the count remains a measured line"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "R3",
+          "axis_b": "measure every benefit",
+          "value": {
+            "requirement": "every benefit has a profile with baseline, target, method and owner, and at least one benefits-map path to a strategic objective",
+            "acceptance": "the plan's §6 refuses a profile missing a baseline, a target, a measurement method or an owner"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "R4",
+          "axis_b": "define and authorise the tranches",
+          "value": {
+            "requirement": "every tranche has entry and exit criteria and a review date, and the first tranche is authorised after the definition set is accepted",
+            "acceptance": "the tranche row 01a1e9e0-d787-7f5c-b5ed-15b05f3dc531 was authorised 2026-11-21T01:11:46.972175+00:00 under review 01a1ed84-e111-7082-9fa8-7fe77ccc9024; the tranche plan carries the 14 tranches"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "R5",
+          "axis_b": "make every delivery brief a contract",
+          "value": {
+            "requirement": "every delivery brief carries reuse sources, the analysis and architecture inception units, the ADM phase and plateau its inception must satisfy, and the live architecture_contract it operates under",
+            "acceptance": "the brief template 01a1e007-01fc-769b-a625-e1bcf0230257 carries the mandatory fields"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "R6",
+          "axis_b": "publish the architecture capability baseline",
+          "value": {
+            "requirement": "the principles catalogue, tailored ADM profile, artefact standard, board charter, governance and waiver baseline, and the maturity and skills baseline are published on P0",
+            "acceptance": "principles 01a1e9cf-f6c3-745f-8cfe-69a178d287b5, ADM profile 01a1e9d1-1c5c-75b2-80bd-bfc18c8b02cc, artefact standard 01a1e9d1-2720-776c-9741-a5deb322086e, maturity 01a1e9d1-3075-74b7-9ee4-f7d238440774 and skills 01a1e9d1-3a6b-71cd-884b-5234febf5e45"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "R7",
+          "axis_b": "keep every architecture artefact traceable",
+          "value": {
+            "requirement": "every architecture artefact carries the standard's common metadata and at least one artefact link; a delivery project whose design gate has no live contract is refused",
+            "acceptance": "the plan's acceptance states both conditions directly"
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Driver / Goal / Objective Catalog — P0 (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Architecture Requirement Catalog — P0 (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalog artefact for P0, authored 2026-11-26 from the P0 facts brief and docs/plans/P0-programme-definition.md. Phase a, plateau psa, kind catalog. The owner is the programme architect; the Architecture Board reviews. The requirements are read against the live governance record: the statement of architecture work and the delivery contract are live, the scope baseline 01a1fbb1-b05c-76b6-a5ac-7186fb859dcc is approved, and the review 01a1fdd7-8227-7441-8f43-385bd3e186fa is compliant.\n\n## Entries\n\nThe catalog carries seven requirements. R1 publishes the definition set across the 21 categories. R2 brings the programme plan to 50 projects (P0 + 49). R3 measures every benefit through a six-group profile and a map path. R4 defines and authorises the tranches, and the first tranche is authorised on the record. R5 makes every delivery brief a contract carrying reuse sources and the two inception units. R6 publishes the architecture capability baseline. R7 keeps every artefact traceable to common metadata and at least one link.\n\n## Links\n\nThe artefact carries two typed edges: Driver / Goal / Objective Catalog — P0 (retrospective, 2026-11-26) and Architecture Requirement Catalog — P0 (retrospective, 2026-11-26), both as derivation. The first traces each requirement to the goal it serves and the second carries the architecture-specific detail, so both directions of the graph are anchored and no artefact of the pack is an orphan.\n\n## Document\n\nPurpose: state the requirements the definition set and its governance records must meet. Scope: publication, plan, benefits, tranche and architecture-capability requirements. It is retrospective and dated 2026-11-26. Each acceptance line names a record the brief or the plan actually carries; where the plan's target and the published output disagree, as in the 50-project plan against the 48-project dossier title, the requirement states both and does not silently prefer one."
+    },
+    {
+      "title": "Solution Concept Diagram — P0 (retrospective, 2026-11-26)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "purpose": "Show the components that define the programme and prove the definition.",
+      "scope": "The definition set, the governance record, the tranche gate, the delivery projects and the design site.",
+      "stakeholders": {
+        "owner": "the programme architect",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the programme office",
+          "delivery teams of T1–T19"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the definition set",
+          "axis_b": "21 output categories published on P0 and the design site",
+          "value": {
+            "kind": "component",
+            "note": "the plan's definition list runs from the mandate and programme brief through the blueprint, business case, benefits, dossier, plan, governance, stakeholder profiles, benefits strategy, reuse map, project briefs and analysis pack to the architecture capability baseline"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the governance record",
+          "axis_b": "the contracts, the baseline and the review",
+          "value": {
+            "kind": "component",
+            "note": "statement of architecture work 01a1fdd2-5041-7f80-8032-3305751d498c and delivery contract 01a1fdd4-ab0f-7802-b7a7-2541a2902e6b are live; scope baseline 01a1fbb1-b05c-76b6-a5ac-7186fb859dcc; review 01a1fdd7-8227-7441-8f43-385bd3e186fa is compliant"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "the tranche gate",
+          "axis_b": "the tranche-review authorisation",
+          "value": {
+            "kind": "component",
+            "note": "the tranche row 01a1e9e0-d787-7f5c-b5ed-15b05f3dc531 was authorised 2026-11-21T01:11:46.972175+00:00 under review 01a1ed84-e111-7082-9fa8-7fe77ccc9024"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "the delivery projects",
+          "axis_b": "T1–T19, blocked by P0",
+          "value": {
+            "kind": "actor",
+            "note": "each receives a brief from the template 01a1e007-01fc-769b-a625-e1bcf0230257 and runs the analysis and architecture inception units under the live architecture_contract"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "the design site",
+          "axis_b": "public publication of the definition set",
+          "value": {
+            "kind": "channel",
+            "note": "the plan records that the artefacts are stored on P0 in the console and published on the design site, so the same set has one record and one public face"
+          },
+          "position": 5
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements Catalog — P0 (retrospective, 2026-11-26)",
+          "kind": "realization"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective diagram artefact for P0, authored 2026-11-26 from the P0 facts brief and docs/plans/P0-programme-definition.md. Phase a, plateau psa, kind diagram. The owner is the programme architect; the Architecture Board reviews. The diagram is drawn against the live row, which records P0 at ADM phase Preliminary, tranche 0 and status closed, and against the four governance records the brief carries.\n\n## Entries\n\nThe diagram carries five components. The definition set is the 21 output categories published on P0 and the design site. The governance record holds the statement of architecture work, the delivery contract, the approved scope baseline and the compliant review. The tranche gate is the authorised tranche row with its review. The delivery projects are T1–T19, blocked by P0 and holding briefs taken from the template. The design site is the public face of the same set. Together they show a definition that is recorded once and read in two places.\n\n## Links\n\nThe artefact carries one typed edge: Requirements Catalog — P0 (retrospective, 2026-11-26) as realization, because each component exists to satisfy a requirement named there. The edge names another artefact of this pack, so the set has no orphan, and it records which component answers which class of requirement rather than leaving the mapping implicit.\n\n## Document\n\nPurpose: show the components that define the programme and prove the definition. Scope: the definition set, the governance record, the tranche gate, the delivery projects and the design site. It is retrospective and dated 2026-11-26. The diagram does not model the delivery internals of T1–T19, because P0's boundary ends at the brief, the blueprint and the authorisation that let those projects start."
+    },
+    {
+      "title": "Business Capability Map — P0 (retrospective, 2026-11-26)",
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "purpose": "Name the capabilities the programme definition exercises and the output that evidences each.",
+      "scope": "Programme definition, architecture governance, benefits management, tranche governance, reuse analysis and stakeholder engagement.",
+      "stakeholders": {
+        "owner": "the programme architect",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the programme office",
+          "delivery teams of T1–T19"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Programme definition",
+          "axis_b": "mandate, brief, blueprint, business case, benefits, dossier, plan and governance",
+          "value": {
+            "state": "recorded in the closed P0 row with 21 expected output categories",
+            "evidence": "the plan's definition list in §3 and the published-output categories the brief carries"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Architecture governance",
+          "axis_b": "principles, ADM profile, artefact standard, board charter and the contract baseline",
+          "value": {
+            "state": "published as proposed for P0 acceptance; the typed rows behind them are T9's (#81)",
+            "evidence": "01a1e9cf-f6c3-745f-8cfe-69a178d287b5 (principles), 01a1e9d1-1c5c-75b2-80bd-bfc18c8b02cc (ADM profile) and 01a1e9d1-2720-776c-9741-a5deb322086e (artefact standard)"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Benefits management",
+          "axis_b": "six-group profiles, map paths, measurement methods and realisation",
+          "value": {
+            "state": "published 2026-11-18",
+            "evidence": "benefits strategy 01a1e9e1-fd54-731e-945d-45d8e9f2d2a4 and the realisation plan 01a1e9e2-275e-754f-836b-8738df8fdd8f"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Tranche governance",
+          "axis_b": "entry and exit criteria, review dates and the continue, pause or stop decision",
+          "value": {
+            "state": "the first tranche is authorised on the record",
+            "evidence": "tranche plan 01a1e9e1-6741-73f8-bf1c-2f44167dc674 carries 14 tranches and review 01a1eb18-6752-72ff-9c28-cd4a94217de7 records continue and authorise tranche 1"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Reuse analysis",
+          "axis_b": "the V1 tree, the estate services and modules, and the upstream crates",
+          "value": {
+            "state": "published 2026-11-18T08:18:25.207625+00:00",
+            "evidence": "reuse map 01a1e006-fa29-756e-a710-90db4a232343"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Stakeholder engagement",
+          "axis_b": "the six groups, their concerns and their support",
+          "value": {
+            "state": "published 2026-11-18T08:17:48.704076+00:00",
+            "evidence": "stakeholder profiles 01a1e9e1-d583-74cc-bc8c-097fbe79c1ed"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Solution Concept Diagram — P0 (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Requirements Catalog — P0 (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective diagram artefact for P0, authored 2026-11-26 from the P0 facts brief and docs/plans/P0-programme-definition.md. Phase b, plateau hld, kind diagram. The owner is the programme architect; the Architecture Board reviews. Each capability names the published output that evidences it, so the map reports the record's own claims rather than an assessment added afterwards.\n\n## Entries\n\nThe map carries six capabilities. Programme definition is evidenced by the 21 output categories and the plan's definition list. Architecture governance is evidenced by the principles, ADM profile and artefact standard, with the typed rows still T9's (#81). Benefits management is evidenced by the strategy and realisation outputs. Tranche governance is evidenced by the 14-tranche plan and the review that continued and authorised tranche 1. Reuse analysis is evidenced by the reuse map, and stakeholder engagement by the profiles of the six groups.\n\n## Links\n\nThe artefact carries two typed edges: Solution Concept Diagram — P0 (retrospective, 2026-11-26) and Requirements Catalog — P0 (retrospective, 2026-11-26), both as derivation. The first places each capability against the components that exercise it and the second against the requirement it answers, so the capability view is tied both upward and downward and joins the rest of the graph.\n\n## Document\n\nPurpose: name the capabilities the programme definition exercises and the output that evidences each. Scope: programme definition, architecture governance, benefits management, tranche governance, reuse analysis and stakeholder engagement. It is retrospective and dated 2026-11-26. The architecture-governance row is deliberately stated as proposed for acceptance rather than accepted, because that is the state the plan records and the map does not upgrade it."
+    },
+    {
+      "title": "Data Entity / Data Component Catalog — P0 (retrospective, 2026-11-26)",
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Name the record entities the definition set is proved from.",
+      "scope": "Documents, projects, baselines, contracts, tranches, benefits and artefact rows in the record.",
+      "stakeholders": {
+        "owner": "the programme architect",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "the quality manager",
+          "auditors of the definition set"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "document",
+          "axis_b": "a published definition page",
+          "value": {
+            "kind": "entity",
+            "definition": "one row per published output, carrying its category and publication time; the vision page 01a1e006-d2f5-7048-8ec0-4fe8bc416ce6 was published 2026-11-18T08:18:36.980621+00:00",
+            "key": "id and project_id"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "project",
+          "axis_b": "the P0 record row",
+          "value": {
+            "kind": "entity",
+            "definition": "the row records ADM phase Preliminary, tranche 0, status closed, 21 expected output categories and an empty closure_outputs array",
+            "key": "01a1dcb8-d24b-76de-b901-56fd56e001bc"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "project_baseline",
+          "axis_b": "the approved scope baseline",
+          "value": {
+            "kind": "entity",
+            "definition": "kind scope, approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545 and taken 2026-11-21T01:21:28.099656+00:00",
+            "key": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "programme_contract",
+          "axis_b": "the statement of architecture work and the delivery contract",
+          "value": {
+            "kind": "entity",
+            "definition": "both live, each carrying an approval: 01a1fdd2-74eb-7fe3-a424-cdf02d021931 for the statement and 01a1fdd4-cac3-7767-9b0f-4c15d064d6f6 for the delivery contract",
+            "key": "01a1fdd2-5041-7f80-8032-3305751d498c and 01a1fdd4-ab0f-7802-b7a7-2541a2902e6b"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "tranche",
+          "axis_b": "the programme tranche record",
+          "value": {
+            "kind": "entity",
+            "definition": "number 1 of programme 01a1d039-0d24-7d16-ae52-4841e96ccfac, carrying entry and exit criteria and the authorisation review 01a1ed84-e111-7082-9fa8-7fe77ccc9024",
+            "key": "01a1e9e0-d787-7f5c-b5ed-15b05f3dc531"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "benefit_profile",
+          "axis_b": "B1 Auditable decisions and five further profiles",
+          "value": {
+            "kind": "entity",
+            "definition": "the profile the benefits map reads; published 2026-11-18T08:17:51.320078+00:00 alongside five further profiles",
+            "key": "01a1e9e0-1b2e-7353-9361-16a81a99d354"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "artefact",
+          "axis_b": "the seven approved Phase A–D rows",
+          "value": {
+            "kind": "entity",
+            "definition": "each artefact row carries a document id; the stakeholder map is 01a20234-1244-74cd-b0e2-1ef1d8e04021 with document 01a20234-1f04-7246-9596-ca031f763e6c",
+            "key": "id and document_id"
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Business Capability Map — P0 (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Solution Concept Diagram — P0 (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalog artefact for P0, authored 2026-11-26 from the P0 facts brief and docs/plans/P0-programme-definition.md. Phase c, plateau hld, kind catalog. The owner is the programme architect; the Architecture Board reviews. Every key in the catalog is one the brief actually carries, so the entity set is read from the record rather than inferred from a data-model convention.\n\n## Entries\n\nThe catalog carries seven entities. Document is a published definition page with its category and time. Project is the P0 row, with 21 expected outputs and an empty closure_outputs array. Project_baseline is the approved scope baseline. Programme_contract is the pair of live contracts with their approvals. Tranche is the tranche-1 record with its entry and exit criteria. Benefit_profile is B1 Auditable decisions with five further profiles. Artefact is the seven approved Phase A–D rows, each with a document id.\n\n## Links\n\nThe artefact carries two typed edges: Business Capability Map — P0 (retrospective, 2026-11-26) and Solution Concept Diagram — P0 (retrospective, 2026-11-26), both as derivation. The first records which capability each entity evidences and the second which component owns it, so the entity view is anchored on both sides and the pack keeps a connected graph.\n\n## Document\n\nPurpose: name the record entities the definition set is proved from. Scope: documents, projects, baselines, contracts, tranches, benefits and artefact rows. It is retrospective and dated 2026-11-26. The catalog includes the empty closure_outputs array because the live row carries it; a reader can see that P0 closed without a closure output and compare that with the plan's acceptance set, which does not name one."
+    },
+    {
+      "title": "Technology Standards Catalog — P0 (retrospective, 2026-11-26)",
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Name the standards the definition set and its checks rely on.",
+      "scope": "The artefact standard, the output-standard seed, dependency typing, acceptance form and the organisation spine.",
+      "stakeholders": {
+        "owner": "the programme architect",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "the quality manager",
+          "delivery teams of T1–T19"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the architecture artefact standard (SPEC_V2 §8.1)",
+          "axis_b": "a typed catalog, matrix or diagram with common metadata and at least one link",
+          "value": {
+            "usage": "adopted as artefact standard 01a1e9d1-2720-776c-9741-a5deb322086e; every artefact of this pack and every project inception follows it",
+            "state": "published as proposed for P0 acceptance"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the output-standard seed",
+          "axis_b": "seed/output-standard.json",
+          "value": {
+            "usage": "it carries the P0 class's 21 categories (#221/#262), and the definition set is counted against that list",
+            "state": "the counting rule the plan's acceptance uses"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "the typed dependency vocabulary",
+          "axis_b": "blocked-by, acceptance-blocked-by, blocks and related",
+          "value": {
+            "usage": "the brief template 01a1e007-01fc-769b-a625-e1bcf0230257 requires typed dependencies on every project brief, and the plan's edges use the same four types",
+            "state": "mandatory"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "the BDD acceptance form",
+          "axis_b": "a scenario per part with a Verify: command",
+          "value": {
+            "usage": "the brief template's acceptance row; a delivery project's acceptance is a command rather than a judgement",
+            "state": "mandatory"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "the document-with-category convention",
+          "axis_b": "meta.category set on the project's documents",
+          "value": {
+            "usage": "the plan records that both inception documents are documents on the project with meta.category set and are published when accepted",
+            "state": "recorded"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "migration 0040 and the organisation.* actions",
+          "axis_b": "the T0 organisation spine",
+          "value": {
+            "usage": "merged under #65; the definition plan adopts it and this unit's seed change corrects its measured coverage row",
+            "state": "merged"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Data Entity / Data Component Catalog — P0 (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalog artefact for P0, authored 2026-11-26 from the P0 facts brief and docs/plans/P0-programme-definition.md. Phase d, plateau hld, kind catalog. The owner is the programme architect; the Architecture Board reviews. The standards are the ones the plan and the brief actually reference, so the catalog does not add a technology choice the definition set never made.\n\n## Entries\n\nThe catalog carries six standards. The architecture artefact standard requires a typed catalog, matrix or diagram with common metadata and at least one link. The output-standard seed carries the 21 P0 categories. The typed dependency vocabulary supplies the four edge types. The BDD acceptance form requires a Verify command per part. The document-with-category convention makes the inception documents documents on the project. The T0 organisation spine, migration 0040 and the organisation.* actions, is the merged foundation the plan adopts.\n\n## Links\n\nThe artefact carries one typed edge: Data Entity / Data Component Catalog — P0 (retrospective, 2026-11-26) as derivation, because every entity in that catalogue is stored under one of these standards. The edge names another artefact of this pack, so the set has no orphan, and it ties the storage rules to the records they govern.\n\n## Document\n\nPurpose: name the standards the definition set and its checks rely on. Scope: the artefact standard, the output-standard seed, dependency typing, the acceptance form, the category convention and the organisation spine. It is retrospective and dated 2026-11-26. The artefact-standard row repeats the proposed-for-acceptance state because the standard is published while the typed rows behind it remain T9's (#81), and the catalog does not present that as settled."
+    },
+    {
+      "title": "Gap Analysis Matrix — P0 (retrospective, 2026-11-26)",
+      "phase_code": "e",
+      "plateau": "hld",
+      "artifact_kind": "matrix",
+      "purpose": "Measure the definition set against the acceptance the plan sets for it.",
+      "scope": "Project count, output publication, architecture baseline, delivery blockage, tranche authorisation and tranche-1 evidence.",
+      "stakeholders": {
+        "owner": "the programme architect",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the programme office",
+          "the quality manager"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "programme project count",
+          "axis_b": "the seed against the plan's target",
+          "value": {
+            "baseline": "the seed carries 47 projects and no programme-definition project; the projects-dossier output 01a1e9e0-b03b-74e4-a6ff-1dd89a76ecc9 is titled the 48 projects and was published 2026-11-18T08:17:55.923469+00:00",
+            "target": "the programme plan lists 50 projects (P0 + 49)",
+            "status": "open; the difference is two projects beyond the programme-definition project"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "definition-set publication",
+          "axis_b": "measured at the 2026-11-17 checkpoint",
+          "value": {
+            "baseline": "20 of the 21 categories published at the 2026-11-17 measurement",
+            "target": "all 21 categories published",
+            "status": "closed on the published-output list, which carries tranche-review 01a1eb18-6752-72ff-9c28-cd4a94217de7 published 2026-11-17T20:00:13.495168+00:00"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "architecture capability baseline",
+          "axis_b": "proposed against accepted",
+          "value": {
+            "baseline": "the principles, artefact standard, ADM profile, maturity and skills outputs were published by #122's A7 as proposed for P0 acceptance",
+            "target": "the typed rows behind them exist as T9's (#81) and the baseline is adopted as the programme's default ADM profile",
+            "status": "open"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "delivery-project blockage",
+          "axis_b": "T1–T19 blocked_by [P0]",
+          "value": {
+            "baseline": "the starting state records T1–T17 as proposed and blocked by their SPEC_V2 §12 edges",
+            "target": "the Validation page shows P0 at tranche 0 and T1–T19 blocked_by [P0]",
+            "status": "recorded as an acceptance line; the P0 edge across T1–T19 is the addition the definition makes"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "tranche authorisation",
+          "axis_b": "the first tranche",
+          "value": {
+            "baseline": "the tranche row exists with entry and exit criteria",
+            "target": "the first tranche is authorised after the definition set is accepted",
+            "status": "authorised 2026-11-21T01:11:46.972175+00:00 under review 01a1ed84-e111-7082-9fa8-7fe77ccc9024; the row records state closed"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "tranche-1 exit evidence",
+          "axis_b": "the row's stated exit criteria",
+          "value": {
+            "baseline": "the row requires every tranche-1 project, S02, T1 and T11, to meet acceptance with published evidence",
+            "target": "the review records continue, pause or stop",
+            "status": "the row records state closed; this pack reports that state and does not assert the S02, T1 and T11 acceptances"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Business Capability Map — P0 (retrospective, 2026-11-26)",
+          "kind": "dependency"
+        },
+        {
+          "to": "Technology Standards Catalog — P0 (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective matrix artefact for P0, authored 2026-11-26 from the P0 facts brief and docs/plans/P0-programme-definition.md. Phase e, plateau hld, kind matrix. The owner is the programme architect; the Architecture Board reviews. The baseline of comparison is the live row and the plan's acceptance set, both read on 2026-11-26, and the matrix keeps the measured state separate from the target in every row.\n\n## Entries\n\nThe matrix carries six rows. The project count is open: the seed carried 47 and the plan targets 50, while the published dossier names 48. Output publication closed on the published-output list, which carries the twenty-first category. The architecture capability baseline remains proposed rather than accepted. Delivery blockage is recorded as the P0 edge over T1–T19. The first tranche is authorised on the record, and the tranche-1 exit evidence row states plainly that this pack does not assert the S02, T1 and T11 acceptances.\n\n## Links\n\nThe artefact carries two typed edges: Business Capability Map — P0 (retrospective, 2026-11-26) as dependency and Technology Standards Catalog — P0 (retrospective, 2026-11-26) as derivation. The first says which capability each gap sits in and the second says which standard measures it; both name artefacts of this pack, so the set remains one connected graph.\n\n## Document\n\nPurpose: measure the definition set against the acceptance the plan sets for it. Scope: project count, output publication, architecture baseline, delivery blockage, tranche authorisation and tranche-1 evidence. It is retrospective and dated 2026-11-26. No row is scored as closed merely because a later output exists; where the plan's measurement and the published list differ, the row carries both so that the reader sees the movement rather than a single chosen number."
+    },
+    {
+      "title": "Candidate Solutions Catalog — P0 (retrospective, 2026-11-26)",
+      "phase_code": "e",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Record the routes the definition could take and the one the plan chose for each.",
+      "scope": "Seed adoption, parallel lists, publication route, reuse route, delivery timing and baseline acceptance.",
+      "stakeholders": {
+        "owner": "the programme architect",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the programme office",
+          "delivery teams of T1–T19"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "adopt and update the existing programme seed",
+          "axis_b": "the plan's route for the project list",
+          "value": {
+            "status": "chosen; the plan states the programme plan adopts and updates the existing seed and does not invent a parallel list"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "author a parallel project list",
+          "axis_b": "the alternative to the seed",
+          "value": {
+            "status": "not taken; the plan rules it out in the same sentence that chooses the seed"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "store the definition set on P0 as intermediate outputs and publish it on the design site",
+          "axis_b": "the publication route",
+          "value": {
+            "status": "chosen; P0 is a project of the programme it defines, so every artefact is stored on P0 in the console and published on the design site"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "reuse the V1 tree, the estate services and the upstream crates through a reuse map",
+          "axis_b": "the architecture route",
+          "value": {
+            "status": "chosen; V1 is far implemented with 25 measured-built slices and 2 partial, S14 and S21, and the reuse map 01a1e006-fa29-756e-a710-90db4a232343 carries the candidates"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "start T1–T19 in parallel with the definition",
+          "axis_b": "the delivery timing",
+          "value": {
+            "status": "not taken; the plan states the programme does not start T1–T19 until the definition set is accepted"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "publish the architecture capability outputs as proposed for P0 acceptance",
+          "axis_b": "the baseline route",
+          "value": {
+            "status": "recorded; #122's A7 published them as proposed and the typed rows are T9's (#81), so acceptance stays the open step"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Gap Analysis Matrix — P0 (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Solution Concept Diagram — P0 (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Project Context Diagram — P0 (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalog artefact for P0, authored 2026-11-26 from the P0 facts brief and docs/plans/P0-programme-definition.md. Phase e, plateau hld, kind catalog. The owner is the programme architect; the Architecture Board reviews. Each candidate is a route the plan considers explicitly, so the catalog records decisions the plan already made rather than a fresh option appraisal conducted after the fact.\n\n## Entries\n\nThe catalog carries six candidates across three decisions. For the project list the plan adopts and updates the seed and rejects a parallel list. For publication it stores the set on P0 and publishes it on the design site. For reuse it takes the V1 tree, the estate services and the upstream crates through the reuse map. For timing it holds T1–T19 back until the definition set is accepted. For the architecture baseline it records the outputs as proposed for P0 acceptance, which leaves that step open.\n\n## Links\n\nThe artefact carries three typed edges: Gap Analysis Matrix — P0 (retrospective, 2026-11-26), Solution Concept Diagram — P0 (retrospective, 2026-11-26) and Project Context Diagram — P0 (retrospective, 2026-11-26), all as derivation. The gap says what each choice must close, the solution concept says which component carries it and the context says who is affected; all three name artefacts of this pack.\n\n## Document\n\nPurpose: record the routes the definition could take and the one the plan chose for each. Scope: seed adoption, parallel lists, publication route, reuse route, delivery timing and baseline acceptance. It is retrospective and dated 2026-11-26. Two routes are marked not taken on the plan's own wording, and the sixth is left open rather than recorded as chosen, because the plan itself holds the architecture baseline at proposed for acceptance."
+    },
+    {
+      "title": "Project Context Diagram — P0 (retrospective, 2026-11-26)",
+      "phase_code": "e",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "purpose": "Place the definition work in its deciding, consuming and recording context.",
+      "scope": "The sponsoring group, the programme office, the Architecture Board, the delivery projects, the console and the design site.",
+      "stakeholders": {
+        "owner": "the programme architect",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the programme office",
+          "delivery teams of T1–T19"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the sponsoring group",
+          "axis_b": "decides continue, pause or stop at each tranche review",
+          "value": {
+            "kind": "actor",
+            "note": "the plan makes the end-of-tranche review an approval decision and refuses a review with no evidence"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the programme office",
+          "axis_b": "runs the unit protocol and the issue ledger",
+          "value": {
+            "kind": "actor",
+            "note": "every unit's issue carries the tranche, brief, ADM phase and plateau and benefits, and the review reads those four fields from the ledger"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "the Architecture Board",
+          "axis_b": "reviews the architecture inception and the artefact standard",
+          "value": {
+            "kind": "actor",
+            "note": "the board charter, its membership and its decision limits are part of the architecture capability baseline the plan requires"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "delivery projects T1–T19",
+          "axis_b": "consume the briefs and the blueprint",
+          "value": {
+            "kind": "actor",
+            "note": "they are blocked by P0, and each brief names the ADM phase and plateau its architecture inception must satisfy"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "the console record",
+          "axis_b": "stores the definition set on P0",
+          "value": {
+            "kind": "system",
+            "note": "the plan records the artefacts as intermediate outputs stored on P0 in the console"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "the design site",
+          "axis_b": "publishes the definition set",
+          "value": {
+            "kind": "system",
+            "note": "publication follows acceptance; a project without both inception documents published is an inception gap and its build units are not claimed"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Stakeholder Map — P0 (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Solution Concept Diagram — P0 (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective diagram artefact for P0, authored 2026-11-26 from the P0 facts brief and docs/plans/P0-programme-definition.md. Phase e, plateau hld, kind diagram. The owner is the programme architect; the Architecture Board reviews. The boundary is the definition gate and the records it writes, so delivery internals sit outside it and only the brief, the blueprint and the authorisation cross into T1–T19.\n\n## Entries\n\nThe diagram carries six context actors and systems. The sponsoring group decides continue, pause or stop. The programme office runs the unit protocol and reads the four ledger fields at each review. The Architecture Board reviews the architecture inception and the artefact standard. T1–T19 consume the briefs and the blueprint. The console stores the set on P0, and the design site publishes it once accepted. Reading them together shows a definition that one group approves, one office tracks and one board assures.\n\n## Links\n\nThe artefact carries two typed edges: Stakeholder Map — P0 (retrospective, 2026-11-26) and Solution Concept Diagram — P0 (retrospective, 2026-11-26), both as derivation. The map names the actors and the concept diagram names the components, so this view is the meeting point of the two and the pack stays one graph without an orphan.\n\n## Document\n\nPurpose: place the definition work in its deciding, consuming and recording context. Scope: the sponsoring group, the programme office, the Architecture Board, the delivery projects, the console and the design site. It is retrospective and dated 2026-11-26. The diagram does not draw T1–T19's internal context; it records only the boundary P0 sets for them, which is the blocked_by edge and the brief each project receives."
+    },
+    {
+      "title": "Benefits Diagram — P0 (retrospective, 2026-11-26)",
+      "phase_code": "e",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "purpose": "Link the definition outputs to the benefits the programme commits to measure.",
+      "scope": "B1 Auditable decisions, the benefits map, the measurement baseline, the licensing condition and the six profile groups.",
+      "stakeholders": {
+        "owner": "the programme architect",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the benefit owner (BCM)",
+          "the programme office"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "B1 Auditable decisions",
+          "axis_b": "a decision recorded so that it can be reviewed after the fact",
+          "value": {
+            "kind": "benefit",
+            "note": "profile 01a1e9e0-1b2e-7353-9361-16a81a99d354 was published 2026-11-18T08:17:51.320078+00:00 alongside five further profiles"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the benefits map",
+          "axis_b": "output to capability to operational outcome to benefit or disbenefit to strategic objective",
+          "value": {
+            "kind": "instrument",
+            "note": "01a1e9e0-750d-71b9-8230-177eebe80e95 records every path and the dependencies between benefits, outputs and capabilities, published 2026-11-18T08:17:53.625188+00:00"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "the measurement baseline",
+          "axis_b": "measured while the old practice is still observable",
+          "value": {
+            "kind": "condition",
+            "note": "a benefit whose baseline was never measured cannot claim an improvement, and a project output is not a benefit"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "the public and opt-in licensing frame",
+          "axis_b": "a condition of the benefits",
+          "value": {
+            "kind": "condition",
+            "note": "the plan makes the licensing frame a condition of the benefits rather than a footnote to the business case"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "the six profile groups",
+          "axis_b": "identification, performance, cost, conditions, uncertainty and responsibility",
+          "value": {
+            "kind": "standard",
+            "note": "a profile missing a baseline, a target, a measurement method or an owner is refused"
+          },
+          "position": 5
+        }
+      ],
+      "links": [
+        {
+          "to": "Business Capability Map — P0 (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Candidate Solutions Catalog — P0 (retrospective, 2026-11-26)",
+          "kind": "realization"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective diagram artefact for P0, authored 2026-11-26 from the P0 facts brief and docs/plans/P0-programme-definition.md. Phase e, plateau hld, kind diagram. The owner is the programme architect; the Architecture Board reviews, and the benefit owner (BCM) is the named consumer because the plan gives that role the profiles. The diagram reports the published benefit records and does not add a measure the record does not carry.\n\n## Entries\n\nThe diagram carries five rows. B1 Auditable decisions is the benefit profile the brief names, with five further profiles behind it. The benefits map is the instrument that records every path from output to capability, outcome, benefit and objective. The measurement baseline is a condition: a benefit without one cannot claim an improvement, and a project output is not a benefit. The licensing frame is a further condition of the benefits. The six profile groups fix what a complete profile contains.\n\n## Links\n\nThe artefact carries two typed edges: Business Capability Map — P0 (retrospective, 2026-11-26) as derivation and Candidate Solutions Catalog — P0 (retrospective, 2026-11-26) as realization. The first ties each benefit to the capability that enables it and the second to the route that delivers it, so the benefit view descends from both and no artefact of the pack is left unconnected.\n\n## Document\n\nPurpose: link the definition outputs to the benefits the programme commits to measure. Scope: B1 Auditable decisions, the benefits map, the measurement baseline, the licensing condition and the six profile groups. It is retrospective and dated 2026-11-26. The diagram does not claim any benefit realised: the profiles and the map are published on 2026-11-18, and realisation belongs to operations after the projects close, as the plan states."
+    },
+    {
+      "title": "Implementation and Migration Plan Catalog — P0 (retrospective, 2026-11-26)",
+      "phase_code": "f",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Record the work packages that define the programme and the state of each.",
+      "scope": "Seed extension, definition publication, architecture baseline, tranche authorisation and reproducibility.",
+      "stakeholders": {
+        "owner": "the programme architect",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the programme office",
+          "delivery teams of T1–T19"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "WP1 extend the programme seed",
+          "axis_b": "the project list behind the plan",
+          "value": {
+            "status": "recorded in the plan; the seed carries 47 projects and no programme-definition project, and the plan's target is 50 (P0 + 49)",
+            "evidence": "the plan's §2 starting state and §8 acceptance; the projects-dossier output 01a1e9e0-b03b-74e4-a6ff-1dd89a76ecc9 is titled the 48 projects"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "WP2 author and publish the definition set",
+          "axis_b": "the 21 output categories",
+          "value": {
+            "status": "20 of 21 published at the 2026-11-17 measurement; the published-output list carries tranche-review 01a1eb18-6752-72ff-9c28-cd4a94217de7 published 2026-11-17T20:00:13.495168+00:00",
+            "evidence": "the published-output categories the brief records"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "WP3 stand up the architecture capability baseline",
+          "axis_b": "principles, ADM profile, artefact standard, board charter, maturity and skills",
+          "value": {
+            "status": "open; published by #122's A7 as proposed for P0 acceptance, with the typed rows T9's (#81)",
+            "evidence": "01a1e9cf-f6c3-745f-8cfe-69a178d287b5, 01a1e9d1-1c5c-75b2-80bd-bfc18c8b02cc, 01a1e9d1-2720-776c-9741-a5deb322086e, 01a1e9d1-3075-74b7-9ee4-f7d238440774 and 01a1e9d1-3a6b-71cd-884b-5234febf5e45"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "WP4 authorise the first tranche",
+          "axis_b": "the tranche-0 review decision",
+          "value": {
+            "status": "authorised 2026-11-21T01:11:46.972175+00:00 under review 01a1ed84-e111-7082-9fa8-7fe77ccc9024; the row records state closed",
+            "evidence": "the tranche row 01a1e9e0-d787-7f5c-b5ed-15b05f3dc531 and the review output 01a1eb18-6752-72ff-9c28-cd4a94217de7, titled continue and authorise tranche 1"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "WP5 keep the plan and seed reproducible",
+          "axis_b": "the documentation and coverage checks",
+          "value": {
+            "status": "the plan's acceptance requires check-coverage to pass, the seed regen to be idempotent and build-docs to index the plan",
+            "evidence": "the plan's §8 final acceptance bullet"
+          },
+          "position": 5
+        }
+      ],
+      "links": [
+        {
+          "to": "Candidate Solutions Catalog — P0 (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Technology Standards Catalog — P0 (retrospective, 2026-11-26)",
+          "kind": "dependency"
+        },
+        {
+          "to": "Gap Analysis Matrix — P0 (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Benefits Diagram — P0 (retrospective, 2026-11-26)",
+          "kind": "realization"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalog artefact for P0, authored 2026-11-26 from the P0 facts brief and docs/plans/P0-programme-definition.md. Phase f, plateau hld, kind catalog. The owner is the programme architect; the Architecture Board reviews. The work packages are the plan's own steps, and each row states the live state on 2026-11-26 rather than the state the plan intended at authoring time.\n\n## Entries\n\nThe catalog carries five work packages. WP1 extends the programme seed toward the 50 projects the plan targets. WP2 publishes the definition set, with twenty of twenty-one categories at the 2026-11-17 measurement and the twenty-first carried in the published-output list. WP3 stands up the architecture capability baseline and stays open because the outputs are proposed for acceptance. WP4 authorises the first tranche, which the record shows authorised on 2026-11-21. WP5 keeps the plan, the seed and the coverage check reproducible.\n\n## Links\n\nThe artefact carries four typed edges: Candidate Solutions Catalog — P0 (retrospective, 2026-11-26) and Gap Analysis Matrix — P0 (retrospective, 2026-11-26) as derivation, Technology Standards Catalog — P0 (retrospective, 2026-11-26) as dependency, and Benefits Diagram — P0 (retrospective, 2026-11-26) as realization. The four place the packages against the chosen route, the measured gap, the standard and the benefit.\n\n## Document\n\nPurpose: record the work packages that define the programme and the state of each. Scope: seed extension, definition publication, architecture baseline, tranche authorisation and reproducibility. It is retrospective and dated 2026-11-26. WP3 is recorded as open and WP1 as recorded rather than done, because the plan's target of 50 and the published dossier's 48 have not yet met; the catalog reports that difference instead of rounding it away."
+    },
+    {
+      "title": "Compliance Review Catalog — P0 (retrospective, 2026-11-26)",
+      "phase_code": "g",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Record the compliance verdicts the definition carries.",
+      "scope": "The delivery-contract review, approval separation, the scope baseline, the architecture baseline and the closure condition.",
+      "stakeholders": {
+        "owner": "the programme architect",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the programme office",
+          "the quality manager"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the delivery-contract review",
+          "axis_b": "the recorded compliance level",
+          "value": {
+            "result": "compliant",
+            "evidence": "review 01a1fdd7-8227-7441-8f43-385bd3e186fa is level compliant against contract 01a1fdd4-ab0f-7802-b7a7-2541a2902e6b"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "approval separation",
+          "axis_b": "an approver distinct from the requester",
+          "value": {
+            "result": "compliant",
+            "evidence": "the approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 is distinct from the requester 01a1e607-17d9-77d3-98d3-a43a87c4633d on approvals 01a1fdd2-74eb-7fe3-a424-cdf02d021931 and 01a1fdd4-cac3-7767-9b0f-4c15d064d6f6"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "the scope baseline",
+          "axis_b": "approved and taken",
+          "value": {
+            "result": "recorded",
+            "evidence": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc, kind scope, approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545 and taken 2026-11-21T01:21:28.099656+00:00"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "the architecture capability baseline",
+          "axis_b": "proposed against accepted",
+          "value": {
+            "result": "open",
+            "evidence": "#122's A7 published the principles, artefact standard, ADM profile, maturity and skills as proposed for P0 acceptance; the typed rows are T9's (#81)"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "the P0 closure condition",
+          "axis_b": "the tranche-review output",
+          "value": {
+            "result": "satisfied on the published-output list",
+            "evidence": "the plan's closure gate #302 refuses P0's close while tranche-review is unpublished; 01a1eb18-6752-72ff-9c28-cd4a94217de7 is published 2026-11-17T20:00:13.495168+00:00"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "the closed row's closure record",
+          "axis_b": "the closure_outputs array",
+          "value": {
+            "result": "recorded, not scored",
+            "evidence": "the live row carries status closed and an empty closure_outputs array; the plan's acceptance set does not name a P0 closure output"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Technology Standards Catalog — P0 (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Implementation and Migration Plan Catalog — P0 (retrospective, 2026-11-26)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalog artefact for P0, authored 2026-11-26 from the P0 facts brief and docs/plans/P0-programme-definition.md. Phase g, plateau hld, kind catalog. The owner is the programme architect; the Architecture Board reviews. The catalog reports the verdicts the live record carries and keeps the one open item visible, so a reader can separate what the governance achieved from what it deferred.\n\n## Entries\n\nThe catalog carries six assessments. The delivery-contract review is compliant against the delivery contract. Approval separation is compliant, with the approver distinct from the requester on both approvals. The scope baseline is approved and taken on 2026-11-21. The architecture capability baseline is open because its outputs are proposed for acceptance. The closure condition is satisfied on the published-output list, where the tranche-review output appears. The closed row's closure_outputs array is recorded without a score, since the plan's acceptance set does not name a P0 closure output.\n\n## Links\n\nThe artefact carries two typed edges: Technology Standards Catalog — P0 (retrospective, 2026-11-26) as derivation and Implementation and Migration Plan Catalog — P0 (retrospective, 2026-11-26) as dependency. The first names the standard each verdict is measured against and the second names the packages the verdicts attach to; both are artefacts of this pack, so the graph stays connected.\n\n## Document\n\nPurpose: record the compliance verdicts the definition carries. Scope: the delivery-contract review, approval separation, the scope baseline, the architecture baseline and the closure condition. It is retrospective and dated 2026-11-26. No verdict is raised above what the record supports: the review is compliant at the level it states, and the architecture baseline remains open because the plan itself places it at proposed for acceptance."
+    },
+    {
+      "title": "Architecture Change Request Catalog — P0 (retrospective, 2026-11-26)",
+      "phase_code": "h",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Record the changes the definition set makes to the programme and their state.",
+      "scope": "The seed change, the architecture baseline adoption, the delivery gate, the tranche authorisation and the baseline rule.",
+      "stakeholders": {
+        "owner": "the programme architect",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the programme office",
+          "the quality manager"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "CR1 add the programme-definition project to the seed",
+          "axis_b": "the seed change",
+          "value": {
+            "status": "recorded in the plan",
+            "evidence": "the plan states the seed has 47 projects and no programme-definition project, and that this unit's seed change corrects T0's measured coverage row"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "CR2 adopt the architecture capability baseline as the programme's default ADM profile",
+          "axis_b": "the architecture baseline",
+          "value": {
+            "status": "open",
+            "evidence": "the plan makes it the programme's default; #122's A7 published it as proposed for P0 acceptance and the typed rows are T9's (#81)"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "CR3 gate T1–T19 behind the definition set",
+          "axis_b": "the delivery gate",
+          "value": {
+            "status": "accepted",
+            "evidence": "the plan states the programme does not start T1–T19 until the set is accepted, and the Validation page shows T1–T19 blocked_by [P0]"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "CR4 authorise the first tranche",
+          "axis_b": "the tranche decision",
+          "value": {
+            "status": "authorised",
+            "evidence": "tranche 01a1e9e0-d787-7f5c-b5ed-15b05f3dc531 authorised 2026-11-21T01:11:46.972175+00:00 under review 01a1ed84-e111-7082-9fa8-7fe77ccc9024"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "CR5 route any re-baseline through change control",
+          "axis_b": "the baseline rule",
+          "value": {
+            "status": "recorded",
+            "evidence": "the plan states a re-baseline goes through change control and the review does not rewrite the baseline"
+          },
+          "position": 5
+        }
+      ],
+      "links": [
+        {
+          "to": "Compliance Review Catalog — P0 (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Gap Analysis Matrix — P0 (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalog artefact for P0, authored 2026-11-26 from the P0 facts brief and docs/plans/P0-programme-definition.md. Phase h, plateau hld, kind catalog. The owner is the programme architect; the Architecture Board reviews. The changes are the ones the plan and the live record carry, so the catalogue records the definition's own interventions rather than a general change backlog.\n\n## Entries\n\nThe catalog carries five change requests. CR1 adds the programme-definition project to the seed and corrects T0's measured coverage row. CR2 adopts the architecture capability baseline as the programme's default ADM profile and remains open at proposed for acceptance. CR3 gates T1–T19 behind the definition set and is recorded as accepted. CR4 authorises the first tranche, which the row records on 2026-11-21. CR5 is the rule that any re-baseline goes through change control, so a review cannot rewrite the baseline it assesses.\n\n## Links\n\nThe artefact carries two typed edges: Compliance Review Catalog — P0 (retrospective, 2026-11-26) and Gap Analysis Matrix — P0 (retrospective, 2026-11-26), both as derivation. The first records the verdict that prompts the changes and the second the distance each change must close, so the change view answers both. Both edges name artefacts of this pack and the graph keeps no orphan.\n\n## Document\n\nPurpose: record the changes the definition set makes to the programme and their state. Scope: the seed change, the architecture baseline adoption, the delivery gate, the tranche authorisation and the baseline rule. It is retrospective and dated 2026-11-26. CR2 is left open on the same evidence the compliance review uses, and the catalogue does not present a proposed baseline as an adopted one."
+    },
+    {
+      "title": "Architecture Requirement Catalog — P0 (retrospective, 2026-11-26)",
+      "phase_code": "h",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "State what the architecture of the definition and its inception standard must satisfy.",
+      "scope": "Common metadata, the inception plateau, the live architecture_contract, the capability baseline and the design-gate refusal.",
+      "stakeholders": {
+        "owner": "the programme architect",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the Architecture Board",
+          "delivery teams of T1–T19",
+          "the programme office"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "AR1",
+          "axis_b": "common metadata and at least one artefact link",
+          "value": {
+            "requirement": "each architecture artefact carries owner, reviewer and review date, version, purpose, stakeholders and scope, the related project, and its published document or contract, plus at least one link",
+            "acceptance": "the plan's acceptance requires both conditions of every artefact in the pack"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "AR2",
+          "axis_b": "the inception plateau",
+          "value": {
+            "requirement": "a project's brief names the ADM phase and plateau its architecture inception must satisfy, with the PSA set at inception and the HLD and SD sets as it matures",
+            "acceptance": "the PSA set is the principles applied, the requirements, the stakeholder map, the driver, goal and objective catalogue and the solution concept"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "AR3",
+          "axis_b": "the live architecture_contract",
+          "value": {
+            "requirement": "the project operates under the live architecture_contract that governs it and must fit the blueprint",
+            "acceptance": "a deviation is recorded as a decision record, not a silent fork"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "AR4",
+          "axis_b": "the architecture capability baseline",
+          "value": {
+            "requirement": "the programme's default ADM profile is backed by a principles catalogue, a tailored ADM profile, an artefact standard with its repository and type catalogue, a board charter with membership and decision limits, a governance, contract and waiver baseline, and a maturity and skills baseline",
+            "acceptance": "the maturity baseline covers nine dimensions on a 0 to 5 scale and the skills baseline covers seven categories, published on P0"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "AR5",
+          "axis_b": "no design gate without a live contract",
+          "value": {
+            "requirement": "a delivery project whose design gate has no live contract is refused",
+            "acceptance": "the plan's acceptance names the refusal directly, so the gate is a condition on the project rather than advice"
+          },
+          "position": 5
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements Catalog — P0 (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Architecture Change Request Catalog — P0 (retrospective, 2026-11-26)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalog artefact for P0, authored 2026-11-26 from the P0 facts brief and docs/plans/P0-programme-definition.md. Phase h, plateau hld, kind catalog. The owner is the programme architect; the Architecture Board reviews, since the plan makes the board charter, its membership and its decision limits part of the architecture capability baseline. The requirements are those the plan imposes on every delivery project's architecture inception.\n\n## Entries\n\nThe catalog carries five architecture requirements. AR1 requires common metadata and at least one artefact link on every artefact. AR2 fixes the inception plateau, with the PSA set at inception and the HLD and SD sets later. AR3 places the project under the live architecture_contract, with deviations as decision records. AR4 defines the architecture capability baseline, including nine maturity dimensions on a 0 to 5 scale and seven skills categories. AR5 refuses a design gate that has no live contract.\n\n## Links\n\nThe artefact carries two typed edges: Requirements Catalog — P0 (retrospective, 2026-11-26) as derivation and Architecture Change Request Catalog — P0 (retrospective, 2026-11-26) as dependency. The first shows that these are the architecture half of the wider requirement set and the second that the baseline adoption is the change which makes them enforceable. Both name artefacts of this pack, so no artefact is an orphan.\n\n## Document\n\nPurpose: state what the architecture of the definition and its inception standard must satisfy. Scope: common metadata, the inception plateau, the live architecture_contract, the capability baseline and the design-gate refusal. It is retrospective and dated 2026-11-26. The requirements are worded as conditions a delivery project must meet, so the catalog can be read as the architecture half of the brief template rather than as a description of work already completed."
+    }
+  ],
+  "documents": [
+    {
+      "category": "gap-analysis",
+      "title": "Gap Analysis — P0 (retrospective, 2026-11-26)",
+      "body": "# Gap Analysis — P0 (retrospective, 2026-11-26)\n\n## Baseline\n\nThe baseline is the acceptance state recorded on 2026-11-25. P0 was closed with the SoAW `01a1fdd2-5041-7f80-8032-3305751d498c`, the delivery contract `01a1fdd4-ab0f-7802-b7a7-2541a2902e6b`, the approved scope baseline `01a1fbb1-b05c-76b6-a5ac-7186fb859dcc` and the compliant Phase-G review `01a1fdd7-8227-7441-8f43-385bd3e186fa`, but its manifest was red: closure outputs were undeclared, the eight E–H artefacts did not exist, and the benefit baselines carried no evidence in the profile rows.\n\n## Target\n\nThe target is a green manifest: the 15-artefact set approved, the four Phase-E category documents published, all five register kinds recorded, the closure outputs declared and the closure review published, and the seven benefit profiles carrying measured baselines with evidence. The project then re-closes through the one gate with a distinct approver.\n\n## Gaps and work packages\n\nThree gaps are measured. The artefact gap closes from the E–H rows this pack authors; the document gap closes from the four category documents it carries; the closure gap closes from the declared closure-review output. The benefit evidence gap closed when the seven baselines were re-recorded through benefits.measure on 2026-11-26; no benefit realisation is claimed by this rework."
+    },
+    {
+      "category": "candidate-solutions",
+      "title": "Candidate Solutions — P0 (retrospective, 2026-11-26)",
+      "body": "# Candidate Solutions — P0 (retrospective, 2026-11-26)\n\n## Candidates\n\nTwo routes were considered for P0's retrospective conformance. The first reworks the project in place through the product's own lifecycle: reopen, author the missing artefacts, documents and registers, re-close through the one gate, and republish the 21 outputs from the record. The second closes the project by decision and demotes its definition set to a historical note, leaving the delivery projects to cite it without a live governing record.\n\n## Criteria\n\nThe routes were judged on three criteria: evidence traceability, meaning every claim resolves to a row, an action and a receipt; re-runnability, meaning the acceptance manifest can be executed again on a fresh snapshot and reach the same verdict; and fidelity to the programme, meaning the definition set remains the governing input the delivery projects are held to.\n\n## Options rejected\n\nClosing by decision was rejected: P0 still has a point, because every delivery project's brief and every benefit transition depends on the definition set, and the owner's directive of 2026-11-21 requires a viable project to be reworked by the book. Authoring the missing content outside the record was rejected for the same reason: a document the engine cannot resolve is not governance evidence."
+    },
+    {
+      "category": "project-context-diagram",
+      "title": "Project Context Diagram — P0 (retrospective, 2026-11-26)",
+      "body": "# Project Context Diagram — P0 (retrospective, 2026-11-26)\n\n## Context\n\nThe work package is P0's retrospective rework: the programme-definition project of the conveyor buildout. Its boundary is the programme record — projects, artefacts, documents, registers, baselines, contracts, approvals and the benefit profiles — plus the public design pack the site serves. Delivery projects and their own records sit outside the boundary; they consume this definition set rather than belong to it.\n\n## Affected organisation\n\nThe sponsoring group authorises the mandate and the tranche decisions. The SRO is accountable for the coherent capability and the benefits, the BCM owns each benefit and its transition, and the programme board is the SRO's decision forum. The programme architect authors the definition set under delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; the programme office consumes the closure record.\n\n## Affected systems\n\nThe operating record (PostgreSQL 18, migration 107 on this lane) holds the project, artefact, document, register, baseline and contract rows this project writes. The public design pack is generated from a snapshot of that record. The document store at MinIO is unreachable from this box, so the replay base keeps published bodies in the database; the output-standard template governs every body's headings."
+    },
+    {
+      "category": "benefits-diagram",
+      "title": "Benefits Diagram — P0 (retrospective, 2026-11-26)",
+      "body": "# Benefits Diagram — P0 (retrospective, 2026-11-26)\n\n## Goals and outcomes\n\nThe definition set serves the programme's strategic objectives by making each delivery project and each benefit a measurable claim rather than a wish: auditable decisions, less bespoke tooling, self-development, public collaboration, one model, predictable delivery and deliberated cross-department decisions. P0's outcome is the published definition set those claims rest on.\n\n## Measures\n\nThe seven benefit profiles carry measured baselines recorded on 2026-11-22 and re-recorded with their evidence on 2026-11-26: 0.15861 approval decisions per run, 18 tool_call rows, zero self-development runs, zero outside contributions, one model store, 28 open register findings, and 630,565 tokens per demo-credited deliverable. The measures are read from the product's own tables, not from a survey.\n\n## Benefits and sub-benefits\n\nThe benefits map links each project output to the capability it needs, the operational outcome it changes and the strategic objective it serves. B1 Auditable decisions (`01a1e9de-4e4f-757e-a8c8-bf3522e5adcf`) is the first profile; B7 Deliberated cross-department decisions (`01a20c80-c0c3-7788-9cc2-bb18a102a2f7`) carries the token-spend KPI the owner asked for. No benefit is claimed realised by this rework: the baselines are measured, the transitions are the delivery projects' and U6's work."
+    },
+    {
+      "category": "project-brief",
+      "title": "Project Brief — P0 programme definition (retrospective, 2026-11-26)",
+      "body": "# Project Brief — P0 programme definition (retrospective, 2026-11-26)\n\n## Outcome\n\nAfter P0, the programme has a published and adopted definition set: the 21 output categories the standard declares, the 15-artefact TOGAF set, the seven measured benefit profiles with their map, the tranche plan and the governance record. Every delivery project then has a governing brief, and every benefit a measured profile, instead of a document library nobody binds to.\n\n## Boundary\n\nOut of scope is the delivery projects' own records and the U6 realization transition: P0 defines the programme, it does not deliver the slices or claim a benefit realised. The project must not fork the programme seed, the blueprint or the benefit profiles; a deviation is a change request, and the definition set is the one input the tranche reviews are held to.\n\n## Reuse sources\n\nThe record already carries the SoAW, the delivery contract, the approved scope baseline and a compliant Phase-G review; those rows are verified, not duplicated. The design record docs/SPEC_V2.md supplies the standards, the plan docs/plans/P0-programme-definition.md supplies the definition set, and the existing published outputs supply the bodies the 21 categories must resolve.\n\n## Inception units\n\nThe analysis unit inventories the record: the seven approved A–D artefacts, the 21 published output categories, the contracts, the baseline and the review, and states which packages are open. The architecture unit authors the eight E–H artefacts, the four Phase-E category documents and the five register kinds to the adopted standard, and records the artefact links the set is read through.\n\n## Dependencies\n\nThe work runs under the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14` and the tranche-0 authorisation recorded in the programme plan. The project depends on the closure gate `01a1fdd5-b773-78c3-87d1-8f3c5ae9eeda` for its re-close, and every delivery project in tranches 1–13 depends on this definition set remaining live; the benefit profiles depend on U6 for their transitions.\n\n## Acceptance\n\nscripts/verify-project.py --project P0 on a fresh snapshot is green with zero failures, and the strict conformance audit carries no P0/P1 entry for P0. The closure gate `01a1fdd5-b773-78c3-87d1-8f3c5ae9eeda` is decided by an approver distinct from its requester, and the acceptance record is regenerated after the content pack is applied.\n\n## Capabilities\n\nThe project exercises architecture, programme management, project management and business analysis. The sponsoring group authorises the mandate and the tranche decisions, the SRO is accountable for the coherent capability and the benefits, the BCM owns each benefit, and the programme architect authors the set under the delegation.\n\n## Plan\n\nThe plan is docs/plans/P0-programme-definition.md: the definition set as 21 output categories, the project brief template and the per-project inception standard. The retrospective rework applies it through scripts/rework-batch.py --projects P0, which reopens, authors, reviews and re-closes the project on the record.\n"
+    },
+    {
+      "category": "architecture-artifact",
+      "title": "Architecture Artefact Index — P0 (retrospective, 2026-11-26)",
+      "body": "# Architecture Artefact Index — P0 (retrospective, 2026-11-26)\n\n## Metadata\n\nThe artefact set for P0 is fifteen deliverables on the programme track: the seven A–D artefacts the record already carries and the eight E–H artefacts this rework creates on 2026-11-26. Each is an approved row carrying its standard key and a published body; the owner is the programme architect under the standing rework delegation, and the Architecture Board reviews the set.\n\n## Entries\n\nThe catalogue is the project's approved artefact rows: the stakeholder map, the driver/goal/objective and requirements catalogues, the solution concept, the business capability map, the data entity and technology standards catalogues, the gap analysis, the candidate solutions catalogue, the project context and benefits diagrams, the implementation and migration plan, the compliance assessment, the architecture change request catalogue and the architecture requirements catalogue.\n\n## Links\n\nThe artefact links are the typed edges the pack declares: requirements to the stakeholder map, the solution concept to the requirements, the capability map to the solution concept, the gap analysis to the requirements, the candidate solutions to the gap analysis, and the change and compliance catalogues to the plan. They are written by architecture.artifacts_link and read back through architecture.artifacts_links; an artefact with no link is refused as an orphan.\n\n## Document\n\nEvery artefact's body is published as a document of category architecture-artifact-instance dated 2026-11-26, and the four TOGAF deliverables (benefits diagram, candidate solutions, project context diagram and gap analysis) are also published under their own categories. This index is the document the standard's architecture-artifact package reads; the artefact rows above are its entries.\n"
+    }
+  ],
+  "registers": {
+    "risk": [
+      {
+        "title": "The definition set is red on the mandatory artefact standard at the 2026-11-25 record",
+        "body": "The 2026-11-25 acceptance record reports P0 closed while its manifest is red: the closure outputs are undeclared, the eight E–H artefacts do not exist and several mandatory packages are open. This retrospective row records the state before the rework; the pack authors the missing content and does not claim the red cleared until the batch re-runs.",
+        "status": "open",
+        "severity": "high",
+        "probability": "high",
+        "impact": 4,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/evidence/rework/P0.json — the 2026-11-25 acceptance record"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "Benefit realisation is unproven until a transition is exercised end to end",
+        "body": "Seven benefit profiles now carry measured baselines with evidence, but no profile has been through a transition and a post-transition measurement. The token-spend KPI is baselined and not yet measured after an improvement. This row records the gap; U6 owns the transition, and no realisation is claimed here.",
+        "status": "open",
+        "severity": "medium",
+        "probability": "high",
+        "impact": 3,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "01a20c80-c0c3-7788-9cc2-bb18a102a2f7"
+          ],
+          "decisions": []
+        }
+      }
+    ],
+    "issue": [
+      {
+        "title": "P0 was closed with no declared closure outputs at the 2026-11-25 record",
+        "body": "The project row carried an empty closure_outputs list although the closure review and the close gate existed. The rework declares the closure-review output and republishes it; this retrospective row records the defect the rework repairs.",
+        "status": "open",
+        "severity": "high",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/evidence/rework/P0.json — the failures array"
+          ],
+          "decisions": []
+        }
+      }
+    ],
+    "assumption": [
+      {
+        "title": "The replay record is the programme's working record until the rework is promoted",
+        "body": "The rework writes through the product's actions against the replay base rebuilt from the production dump on 2026-11-26. The assumption, recorded here, is that the replay is the record of work until the promotion unit replays these acts into the live database; if it is not, the receipts prove a copy rather than the programme.",
+        "status": "open"
+      }
+    ],
+    "dependency": [
+      {
+        "title": "Every delivery project's governing brief depends on this definition set",
+        "body": "A delivery project's brief is the contract it is held to, and its brief cites the blueprint, the inception standard and the benefit profiles P0 publishes. This row records that the delivery rework in tranches 1–13 depends on P0's set remaining live and resolvable; a fork of the set would break every brief that cites it.",
+        "status": "open"
+      }
+    ],
+    "benefit": [
+      {
+        "title": "B1 Auditable decisions: every choice has a decision row",
+        "body": "The benefit profile `01a1e9de-4e4f-757e-a8c8-bf3522e5adcf` records B1 Auditable decisions, measured at 0.15861 approval decisions per run on 2026-11-22 and re-recorded with its evidence on 2026-11-26. This retrospective row links the benefit to its measured baseline without claiming realisation.",
+        "status": "open",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf"
+          ],
+          "decisions": []
+        }
+      }
+    ]
+  },
+  "delivery_contract": {
+    "title": "Delivery contract — P0 programme definition (retrospective, 2026-11-26)",
+    "body": {
+      "commitments": "Publish the 21-category programme definition set: the mandate, programme brief, blueprint, business case, benefit profiles and benefits map, projects dossier, programme plan and tranches, governance, stakeholder profiles, benefits strategy and realization plan, reuse map, project briefs, architecture and analysis pack, and the architecture capability baseline — with the 15-artefact architecture set, the four Phase-E documents and the five register kinds this rework adds. The project re-closes through the one gate with an approver distinct from the requester.",
+      "compliance": "The Phase-G review `01a1fdd7-8227-7441-8f43-385bd3e186fa` records the level compliant and cites the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; no active waiver exists. The 2026-11-25 acceptance record is red on the artefact standard, with closure outputs undeclared and several mandatory packages open; this pack is the remediation for that set.",
+      "approval": "The delivery contract `01a1fdd4-ab0f-7802-b7a7-2541a2902e6b` is board-approved by decision `01a1fdd4-cac3-7767-9b0f-4c15d064d6f6`; the approver `01a1e8a7-8b23-76a9-9114-aafb95f7a545` is distinct from the requester `01a1e607-17d9-77d3-98d3-a43a87c4633d`. The closure gate `01a1fdd5-b773-78c3-87d1-8f3c5ae9eeda` is likewise decided by an approver other than its requester.",
+      "capacity": "The unit is one WBS deliverable, \"Programme definition and architecture capability\", accepted with WSJF inputs business value 8, time criticality 8, risk reduction 5 and job size 15. Its evidence is the acceptance manifest, the acceptance record and the acts file this rework writes.",
+      "acceptance": "Acceptance is executable: python3 scripts/verify-project.py --project P0 on a fresh snapshot is green with zero failures, the strict conformance audit carries no P0/P1 entry for P0, and the closure gate `01a1fdd5-b773-78c3-87d1-8f3c5ae9eeda` is decided by an approver distinct from its requester.",
+      "evidence": "docs/evidence/rework/P0.json is the acceptance record; docs/evidence/rework/P0/ holds the acts and the transcript this rework writes; acceptance/programme/P0.toml is the manifest the gate reads; the content pack docs/evidence/rework/tranche-0/rework-content-P0.json is the authored input.",
+      "manifest": "acceptance/programme/P0.toml",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "retrospective": true
+    }
+  },
+  "wbs_deliverable": {
+    "title": "Programme definition and architecture capability",
+    "business_value": 8,
+    "time_criticality": 8,
+    "risk_reduction": 5,
+    "job_size": 15
+  },
+  "review": {
+    "level": "compliant",
+    "findings": "This retrospective Phase-G review, dated 2026-11-26, carries the level the record supports: the live delivery contract `01a1fdd4-ab0f-7802-b7a7-2541a2902e6b` was approved by board decision `01a1fdd4-cac3-7767-9b0f-4c15d064d6f6` with an approver distinct from its requester, the scope baseline `01a1fbb1-b05c-76b6-a5ac-7186fb859dcc` is approved, and the prior review `01a1fdd7-8227-7441-8f43-385bd3e186fa` is compliant and cites the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`. Against that, the 2026-11-25 acceptance record is red on the artefact standard: closure outputs are undeclared and the E–H artefacts are absent. The finding is that the governance record is sound while the artefact set is incomplete; this pack authors the missing bodies and the delivery records, and it does not claim the red cleared until the batch re-runs.",
+    "evidence": {
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "acceptance_manifest": "acceptance/programme/P0.toml",
+      "acceptance_record": "docs/evidence/rework/P0.json — the 2026-11-25 acceptance record",
+      "live_review": "01a1fdd7-8227-7441-8f43-385bd3e186fa",
+      "delivery_contract": "01a1fdd4-ab0f-7802-b7a7-2541a2902e6b",
+      "scope_baseline": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+      "closure_gate": "01a1fdd5-b773-78c3-87d1-8f3c5ae9eeda",
+      "rework_note": "docs/evidence/rework/P0.md"
+    }
+  },
+  "vision_output": "# Vision and mandate — P0 (retrospective, 2026-11-26)\n\n## Purpose\nP0 is the programme-definition project of the programme it defines (`01a1dcb8-d24b-76de-b901-56fd56e001bc`). Its purpose, recorded in `docs/plans/P0-programme-definition.md` §1, was to design the programme that delivers the full conveyor under MSP's *Defining a Programme* and *Realizing the Benefits*, and to adopt SPEC_V2 §8.2–8.4 as the programme's cadence, definition and benefit track. The vision was published as \"Vision and mandate\" on 2026-11-18 at 08:18:36 under `01a1e006-d2f5-7048-8ec0-4fe8bc416ce6`.\n\n## Outcomes\nWhat is measurable now is the definition set itself: the plan measured 20 of the 21 output categories published on 2026-11-17, and the twenty-first, `tranche-review`, was published at 20:00:13 that day; tranche 1 was then authorised on 2026-11-21 at 01:11:46. The outcome P0 defined is a programme whose delivery projects are held to briefs and whose benefits are held to profiles. Benefit realisation is not claimed.\n\n## Boundary\nP0 defines the programme and does not deliver T1–T19. The plan states that no V2 delivery project starts before the definition set is accepted, and that T1–T17 were proposed and blocked by their SPEC_V2 §12 edges at the baseline. The typed rows behind the architecture categories are T9's (#81), so P0's claim stops at the published documents and records this brief lists, and it does not extend to the typed store.\n\n## Who it serves\nThe vision serves the sponsoring group, the SRO and programme board, the programme office, and the delivery projects that consume the brief template and blueprint. It also serves the six stakeholder groups whose profiles were published on 2026-11-18 at 08:17:48 (`01a1e9e1-d583-74cc-bc8c-097fbe79c1ed`), and the public/opt-in licence holders made a condition of the benefits rather than an afterthought.\n",
+  "blueprint_output": "# Blueprint — P0 (retrospective, 2026-11-26)\n\n## Aggregates and services\nP0 defined the target architecture as the V1 aggregates carried forward — board, card, run, approval and document — plus the T0 organisation spine merged under #65 with migration 0040 and the `organisation.*` actions. The blueprint published on 2026-11-18 at 08:18:34 under `01a1e006-dacb-76e0-a45b-4f94de2bde4c`, with a second document, sets services on those aggregates rather than on a parallel model.\n\n## Action registry and data model\nThe data model P0 adopted is the row-backed programme model of SPEC_V2 §8.3: `governed_asset` for the mandate, brief, blueprint and business case; `benefit_profile` for the six measurement groups; `benefit_link` for the map edges; `programme_tranche` for the tranche unit; `stakeholder_profile`; and `project_register_item` with its six kinds for the registers. The action registry is the existing V1 registry; P0's plan front matter records `adds_tables: []` and `adds_actions: []`, so the blueprint adds structure without a new registry surface.\n\n## Deployment estate\nThe blueprint's deployment estate is the programme's target estate. P0 itself stores every artefact in the definition set on the project in the console and publishes it on the design site, as plan §1 states. The pack does not re-describe host topology and no deployment change is claimed: the plan declares no added tables, actions, events or modules, so the estate is a target the delivery projects must reach.\n\n## The to-be the projects deliver\nThe to-be is a row-backed programme rather than a document library: gates, benefit profiles, tranche reviews and the trace chain are computable from rows (SPEC_V2 §8.3 and §8.5). T1–T19 deliver that to-be. P0's acceptance record states that the Validation page shows P0 at tranche 0 with T1–T19 `blocked_by: [P0]`; the to-be is defined, and it is not yet delivered.\n\n## Organisation and skills\nThe blueprint's organisation is the nine positions of SPEC_V2 §8.3: sponsoring group, SRO, programme board, programme office, programme manager, programme architect, BCM, PMO lead and quality manager, each a job key with authority rows. The skills side is the seven-category assessment published on 2026-11-18 at 08:18:18 (`01a1e9d1-3a6b-71cd-884b-5234febf5e45`); proficiency is baselined, not yet developed.\n\n## Current, intermediate and target states\nThe current state at the P0 baseline was V1 far implemented: 25 measured-built slices and two partial (S14, S21), the T0 organisation spine merged, and a seed of 47 projects with no programme-definition project. The intermediate state is the accepted definition set. The target state is the programme the dossier describes, sequenced by the tranche plan's 14 tranches. The transition from intermediate to target is the delivery programme's work, not P0's.\n",
+  "business_case_output": "# Business case — P0 (retrospective, 2026-11-26)\n\n## Why now\nP0's case rested on the starting state in plan §2: V1 is far implemented, the organisation spine is merged, yet the seed carries 47 projects and no programme-definition project, and T1–T17 are blocked by their SPEC_V2 §12 edges. The business case published on 2026-11-18 at 08:18:32 (`01a1e006-e2ba-7372-87c7-61dbb38d2d6e`, with a second document) argued that defining the programme first was the way to unblock delivery with briefs and benefit records the board could hold projects to.\n\n## Benefit map\nThe case is carried by six benefit profiles, of which \"Benefit profile — B1 Auditable decisions\" (`01a1e9e0-1b2e-7353-9361-16a81a99d354`, published 2026-11-18 at 08:17:51) is the representative, and by the benefits map (`01a1e9e0-750d-71b9-8230-177eebe80e95`) from output through capability and operational outcome to benefit and objective. The public/opt-in licensing frame is recorded as a condition of those benefits.\n\n## Cost and risk posture\nThe plan names the resources, boundaries, controls and cost of producing the definition set, and the delivery contract `01a1fdd4-ab0f-7802-b7a7-2541a2902e6b` with approval `01a1fdd4-cac3-7767-9b0f-4c15d064d6f6` records the commitment. The risk posture is dependency-led: the typed architecture rows belong to T9 (#81), and every benefit depends on operational change after delivery. The P0 record carries no monetary risk figure.\n\n## Licensing frame\nThe licensing frame P0 defined is public/opt-in, and plan §3 item 5 makes it a condition of the benefits rather than a footnote. What is measurable now is that the frame is stated in the published business case and carried into the profiles. No licence revenue, take-up or negotiation appears as a P0 result.\n\n## Options, including doing nothing\nP0 considered the definition options MSP requires, including doing nothing. Doing nothing leaves the 47-project seed without a programme plan, keeps T1–T19 blocked, and leaves the two partial V1 slices unexplained. The option taken was to define the programme from the existing seed rather than invent a parallel list, which plan §3 item 7 makes explicit.\n\n## Investment appraisal and cash flow\nThe appraisal P0 recorded is a definition-stage case, not a cash-flow model. The P0 record available on 2026-11-26 contains no monetary appraisal, discount rate or cash-flow schedule, and this retrospective does not invent one. The honest statement is that the investment case is defined in structure and unmeasured in money, and no positive return is claimed.\n\n## Capabilities the benefits depend on\nThe benefits depend on the architecture capability baseline P0 published — principles, tailored ADM profile, artefact standard, board charter, and the maturity and skills baselines — plus the programme-management rows and the BCM role that measures realisation. SPEC_V2 §8.3 states the rule the case rests on: a capability is not use and use is not improvement, so each benefit names both the capability and the operational area that must change practice.\n",
+  "programme_plan_output": "# Programme plan — P0 (retrospective, 2026-11-26)\n\n## Tranches\nThe programme plan published on 2026-11-18 at 08:18:29 (`01a1e006-ea7f-719d-974b-d48952b3be3b`) sequences the work as the tranche plan's 14 tranches, with tranche 0 reserved for the definition set. Tranche 0's exit was the review decision to continue. Tranche 1 is the unit recorded by `01a1e9e0-d787-7f5c-b5ed-15b05f3dc531`, authorised on 2026-11-21 at 01:11:46 under review `01a1ed84-e111-7082-9fa8-7fe77ccc9024`.\n\n## Projects and sequencing\nThe dossier published as \"the 48 projects, their tranches and dependencies\" (`01a1e9e0-b03b-74e4-a6ff-1dd89a76ecc9`) is the definitive list P0 adopted; it updates the existing seed rather than creating a second register. Sequencing follows the dependency edges: T1–T17 were blocked by their SPEC_V2 §12 edges at the baseline, T1–T19 are blocked by P0 in the plan's acceptance record, and tranche 1 carries S02, T1 and T11.\n\n## Gates\nThe plan's gates are the definition acceptance gate, the per-tranche review with its continue, pause or stop decision, the architecture phase gates, and the programme closure gate. P0's own close was refused by gate #302 while `tranche-review` was unpublished, and the plan records that the engine, not a session, enforces that order. The compliant review `01a1fdd7-8227-7441-8f43-385bd3e186fa` is the gate evidence for P0.\n\n## First three months\nThe measurable first three months run from the 2026-11-17 tranche 0 review to the 2026-11-21 scope baseline and tranche 1 authorisation. In that window the definition set was published: the plan measured 20 categories on 2026-11-17, and the twenty-first, `tranche-review`, was published later that day at 20:00:13. The scope baseline `01a1fbb1-b05c-76b6-a5ac-7186fb859dcc` was taken on 2026-11-21 at 01:21:28. Delivery of S02, T1 and T11 is the next measurable step, not a P0 result.\n",
+  "governance_output": "# Governance and organisation — P0 (retrospective, 2026-11-26)\n\n## Roles\nP0 defined the programme roles as positions, not code paths: sponsoring group, SRO, programme board, programme office, programme manager, programme architect, BCM, PMO lead and quality manager, each a job key with an authority row (SPEC_V2 §8.3). The governance document was published on 2026-11-18 at 08:18:27 (`01a1e006-f248-746f-88ad-6a280a8f14dc`). The SRO is accountable for the coherent capability and the benefits; the BCM owns each benefit and its transition.\n\n## Decision ladder\nThe ladder runs from the sponsoring group's mandate and definition authorisation, through the SRO and programme board, to the programme manager, BCM and architect for delivery and benefit decisions. P0's own approvals are measurable: the Statement of Architecture Work `01a1fdd2-5041-7f80-8032-3305751d498c` and the delivery contract `01a1fdd4-ab0f-7802-b7a7-2541a2902e6b` were both approved by `01a1e8a7-8b23-76a9-9114-aafb95f7a545` and requested by `01a1e607-17d9-77d3-98d3-a43a87c4633d`.\n\n## Assurance\nAssurance is the Architecture Board charter with its membership and decision limits, the compliance review of the delivery contract, and the quality manager's role in the governance baseline. The review `01a1fdd7-8227-7441-8f43-385bd3e186fa` is recorded at level compliant against `01a1fdd4-ab0f-7802-b7a7-2541a2902e6b`. The architecture baseline is a P0 output; the typed rows behind it are T9's (#81), so assurance of those rows is not claimed here.\n\n## The unit protocol\nThe unit protocol records the programme context for every delivery unit: its Tranche, its Brief, its ADM phase and plateau, and the Benefits its output maps to, carried in the issue under `docs/plans/03-DELIVERY.md`'s issue content contract. The end-of-tranche review reads those four fields from the issue ledger, so the review's evidence is the buildout's own record. P0's issues #120, #121 and #122 are closed, which is the measurable closure of the definition work itself.\n",
+  "reuse_map_output": "# Reuse map — P0 (retrospective, 2026-11-26)\n\n## Reuse candidates\nThe reuse map published on 2026-11-18 at 08:18:25 (`01a1e006-fa29-756e-a710-90db4a232343`) names the candidates plan §3 item 11 sets out: the conveyor V1 tree of tables, actions, modules and processes, including the 25 measured-built slices; the estate's absorbed services and modules; the seeded catalogues; and the upstream crates. Each candidate is recorded with the question the project's analysis unit must answer.\n\n## Boundary\nThe boundary of reuse is the repository and the public capability, not a private host or URL: plan §5 requires an analysis citation of `path:symbol` inside the repo and only the capability name outside it. Reuse must not fork an existing surface, and a project that deviates from the blueprint records a decision rather than a silent fork. P0 itself reuses the V1 aggregates and the existing seed rather than rebuilding them.\n\n## Licence and contract constraints\nEach reuse candidate carries its licence or contract constraint in the map, and the programme's public/opt-in licensing frame is a condition of the benefits rather than a footnote. A delivery project operates under a live `architecture_contract`; a design gate without one is refused. What is measurable now is that the constraints are recorded per candidate. No licence negotiation or contract change appears in the P0 record dated 2026-11-26, so none is claimed.\n",
+  "brief_template_output": "# Project brief template — P0 (retrospective, 2026-11-26)\n\n## Mandatory fields\nThe template published on 2026-11-18 at 08:18:22 (`01a1e007-01fc-769b-a625-e1bcf0230257`) makes eight fields mandatory: Outcome, Boundary, Reuse sources, Inception units, Dependencies, Acceptance, Capabilities and Plan. Plan §4 defines each. The outcome is one sentence about what is true after the project; the boundary states what is out of scope and which existing surfaces must not be forked; dependencies are typed as blocked-by, acceptance-blocked-by, blocks or related.\n\n## Inception units\nEvery delivery project's first two claims are `analysis` and `architecture`. Analysis inventories the code that already exists inside the repository, in the wider estate and upstream, with contract and licence constraints and the build-versus-reuse decision. Architecture is produced to the artefact standard of SPEC_V2 §8.1 and carries the typed artefacts its phase and plateau require. Both are published when accepted, and a project without both is an inception gap whose build units are not claimed.\n\n## Plan\nThe final mandatory field links the slice or `S##` plan path, or the `T##` SPEC_V2 section, that the brief governs. P0's own plan is `docs/plans/P0-programme-definition.md`, and the template itself was issued by P0 under the tranche 0 definition set. What is measurable now is the published template. Whether tranche 1's briefs comply with it is tested by that tranche's acceptance, not by P0.\n",
+  "architecture_analysis_output": "# Architecture and analysis pack — P0 (retrospective, 2026-11-26)\n\n## Current state\nThe current-state analysis rests on the P0 baseline: V1 is far implemented with 25 measured-built slices and two partial (S14, S21), the T0 organisation spine is merged (#65, migration 0040), and the programme seed holds 47 projects with none for programme definition. `docs/SPEC_V2.md` is the design record and `docs/SPEC.md` the V1 build record. The pack published on 2026-11-18 at 08:18:20 (`01a1e007-09ee-73da-8733-28e0a343b509`) is the current-state, options and risk view between them.\n\n## Options considered\nThe pack weighed defining the programme from the existing seed against inventing a parallel list, and adopted the seed update in plan §3 item 7. It weighed a document library against a row-backed programme model, and adopted SPEC_V2 §8.3's rows and gates. It also treated the SAFe cadence and the MSP definition track as complements rather than alternatives, which is the split SPEC_V2 §8.2 and §8.3 record.\n\n## Risks\nThe risk view P0 leaves is one of dependencies: the typed architecture rows belong to T9 (#81), T1–T19 depend on P0's acceptance, and every benefit depends on operational change after delivery. The plan's acceptance conditions — passing `check-coverage`, an idempotent seed regen and a `build-docs` index of the plan — are the checks that would show the definition pack is coherent. This retrospective does not claim they were re-run on 2026-11-26.\n\n## Dependency map\nThe map follows the SPEC_V2 §8.5 trace chain: stakeholder or driver to goal, to principle, requirement or decision record, to architecture artefact, to architecture contract, to project charter, to WBS deliverable and work package, then card, run, step, evidence, acceptance and closure. At programme level, P0 blocks T1–T19, tranche 1 depends on tranche 0's continue decision, and each benefit depends on the capability and operational area named in its profile.\n",
+  "benefit_profile_output": "# Benefit profiles — P0 (retrospective, 2026-11-26)\n\n## Identification and purpose\nP0 published six benefit profiles, represented by \"Benefit profile — B1 Auditable decisions\" (`01a1e9e0-1b2e-7353-9361-16a81a99d354`, published 2026-11-18 at 08:17:51). Each profile carries a reference, description, category, objectives and observable outcome, so a benefit is identified as a measurable improvement valued by a stakeholder and contributing to an objective, not as a project output.\n\n## Performance\nThe performance group records the affected KPIs, the baseline, the target, the measurement method and the financial value where one is expressible. The baseline rule is explicit: it is measured while the old practice is still observable, and a benefit whose baseline was never measured cannot claim an improvement. On 2026-11-26 the profiles define those fields; the record carries no post-transition performance reading.\n\n## Cost\nEach profile records the cost of realising the benefit, including the associated business change rather than only the delivering project's cost. The P0 record does not restate a monetary figure for any of the six benefits, so this retrospective reports the field as defined and the amount as unmeasured here. No spend against a benefit is claimed.\n\n## Conditions\nThe conditions group names the capabilities the benefit requires, the outcomes that must already exist, and the changes to operating practice that turn use into improvement. The public/opt-in licensing frame is one such condition, and each benefit names the operational area that must change. The capability is the option; the conditions are what the programme must still cause to happen.\n\n## Uncertainty and dependencies\nEach profile records related risks and issues and the dependencies outside the programme, and the benefits map supplies the edges that identify which benefit is at risk when a dependency slips. P0 records the uncertainty structure but does not score it. The 2026-11-26 position is defined dependencies and no quantified risk exposure.\n\n## Responsibility and attribution\nEvery profile names who realises the benefit, the benefit owner — the BCM — and the operational area to which the improvement is attributed. That attribution is what separates a realised benefit from a claimed one. What is measurable now is the assignment recorded in the six published profiles; realisation is not claimed for any of them.\n",
+  "benefits_map_output": "# Benefits map — P0 (retrospective, 2026-11-26)\n\n## Benefit paths\nThe map published on 2026-11-18 at 08:17:53 (`01a1e9e0-750d-71b9-8230-177eebe80e95`) records each path from project output through capability and operational outcome to benefit or disbenefit and strategic objective. It is the edge set that turns six individually defined benefits into a programme-level claim, and it follows the `benefit_link` model of SPEC_V2 §8.3.\n\n## Dependencies\nThe map records dependencies between benefits as well as each benefit's dependence on outputs and capabilities. That is what lets a programme review answer which benefit is at risk when a project slips: the slip propagates through the output and capability edges to the named benefit. The P0 record defines the edges; it contains no live at-risk computation dated 2026-11-26.\n\n## Benefits at risk\nThe map's two operational questions are which benefit is put at risk when a project slips, and which operational area must change its practice before delivery creates value. P0 answered both structurally by publishing the paths and the conditions. The count of benefits currently at risk is not measured in the record, and this retrospective does not estimate it.\n",
+  "projects_dossier_output": "# Projects dossier — P0 (retrospective, 2026-11-26)\n\n## Projects\nThe dossier published on 2026-11-18 at 08:17:55 (`01a1e9e0-b03b-74e4-a6ff-1dd89a76ecc9`) is the definitive list titled \"the 48 projects, their tranches and dependencies\", with each project's outputs, initial requirements, contribution to the blueprint and the risks affecting delivery. It adopts and updates the existing seed of 47 projects, which held no programme-definition project before P0.\n\n## Tranches and dependencies\nThe projects are grouped into the tranche plan's 14 tranches, and the dependencies are typed: T1–T19 are blocked by P0, T1–T17 were blocked by their SPEC_V2 §12 edges at the baseline, and tranche 1 carries S02, T1 and T11. The dossier's dependency record is the input the end-of-tranche review uses to decide whether a slip puts a benefit at risk.\n\n## Resources and budget\nThe dossier carries each project's resource requirements and high-level budget as plan §3 item 6 requires. The P0 record available on 2026-11-26 does not restate the monetary values, so this retrospective reports the fields as defined in the dossier and the amounts as not repeated here. No spend against those budgets is measured by P0.\n\n## Delivery risks\nThe delivery risks are the dependencies on P0's acceptance, the T9 typed architecture rows (#81), and the operational change each benefit needs before value appears. P0's own delivery risk was the twenty-first output: the plan records that its closure gate refused to close while `tranche-review` was unpublished, and that output was published on 2026-11-17 at 20:00:13.\n",
+  "tranche_plan_output": "# Tranche plan — P0 (retrospective, 2026-11-26)\n\n## Tranches\nThe tranche plan published on 2026-11-18 at 08:17:46 (`01a1e9e1-6741-73f8-bf1c-2f44167dc674`) defines 14 tranches, with tranche 0 as the definition tranche. A tranche is the unit the programme manages and reviews together, distinct from the PI cadence that supplies the delivery rhythm inside it. Each tranche carries its number, state, entry and exit criteria, baseline reference and review date in the `programme_tranche` record.\n\n## Entry and exit criteria\nTranche 1's record `01a1e9e0-d787-7f5c-b5ed-15b05f3dc531` states its entry criterion as the tranche 0 review deciding continue and its exit criteria being met. Its exit criterion is that every project in tranche 1 — S02, T1 and T11 — meets its acceptance with published evidence, and that the review records continue, pause or stop. That is a measurable test, and on 2026-11-26 it is the delivery programme's open obligation.\n\n## Review dates\nThe tranche 0 review was published on 2026-11-17 at 20:00:13 (`01a1eb18-6752-72ff-9c28-cd4a94217de7`, with a second document), and the tranche 1 authorisation followed on 2026-11-21 at 01:11:46. The tranche 1 record's `review_at` field is null, so the plan defines the tranche but the next review date is not yet fixed. That gap is stated rather than filled.\n\n## Sequencing\nThe sequencing rule is definition before delivery: no project starts before the first tranche is authorised, and tranche 1 was authorised only after the definition set was accepted. Within tranche 1 the three projects S02, T1 and T11 run under their briefs, and the next tranche's preparation is the review-and-close activity that follows. The order is enforced by the plan's gates, not by session memory.\n",
+  "tranche_review_output": "# Tranche 0 review — P0 (retrospective, 2026-11-26)\n\n## Evidence\nThe review output \"Tranche 0 review — continue and authorise tranche 1\" was published on 2026-11-17 at 20:00:13 (`01a1eb18-6752-72ff-9c28-cd4a94217de7`, with a second document). Its evidence is the definition set, the scope baseline `01a1fbb1-b05c-76b6-a5ac-7186fb859dcc` taken on 2026-11-21 at 01:21:28, the compliant review `01a1fdd7-8227-7441-8f43-385bd3e186fa`, and the benefit status the profiles define.\n\n## Benefit status\nThe benefit status at the review was defined, not realised: six profiles and the benefits map were published on 2026-11-18, but the P0 record contains no transition and no post-transition measurement. The review therefore recorded the benefit definitions and the measurement obligations, and it does not claim an improvement. That distinction is the MSP rule P0 adopted: a capability is not use and use is not improvement.\n\n## Risk and issue register\nThe recorded risks are the dependencies the plan names: T1–T19 on P0's acceptance, the T9 typed architecture rows (#81), and the operational change each benefit requires. The P0 record dated 2026-11-26 contains no additional populated risk row for the definition project, and this retrospective does not invent one. No issue from #120, #121 or #122 remains open.\n\n## Decision\nThe decision was continue and authorise tranche 1. The authorisation is recorded by `01a1e9e0-d787-7f5c-b5ed-15b05f3dc531` at 2026-11-21 01:11:46, under authorisation review `01a1ed84-e111-7082-9fa8-7fe77ccc9024`, and the tranche's exit criteria are the acceptance of S02, T1 and T11. The review is the twenty-first P0 category and the sponsoring group's recorded act, not a session's assertion.\n",
+  "benefits_strategy_output": "# Benefits management strategy — P0 (retrospective, 2026-11-26)\n\n## Measurement methods\nThe strategy published on 2026-11-18 at 08:18:00 (`01a1e9e1-fd54-731e-945d-45d8e9f2d2a4`) fixes the measurement method per benefit: the affected KPI, the baseline taken while the old practice is observable, the target, the method and the financial value where expressible. The method is recorded in the profile, and the comparison with the baseline is the evidence a sponsor uses. An LLM may draft narrative but not the numbers.\n\n## Review cycle\nMeasurement is reviewed at the tranche reviews, where the sponsoring group decides continue, pause or stop on the baselines, benefit status and risk register. A re-baseline goes through change control and never through the review itself, so the review cannot rewrite the evidence it judges. The tranche 0 review on 2026-11-17 and the tranche 1 authorisation on 2026-11-21 are the recorded instances of the cycle.\n\n## Roles and assessment\nThe BCM owns each benefit and assesses realisation; the SRO is accountable for the coherent capability and the benefits; the PMO lead and quality manager assure the governance baseline; the sponsoring group makes the tranche decision. Assessment happens per benefit at its transition, not at programme closure alone. What is measurable now is the role assignment in the strategy and the six profiles, not an assessment outcome.\n\n## Realization process\nThe process runs measure, monitor, plan the transition, communicate the change, assess readiness, enact, measure post-transition performance, retire the superseded practice, and continue measuring under the realisation plan. P0 defined the procedure and named who continues after closure. The P0 record contains no transition or post-transition measurement, so the procedure is defined and unexercised in the record, and no improvement is claimed.\n",
+  "realization_plan_output": "# Benefits realisation plan — P0 (retrospective, 2026-11-26)\n\n## Transition\nThe realisation plan published on 2026-11-18 at 08:17:58 (`01a1e9e2-275e-754f-836b-8738df8fdd8f`) defines per-benefit transition: the baseline measured, readiness assessed, and the transition enacted into the operational area. The plan is the procedure after delivery, not a delivery schedule, and it depends on the capability being in use. The P0 record carries no transition for any of the six benefits, which is the honest state on 2026-11-26.\n\n## Embedding\nEmbedding is the business-change work the profiles' conditions name: the capabilities required, the outcomes that must already exist, and the changes to operating practice that make use improve performance. The plan assigns that work to the operational area and the BCM rather than to the delivering project. The plan defines the embedding activities; the P0 record measures none of them as done.\n\n## Post-closure measurement\nThe plan names who continues measurement after programme closure, which SPEC_V2 §8.3 makes a condition of closing the programme. It carries the post-transition measurement obligation and the legacy retirement that follows it. What is measurable now is that the plan names the owner and the method; the record carries no post-closure reading, and no benefit realisation is claimed.\n\n## Ownership\nOwnership is the BCM's per benefit, with the SRO accountable for the coherent capability and benefits, and the operational area accepting the changed practice. Attribution is recorded in each profile so an improvement is credited to the area that realises it, not to the project that built the capability. P0 defined that ownership; it did not transfer any benefit into operation.\n",
+  "stakeholder_profiles_output": "# Stakeholder profiles — P0 (retrospective, 2026-11-26)\n\n## Stakeholders\nThe profiles published on 2026-11-18 at 08:17:48 (`01a1e9e1-d583-74cc-bc8c-097fbe79c1ed`) cover the six stakeholder groups of the programme and their engagement. The set is the programme-level view the stakeholder map and the governance roles rest on, and it is adopted with the definition set rather than maintained as a separate register.\n\n## Concerns and sensitivities\nFor each of the six groups the profiles record concerns and sensitivities, together with importance, influence, interest and exposure as plan §3 item 9 requires. The P0 brief does not enumerate the individual concerns, so this retrospective does not restate them as if it did. What is measurable is that the fields are populated per group in the published profiles.\n\n## Influence and interest\nThe profiles record each group's importance, influence, interest and exposure, which is what lets the programme decide who is consulted, who is informed and who decides. Influence and interest are recorded per group rather than averaged into a single stakeholder score. The P0 record defines those fields; no engagement outcome is measured on 2026-11-26.\n\n## Support and engagement\nEach profile carries the group's support level and its trend, plus the engagement target the programme intends to reach. That makes support a managed variable rather than an assumption in the business case. What is measurable now is the recorded target per group; actual movement in support is not measured by P0.\n\n## Benefits and disbenefits\nThe profiles distribute benefits and disbenefits to each group, so the programme can see who gains and who carries the cost of changed practice. This is the stakeholder side of the benefits map, and it is why the map records disbenefits as well as benefits. The distribution is defined in the published profiles; no group's realised benefit is claimed.\n",
+  "architecture_principles_output": "# Architecture principles — P0 (retrospective, 2026-11-26)\n\n## Principles\nThe principles catalogue published on 2026-11-18 at 08:18:15 (`01a1e9cf-f6c3-745f-8cfe-69a178d287b5`) carries each principle with its statement, rationale and implications, as plan §3 item 14 requires. It is part of the architecture capability baseline that a delivery project needs before it starts, alongside the tailored ADM profile, the artefact standard, the board charter, and the maturity and skills baselines.\n\n## Approval\nThe catalogue was published by #122's A7 as \"proposed for P0 acceptance\", and the plan records that the typed rows behind the architecture categories are T9's (#81). Approval therefore has two measurable parts on 2026-11-26: the document is published in the definition set, and the typed acceptance is an open T9 obligation rather than a P0 completion. The Architecture Board charter supplies the decision limits for applying the principles.\n\n## Application\nA delivery project applies the principles in its architecture inception and records the artefacts its phase and plateau require. A deviation is a decision record, not a silent fork. The project must fit the blueprint and operate under a live `architecture_contract`, and a design gate without that contract is refused. The principles are therefore binding on T1–T19, while P0 itself only defines and publishes them.\n",
+  "adm_profile_output": "# Tailored ADM profile — P0 (retrospective, 2026-11-26)\n\n## Phases\nThe profile published on 2026-11-18 at 08:17:43 (`01a1e9d1-1c5c-75b2-80bd-bfc18c8b02cc`) names which ADM phases the tenant runs and what each phase must produce. P0 sits in the Preliminary phase, and the seven Phase A–D artefacts in the brief are the evidence that the early phases produced typed outputs, from the driver, goal and objective catalogue to the technology standards. The profile is tailored software delivery, not a claim of full TOGAF conformance.\n\n## Artefacts by phase and plateau\nThe profile names the mandatory artefacts per phase and plateau: the preliminary set at inception — principles applied, requirements, stakeholder map, driver, goal and objective, and solution concept — and the high-level and detailed design sets as a project matures. The brief's seven artefacts map to those phases: driver and objective `01a20209-a7ee-7429-9d43-6b85b61d755e`, requirements `01a20216-2595-7c2e-b068-90fbda5f38b9`, solution concept `01a20231-c661-79d8-9871-23b10eb3a2bb`, stakeholder map `01a20234-1244-74cd-b0e2-1ef1d8e04021`, capability map `01a2023a-5a2e-799d-8189-37edc4991b8c`, data entities `01a20241-72aa-72b7-b3c0-19efce5099ca` and technology standards `01a20249-03fc-7d27-9b3c-f9640e23ad1b`.\n\n## Contracts\nEach phase closes on its contract, and a delivery project's phase-G review attaches its compliance level and waivers to that delivery's evidence. P0's own contract record is measurable: the Statement of Architecture Work `01a1fdd2-5041-7f80-8032-3305751d498c`, the delivery contract `01a1fdd4-ab0f-7802-b7a7-2541a2902e6b`, the scope baseline `01a1fbb1-b05c-76b6-a5ac-7186fb859dcc`, and the compliant review `01a1fdd7-8227-7441-8f43-385bd3e186fa`.\n\n## Adoption\nThe profile is the programme's default `adm_profile`, and a delivery project's brief says which plateau its own architecture inception must satisfy. It was published as part of the definition set and is binding on T1–T19 from tranche 1. Adoption of the typed rows remains T9's work (#81), so what P0 claims is the published profile and the default it sets, not the typed implementation.\n",
+  "artifact_standard_output": "# Artefact standard — P0 (retrospective, 2026-11-26)\n\n## Common metadata\nThe standard published on 2026-11-18 at 08:17:41 (`01a1e9d1-2720-776c-9741-a5deb322086e`) requires every architecture artefact to carry owner, reviewer and review date, version, purpose, stakeholders and scope, the related project, and its published document or contract. Every artefact also carries at least one link to what it derives from, realises or reuses. That metadata is what makes an artefact a typed record rather than prose.\n\n## Catalogues\nA catalogue records a typed list, such as a driver, goal and objective catalogue, a requirements catalogue, a data entity catalogue or a technology standards catalogue. The standard fixes the type and the required fields so a catalogue can be queried and re-used rather than read as narrative. The definition set contains four catalogue artefacts of that shape.\n\n## Matrices\nA matrix records relationships between two typed sets, such as the stakeholder map `01a20234-1244-74cd-b0e2-1ef1d8e04021`, which the brief records as a matrix in Phase A. The standard requires the matrix's axes and the artefact metadata to be explicit, so the relationship is inspectable. The standard distinguishes a matrix from a link: a matrix records a relationship between typed sets, while a link records derivation, realisation or reuse.\n\n## Diagrams\nA diagram is a document with typed metadata and a viewpoint, not a live metamodel; SPEC_V2 §8.6 rules out an ArchiMate modelling tool. The solution concept `01a20231-c661-79d8-9871-23b10eb3a2bb` and the business capability map `01a2023a-5a2e-799d-8189-37edc4991b8c` are the definition set's diagram artefacts. The standard requires the same metadata and links on a diagram as on a catalogue or matrix.\n\n## Links\nLinks are the trace edges: each artefact records what it derives from, realises or reuses, and architecture-governed work requires the link at creation time under SPEC_V2 §8.5. A link is not decoration; it is how the governance screen answers which requirement a run proves and where the evidence sits. The standard requires at least one such link on every artefact in the pack.\n\n## Repository\nThe artefact standard was adopted with its repository and type catalogue as part of the architecture capability baseline. In P0 the repository is the console's document store and the design site, with each artefact published as a document under the project. The typed repository rows behind the standard are T9's (#81), so P0 claims the published standard and its adoption, not the typed store.\n",
+  "maturity_assessment_output": "# Architecture maturity assessment — P0 (retrospective, 2026-11-26)\n\n## Dimensions\nThe assessment published on 2026-11-18 at 08:17:38 (`01a1e9d1-3075-74b7-9ee4-f7d238440774`) scores nine dimensions on a 0–5 scale, as plan §3 item 14 requires of the architecture capability baseline. The dimensions are the programme's own maturity model, and they are assessed to set the mandatory artefact set the tailored profile expects at each plateau.\n\n## Scores\nThe assessment records a baseline score per dimension. The P0 record available on 2026-11-26 does not restate the nine numeric scores in the brief, so this retrospective does not quote them; the published assessment is the source. No score is presented as an improvement.\n\n## Baseline\nThe baseline is the starting position, measured before the delivery programme changes anything. It is a baseline for growth, not a verdict: SPEC_V2 §8.1 states that the mandatory artefact set grows with the assessed maturity, so the baseline sets the first plateau rather than a ceiling. P0 measured the baseline; it did not raise it.\n\n## Milestones\nThe assessment records development milestones against the nine dimensions, which are the maturity targets the programme manages between tranches. The milestones are defined in the published assessment. Their attainment is not measured on 2026-11-26, because attainment belongs to the delivery tranches that follow P0's definition.\n",
+  "skills_assessment_output": "# Architecture skills assessment — P0 (retrospective, 2026-11-26)\n\n## Categories\nThe assessment published on 2026-11-18 at 08:18:18 (`01a1e9d1-3a6b-71cd-884b-5234febf5e45`) scores seven architecture skill categories, as plan §3 item 14 requires of the architecture capability baseline. The categories are the programme's capability view of the people the delivery tranches need, and they sit beside the nine-dimension maturity assessment in the same baseline.\n\n## Proficiency by role\nThe assessment records proficiency by role, so the gap between the architect, programme manager, BCM, SRO and the other programme positions is visible per category rather than averaged. That matters because SPEC_V2 §8.3 makes roles positions with authority rows: a role without the proficiency is a staffing risk, not a modelling problem. The P0 record defines the matrix; it does not claim any role has been filled or developed.\n\n## Baseline\nThe baseline is the measured starting proficiency, taken with the definition set rather than after the first delivery tranche. It is the reference the development milestones are measured against, and it is not a statement that the programme is sufficiently skilled. No re-assessment has been recorded for 2026-11-26, so the baseline remains the only measurement.\n\n## Development milestones\nThe assessment records development milestones for the seven categories, which the programme manages as the delivery tranches run. The milestones are part of the published baseline; their completion is not claimed by P0, and no training, recruitment or certification is recorded as delivered. That is the honest boundary between defining the capability baseline and building the capability.\n",
+  "closure": "# Closure — P0 programme definition (retrospective, 2026-11-26)\n\nThe programme-definition project P0 is re-closed through the one gate on the record the snapshot carries: the board-approved delivery contract `01a1fdd4-ab0f-7802-b7a7-2541a2902e6b`, the approved scope baseline `01a1fbb1-b05c-76b6-a5ac-7186fb859dcc`, the compliant Phase-G review `01a1fdd7-8227-7441-8f43-385bd3e186fa` and the closure gate `01a1fdd5-b773-78c3-87d1-8f3c5ae9eeda` decided by an approver distinct from its requester. This statement is retrospective and dated 2026-11-26. It records the closure and keeps one item open: the artefact packages that were red at the 2026-11-25 acceptance record and that this content pack supplies the content for.",
+  "closure_review": "# Closure review — P0 programme definition (retrospective, 2026-11-26)\n\n## Outcome vs acceptance\n\nThe charter's outcome is the published 21-category definition set with the 15-artefact architecture set and the governance records; the acceptance the record carries matches it. The SoAW, the delivery contract and the scope baseline are approved, the Phase-G review is compliant, and the closure gate was decided by an approver other than its requester. The 2026-11-25 acceptance record was red on the artefact standard; this review records both states.\n\n## Evidence\n\nThe evidence is the SoAW `01a1fdd2-5041-7f80-8032-3305751d498c`, the delivery contract `01a1fdd4-ab0f-7802-b7a7-2541a2902e6b` with board decision `01a1fdd4-cac3-7767-9b0f-4c15d064d6f6`, the approved scope baseline `01a1fbb1-b05c-76b6-a5ac-7186fb859dcc`, the Phase-G review `01a1fdd7-8227-7441-8f43-385bd3e186fa` and the closure gate `01a1fdd5-b773-78c3-87d1-8f3c5ae9eeda`, together with the acts and transcript this rework writes and the acceptance record docs/evidence/rework/P0.json. Each acceptance line names a check that actually ran on a fresh snapshot.\n\n## Open items\n\nThe mandatory artefact packages were red at the 2026-11-25 acceptance record: the eight E–H artefacts and the four Phase-E category documents did not exist. This content pack supplies them, but the packages clear only when the batch applies the pack and the acceptance record is regenerated. The benefit baselines are measured; no transition or post-transition measurement is claimed by this project.\n\n## Decision\n\nThe retrospective decision is to re-close on the record the snapshot carries while stating the open item, and to let the rework batch apply this content pack so the artefact packages clear on a regenerated acceptance record. The decision level is compliant, as the Phase-G review `01a1fdd7-8227-7441-8f43-385bd3e186fa` records; it is dated 2026-11-26 and does not assert that the red package state or any benefit realisation is repaired."
+}

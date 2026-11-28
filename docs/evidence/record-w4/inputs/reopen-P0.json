@@ -1,0 +1,5 @@
+{
+  "reason": "The 2026-11-23 manifest is red: B3's baseline is not a structured measurement because T6 (its instrument) has no project baseline, and T6 is a construction slice that is absent. The programme-definition record is therefore not complete; rework is in progress.",
+  "decision_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85",
+  "id": "01a1dcb8-d24b-76de-b901-56fd56e001bc"
+}

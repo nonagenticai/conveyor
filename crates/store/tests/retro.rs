@@ -112,6 +112,7 @@ async fn lesson(db: &support::TestDb, f: &Fixture, key: &str) -> Uuid {
         &format!("lesson for {key}"),
         // T8's rule applies to a retro proposal too: one referenced object is not evidence.
         &json!([{ "run_id": "r-1" }, { "run_id": "r-2" }]),
+        &json!({}),
     )
     .await
     .expect("propose a lesson");
@@ -216,4 +217,39 @@ async fn retro_cannot_close_without_lessons() {
     .await
     .expect("read the card");
     assert!(!closed, "the refused close wrote nothing");
+}
+
+/// v1-p82-6 — a lesson is evidence first: an empty (or absent) evidence array is refused.
+#[tokio::test]
+async fn a_lesson_needs_evidence() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db).await;
+    for empty in [json!([]), json!(null)] {
+        let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
+        let refused = spine::propose_lesson_tx(
+            &mut tx,
+            f.tenant,
+            f.programme,
+            Some(f.cadence),
+            "F1",
+            "a lesson",
+            &empty,
+            &json!({}),
+        )
+        .await;
+        tx.rollback().await.expect("rollback");
+        assert!(
+            matches!(
+                refused,
+                Err(PlanStoreError::Illegal(PlanError::LessonEvidenceMissing))
+            ),
+            "{empty} is not evidence: {refused:?}"
+        );
+    }
+    let rows: i64 = sqlx::query_scalar("SELECT count(*) FROM lesson WHERE tenant_id = $1")
+        .bind(f.tenant.as_uuid())
+        .fetch_one(&db.super_pool)
+        .await
+        .expect("count the lessons");
+    assert_eq!(rows, 0, "the refusal wrote nothing");
 }

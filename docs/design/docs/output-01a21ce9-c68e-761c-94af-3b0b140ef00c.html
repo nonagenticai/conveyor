@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Owner decision — the conformance ledger shrinks at the merged head (2026-11-27) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="decision" data-provenance-version="1" data-provenance-hash="0a6ee086ee3e179c89be92f230af547b24340d74d597d3c9415ff7d1a343a176" data-provenance-status="active" data-provenance-owner="FR Test" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>decision</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>0a6ee086ee3e179c89be92f230af547b24340d74d597d3c9415ff7d1a343a176</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>FR Test</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Owner decision — the conformance ledger shrinks at the merged head (2026-11-27)</h1>
+<h2>Context</h2>
+<p>The accepted conformance baseline of 2026-11-26 lists 155 findings. The tranche 0-5 rework has since resolved a set of them on the live record: closure reviews, closure outputs, delivery contracts, artefact sets, PI cadences and refinement rows now exist for the projects the baseline named. The audit's strict comparison refuses a baseline that names a finding with no live gap, so the baseline must be re-accepted at the current head before the public pack can be republished.</p>
+<h2>Decision</h2>
+<p>The baseline is re-accepted at the merged head (origin/main 5a7d02ddd merged into the rework lane) from the live register the audit computes. Every remaining entry is a live gap; the entries this acceptance removes are the fixes the rework has landed, evidenced by the project rows and the tranche receipts. This is a shrink-only acceptance: no new finding is folded into the baseline without a live gap of its own.</p>
+<h2>Consequences</h2>
+<p>The register published with the design pack now matches the live record, so the pack's checks and the tranche receipts speak from the same data. Any future growth of the ledger requires its own live gap and a fresh acceptance; the audit keeps refusing a baseline entry with no current gap.</p>
+<h2>Evidence</h2>
+<p>The draft snapshot built from the replay record at the merged head; the audit's --report output; the tranche receipts under docs/evidence/rework/*.json; the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>conveyor output · published 2026-11-27T12:10:18.740973+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

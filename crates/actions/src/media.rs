@@ -87,7 +87,7 @@ pub const KINDS: [&str; 11] = [
 /// media executor (#174).
 ///
 /// It lives outside [`KINDS`] on purpose: `KINDS` are the job kinds the executor dispatches, and this
-/// one has no executor envelope and no job row — the engine calls mini1's MOSS-Image host directly
+/// one has no executor envelope and no job row — the engine calls media-1's MOSS-Image host directly
 /// and stores the render. It is still a capability this service advertises, so `capabilities()` lists
 /// it (the probe reads the registry, not this list).
 pub const GENERATE_IMAGE: &str = "media.generate_image";
@@ -417,7 +417,7 @@ pub fn capabilities() -> MediaCapabilitiesOut {
         .iter()
         .filter(|spec| spec.name.starts_with("media.") && spec.name != CAPABILITIES)
         .map(|spec| MediaCapabilityView {
-            kind: spec.name.to_owned(),
+            kind: spec.name.to_string(),
             effect: spec.effect.as_str().to_owned(),
         })
         .collect();

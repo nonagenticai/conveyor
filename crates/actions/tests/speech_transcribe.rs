@@ -205,6 +205,7 @@ fn base64(bytes: &[u8]) -> String {
 
 fn request(action: &str, user_id: Uuid, input: Value) -> InvokeRequest {
     InvokeRequest {
+        credential_alias: None,
         action: action.to_owned(),
         input,
         precondition: None,

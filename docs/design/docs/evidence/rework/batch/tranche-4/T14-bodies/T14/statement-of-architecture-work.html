@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Statement Of Architecture Work — Estate toolkits · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T14-bodies/T14/statement-of-architecture-work.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="statement-of-architecture-work--estate-toolkits">Statement Of Architecture Work — Estate toolkits</h1>
+<h2 id="assignment">Assignment</h2>
+<p>What the architecture work is asked to deliver and for whom.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a219dd-4701-7342-9adf-f2c47331c4af&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-26T21:57:41.900644+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The SPEC_V2 \u00a712 T14 gate, executed on the live estate through `acceptance/programme/T14.toml`: (a) each published toolkit has a probe and one live call; (b) `scientific_processor` is scaled up for its probe and one live call, then scaled back, with a receipt; (c) a zero-use report exists; (d) a backend outage unbinds new runs while in-flight runs finish. The snapshot carries no executed receipt for any of the four clauses, so this rework records them as the project&#39;s open verification item rather than a pass; the level written is consistent, never non_conformant without a waiver, and no waiver exists.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V2 slice T14 (SPEC_V2 \u00a712) by the reconstituted TOGAF/MSP lifecycle: author and publish the seven mandatory Phase A\u2013D artefacts, the charter and the delivery contract, record the Phase-G compliance review at the level the record supports, publish the expected outputs (`project-brief`, `evidence`) and leave the project active with its gate recorded as open verification rather than closing it.&quot;,
+        &quot;contract&quot;: &quot;No live Statement of Architecture Work and no live delivery contract exist for T14 at the snapshot; this pair is supplied retrospectively by the 2026-11-24 rework and is the contract of record until a Board-approved one supersedes it. It binds the project to the four gate clauses above, to broker-only calls inherited from T13, to draft status for the named draft services, and to a receipt per claim; it does not authorise closure. The standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 is the authority under which the rework acts.&quot;,
+        &quot;responsibilities&quot;: &quot;the conveyor-approver approves the Phase A\u2013D set and the delivery contract; the conveyor-architecture-board governs the standards; the programme architect (conveyor-e2e) owns T14 and this retrospective pack; the T13 tool-platform team owns the tool family, the broker, the effect classes and the credential profiles; the estate service owners grant the live-call window and the outage drill; the SRO is accountable for the tranche outcome.&quot;,
+        &quot;retrospective&quot;: &quot;written by the 2026-11-24 tranche-4 rework; it reconstructs the record and does not attest contemporaneous intent.&quot;,
+        &quot;scope&quot;: &quot;the estate-toolkit import wave on T13&#39;s tool platform: the `tool`, `toolkit`, `tool_binding` and `tool_call` rows for the coding fleet, strata, billing and licence reads, webscraper, media_discovery, scientific_processor, lean4_prover, video-compiler, the w2v orchestrator and the ops read tools; `evidence_review`, `discovery` :8807 and the planned AHTAPol services as `draft`; the probe and the one live call per published toolkit; the `scientific_processor` scale-up and scale-back receipt; the zero-use report; and the backend-outage unbind test. Out of scope: the broker itself (T13), tool authoring and BYO (T15), and the UI.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-26T21:57:41.6166+00:00&quot;,
+      &quot;id&quot;: &quot;01a219dd-4673-70da-b701-3f43675b4fa6&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d37-7896-adfb-fa7bd2279dfd&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T14 Estate toolkits (retrospective, 2026-11-24)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:57:41.900644+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="scope">Scope</h2>
+<p>The boundaries, the artefacts expected and the phase set.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a219dd-4701-7342-9adf-f2c47331c4af&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-26T21:57:41.900644+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The SPEC_V2 \u00a712 T14 gate, executed on the live estate through `acceptance/programme/T14.toml`: (a) each published toolkit has a probe and one live call; (b) `scientific_processor` is scaled up for its probe and one live call, then scaled back, with a receipt; (c) a zero-use report exists; (d) a backend outage unbinds new runs while in-flight runs finish. The snapshot carries no executed receipt for any of the four clauses, so this rework records them as the project&#39;s open verification item rather than a pass; the level written is consistent, never non_conformant without a waiver, and no waiver exists.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V2 slice T14 (SPEC_V2 \u00a712) by the reconstituted TOGAF/MSP lifecycle: author and publish the seven mandatory Phase A\u2013D artefacts, the charter and the delivery contract, record the Phase-G compliance review at the level the record supports, publish the expected outputs (`project-brief`, `evidence`) and leave the project active with its gate recorded as open verification rather than closing it.&quot;,
+        &quot;contract&quot;: &quot;No live Statement of Architecture Work and no live delivery contract exist for T14 at the snapshot; this pair is supplied retrospectively by the 2026-11-24 rework and is the contract of record until a Board-approved one supersedes it. It binds the project to the four gate clauses above, to broker-only calls inherited from T13, to draft status for the named draft services, and to a receipt per claim; it does not authorise closure. The standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 is the authority under which the rework acts.&quot;,
+        &quot;responsibilities&quot;: &quot;the conveyor-approver approves the Phase A\u2013D set and the delivery contract; the conveyor-architecture-board governs the standards; the programme architect (conveyor-e2e) owns T14 and this retrospective pack; the T13 tool-platform team owns the tool family, the broker, the effect classes and the credential profiles; the estate service owners grant the live-call window and the outage drill; the SRO is accountable for the tranche outcome.&quot;,
+        &quot;retrospective&quot;: &quot;written by the 2026-11-24 tranche-4 rework; it reconstructs the record and does not attest contemporaneous intent.&quot;,
+        &quot;scope&quot;: &quot;the estate-toolkit import wave on T13&#39;s tool platform: the `tool`, `toolkit`, `tool_binding` and `tool_call` rows for the coding fleet, strata, billing and licence reads, webscraper, media_discovery, scientific_processor, lean4_prover, video-compiler, the w2v orchestrator and the ops read tools; `evidence_review`, `discovery` :8807 and the planned AHTAPol services as `draft`; the probe and the one live call per published toolkit; the `scientific_processor` scale-up and scale-back receipt; the zero-use report; and the backend-outage unbind test. Out of scope: the broker itself (T13), tool authoring and BYO (T15), and the UI.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-26T21:57:41.6166+00:00&quot;,
+      &quot;id&quot;: &quot;01a219dd-4673-70da-b701-3f43675b4fa6&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d37-7896-adfb-fa7bd2279dfd&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T14 Estate toolkits (retrospective, 2026-11-24)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:57:41.900644+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="responsibilities">Responsibilities</h2>
+<p>Who does the work and who accepts it.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a219dd-4701-7342-9adf-f2c47331c4af&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-26T21:57:41.900644+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The SPEC_V2 \u00a712 T14 gate, executed on the live estate through `acceptance/programme/T14.toml`: (a) each published toolkit has a probe and one live call; (b) `scientific_processor` is scaled up for its probe and one live call, then scaled back, with a receipt; (c) a zero-use report exists; (d) a backend outage unbinds new runs while in-flight runs finish. The snapshot carries no executed receipt for any of the four clauses, so this rework records them as the project&#39;s open verification item rather than a pass; the level written is consistent, never non_conformant without a waiver, and no waiver exists.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V2 slice T14 (SPEC_V2 \u00a712) by the reconstituted TOGAF/MSP lifecycle: author and publish the seven mandatory Phase A\u2013D artefacts, the charter and the delivery contract, record the Phase-G compliance review at the level the record supports, publish the expected outputs (`project-brief`, `evidence`) and leave the project active with its gate recorded as open verification rather than closing it.&quot;,
+        &quot;contract&quot;: &quot;No live Statement of Architecture Work and no live delivery contract exist for T14 at the snapshot; this pair is supplied retrospectively by the 2026-11-24 rework and is the contract of record until a Board-approved one supersedes it. It binds the project to the four gate clauses above, to broker-only calls inherited from T13, to draft status for the named draft services, and to a receipt per claim; it does not authorise closure. The standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 is the authority under which the rework acts.&quot;,
+        &quot;responsibilities&quot;: &quot;the conveyor-approver approves the Phase A\u2013D set and the delivery contract; the conveyor-architecture-board governs the standards; the programme architect (conveyor-e2e) owns T14 and this retrospective pack; the T13 tool-platform team owns the tool family, the broker, the effect classes and the credential profiles; the estate service owners grant the live-call window and the outage drill; the SRO is accountable for the tranche outcome.&quot;,
+        &quot;retrospective&quot;: &quot;written by the 2026-11-24 tranche-4 rework; it reconstructs the record and does not attest contemporaneous intent.&quot;,
+        &quot;scope&quot;: &quot;the estate-toolkit import wave on T13&#39;s tool platform: the `tool`, `toolkit`, `tool_binding` and `tool_call` rows for the coding fleet, strata, billing and licence reads, webscraper, media_discovery, scientific_processor, lean4_prover, video-compiler, the w2v orchestrator and the ops read tools; `evidence_review`, `discovery` :8807 and the planned AHTAPol services as `draft`; the probe and the one live call per published toolkit; the `scientific_processor` scale-up and scale-back receipt; the zero-use report; and the backend-outage unbind test. Out of scope: the broker itself (T13), tool authoring and BYO (T15), and the UI.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-26T21:57:41.6166+00:00&quot;,
+      &quot;id&quot;: &quot;01a219dd-4673-70da-b701-3f43675b4fa6&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d37-7896-adfb-fa7bd2279dfd&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T14 Estate toolkits (retrospective, 2026-11-24)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:57:41.900644+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="acceptance-criteria">Acceptance criteria</h2>
+<p>The conditions the architecture must meet to close Phase A.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a219dd-4701-7342-9adf-f2c47331c4af&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-26T21:57:41.900644+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The SPEC_V2 \u00a712 T14 gate, executed on the live estate through `acceptance/programme/T14.toml`: (a) each published toolkit has a probe and one live call; (b) `scientific_processor` is scaled up for its probe and one live call, then scaled back, with a receipt; (c) a zero-use report exists; (d) a backend outage unbinds new runs while in-flight runs finish. The snapshot carries no executed receipt for any of the four clauses, so this rework records them as the project&#39;s open verification item rather than a pass; the level written is consistent, never non_conformant without a waiver, and no waiver exists.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V2 slice T14 (SPEC_V2 \u00a712) by the reconstituted TOGAF/MSP lifecycle: author and publish the seven mandatory Phase A\u2013D artefacts, the charter and the delivery contract, record the Phase-G compliance review at the level the record supports, publish the expected outputs (`project-brief`, `evidence`) and leave the project active with its gate recorded as open verification rather than closing it.&quot;,
+        &quot;contract&quot;: &quot;No live Statement of Architecture Work and no live delivery contract exist for T14 at the snapshot; this pair is supplied retrospectively by the 2026-11-24 rework and is the contract of record until a Board-approved one supersedes it. It binds the project to the four gate clauses above, to broker-only calls inherited from T13, to draft status for the named draft services, and to a receipt per claim; it does not authorise closure. The standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 is the authority under which the rework acts.&quot;,
+        &quot;responsibilities&quot;: &quot;the conveyor-approver approves the Phase A\u2013D set and the delivery contract; the conveyor-architecture-board governs the standards; the programme architect (conveyor-e2e) owns T14 and this retrospective pack; the T13 tool-platform team owns the tool family, the broker, the effect classes and the credential profiles; the estate service owners grant the live-call window and the outage drill; the SRO is accountable for the tranche outcome.&quot;,
+        &quot;retrospective&quot;: &quot;written by the 2026-11-24 tranche-4 rework; it reconstructs the record and does not attest contemporaneous intent.&quot;,
+        &quot;scope&quot;: &quot;the estate-toolkit import wave on T13&#39;s tool platform: the `tool`, `toolkit`, `tool_binding` and `tool_call` rows for the coding fleet, strata, billing and licence reads, webscraper, media_discovery, scientific_processor, lean4_prover, video-compiler, the w2v orchestrator and the ops read tools; `evidence_review`, `discovery` :8807 and the planned AHTAPol services as `draft`; the probe and the one live call per published toolkit; the `scientific_processor` scale-up and scale-back receipt; the zero-use report; and the backend-outage unbind test. Out of scope: the broker itself (T13), tool authoring and BYO (T15), and the UI.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-26T21:57:41.6166+00:00&quot;,
+      &quot;id&quot;: &quot;01a219dd-4673-70da-b701-3f43675b4fa6&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d37-7896-adfb-fa7bd2279dfd&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T14 Estate toolkits (retrospective, 2026-11-24)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:57:41.900644+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="contract">Contract</h2>
+<p>The contract record, its version and its approval.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a219dd-4701-7342-9adf-f2c47331c4af&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-26T21:57:41.900644+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The SPEC_V2 \u00a712 T14 gate, executed on the live estate through `acceptance/programme/T14.toml`: (a) each published toolkit has a probe and one live call; (b) `scientific_processor` is scaled up for its probe and one live call, then scaled back, with a receipt; (c) a zero-use report exists; (d) a backend outage unbinds new runs while in-flight runs finish. The snapshot carries no executed receipt for any of the four clauses, so this rework records them as the project&#39;s open verification item rather than a pass; the level written is consistent, never non_conformant without a waiver, and no waiver exists.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V2 slice T14 (SPEC_V2 \u00a712) by the reconstituted TOGAF/MSP lifecycle: author and publish the seven mandatory Phase A\u2013D artefacts, the charter and the delivery contract, record the Phase-G compliance review at the level the record supports, publish the expected outputs (`project-brief`, `evidence`) and leave the project active with its gate recorded as open verification rather than closing it.&quot;,
+        &quot;contract&quot;: &quot;No live Statement of Architecture Work and no live delivery contract exist for T14 at the snapshot; this pair is supplied retrospectively by the 2026-11-24 rework and is the contract of record until a Board-approved one supersedes it. It binds the project to the four gate clauses above, to broker-only calls inherited from T13, to draft status for the named draft services, and to a receipt per claim; it does not authorise closure. The standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 is the authority under which the rework acts.&quot;,
+        &quot;responsibilities&quot;: &quot;the conveyor-approver approves the Phase A\u2013D set and the delivery contract; the conveyor-architecture-board governs the standards; the programme architect (conveyor-e2e) owns T14 and this retrospective pack; the T13 tool-platform team owns the tool family, the broker, the effect classes and the credential profiles; the estate service owners grant the live-call window and the outage drill; the SRO is accountable for the tranche outcome.&quot;,
+        &quot;retrospective&quot;: &quot;written by the 2026-11-24 tranche-4 rework; it reconstructs the record and does not attest contemporaneous intent.&quot;,
+        &quot;scope&quot;: &quot;the estate-toolkit import wave on T13&#39;s tool platform: the `tool`, `toolkit`, `tool_binding` and `tool_call` rows for the coding fleet, strata, billing and licence reads, webscraper, media_discovery, scientific_processor, lean4_prover, video-compiler, the w2v orchestrator and the ops read tools; `evidence_review`, `discovery` :8807 and the planned AHTAPol services as `draft`; the probe and the one live call per published toolkit; the `scientific_processor` scale-up and scale-back receipt; the zero-use report; and the backend-outage unbind test. Out of scope: the broker itself (T13), tool authoring and BYO (T15), and the UI.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-26T21:57:41.6166+00:00&quot;,
+      &quot;id&quot;: &quot;01a219dd-4673-70da-b701-3f43675b4fa6&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d37-7896-adfb-fa7bd2279dfd&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T14 Estate toolkits (retrospective, 2026-11-24)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:57:41.900644+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-4/T14-bodies/T14/statement-of-architecture-work.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

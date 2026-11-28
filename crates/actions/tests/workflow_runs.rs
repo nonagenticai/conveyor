@@ -8,6 +8,7 @@ mod support;
 
 use conveyor_store::begin_scoped;
 use serde_json::{Value, json};
+use uuid::Uuid;
 
 fn output(body: &Value) -> &Value {
     body.get("output").unwrap_or(body)
@@ -130,6 +131,113 @@ async fn published_workflow(running: &support::Running) -> String {
         .await;
     assert_eq!(status, 200, "{published}");
     workflow_id
+}
+
+/// A `strata_rag` endpoint that answers every pack read `404`: the bound pack is unpublished.
+async fn unpublished_strata_stub() -> String {
+    let app = axum::Router::new();
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+        .await
+        .expect("bind strata stub");
+    let base = format!("http://{}", listener.local_addr().expect("addr"));
+    tokio::spawn(async move {
+        let _ = axum::serve(listener, app).await;
+    });
+    base
+}
+
+/// An active capability with one active executor and one REQUIRED pack nobody published.
+async fn unpublished_capability(pg: &support::Pg, seeded: &support::Seeded) -> (Uuid, Uuid) {
+    let capability: Uuid = sqlx::query_scalar(
+        "INSERT INTO capability (tenant_id, code, label, status)
+         VALUES ($1, $2, 'Unpublished', 'active') RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(format!("unpublished-{}", Uuid::now_v7().simple()))
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("seed capability");
+    let agent: Uuid = sqlx::query_scalar(
+        "INSERT INTO capability_agent
+             (tenant_id, capability_id, key, role, status, model_ref, allowed_actions)
+         VALUES ($1, $2, $3, 'tool_agent', 'active', 'local-llm', ARRAY['cards.get'])
+         RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(capability)
+    .bind(format!("agent-{}", Uuid::now_v7().simple()))
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("seed agent");
+    sqlx::query(
+        "INSERT INTO capability_knowledge
+             (tenant_id, capability_id, pack_key, pack_version, required)
+         VALUES ($1, $2, 'missing-pack', 1, true)",
+    )
+    .bind(seeded.tenant_id)
+    .bind(capability)
+    .execute(&pg.super_pool)
+    .await
+    .expect("bind the required pack");
+    (capability, agent)
+}
+
+/// A workflow run that names an executor carries that executor's capability, so the process
+/// path's readiness guard applies: a required pack with no published leaves refuses before the
+/// run row. Zero run rows means zero steps — and therefore zero model calls.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_workflow_run_against_an_unpublished_required_pack_is_refused() {
+    let (pg, seeded, running) = fixture().await;
+    let (project, card) = project_and_card(&running).await;
+    let workflow = published_workflow(&running).await;
+    let (_capability, agent) = unpublished_capability(&pg, &seeded).await;
+
+    let (status, body) = running
+        .invoke(
+            "secrets.create",
+            "dev:alice",
+            json!({"name": "strata_rag.token", "value": "test-token-not-a-credential"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    support::set_env("CONVEYOR_STRATA_RAG_URL", &unpublished_strata_stub().await);
+
+    let (status, _headers, body) = running
+        .invoke_full(
+            "workflow_runs.start",
+            "dev:alice",
+            json!({
+                "workflow_id": workflow,
+                "project_id": project,
+                "card_id": card,
+                "capability_agent_id": agent,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 409, "{body}");
+    let codes: Vec<&str> = body["errors"]
+        .as_array()
+        .map(|rows| rows.iter().filter_map(|row| row["code"].as_str()).collect())
+        .unwrap_or_default();
+    assert!(codes.contains(&"pack_not_published"), "{body}");
+
+    let runs: i64 = sqlx::query_scalar("SELECT count(*) FROM run WHERE tenant_id = $1")
+        .bind(seeded.tenant_id)
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("count runs");
+    let steps: i64 = sqlx::query_scalar("SELECT count(*) FROM run_step WHERE tenant_id = $1")
+        .bind(seeded.tenant_id)
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("count run steps");
+    assert_eq!((runs, steps), (0, 0), "a refusal wrote run state");
 }
 
 #[tokio::test]

@@ -1,0 +1,205 @@
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project T4 --content docs/evidence/rework/tranche-4/rework-content-T4.json --tranche-label tranche 4 --demo-cadence 01a202a1-f4ee-7acc-8e57-50ac6f0417fd
+
+  01 projects.reopen ok
+  charter: already approved
+  closure outputs: already ['closure-review']
+  SoAW: already live
+  artefact: Stakeholder Map — T4 Kanban coach (Phase A) already present
+  artefact: Driver/Goal/Objective Catalog — T4 Kanban coach (Phase A) already present
+  artefact: Requirements Catalog — T4 Kanban coach (Phase A) already present
+  artefact: Solution Concept Diagram — T4 Kanban coach (Phase A) already present
+  artefact: Business Capability Map — T4 Kanban coach (Phase B) already present
+  artefact: Data Entity/Data Component Catalog — T4 Kanban coach (Phase C) already present
+  artefact: Technology Standards Catalog — T4 Kanban coach (Phase D) already present
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  08 architecture.artifacts_link ok
+  09 architecture.artifacts_link ok
+  10 architecture.artifacts_link ok
+  document architecture-artifact: already present and published
+  delivery contract: already live
+  register risk: No sha-bound green run of the coach gate exists, so T4's acceptance is unproven already present
+  register risk: The acceptance run cannot reach the charter transport, so the governance gate fails at its first check already present
+  register issue: docs/evidence/rework/T4.json is red: four governance checks fail at 2026-11-24T21:07:28Z already present
+  register assumption: The kata lifecycle after open stays with T5 (issue #77), so the pack stops at the kata.open hand-off already present
+  register dependency: The coach depends on T3's failed-run provenance and on P0's board, process, action and approval primitives already present
+  register dependency: Systemic-class learning depends on T5 (issue #77) for the kata lifecycle after open already present
+  register benefit: One coach card, one triage and at most one remedy per interruption, with a repeat signature escalating instead of flooding the board already present
+  register benefit: Systemic classes become one measured kata rather than a recurring fault already present
+  benefit transitions: none in the content
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
+  closure-review output: already published
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  11 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 1 change row(s) present
+  record fixes: none in the content
+  card discharge: no open rework card owned by the project
+  12 projects.close_request ok
+  13 approvals.decide ok
+  14 approvals.request ok
+  15 approvals.decide ok
+  16 projects.close ok
+  closed T4: 01a1d039-0d33-7e7e-890e-b437b0c78db9
+T4: 16 acts recorded
+
+
+[exit 0]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T4 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T4-snap-q3ier0ev/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T4-snap-q3ier0ev/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/T4-bodies --local-bin /tmp/conv526-t14-bin-20261126
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [],
+  "skipped": [
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "closure-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "project-registers",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "NO_EVIDENCE",
+        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
+      }
+    }
+  ],
+  "counts": {
+    "due": 4,
+    "present": 6,
+    "missing-edge": 0,
+    "stale": 4,
+    "ambiguous": 0
+  }
+}
+
+
+[exit 1]
+

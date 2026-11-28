@@ -1,0 +1,214 @@
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project T1 --content docs/evidence/rework/tranche-1/rework-content-T1.json --tranche-label tranche 1 --demo-cadence 01a1ff74-9819-72dc-a1f2-e102c73e9672
+
+  01 projects.reopen ok
+  charter: already approved
+  closure outputs: already ['closure-review']
+  SoAW: already live
+  artefact: Stakeholder map — T1 plan spine already present
+  artefact: Driver/goal/objective — T1 plan spine already present
+  artefact: Requirements catalog — T1 plan spine already present
+  artefact: Solution concept — T1 plan spine already present
+  artefact: Business capability map — T1 plan spine already present
+  artefact: Data entity catalog — T1 plan spine already present
+  artefact: Technology standards — T1 plan spine already present
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  08 architecture.artifacts_link ok
+  09 architecture.artifacts_link ok
+  10 architecture.artifacts_link ok
+  document architecture-artifact: already present and published
+  delivery contract: already live
+  register risk: A later consumer reads a cadence row as a working PI rhythm already present
+  register risk: An edit after a baseline is expected to appear in the frozen scope already present
+  register risk: The in-flight set is tenant configuration, so a misconfiguration hides live work already present
+  register issue: No contemporaneous governance record existed at the 2026-11-17 close already present
+  register issue: The Plan tab's WBS, baseline and register screens are not a console delivery already present
+  register assumption: Every gate passes through approvals.decide, so the requester exclusion covers the whole programme already present
+  register assumption: The four WSJF inputs are valid integers for every WBS row that reaches the read already present
+  register dependency: T2, T3, T9 and T10 build on the plan-spine rows already present
+  register dependency: The frozen baseline depends on the take and the snapshot sharing one transaction already present
+  register benefit: Priority is arithmetic and never a stale stored score already present
+  register benefit: A tranche review cannot decide without baselines, benefit status and the risk register already present
+  register benefit: Self-approval is refused on every gate, not only where a test looks already present
+  programme shared_config: already set
+  benefit transitions: none in the content
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
+  closure-review output: already published
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  11 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 1 change row(s) present
+  record fixes: none in the content
+  card discharge: no open rework card owned by the project
+  12 projects.close_request ok
+  13 approvals.decide ok
+  14 approvals.request ok
+  15 approvals.decide ok
+  16 projects.close ok
+  closed T1: 01a1d039-0d32-7c81-8365-371217d16ef7
+T1: 16 acts recorded
+
+
+[exit 0]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T1 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T1-snap-v4yjytx7/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T1-snap-v4yjytx7/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-1/T1-bodies --local-bin /tmp/conv526-bin-5dcfc953
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [],
+  "skipped": [
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "closure-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "inception-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "project-registers",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "NO_EVIDENCE",
+        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
+      }
+    }
+  ],
+  "counts": {
+    "due": 3,
+    "present": 6,
+    "missing-edge": 0,
+    "stale": 6,
+    "ambiguous": 0
+  }
+}
+
+
+[exit 1]
+

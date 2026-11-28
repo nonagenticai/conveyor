@@ -107,7 +107,8 @@ pub const TRANSPORT_EXEMPTIONS: [&str; 1] = ["copilot.chat"];
 /// test report an injected unmapped operation **by name**, so a new screen element that forgets its
 /// action fails loudly instead of silently widening the exemption list.
 pub fn unmapped(operations: &[&str], surface: &[&ActionSpec]) -> Vec<String> {
-    let names: std::collections::BTreeSet<&str> = surface.iter().map(|spec| spec.name).collect();
+    let names: std::collections::BTreeSet<&str> =
+        surface.iter().map(|spec| spec.name.as_ref()).collect();
     operations
         .iter()
         .filter(|operation| {
@@ -120,7 +121,7 @@ pub fn unmapped(operations: &[&str], surface: &[&ActionSpec]) -> Vec<String> {
 /// The wire form of one action.
 pub fn entry(spec: &ActionSpec) -> SurfaceEntry {
     SurfaceEntry {
-        name: spec.name.to_owned(),
+        name: spec.name.to_string(),
         version: spec.version,
         kind: spec.kind.as_str().to_owned(),
         spec_hash: spec.spec_hash(),
@@ -162,7 +163,7 @@ mod tests {
         assert!(!member.is_empty());
         assert!(member.len() <= admin.len());
         for spec in &member {
-            assert!(admin.iter().any(|other| other.name == spec.name));
+            assert!(admin.iter().any(|other| other.name == spec.name.as_ref()));
         }
         // The kind filter excludes nothing today (no workflow action is registered), which is
         // exactly why it is asserted rather than assumed: the first S13 action must change this.

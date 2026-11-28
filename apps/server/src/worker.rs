@@ -929,11 +929,14 @@ async fn dispatch(
             .map_err(db)?;
             tracing::info!(tenant = %tenant, deleted, "prompt_audit.prune");
         }
-        "card.lease_sweep" => card_lease_sweep(pool, tenant).await?,
+        "card.lease_sweep" => card_lease_sweep(pool, tenant, &config.app_key).await?,
         "card.claim" => card_claim(pool, tenant, payload).await?,
-        "approval.expire" => approval_expire(pool, tenant).await?,
+        "approval.expire" => approval_expire(pool, tenant, &config.app_key).await?,
         "delivery.send" => delivery_send(pool, tenant, payload).await?,
         "approval.closed.emit" => approval_closed_emit(pool, tenant).await?,
+        // S07 §5.4: a `draft` intake still unresolved after the 24 h window is expired in
+        // place and announced on its own topic (S06 §5.3's `project_request.timeout`).
+        "project_request.timeout" => project_request_timeout(pool, tenant).await?,
         "interaction.dispatch" => interaction_dispatch(pool, tenant).await?,
         "interaction.close" => interaction_close(pool, tenant).await?,
         "quality.score" => quality_score(pool, tenant, payload).await?,
@@ -1354,11 +1357,16 @@ async fn workflow_node(
 /// row, so the event lands on the board's stream (`board:<id>`) and a `card` subscriber sees
 /// the lease expire like any other card fact. The row count is bounded by
 /// [`LEASE_SWEEP_LIMIT`], so the extra read is bounded too.
-async fn card_lease_sweep(pool: &PgPool, tenant: TenantId) -> Result<(), JobFailure> {
+async fn card_lease_sweep(
+    pool: &PgPool,
+    tenant: TenantId,
+    app_key: &str,
+) -> Result<(), JobFailure> {
     let mut tx = store::begin_scoped(pool, tenant).await.map_err(retryable)?;
     let cleared = store::card::sweep_expired_leases_tx(&mut tx, tenant, LEASE_SWEEP_LIMIT)
         .await
         .map_err(retryable)?;
+    let mut expired: Vec<Uuid> = Vec::new();
     for (card_id, claim_fence) in cleared {
         let Some(card) = store::card::get_card_tx(&mut tx, tenant, card_id)
             .await
@@ -1376,8 +1384,29 @@ async fn card_lease_sweep(pool: &PgPool, tenant: TenantId) -> Result<(), JobFail
             serde_json::json!({ "card_id": card_id, "claim_fence": claim_fence }),
         )
         .await?;
+        expired.push(card_id);
     }
     tx.commit().await.map_err(retryable)?;
+    // §6.2 stale lease: this sweep is the only place that sees a claim expire unanswered, and
+    // it runs after the commit so the interruption never shares this transaction.
+    for card_id in expired {
+        if let Err(error) = conveyor_actions::coach::open_flow_interruption(
+            pool,
+            app_key,
+            tenant,
+            card_id,
+            "stale_lease",
+            &format!("stale_lease|card:{card_id}"),
+        )
+        .await
+        {
+            tracing::warn!(
+                %error,
+                %card_id,
+                "card.lease_sweep: the coach could not be interrupted"
+            );
+        }
+    }
     Ok(())
 }
 
@@ -1463,12 +1492,18 @@ async fn card_claim(pool: &PgPool, tenant: TenantId, payload: &Value) -> Result<
 /// `waiting_approval → failed` edge, and leaving it live would hold `uq_run_live` forever,
 /// so it is cancelled with `error_class='approval_expired'` (S06 §5.4). Both announcements
 /// are written in the same transaction as the writes.
-async fn approval_expire(pool: &PgPool, tenant: TenantId) -> Result<(), JobFailure> {
+async fn approval_expire(pool: &PgPool, tenant: TenantId, app_key: &str) -> Result<(), JobFailure> {
     let mut tx = store::begin_scoped(pool, tenant).await.map_err(retryable)?;
     let expired = store::approval::expire_due_ids_tx(&mut tx, tenant)
         .await
         .map_err(retryable)?;
-    for (approval_id, run_id) in expired {
+    // §6.2 gate timeout: gathered here and opened after the commit, so the interruption never
+    // shares this transaction. A project-scoped gate carries no card to coach.
+    let mut timed_out: Vec<(Uuid, Uuid)> = Vec::new();
+    for (approval_id, run_id, card_id) in expired {
+        if let Some(card_id) = card_id {
+            timed_out.push((approval_id, card_id));
+        }
         emit_event(
             &mut tx,
             tenant,
@@ -1537,6 +1572,60 @@ async fn approval_expire(pool: &PgPool, tenant: TenantId) -> Result<(), JobFailu
             Ok(None) => {}
             Err(error) => return Err(run_failure(error)),
         }
+    }
+    tx.commit().await.map_err(retryable)?;
+    // §6.2 gate timeout: a gate that expired unanswered is a flow interruption.
+    for (approval_id, card_id) in timed_out {
+        if let Err(error) = conveyor_actions::coach::open_flow_interruption(
+            pool,
+            app_key,
+            tenant,
+            card_id,
+            "gate_timeout",
+            &format!("gate_timeout|approval:{approval_id}"),
+        )
+        .await
+        {
+            tracing::warn!(
+                %error,
+                %approval_id,
+                %card_id,
+                "approval.expire: the coach could not be interrupted"
+            );
+        }
+    }
+    Ok(())
+}
+
+// ── S07: the CP intake ──────────────────────────────────────────────────────────────────
+
+/// `project_request.timeout` — a `draft` intake still unresolved after
+/// `store::project_request::TIMEOUT_HOURS` expires in place (S06 §5.3, S07 §5.4).
+///
+/// The sweep only matches `draft`, so a second run expires nothing and writes no second
+/// event: the row's status is the idempotency witness, not a separate marker. Each expired
+/// row is announced once on `project_request:<id>` in the same transaction as the update.
+async fn project_request_timeout(pool: &PgPool, tenant: TenantId) -> Result<(), JobFailure> {
+    let mut tx = store::begin_scoped(pool, tenant).await.map_err(retryable)?;
+    let cutoff = Utc::now() - chrono::Duration::hours(store::project_request::TIMEOUT_HOURS);
+    let expired = store::project_request::expire_stale_project_requests_tx(&mut tx, tenant, cutoff)
+        .await
+        .map_err(retryable)?;
+    for record in &expired {
+        emit_event(
+            &mut tx,
+            tenant,
+            &format!("project_request:{}", record.id),
+            "project_request",
+            record.id,
+            "project_request.expired",
+            serde_json::json!({
+                "id": record.id,
+                "external_ref": record.external_ref,
+                "status": record.status,
+            }),
+        )
+        .await?;
     }
     tx.commit().await.map_err(retryable)?;
     Ok(())

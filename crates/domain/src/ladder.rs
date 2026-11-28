@@ -155,6 +155,131 @@ impl Outcome {
     }
 }
 
+/// The smallest and largest authored option set laya accepts (§7.2: a choice is 2–255
+/// labelled options).
+pub const MIN_OPTIONS: usize = 2;
+/// The largest authored option set laya accepts.
+pub const MAX_OPTIONS: usize = 255;
+
+/// Where an authored option set came from.
+///
+/// The platform library is the base set; a tenant's own set for the same case shadows it
+/// (the agent platform's library-first, tenant-key-shadow fold). Both origins live in the
+/// tenant-scoped `decision_option_set` because every conveyor table is RLS-isolated; the
+/// library rows are written by the platform seed, never by a tenant action.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum OptionOrigin {
+    /// The platform's base option set.
+    Library,
+    /// The tenant's authored set; it shadows the library for the same `(kind, gate)`.
+    Tenant,
+}
+
+impl OptionOrigin {
+    /// The stored spelling.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Library => "library",
+            Self::Tenant => "tenant",
+        }
+    }
+
+    /// Parse a stored or posted spelling.
+    pub fn parse(value: &str) -> Option<Self> {
+        match value {
+            "library" => Some(Self::Library),
+            "tenant" => Some(Self::Tenant),
+            _ => None,
+        }
+    }
+}
+
+/// One effective option as the set hash pins it.
+#[derive(Clone, Copy, Debug)]
+pub struct OptionPin<'a> {
+    /// The option key the answer must equal.
+    pub key: &'a str,
+    /// The effective human label.
+    pub label: &'a str,
+    /// The effective description the laya wire reads.
+    pub criteria: &'a str,
+    /// The effective authored order.
+    pub position: i32,
+    /// The refinement's `base_hash`, or the base entry's own hash when unrefined.
+    pub base_hash: &'a str,
+}
+
+/// The canonical hash of one library option's base content.
+///
+/// A refinement stores this value when it is published; the resolver recomputes it from the
+/// entry it read and refuses a mismatch. `kind` and `gate` are part of the basis so a
+/// refinement cannot be replayed across cases.
+pub fn option_base_hash(
+    kind: &str,
+    gate: Option<&str>,
+    key: &str,
+    label: &str,
+    criteria: &str,
+    position: i32,
+) -> String {
+    crate::compare::content_hash(&serde_json::json!({
+        "kind": kind,
+        "gate": gate,
+        "key": key,
+        "label": label,
+        "criteria": criteria,
+        "position": position,
+    }))
+}
+
+/// The canonical hash of the effective option set a decision was constrained to.
+///
+/// The decision row stores this value next to the set id and version; a later edit of the
+/// set cannot rewrite what the decision actually offered.
+pub fn option_set_hash(kind: &str, gate: Option<&str>, options: &[OptionPin<'_>]) -> String {
+    let options: Vec<serde_json::Value> = options
+        .iter()
+        .map(|option| {
+            serde_json::json!({
+                "key": option.key,
+                "label": option.label,
+                "criteria": option.criteria,
+                "position": option.position,
+                "base_hash": option.base_hash,
+            })
+        })
+        .collect();
+    crate::compare::content_hash(&serde_json::json!({
+        "kind": kind,
+        "gate": gate,
+        "options": options,
+    }))
+}
+
+/// The canonical hash of a policy's base content.
+///
+/// A tenant refinement stores this when it is published; `effective_policy_tx` recomputes it
+/// and refuses a refinement whose base changed. The basis deliberately excludes `version`:
+/// republishing identical content does not invalidate a refinement.
+pub fn policy_base_hash(
+    kind: &str,
+    gate: Option<&str>,
+    threshold: Option<f64>,
+    fail_policy: &str,
+    action: &str,
+    meta: &serde_json::Value,
+) -> String {
+    crate::compare::content_hash(&serde_json::json!({
+        "kind": kind,
+        "gate": gate,
+        "threshold": threshold,
+        "fail_policy": fail_policy,
+        "action": action,
+        "meta": meta,
+    }))
+}
+
 /// The version pins a decision row carries (§7.2).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct Pins {
@@ -164,6 +289,12 @@ pub struct Pins {
     pub refinement_version: Option<i64>,
     /// The `laya_inference_config.version` it used; `None` for a rule or a human rung.
     pub laya_config_version: Option<i64>,
+    /// The `action_invocation.id` of the verified `laya.classify` call behind a laya answer.
+    ///
+    /// A laya decision is not reproducible from its own numbers: the answer was produced by an
+    /// external call, and the row must name the recorded invocation that made it (§7.2). A
+    /// rule or human rung names none.
+    pub laya_invocation_id: Option<uuid::Uuid>,
 }
 
 /// The reasons the ladder refuses.
@@ -228,6 +359,45 @@ pub enum LadderError {
         kind: String,
         /// The gate, when the policy is gate-specific.
         gate: Option<String>,
+    },
+    /// An authored option set is outside laya's 2–255 range.
+    #[error("a choice question needs between 2 and 255 options, got {count}")]
+    OptionSetSize {
+        /// The number the caller supplied or the effective set holds.
+        count: usize,
+    },
+    /// An option key is repeated inside one set.
+    #[error("the option key {key:?} is repeated")]
+    DuplicateOption {
+        /// The repeated key.
+        key: String,
+    },
+    /// Two options claim one position inside a set.
+    #[error("the option position {position} is repeated")]
+    DuplicatePosition {
+        /// The repeated position.
+        position: i32,
+    },
+    /// An option position is below 1.
+    #[error("the option position must be at least 1")]
+    InvalidPosition,
+    /// An option origin spelling the domain does not know.
+    #[error("{value:?} is not an option origin (library|tenant)")]
+    UnknownOptionOrigin {
+        /// The posted value.
+        value: String,
+    },
+    /// A decision's answer is not one of the authored option keys.
+    #[error("the answer {answer:?} is not a key of the authored option set")]
+    AnswerNotInSet {
+        /// The answer the rung produced.
+        answer: String,
+    },
+    /// Hiding an option would leave fewer than two visible choices.
+    #[error("a question keeps at least two visible options; {visible} would remain")]
+    TooFewOptions {
+        /// The visible options that would remain.
+        visible: usize,
     },
     /// An authored option set is unusable.
     #[error("the option set is invalid: {detail}")]
@@ -301,9 +471,36 @@ pub fn evaluate(
 /// The fields a decision row must carry for its rung, in the §7.2 order.
 ///
 /// * A rule or laya decision pins the policy version it enforced and a sha256 of the inputs it
-///   consumed; a laya decision pins the laya config, and a refined one pins the refinement.
+///   consumed; a laya decision pins the laya config and the recorded `laya.classify`
+///   invocation that produced its answer, and a refined one pins the refinement.
 /// * A human decision cites the approval it records.
 pub fn missing_pins(rung: Rung, pins: &Pins, approval_id: Option<uuid::Uuid>) -> Vec<&'static str> {
+    missing_pins_for_kind("", rung, pins, approval_id)
+}
+
+/// The decision kinds the step executor records for its judge verdicts (v1-p101-1).
+///
+/// A step judge's verdict is one `decision` row — the same store every ladder decision uses —
+/// but it is not a case the ladder's policy resolved: the SOP's inspection decided, and the row
+/// pins the SOP version and the `laya.judge` invocation that answered, not a `decision_policy`
+/// and its laya config. The per-rung pin contract therefore does not apply to this prefix; every
+/// other kind keeps it.
+pub const STEP_JUDGE_KIND_PREFIX: &str = "process.step.";
+
+/// [`missing_pins`], with the decision kind in hand so the step judge's own store can be exempt.
+///
+/// v1-p101-1: a `process.step.` decision carries no ladder policy pins — there is no policy row
+/// behind a step judge — so the usual per-rung fields are not owed. The exemption is scoped to
+/// that prefix alone; a ladder case's pins are unchanged.
+pub fn missing_pins_for_kind(
+    kind: &str,
+    rung: Rung,
+    pins: &Pins,
+    approval_id: Option<uuid::Uuid>,
+) -> Vec<&'static str> {
+    if kind.starts_with(STEP_JUDGE_KIND_PREFIX) {
+        return Vec::new();
+    }
     let mut missing = Vec::new();
     match rung {
         Rung::Rule => {
@@ -317,6 +514,9 @@ pub fn missing_pins(rung: Rung, pins: &Pins, approval_id: Option<uuid::Uuid>) ->
             }
             if pins.laya_config_version.is_none() {
                 missing.push("laya_config_version");
+            }
+            if pins.laya_invocation_id.is_none() {
+                missing.push("laya_invocation_id");
             }
         }
         Rung::Human => {
@@ -357,7 +557,8 @@ pub fn is_input_hash(value: &str) -> bool {
 ///
 /// `GeneratedDraft` has no `From`/`Into` impl and no method that yields a card transition; a
 /// generation result can only be stored (a `governed_asset`, a `document` or a code patch) and
-/// applied by an action whose own gate is L1/L3 (§7.4). The `compile_fail` doctest below is
+/// applied by an action whose gate is an accepted L3 human decision of the `draft.apply` gate
+/// (§7.4). The `compile_fail` doctest below is
 /// the type-level proof, and `apply_card_transition_tx` takes no such type.
 ///
 /// ```compile_fail

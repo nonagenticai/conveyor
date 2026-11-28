@@ -52,7 +52,7 @@
 <td><strong>executed over conveyor's durable queue</strong> (#450 retired the Python upstream)</td>
 <td><code>workers.list</code></td>
 <td>same</td>
-<td>47 <code>(kind,status)</code> queue buckets (for example <code>approval.closed.emit</code> succeeded × 20905, <code>benchmark.reap</code> succeeded × 4163) and 2 registered hosts (<code>mini1</code>, <code>mini2</code>)</td>
+<td>47 <code>(kind,status)</code> queue buckets (for example <code>approval.closed.emit</code> succeeded × 20905, <code>benchmark.reap</code> succeeded × 4163) and 2 registered hosts (<code>media-1</code>, <code>media-2</code>)</td>
 <td><code>10-workers.json</code></td>
 </tr>
 <tr>
@@ -84,7 +84,7 @@
 <h2 id="post-receipt-re-read-2026-11-27t07290730z">Post-receipt re-read (2026-11-27T07:29–07:30Z)</h2>
 <p>The engine had rolled since the receipt (<code>sha256:4cd9a9f3…</code> → <code>sha256:2aafb685…</code>). Read again through the same CLI transport, read-only:</p>
 <ul>
-<li><code>workers.list</code> → still 47 <code>(kind,status)</code> buckets and hosts <code>mini1</code>, <code>mini2</code> (<code>30-recheck-workers.json</code>);</li>
+<li><code>workers.list</code> → still 47 <code>(kind,status)</code> buckets and hosts <code>media-1</code>, <code>media-2</code> (<code>30-recheck-workers.json</code>);</li>
 <li><code>billing.summary {window_days:30}</code> → <code>total_usd</code> 1.417925 again; 649 inference calls, 27 tool calls (two more than the 06:21Z reading — the ledger moved, the figure held) (<code>31-recheck-billing.json</code>);</li>
 <li><code>tools.call coding.jobs_get</code> → the same job <code>7c5b90bb…</code> is now <code>succeeded</code>; the coding service's result is <code>status: unsupported</code> ("profile rust expects Cargo.toml at the root of the source; it is not there"). A typed result from the upstream, not a transport error (<code>32-recheck-coding.json</code>).</li>
 </ul>

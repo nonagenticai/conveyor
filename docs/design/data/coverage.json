@@ -1,31 +1,31 @@
 {
   "actions_invoked": [
     {
-      "line": 1728,
+      "line": 1808,
       "name": "approvals.decide"
     },
     {
-      "line": 6510,
+      "line": 6848,
       "name": "approvals.decide"
     },
     {
-      "line": 6297,
+      "line": 6635,
       "name": "approvals.list"
     },
     {
-      "line": 6298,
+      "line": 6636,
       "name": "approvals.list"
     },
     {
-      "line": 6470,
+      "line": 6808,
       "name": "approvals.request"
     },
     {
-      "line": 1628,
+      "line": 1708,
       "name": "architecture.artifacts_entries"
     },
     {
-      "line": 1629,
+      "line": 1709,
       "name": "architecture.artifacts_links"
     },
     {
@@ -53,111 +53,111 @@
       "name": "cards.release"
     },
     {
-      "line": 2965,
+      "line": 3045,
       "name": "documents.compose"
     },
     {
-      "line": 3452,
+      "line": 3532,
       "name": "documents.compose"
     },
     {
-      "line": 3247,
+      "line": 3327,
       "name": "documents.create"
     },
     {
-      "line": 3318,
+      "line": 3398,
       "name": "documents.delete"
     },
     {
-      "line": 3264,
+      "line": 3344,
       "name": "documents.download"
     },
     {
-      "line": 3297,
+      "line": 3377,
       "name": "documents.download"
     },
     {
-      "line": 2987,
+      "line": 3067,
       "name": "documents.get"
     },
     {
-      "line": 3282,
+      "line": 3362,
       "name": "documents.get"
     },
     {
-      "line": 1487,
+      "line": 1567,
       "name": "documents.list"
     },
     {
-      "line": 1510,
+      "line": 1590,
       "name": "documents.list"
     },
     {
-      "line": 1537,
+      "line": 1617,
       "name": "documents.list"
     },
     {
-      "line": 3215,
+      "line": 3295,
       "name": "documents.list"
     },
     {
-      "line": 3349,
+      "line": 3429,
       "name": "documents.preview"
     },
     {
-      "line": 3395,
+      "line": 3475,
       "name": "documents.return"
     },
     {
-      "line": 3136,
+      "line": 3216,
       "name": "documents.revision_get"
     },
     {
-      "line": 3097,
+      "line": 3177,
       "name": "documents.revision_list"
     },
     {
-      "line": 6378,
+      "line": 6716,
       "name": "procedures.ingest_process"
     },
     {
-      "line": 6370,
+      "line": 6708,
       "name": "procedures.ingest_rdf"
     },
     {
-      "line": 6386,
+      "line": 6724,
       "name": "procedures.ingest_sop"
     },
     {
-      "line": 6254,
+      "line": 6592,
       "name": "procedures.list"
     },
     {
-      "line": 6583,
+      "line": 6921,
       "name": "procedures.publish"
     },
     {
-      "line": 6431,
+      "line": 6769,
       "name": "procedures.review_source"
     },
     {
-      "line": 6413,
+      "line": 6751,
       "name": "procedures.validate"
     },
     {
-      "line": 1751,
+      "line": 1831,
       "name": "process_runs.start"
     },
     {
-      "line": 6277,
+      "line": 6615,
       "name": "processes.get"
     },
     {
-      "line": 6257,
+      "line": 6595,
       "name": "processes.list"
     },
     {
-      "line": 6585,
+      "line": 6923,
       "name": "processes.publish"
     },
     {
@@ -173,23 +173,23 @@
       "name": "programmes.refresh"
     },
     {
-      "line": 2896,
+      "line": 2976,
       "name": "projects.close"
     },
     {
-      "line": 2757,
+      "line": 2837,
       "name": "projects.create"
     },
     {
-      "line": 1701,
+      "line": 1781,
       "name": "runs.cancel"
     },
     {
-      "line": 1679,
+      "line": 1759,
       "name": "runs.get"
     },
     {
-      "line": 1656,
+      "line": 1736,
       "name": "runs.list"
     }
   ],
@@ -2148,7 +2148,8 @@
           563,
           564,
           565,
-          566
+          566,
+          848
         ],
         "open": 0,
         "ready": 0,
@@ -2303,8 +2304,8 @@
       "key": "T3",
       "measured": {
         "actions": [
-          6,
-          6
+          7,
+          7
         ],
         "modules": [
           0,

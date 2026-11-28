@@ -1,0 +1,16 @@
+{
+ "body": {
+  "acceptance_criteria": "SPEC_V2 \u00a712 T3: PM runs a request end to end; cannot approve its own gate; a baseline change requires a change request. The manifest acceptance/programme/T3.toml is the gate, not prose.",
+  "assignment": "The T3 slice (issue #74) under the programme's PM governance: the PM request-to-plan path, the dual-controlled gates, the change-request path and closure against the frozen baseline.",
+  "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+  "delivery_contract_id": "01a2052f-29da-76c4-9bda-e45e0f408fe8",
+  "recorded_on": "2026-11-23",
+  "responsibilities": "The PM job requests and plans; the approver job decides every gate and is never its requester; the programme manager owns delivery; the architect owns the baseline's architecture content; the programme board reviews the tranche.",
+  "retrospective": true,
+  "scope": "pm.plan and projects.baseline; the charter, baseline and change gates; the change-request path with its impact block; projects.close_request and projects.close. Not in scope: project creation and the board surfaces (S05)."
+ },
+ "kind": "statement_of_architecture_work",
+ "phase_code": "a",
+ "project_id": "01a1d039-0d33-7915-8833-75f4dc31cc07",
+ "title": "T3 \u2014 Statement of Architecture Work"
+}

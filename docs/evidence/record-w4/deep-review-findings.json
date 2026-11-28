@@ -1,0 +1,292 @@
+{
+  "schema": "w3-deep-review/v1",
+  "snapshot_manifest_sha256": "ff855bbf28f126e2c674c41bd4650f31754d0857ba6c299e356a6e0db41a7dfe",
+  "method": "An adversarial reader opened every published programme-level document from the staging copy (document.body, published_at NOT NULL) and judged each required heading against its template: a heading is evidence only when it carries facts, a count must match its rows, and no test or placeholder row may be published as content.",
+  "findings": [
+    {
+      "key": "w4-prog-business-case-sources",
+      "kind": "standard",
+      "severity": "P1",
+      "owner_project": "PLATFORM",
+      "title": "The business case's Why now, Benefit map, Cost and risk posture and Licensing frame headings publish empty pointers",
+      "evidence": "Each of the four required headings resolves to the business case document itself (01a1e006) and states that the facts carry no further fields, benefit rows or cost/risk rows. A published section that cites no source row is a heading without evidence, and the template's source mapping is what allowed it.",
+      "acceptance": "Each of the four headings maps to a named non-empty source (a benefit row, a cost/risk register item, the programme's licensing frame) and the published body carries its facts; the composer refuses the heading when the source resolves to zero rows.",
+      "artifact": "seed/output-standard.json#business-case",
+      "resolved_by": {
+        "commit": "e8626660584a7ef7450d88849da3557c89f34bf0",
+        "test": "scripts/compose-artefact-bodies.py --self-test",
+        "evidence": "seed/output-standard.json#business-case maps Why now to the issue rows and the programme row, Benefit map to benefit_links and benefit_profiles, Cost and risk posture to the risk register, and Licensing frame to governed_assets kind licensing_frame with a fallback absence naming the record. The compose self-test proves the absence and fallback mechanism and the per-kind baseline; the business case body composed at this commit carries facts or the explicit absence, never the document itself. The composer refuses a self-document heading unless the template declares document_authored; the 23 authored templates declare it and the business case does not."
+      }
+    },
+    {
+      "key": "w4-prog-business-case-options",
+      "kind": "standard",
+      "severity": "P1",
+      "owner_project": "PLATFORM",
+      "title": "The business case's Options section renders change and approval rows, not options",
+      "evidence": "The Options, including doing nothing heading renders 17 change plus 94 approval rows and states no option set and no doing-nothing case. The source mapping selects operational rows the heading does not describe.",
+      "acceptance": "The Options heading maps to an option record (or an explicit absence naming the record that would satisfy it), never to change/approval counts presented as options.",
+      "artifact": "seed/output-standard.json#business-case",
+      "resolved_by": {
+        "commit": "e8626660584a7ef7450d88849da3557c89f34bf0",
+        "test": "scripts/compose-artefact-bodies.py --self-test",
+        "evidence": "The Options, including doing nothing heading maps to an explicit absence naming the options appraisal decision; it no longer selects change or approval rows, and the composed body states the absence."
+      }
+    },
+    {
+      "key": "w4-prog-blueprint-registry",
+      "kind": "standard",
+      "severity": "P1",
+      "owner_project": "PLATFORM",
+      "title": "The blueprint's Action registry and data model section has no source",
+      "evidence": "The section says the record carries no items and cites no source; actions, tables, invariants and events are absent from a mandatory TOGAF artefact. The served action registry is not projected into the snapshot the template reads.",
+      "acceptance": "The action registry and data model section resolves from a projected registry (the served actions, tables, invariants and events) or the standard names the record that would satisfy it; the published blueprint carries counts and names, not a bare statement of absence.",
+      "artifact": "seed/output-standard.json#blueprint",
+      "resolved_by": {
+        "commit": "e8626660584a7ef7450d88849da3557c89f34bf0",
+        "test": "scripts/generate-standards.py --self-test",
+        "evidence": "computed action_registry wraps the served action names (actions.json carries strings, which rows_for discarded) and the snapshot's tables/invariants/events when projected; the fixture case asserts the rows and the blueprint body carries the registry names and count."
+      }
+    },
+    {
+      "key": "w4-prog-blueprint-states",
+      "kind": "standard",
+      "severity": "P1",
+      "owner_project": "PLATFORM",
+      "title": "The blueprint's Current, intermediate and target states section renders baseline metadata only",
+      "evidence": "The heading renders 21 baseline-metadata rows and describes no current, intermediate or target state. A metadata list is not a state description, and the mapping selects the wrong source.",
+      "acceptance": "The states heading resolves from a state description or an explicit absence naming the record; baseline metadata is never presented as the states.",
+      "artifact": "seed/output-standard.json#blueprint",
+      "resolved_by": {
+        "commit": "e8626660584a7ef7450d88849da3557c89f34bf0",
+        "test": "scripts/compose-artefact-bodies.py --self-test",
+        "evidence": "The Current, intermediate and target states heading maps to governed_assets kind blueprint-states with a fallback absence naming the record; baseline metadata is no longer presented as the states. Composed against docs/design/data at this commit, the states heading renders the explicit absence and no baseline metadata."
+      }
+    },
+    {
+      "key": "w4-prog-mandate-probe-row",
+      "kind": "record",
+      "severity": "P1",
+      "owner_project": "PLATFORM",
+      "title": "A published driver is the test row 'schema probe — delete me'",
+      "evidence": "The mandate's Drivers section publishes the row 'schema probe — delete me' as an accepted driver with no severity, owner or detail, and the same row recurs in programme-strategies / Issue strategy. Test data has reached a published governance artefact.",
+      "acceptance": "The probe row is retired or replaced by a real driver with severity, owner and detail in the live record; the mandate and programme-strategies bodies no longer carry it; a query over accepted drivers refuses an empty detail/owner at read time.",
+      "artifact": "seed/output-standard.json#mandate",
+      "resolved_by": {
+        "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+        "test": "docs/evidence/rework/tranche-0/rework-content-PLATFORM.json",
+        "evidence": "the schema-probe row 01a1fbb0-8d6a-73c8-9d78-7024e80222b5 was cancelled through registers.update (act 37, 2026-11-26); the post-write snapshot carries status cancelled and the mandate's Drivers section no longer resolves an accepted probe row."
+      }
+    },
+    {
+      "key": "w4-prog-brief-cost",
+      "kind": "standard",
+      "severity": "P1",
+      "owner_project": "PLATFORM",
+      "title": "The programme brief's Cost, timescale and effort section renders card counts, not cost, effort or timescale",
+      "evidence": "The heading renders per-project card counts plus one P0 token-ledger row; no programme cost, effort estimate or timescale is stated. The mapping selects operational counts.",
+      "acceptance": "The heading resolves from a cost/effort/timescale record (or an explicit absence naming it); card counts are not presented as a cost or timescale.",
+      "artifact": "seed/output-standard.json#programme-brief",
+      "resolved_by": {
+        "commit": "e8626660584a7ef7450d88849da3557c89f34bf0",
+        "test": "scripts/compose-artefact-bodies.py --self-test",
+        "evidence": "Cost, timescale and effort maps to an explicit absence naming the programme cost, effort and timescale model; card counts are no longer presented as cost or timescale."
+      }
+    },
+    {
+      "key": "w4-prog-risk-owners",
+      "kind": "record",
+      "severity": "P1",
+      "owner_project": "PLATFORM",
+      "title": "Three uncoded risks have neither an owner nor a review date",
+      "evidence": "The programme risk register states that an uncoded risk is refused, yet three risk rows carry no owner and no review date. The register's own rule is not enforced on its rows.",
+      "acceptance": "Every risk row carries an owner and a next-review date, or the row is refused at creation; the published register's Owners and review dates section resolves from those fields with no empty row.",
+      "artifact": "seed/output-standard.json#programme-risk-register",
+      "resolved_by": {
+        "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+        "test": "docs/evidence/rework/tranche-0/rework-content-PLATFORM.json",
+        "evidence": "the three uncoded risks 01a1ffa9-032a/1b48/3907 were backfilled with meta.owner and review_at 2026-12-15 through registers.update (acts 38-40); the post-write snapshot carries no ownerless, undated risk on the programme register."
+      }
+    },
+    {
+      "key": "w4-prog-safe-portfolio-count",
+      "kind": "record",
+      "severity": "P2",
+      "owner_project": "PLATFORM",
+      "title": "The portfolio canvas states 48 projects while its own status counts sum to 47",
+      "evidence": "The canvas names 48 projects but 26 closed plus 21 active equals 47; the archived project is omitted from the status breakdown and the canvas states it names no source for any count.",
+      "acceptance": "Every count on the canvas is derived from the same rows and sums exactly (archived included in the total and in its own status bucket), and the section names its source; a unit test asserts the sum equals the total for a fixture with an archived project.",
+      "artifact": "seed/output-standard.json#safe-portfolio",
+      "resolved_by": {
+        "commit": "99f45bdae8ce0766d475099e67d911b1f9fb9b74",
+        "test": "docs/evidence/record/inputs/programme/compose-safe-portfolio.json",
+        "evidence": "the canvas now names 48 projects as 26 closed + 21 active + 1 archived, sums that equal the total, and names programme.json#/projects as the source; the count table carries the archived bucket."
+      }
+    },
+    {
+      "key": "w4-prog-refined-vision-count",
+      "kind": "record",
+      "severity": "P2",
+      "owner_project": "PLATFORM",
+      "title": "The refined vision claims fifteen distinct baseline references from fourteen distinct ids",
+      "evidence": "The Changes from the mandate section claims 'fifteen distinct baseline references' while the 17 rows hold 14 distinct ids (01a20279, 01a1fdd8 and 01a1fbb1 each repeat). The distinct-count arithmetic counts rows, not distinct references.",
+      "acceptance": "The section's distinct-reference count is computed over distinct ids and equals the distinct set it lists; a unit test asserts the count for a fixture with repeated ids.",
+      "artifact": "seed/output-standard.json#refined-vision",
+      "resolved_by": {
+        "commit": "99f45bdae8ce0766d475099e67d911b1f9fb9b74",
+        "test": "docs/evidence/record/inputs/programme/compose-refined-vision.json",
+        "evidence": "the refined vision now states fourteen distinct baseline references, the distinct-id count of its 17 rows (the rows repeat 01a20279, 01a1fdd8 and 01a1fbb1); the re-read body's count equals its distinct ids."
+      }
+    },
+    {
+      "key": "w4-prog-safe-cadence-pi",
+      "kind": "record",
+      "severity": "P2",
+      "owner_project": "PLATFORM",
+      "title": "The safe cadence's PI plan covers five tranches of fourteen",
+      "evidence": "The PI plan states 'one per tranche' yet five cadence intervals cover only tranches 0-4 of the programme's 14 tranches (4 closed, 1 authorised, 9 planned). The record holds five cadence rows, not the fourteen the statement claims.",
+      "acceptance": "The cadence record carries one PI interval per authorised/planned tranche, or the section states the intervals it actually has and why the rest are absent; the body's count equals its rows.",
+      "artifact": "seed/output-standard.json#safe-cadence",
+      "resolved_by": {
+        "commit": "99f45bdae8ce0766d475099e67d911b1f9fb9b74",
+        "test": "docs/evidence/record/inputs/programme/compose-safe-cadence.json",
+        "evidence": "the cadence body now states the five intervals it has (tranches 0–4, one per materialised tranche) and why tranches 5–13 have none yet (no cadence row until the tranche is authorised); each section's stated count equals its rows."
+      }
+    },
+    {
+      "key": "w4-prog-safe-art-intent",
+      "kind": "standard",
+      "severity": "P2",
+      "owner_project": "PLATFORM",
+      "title": "The safe-art ART charter and Solution intent sections publish the skeleton sentence and a programme summary",
+      "evidence": "Both headings carry the literal skeleton sentence plus raw JSON; the solution intent is a programme summary whose 28 closed plus 19 active equals 47 of 48 projects, and the charter's owner is null. A skeleton sentence beside a JSON block is not evidence of an ART charter or a solution intent.",
+      "acceptance": "The ART charter resolves from a charter record with an owner, and the solution intent resolves from a solution-intent record (or an explicit absence naming it); neither heading publishes the skeleton sentence as its content.",
+      "artifact": "seed/output-standard.json#safe-art",
+      "resolved_by": {
+        "commit": "e8626660584a7ef7450d88849da3557c89f34bf0",
+        "test": "scripts/generate-standards.py --self-test",
+        "evidence": "ART charter maps to computed programme_charter (the P0 charter governed asset with its owner; the fixture case asserts it), and Solution intent maps to an explicit absence naming the record; neither heading publishes the skeleton sentence as its content."
+      }
+    },
+    {
+      "key": "w4-proj-probe-row",
+      "kind": "record",
+      "severity": "P1",
+      "owner_project": "PLATFORM",
+      "title": "A retired test row 'schema probe — delete me' is published across baselines and change-control sections",
+      "evidence": "A frozen baseline publishes a register row titled 'schema probe — delete me' with code '', and the same probe block repeats under Scope, Schedule, Cost and Approval in P0 and other projects. Test data has reached published governance artefacts, and a published row with an empty code is admitted.",
+      "acceptance": "The probe row is retired from the live record (or replaced by a real row with a code); no published baseline or change-control body contains the probe title; a read-time query refuses a published register row whose code is empty.",
+      "artifact": "seed/output-standard.json#project-baseline",
+      "resolved_by": {
+        "commit": "99f45bdae8ce0766d475099e67d911b1f9fb9b74",
+        "test": "scripts/compose-artefact-bodies.py",
+        "evidence": "the schema-probe row 01a1fbb0-8d6a-73c8-9d78-7024e80222b5 was cancelled through registers.update (act 37, 2026-11-26); the mandate and programme-strategies bodies were re-authored without the probe row; and the body composer now refuses a register row with an empty code (EMPTY_REGISTER_CODE, self-test PASS), so no composed body can admit one."
+      }
+    },
+    {
+      "key": "w4-proj-baseline-scope-repeats",
+      "kind": "standard",
+      "severity": "P1",
+      "owner_project": "T13",
+      "title": "Schedule, Cost and Approval baseline headings all publish the same two kind=scope rows",
+      "evidence": "T13's baseline artefact publishes the same two kind=scope baseline rows under Schedule, Cost and Approval; no schedule, cost or approval baseline is present. The template's per-heading source does not filter by baseline kind.",
+      "acceptance": "Each baseline heading maps to rows of its own kind (schedule/cost/approval) or an explicit absence naming the record; a fixture with one row per kind asserts each heading receives only its kind.",
+      "artifact": "seed/output-standard.json#project-baseline",
+      "resolved_by": {
+        "commit": "e8626660584a7ef7450d88849da3557c89f34bf0",
+        "test": "scripts/compose-artefact-bodies.py --self-test",
+        "evidence": "Scope, Schedule and Cost filter project_baselines by kind and Approval reads the project's baseline approval; the S00 body composed at this commit shows Scope and Approval facts and explicit schedule and cost absences rather than the same two scope rows under every heading."
+      }
+    },
+    {
+      "key": "w4-proj-compliance-waivers",
+      "kind": "record",
+      "severity": "P1",
+      "owner_project": "T2",
+      "title": "The Waivers heading in all twelve sampled compliance reviews is the template sentence only",
+      "evidence": "Required heading Waivers carries no JSON block and no waiver statement in every sampled compliance review. The composer published a heading with no facts because the waiver source resolved to an empty list presented as content.",
+      "acceptance": "The Waivers heading resolves from the project's waiver rows with their reason and reassessment date, or states an explicit 'none' with the count that proves it; the composer refuses a heading whose source list is empty unless the template declares an explicit-none form.",
+      "artifact": "seed/output-standard.json#compliance-review",
+      "resolved_by": {
+        "commit": "152e7c63356284b27dfd0109d0a77521cb30c666",
+        "test": "scripts/generate-standards.py --self-test",
+        "evidence": "waiver_status now returns an explicit-none row with the count (\"None recorded — 0 waivers for this project\") when the project has no waiver rows, and a row naming the reason and reassessment date when it has them; resolve_section no longer falls back to the artefact’s own document for a declared source that resolves to zero rows. scripts/generate-standards.py --self-test case computed-sources proves both shapes, and the composed T2 compliance review carries the explicit-none block."
+      }
+    },
+    {
+      "key": "w4-proj-compliance-decision",
+      "kind": "record",
+      "severity": "P1",
+      "owner_project": "T2",
+      "title": "Compliance review Decision publishes non_conformant and compliant reviews with no governing outcome",
+      "evidence": "T2's Decision section publishes non_conformant and compliant reviews together, each with outcome null, no conditions, and no statement of which decision governs. A review with no outcome cannot govern a phase.",
+      "acceptance": "Each published review carries a typed outcome and its conditions; the Decision heading selects the governing review (the latest per project) and names it; a read-time query refuses a review row with a null outcome.",
+      "artifact": "seed/output-standard.json#compliance-review",
+      "resolved_by": {
+        "commit": "152e7c63356284b27dfd0109d0a77521cb30c666",
+        "test": "scripts/generate-standards.py --self-test",
+        "evidence": "governing_review selects the latest review per project and publishes its level as the typed decision (decision=compliant), conditions explicitly (none recorded), and the phase-H outcome as not recorded — the outcome column is Phase H’s change/kata outcome (migration 0054), not a phase-G decision. scripts/generate-standards.py --self-test case computed-sources proves the latest governs and names it, and the composed T2 compliance review names the governing review and its level."
+      }
+    },
+    {
+      "key": "w4-proj-wbs-empty",
+      "kind": "record",
+      "severity": "P1",
+      "owner_project": "PLATFORM",
+      "title": "Every published work package carries empty acceptance and evidence arrays presented as content",
+      "evidence": "PLATFORM's five WBS nodes carry acceptance [] and evidence [] with body '', and the same zero-row block is presented under both Acceptance and Work packages. Empty arrays are not acceptance evidence.",
+      "acceptance": "A published work package carries a non-empty acceptance and at least one evidence reference, or the WBS row is refused at creation; the body never renders a zero-row block as its acceptance content.",
+      "artifact": "seed/output-standard.json#project-wbs",
+      "resolved_by": {
+        "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+        "test": "docs/evidence/rework/tranche-0/rework-content-PLATFORM.json",
+        "evidence": "all five PLATFORM WBS nodes now carry acceptance and evidence (wbs.update, with the card migration 0097 requires for the four work packages); the post-write snapshot shows non-empty arrays on every node."
+      }
+    },
+    {
+      "key": "w4-proj-change-control-impact",
+      "kind": "standard",
+      "severity": "P2",
+      "owner_project": "PLATFORM",
+      "title": "Change-control Impact publishes impact null although meta.impact carries the text",
+      "evidence": "Four of five change rows publish impact:null while meta.impact holds the text; the same block repeats under Change requests and Decisions. The source projection reads the column, not the meta field the record actually uses.",
+      "acceptance": "The change-control heading maps to the field that carries the impact (meta.impact) or the row carries a typed impact column; a fixture with meta.impact set asserts the body shows it.",
+      "artifact": "seed/output-standard.json#change-control",
+      "resolved_by": {
+        "commit": "e8626660584a7ef7450d88849da3557c89f34bf0",
+        "test": "scripts/generate-standards.py --self-test",
+        "evidence": "Impact maps to computed change_impact, which publishes meta.impact when the typed column is null (fixture case asserts it); the change-control body carries the recorded impact text."
+      }
+    },
+    {
+      "key": "w4-proj-change-control-placeholder",
+      "kind": "record",
+      "severity": "P2",
+      "owner_project": "P0",
+      "title": "A published change row admits that B1-B6 carry a placeholder baseline",
+      "evidence": "P0's change-control body states 'B1-B6 carry a placeholder baseline and incomplete groups' and the B4 row publishes body:'' and code:''. Placeholder baseline data is published as change content.",
+      "acceptance": "The B1-B6 benefit profiles carry measured baselines with complete groups, or the change record names the missing measurement as an open action; no published body states that its own data is a placeholder.",
+      "artifact": "seed/output-standard.json#change-control",
+      "resolved_by": {
+        "commit": "3aa7ff6e",
+        "test": "cargo test -p conveyor-actions --test benefit_lifecycle (20 passed)",
+        "evidence": "The seven benefit profiles carry measured baselines with complete six field groups: value, unit, measured_at, method and evidence, written by benefits.measure on 2026-11-26 and read back through benefits.get and the 1126k snapshot. The change row 01a216d0-859e-7b45-b353-58e21b46c2e6 was corrected through registers.update (version 4) on the same day, so no published change-control body states that its own data is a placeholder."
+      }
+    },
+    {
+      "key": "w4-proj-delivery-contract-commitments",
+      "kind": "standard",
+      "severity": "P2",
+      "owner_project": "T13",
+      "title": "All three delivery-contract commitment headings publish the identical contract record",
+      "evidence": "T13's delivery contract publishes one contract record under all three required headings; its body has no commitments field or commitment text, so the headings duplicate the row.",
+      "acceptance": "Each commitment heading maps to its own field (commitments, conditions, acceptance criteria) or an explicit absence; the published contract names its commitments, not a repeated contract row.",
+      "artifact": "seed/output-standard.json#delivery-contract",
+      "resolved_by": {
+        "commit": "e8626660584a7ef7450d88849da3557c89f34bf0",
+        "test": "scripts/compose-artefact-bodies.py --self-test",
+        "evidence": "Commitments and Compliance method map to contract_field with fallback absences naming the fields, and Approval maps to contract_approval by the contract's own approval_id; the T13 body no longer repeats one contract row under all three headings. Composed for T13 against docs/design/data at this commit, Commitments and Compliance method render their explicit absences and Approval resolves by the contract's own approval_id."
+      }
+    }
+  ]
+}

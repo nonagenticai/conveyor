@@ -1,0 +1,23 @@
+{
+ "_version": 1,
+ "change_id": "01a20ae2-1d0a-7eb7-8302-e7a5850919e2",
+ "evidence": [
+  {
+   "kind": "test",
+   "path": "crates/actions/tests/ops_write.rs",
+   "ref": "ops_write::a_destructive_call_without_approval_is_refused"
+  },
+  {
+   "kind": "test",
+   "path": "crates/actions/tests/ops_write.rs",
+   "ref": "ops_write::an_approval_for_another_target_is_refused"
+  },
+  {
+   "kind": "test",
+   "path": "crates/actions/tests/ops.rs",
+   "ref": "ops::the_tenant_policy_sets_the_quorum"
+  }
+ ],
+ "id": "01a20ae2-1b58-7e81-bc49-01f7b13cc7b3",
+ "status": "accepted"
+}

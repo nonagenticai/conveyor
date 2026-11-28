@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Project Registers — Decision forums (meetings) · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T19-bodies/T19/project-registers.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="project-registers--decision-forums-meetings">Project Registers — Decision forums (meetings)</h1>
+<h2 id="risks">Risks</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The charter, the delivery contract&#39;s compliance clause and the evidence gap all state that the 2026-11-24 snapshot holds no rework-time execution of acceptance/programme/T19.toml, the eight meetings suites meetings_policy, meetings_agenda, meetings_attendance, meetings_decision, meetings_outcomes, meetings_human_seat, meetings_metering and meetings_console, or apps/web/e2e/meetings.spec.ts. meta.measured_status says built and the row says closed, but a built status is a record claim, not a gate pass; until the gate runs at a rework head the built claim rests on the snapshot, the CLOSED issues #605 and #606 and the two conformant contract reviews.&quot;,
+      &quot;code&quot;: &quot;T19-R1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:59:36.943104+00:00&quot;,
+      &quot;id&quot;: &quot;01a219df-08f2-7ac2-bf97-d1817b2ca071&quot;,
+      &quot;impact&quot;: 4,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;acceptance/programme/T19.toml&quot;,
+          &quot;R-06 close_item decision arithmetic (meetings_decision)&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;high&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a20c80-b9b8-7214-abc6-f2c4f75a1fc1&quot;,
+      &quot;response&quot;: &quot;Run acceptance/programme/T19.toml and the eight suites plus meetings.spec.ts at a rework head, keep one receipt per suite, and hold the verdict at consistent until those receipts exist rather than inferring a pass from the built status.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-15&quot;,
+      &quot;severity&quot;: &quot;high&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The eight meetings suites and meetings.spec.ts have no rework-time run, so the closed record is unproven&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:59:36.943104+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The data entity catalog and the solution concept both fix that meeting_position is rationale, conditions and commitment, never a decision: the only decision rows are approval_decision records on the linked approval, written once per qualifying seat with via=&#39;meeting&#39;. The risk is that the web room, the asynchronous queue, the Telegram surface or the MCP front end answers an item from positions, so a meeting appears to decide without close_item and without the stricter-wins arithmetic over quorum, required departments, dual control, evidence and the P4 conflict exclusion.&quot;,
+      &quot;code&quot;: &quot;T19-R2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:59:37.086303+00:00&quot;,
+      &quot;id&quot;: &quot;01a219df-0981-7b8e-9826-9fdcbd0e9866&quot;,
+      &quot;impact&quot;: 4,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;R-06 close_item decision arithmetic (meetings_decision)&quot;,
+          &quot;R-12 no second decision store&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the Architecture Board (conveyor-architecture-board)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;medium&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a20c80-b9b8-7214-abc6-f2c4f75a1fc1&quot;,
+      &quot;response&quot;: &quot;Keep every decision read on approval_decision; have the review of the meetings.* actions and the /meetings console check that no surface resolves an item from meeting_position.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-09&quot;,
+      &quot;severity&quot;: &quot;high&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;A meeting_position row could be read as a decision, creating the second decision store R-12 forbids&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:59:37.086303+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="issues">Issues</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The charter&#39;s limit, the delivery contract&#39;s compliance clause and the evidence output&#39;s gap section all record that the snapshot holds no rework-time execution of the gate, the eight meetings suites or the web room spec, so the record cannot show a fresh pass. The close rests on the project row status closed with measured_status built, the CLOSED issues #605 and #606, the seven approved artefacts, the two live contracts and the two conformant contract reviews dated 2026-11-24T09:37-09:38Z.&quot;,
+      &quot;code&quot;: &quot;T19-I1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:59:37.226802+00:00&quot;,
+      &quot;id&quot;: &quot;01a219df-0a0d-7a8b-a8d8-c38a2e1318a9&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a20c80-b9b8-7214-abc6-f2c4f75a1fc1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;high&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;No receipt exists for acceptance/programme/T19.toml, the eight meetings suites or meetings.spec.ts at the rework head&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:59:37.226802+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The delivery contract records tranche 4 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce as authorised at 2026-11-24T17:04:34Z by the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9, while the two contract reviews are dated 2026-11-24T09:37-09:38Z. This retrospective records the order truthfully and claims nothing about it; a future reviewer should read the contracts and reviews as authored before the tranche opened.&quot;,
+      &quot;code&quot;: &quot;T19-I2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:59:37.373909+00:00&quot;,
+      &quot;id&quot;: &quot;01a219df-0aa0-7f4e-994b-4f91fd478310&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a20c80-b9b8-7214-abc6-f2c4f75a1fc1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The tranche-4 authorisation postdates the contract reviews, so the governance acts precede the tranche that authorised them&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:59:37.373909+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The charter states the retrospective does not re-verify the live owner-seat gate and the evidence gap repeats it: no record shows the owner deciding one item live in the web room and one asynchronously over MCP with both rows written via=&#39;meeting&#39;, which objective O4 and requirement R-09 declare. The Telegram and MCP surfaces therefore remain declared checks, not measured ones.&quot;,
+      &quot;code&quot;: &quot;T19-I3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:59:37.518423+00:00&quot;,
+      &quot;id&quot;: &quot;01a219df-0b31-7826-bbba-689a399e8b8a&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a20c80-b9b8-7214-abc6-f2c4f75a1fc1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The live owner-seat gate has no record at the rework head&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:59:37.518423+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="assumptions">Assumptions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The charter states the retrospective is authored from the snapshot&#39;s rows under the standing delegation and records the gap truthfully; the evidence output&#39;s verification section says an independent reader can repeat the check against the same snapshot and that every cited id is gated against it. Every judgement in this pack is read from the snapshot, and an id that appears nowhere in it is refused.&quot;,
+      &quot;code&quot;: &quot;T19-A1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:59:37.657378+00:00&quot;,
+      &quot;id&quot;: &quot;01a219df-0bbc-746d-b8b9-3c9ad5f1e6e3&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a20c80-b9b8-7214-abc6-f2c4f75a1fc1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The 2026-11-24 rework snapshot is the authoritative record for T19&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:59:37.657378+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The Phase-G review reasons that the record supports consistent \u2014 seven approved artefacts, two live contracts, two conformant reviews, the authorised tranche and the CLOSED issues #605 and #606 \u2014 and does not support non_conformant because nothing in the record is non_conformant; the missing acceptance run is stated as a limit, not waived. The re-close rests on that distinction staying true, so it is recorded as an assumption rather than a proven fact.&quot;,
+      &quot;code&quot;: &quot;T19-A2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:59:37.797237+00:00&quot;,
+      &quot;id&quot;: &quot;01a219df-0c48-74d5-8e84-0511300b8166&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a20c80-b9b8-7214-abc6-f2c4f75a1fc1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The consistent verdict stands without a waiver because the record shows no refused gate&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:59:37.797237+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="dependencies">Dependencies</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The project brief records that T19 depends on T1, T2 and T3 for the typed primitives a meeting references \u2014 the approval and its approval_decision rows, the card, the governed asset and the dependency edge \u2014 and the project row&#39;s meta names depends_on T1, T2, T3 and P0. The data entity catalog marks approval, approval_decision, card, project_dependency and governed_asset as referenced primitives rather than tables of this slice.&quot;,
+      &quot;code&quot;: &quot;T19-D1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:59:37.937461+00:00&quot;,
+      &quot;id&quot;: &quot;01a219df-0cd4-745c-9588-7e9c0db03055&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a20c80-b9b8-7214-abc6-f2c4f75a1fc1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;satisfied&quot;,
+      &quot;title&quot;: &quot;T1, T2 and T3 supply the approval, card, governed-asset and dependency primitives the meetings reference&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:59:37.937461+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;meta.depends_on names P0, and the project brief records P0 as the source of the acceptance and ledger discipline. The delivery contract assesses T19 clause by clause against acceptance/programme/T19.toml and is authored under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, the authority the retrospective runs under.&quot;,
+      &quot;code&quot;: &quot;T19-D2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:59:38.07765+00:00&quot;,
+      &quot;id&quot;: &quot;01a219df-0d60-7b89-be7f-77b721f177fe&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a20c80-b9b8-7214-abc6-f2c4f75a1fc1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;satisfied&quot;,
+      &quot;title&quot;: &quot;P0 supplies the acceptance instrument and the ledger discipline the re-close stands on&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:59:38.07765+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="benefits">Benefits</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Goal G2 and objective O1 make the decision arithmetic the slice&#39;s first outcome: close_item writes one approval_decision per qualifying seat with via=&#39;meeting&#39; and the stricter of the meeting type&#39;s rule and the approval&#39;s policy wins, including quorum, required departments, dual control, evidence and the P4 conflict exclusion. Auditors read the same rows the approval primitive always owned, and the data entity catalog keeps meeting_position as rationale rather than a second decision store.&quot;,
+      &quot;code&quot;: &quot;T19-B1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:59:38.217764+00:00&quot;,
+      &quot;id&quot;: &quot;01a219df-0dec-7eb2-92f2-92723a7d0424&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a20c80-b9b8-7214-abc6-f2c4f75a1fc1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;baselined&quot;,
+      &quot;title&quot;: &quot;Every decision is one approval_decision row per qualifying seat with via=&#39;meeting&#39;, so no decision escapes the governed store&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:59:38.217764+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The solution concept and the data entity catalog make the meeting a card with the card_id and the uq_meeting_live constraint, owned by its chair under WIP limits and DoD. The slice adds no fifth unit and no chat: it reuses the approval, card, governed-asset and dependency primitives, so every meeting is visible and governed on the same board as the work it decides.&quot;,
+      &quot;code&quot;: &quot;T19-B2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:59:38.357842+00:00&quot;,
+      &quot;id&quot;: &quot;01a219df-0e78-7bd6-b992-6f677dc55804&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a20c80-b9b8-7214-abc6-f2c4f75a1fc1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;baselined&quot;,
+      &quot;title&quot;: &quot;A meeting is a card under the existing DoD and WIP limits, so forums inherit the board&#39;s governance for free&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:59:38.357842+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Requirements R-07, R-08 and R-10 and the solution concept record minutes as a chaired governed_asset(kind=&#39;minutes&#39;) drafted from the typed rows and published behind the chair&#39;s gate with dissent kept verbatim; actions become cards and commitments become project dependencies or cards. Participant-hours and the never-decided forum flag then let the programme manager see meeting load and retire a forum that produces no decision.&quot;,
+      &quot;code&quot;: &quot;T19-B3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:59:38.497233+00:00&quot;,
+      &quot;id&quot;: &quot;01a219df-0f04-7419-8b54-d974888ba2ca&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a20c80-b9b8-7214-abc6-f2c4f75a1fc1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;baselined&quot;,
+      &quot;title&quot;: &quot;Minutes, commitments and metering are recorded on the typed rows, so the deliberation outlives the room&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:59:38.497233+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="changes">Changes</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: &quot;01a219df-0f99-7a6c-826e-1cdc4dc0ef81&quot;,
+      &quot;body&quot;: &quot;The retrospective MSP/TOGAF/SAFe rework changed this project&#39;s record: its artefacts were re-versioned with documents and links, its register was written, and its schedule and cost baselines were taken. This change records that rework against the frozen scope baseline.&quot;,
+      &quot;code&quot;: &quot;CH-T19-77547c&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:59:48.395279+00:00&quot;,
+      &quot;id&quot;: &quot;01a219df-35b0-75e7-9d23-c3fe8c77547c&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;change&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {
+        &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+        &quot;impact&quot;: {
+          &quot;scope&quot;: &quot;the retrospective rework&#39;s record acts&quot;
+        }
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a20c80-b9b8-7214-abc6-f2c4f75a1fc1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;approved&quot;,
+      &quot;title&quot;: &quot;The retrospective rework of T19&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T22:00:17.539966+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-4/T19-bodies/T19/project-registers.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

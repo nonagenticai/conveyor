@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S04 — the Phase-G compliance review's evidence (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/s04-phase-g.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s04--the-phase-g-compliance-reviews-evidence-2026-11-22">S04 — the Phase-G compliance review's evidence (2026-11-22)</h1>
+<p>This file exists <strong>before</strong> the review is recorded: the recorder refuses a write whose evidence path does not already exist.</p>
+<h2 id="what-is-recorded">What is recorded</h2>
+<p><code>architecture.reviews_record</code> for S04's live governing contract <code>01a20256-6ede-7d70-aae8-5dbfe681a1b7</code> (Statement of Architecture Work, phase A), level <strong><code>compliant</code></strong>, under the published standing delegation <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code>. The review is not a clean bill: it records six deviations, none of them a P0.</p>
+<h2 id="the-measurement-the-review-cites">The measurement the review cites</h2>
+<ul>
+<li>Lane head at measurement: <code>582e2dc67e5882eb63f40de67c129f8c2863c376</code>.</li>
+<li>S04's gate proof: the HTTP/MCP parity run, <strong>7/7</strong>, at that head (the action registry serves the same contract over both transports).</li>
+<li>Fresh full-fidelity snapshot at that head: <strong>12 green / 35 red</strong> manifests, strict audit 200 gaps, standards <strong>919 artefacts / 456 findings</strong>. Work table: issue #526 comment 7076904694.</li>
+<li>S04's own standards findings at that snapshot: compliance-review (P0, this record), delivery-contract (P1), project-registers (P2), architecture-artifact (P2).</li>
+</ul>
+<h2 id="the-six-deviations">The six deviations</h2>
+<ol type="1">
+<li><strong>Delivery contract not yet recorded</strong> (P1). The SoAW governs phases A–G; the post-F delivery contract — delivery commitments and the method for assessing compliance — is recorded with this tranche's close.</li>
+<li><strong>Project registers partial</strong> (P2). The register set does not yet carry all six kinds with named owners; the missing kinds are added in this tranche.</li>
+<li><strong><code>architecture-artifact</code> sections partial</strong> (P2). The A–D artefacts exist and are approved, but the standard's required sections for the instance do not all resolve (metadata and document linkage).</li>
+<li><strong>The plan frontmatter said <code>planned</code> while the code and the parity proof are live.</strong> Corrected with evidence in the same record rather than closing against a stale plan.</li>
+<li><strong>The gate clause was not executed by the manifest.</strong> The 7/7 parity run is the proof; it is encoded as the manifest's gate clause under the acceptance-standard change.</li>
+<li><strong>The mandatory set for S04 is not yet complete</strong> — this review closes the compliance-review P0; the other three findings are dated packages, not waivers.</li>
+</ol>
+<h2 id="read-back">Read-back</h2>
+<p>The recorder refreshes the snapshot after the write and reads the review row back from <code>architecture.json</code>'s <code>compliance_reviews</code> by the id the action returns.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/s04-phase-g.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

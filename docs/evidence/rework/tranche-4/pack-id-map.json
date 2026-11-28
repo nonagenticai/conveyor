@@ -1,0 +1,384 @@
+{
+ "derivation": {
+  "approval": "approval where project_id = key.project_id and gate = key.gate and status = approved (newest)",
+  "architecture_artifact": "architecture_artifact.title = key.title",
+  "compliance_review": "architecture_compliance_review where project_id = key.project_id and level = key.level (the rework run's newest review)",
+  "document": "document.title = key.title",
+  "lesson": "lesson.statement starts with key.statement_prefix",
+  "project_baseline": "project_baseline where project_id = key.project_id and kind = key.kind",
+  "tranche_review": "the review created by the act whose promotion natural_key = key.natural_key"
+ },
+ "replacement_count": 50,
+ "replacements": {
+  "01a20e7d-dfc2-74c9-a17e-af521ed606e6": {
+   "key": {
+    "title": "Closure review — T10 (retrospective, 2026-11-22)"
+   },
+   "kind": "document",
+   "r2_id": "01a211c8-dd34-75dd-8106-1d9c5ae5d460"
+  },
+  "01a20e7d-f065-758b-98b8-3878a95c7314": {
+   "key": {
+    "title": "Closure review — T4 (retrospective, 2026-11-22)"
+   },
+   "kind": "document",
+   "r2_id": "01a211c8-e385-744f-8924-940b279d7954"
+  },
+  "01a20e7d-f29e-779c-a30e-9b7c5117efbf": {
+   "key": {
+    "title": "Closure review — T9 (retrospective, 2026-11-22)"
+   },
+   "kind": "document",
+   "r2_id": "01a211c8-e463-7360-85dd-17e149c8d9e8"
+  },
+  "01a20e7d-fc13-769f-80e9-edd43ef40b79": {
+   "key": {
+    "title": "Compliance Review — SAFe cadence and MSP tranches"
+   },
+   "kind": "document",
+   "r2_id": "01a211c8-e80c-708a-b3cf-e7fb94bf63f9"
+  },
+  "01a20e7d-fe4d-76c8-8df9-e1345d6407f3": {
+   "key": {
+    "title": "Delivery Contract — SAFe cadence and MSP tranches"
+   },
+   "kind": "document",
+   "r2_id": "01a211c8-e8e4-7315-b979-e1db30dfbf1a"
+  },
+  "01a20e7e-02c0-7552-bb0b-a77f2c93440a": {
+   "key": {
+    "title": "Project Baseline — SAFe cadence and MSP tranches"
+   },
+   "kind": "document",
+   "r2_id": "01a211c8-ea9e-718b-9b15-7300897cf432"
+  },
+  "01a20e7e-083d-71fa-86f2-67517beb4cca": {
+   "key": {
+    "title": "T16 — Project Brief"
+   },
+   "kind": "document",
+   "r2_id": "01a211c8-ecbf-7745-a45c-69512bfd2ac2"
+  },
+  "01a20e7e-4043-75e9-8aec-c26dc07b9c0c": {
+   "key": {
+    "title": "T10 — Architecture artefact index (rework, 2026-11-22)"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-01f4-73aa-981a-ec4a3f4e9e3e"
+  },
+  "01a20e7e-40bc-73ce-b339-0df4f485f42e": {
+   "key": {
+    "title": "T10 — Benefits diagram (rework, 2026-11-22)"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-0220-7212-a5a1-5bad37d600ef"
+  },
+  "01a20e7e-4132-7701-811f-4c4421289a69": {
+   "key": {
+    "title": "T10 — Candidate solutions (rework, 2026-11-22)"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-024f-7102-8859-43783840116a"
+  },
+  "01a20e7e-41a8-7170-8262-848562df4976": {
+   "key": {
+    "title": "T10 — Change control (rework, 2026-11-22)"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-027b-712b-af3f-0985f21532f9"
+  },
+  "01a20e7e-421d-7625-b796-f77328226502": {
+   "key": {
+    "title": "T10 — Gap analysis (rework, 2026-11-22)"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-02aa-7281-bd1e-69e21fed23d7"
+  },
+  "01a20e7e-4291-7146-af41-c429d97bd36e": {
+   "key": {
+    "title": "T10 — Project context diagram (rework, 2026-11-22)"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-02d9-7567-852e-35fae383e071"
+  },
+  "01a20e7e-4305-7482-9cc4-94865c21f7ab": {
+   "key": {
+    "title": "T10 — Project registers (rework, 2026-11-22)"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-0307-75ad-b91c-df37cb43188b"
+  },
+  "01a20e7e-4379-70a2-acc0-d40eb98ca051": {
+   "key": {
+    "title": "T10 — Project WBS (rework, 2026-11-22)"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-0335-775d-bc7f-81213ba5d534"
+  },
+  "01a20e7e-43f0-7714-9499-1806f96d622d": {
+   "key": {
+    "title": "T10 — Statement of Architecture Work (rework, 2026-11-22)"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-0365-751b-a032-c57bce98936b"
+  },
+  "01a20e7e-472a-7271-b6ee-6be6313d8bb0": {
+   "key": {
+    "title": "T9 — Project WBS (rework, 2026-11-22)"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-04b5-7779-854f-e298acf8ebfa"
+  },
+  "01a20e7e-6cac-767e-b385-a5b732341aee": {
+   "key": {
+    "title": "PI Plan — conveyor buildout, tranche 4"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-1346-7108-9a44-667ebf08b50f"
+  },
+  "01a20e7e-6dc5-7314-b03d-009f0abea659": {
+   "key": {
+    "title": "PI Objectives — conveyor buildout, tranche 4"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-13ae-73b9-a6cd-e31f3a45ca33"
+  },
+  "01a20e7e-6ede-7f85-97a8-e857b4b0e187": {
+   "key": {
+    "statement_prefix": "A shared target directory can serve a stale rlib from another worktree"
+   },
+   "kind": "lesson",
+   "r2_id": "01a211c9-1412-772b-b094-06288207fcd1"
+  },
+  "01a20e7e-7b8f-7011-bdb5-a9897712ac1b": {
+   "key": {
+    "title": "SAFe Cadence — PI planning, demo, retro and refinement (retrospective, 2026-11-22)"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-1917-74cf-8139-3a751b9557fb"
+  },
+  "01a20e7e-7e2f-70df-9e17-4884d8b188d0": {
+   "key": {
+    "level": "compliant",
+    "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+    "project_key": "T10"
+   },
+   "kind": "compliance_review",
+   "r2_id": "01a211c9-1a1a-7fac-9b11-7dae24af7b9a"
+  },
+  "01a20e7e-7e98-7d48-a8a4-1e4ab3728a7a": {
+   "key": {
+    "level": "compliant",
+    "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+    "project_key": "T9"
+   },
+   "kind": "compliance_review",
+   "r2_id": "01a211c9-1a43-7a0a-9433-f5c5c20ab15c"
+  },
+  "01a20e7e-805b-746f-aaba-380feec5bc5f": {
+   "key": {
+    "gate": "charter",
+    "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+    "project_key": "T16"
+   },
+   "kind": "approval",
+   "r2_id": "01a211c9-1b20-7df8-8991-4f949dc514a7"
+  },
+  "01a20e7e-814e-761e-8176-6750e2a6eefc": {
+   "key": {
+    "kind": "scope",
+    "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+    "project_key": "T16"
+   },
+   "kind": "project_baseline",
+   "r2_id": "01a211c9-1b81-769b-b842-5cc91097dbfd"
+  },
+  "01a20e7e-814f-7c58-bc68-fa4d93506fc5": {
+   "key": {
+    "gate": "baseline",
+    "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+    "project_key": "T16"
+   },
+   "kind": "approval",
+   "r2_id": "01a211c9-1b82-77c2-97e0-6f15311e83da"
+  },
+  "01a20e7e-87cd-701c-b8fb-f3ad7a98ec27": {
+   "key": {
+    "title": "T16 — Statement of Architecture Work"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-1df5-7343-826a-31e3c1c0cc29"
+  },
+  "01a20e7e-88eb-71ec-ab44-bac90fa469e6": {
+   "key": {
+    "title": "T16 — Acceptance evidence"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-1e60-7383-bb48-09c283194df6"
+  },
+  "01a20e7e-8a05-756f-aa3f-18662f1a31ae": {
+   "key": {
+    "title": "T16 — Closure review (record completed, 2026-11-23)"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-1eca-7222-84ec-f81fc2237080"
+  },
+  "01a20e7e-8b26-77fd-ac15-57c255a9c6e1": {
+   "key": {
+    "gate": "closure",
+    "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+    "project_key": "T16"
+   },
+   "kind": "approval",
+   "r2_id": "01a211c9-1f37-7bbb-b8bc-57c860b13794"
+  },
+  "01a20e7e-8c44-7ec5-ab70-57c1881eb558": {
+   "key": {
+    "gate": "projects.close",
+    "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+    "project_key": "T16"
+   },
+   "kind": "approval",
+   "r2_id": "01a211c9-1fa7-7ee4-90cf-58833d230ceb"
+  },
+  "01a20e7e-8d5e-74e7-b24d-c95826f683ff": {
+   "key": {
+    "title": "Stakeholder map — T16 procedure ingestion (retrospective, 2026-11-23)"
+   },
+   "kind": "architecture_artifact",
+   "r2_id": "01a211c9-201c-701d-bc1e-056eefbdc8da"
+  },
+  "01a20e7e-8ed2-758f-aba3-473310bcc527": {
+   "key": {
+    "title": "Driver, goal and objective catalogue — T16 procedure ingestion (retrospective, 2026-11-23)"
+   },
+   "kind": "architecture_artifact",
+   "r2_id": "01a211c9-20a5-752e-a91d-c5b7ee790855"
+  },
+  "01a20e7e-9045-71a3-83bd-9f1c82abd8c0": {
+   "key": {
+    "title": "Requirements catalogue — T16 procedure ingestion (retrospective, 2026-11-23)"
+   },
+   "kind": "architecture_artifact",
+   "r2_id": "01a211c9-212a-70d4-bbbf-17c3c5038409"
+  },
+  "01a20e7e-91b5-7ba6-9ffc-922428588752": {
+   "key": {
+    "title": "Solution concept — T16 procedure ingestion (retrospective, 2026-11-23)"
+   },
+   "kind": "architecture_artifact",
+   "r2_id": "01a211c9-21b3-7d90-a789-8de4b76a8105"
+  },
+  "01a20e7e-9324-7125-a9af-b72b1a784769": {
+   "key": {
+    "title": "Business capability map — T16 procedure ingestion (retrospective, 2026-11-23)"
+   },
+   "kind": "architecture_artifact",
+   "r2_id": "01a211c9-223d-793d-901f-9bda541ac0be"
+  },
+  "01a20e7e-9498-7d7c-965e-8421e664d31c": {
+   "key": {
+    "title": "Data entity catalogue — T16 procedure ingestion (retrospective, 2026-11-23)"
+   },
+   "kind": "architecture_artifact",
+   "r2_id": "01a211c9-22d1-752d-a37e-9f00de53a021"
+  },
+  "01a20e7e-960b-7e58-bf7d-33b6a235c5b8": {
+   "key": {
+    "title": "Technology standards — T16 procedure ingestion (retrospective, 2026-11-23)"
+   },
+   "kind": "architecture_artifact",
+   "r2_id": "01a211c9-2355-7f70-ac03-cda28d967ba0"
+  },
+  "01a20e7e-974d-7159-a648-b3d7e4eef8ad": {
+   "key": {
+    "title": "T16 — Work breakdown structure (retrospective, 2026-11-23)"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-23cd-74fb-9b28-1b02d1e160de"
+  },
+  "01a20e7e-9864-76d5-9964-81be70b79a07": {
+   "key": {
+    "title": "T16 — Project registers at closure (2026-11-23)"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-243c-7393-9adc-40d450a3741d"
+  },
+  "01a20e7e-9982-72c0-8955-5a9e7c990d18": {
+   "key": {
+    "title": "T16 — Architecture artefact index (TOGAF, retrospective)"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-24a4-7090-89bc-5d82add57bae"
+  },
+  "01a20e7e-9a9d-71da-9f86-dc06a34f895b": {
+   "key": {
+    "title": "T16 — Candidate solutions (retrospective, 2026-11-23)"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-2512-769e-bc30-e83347a8d48f"
+  },
+  "01a20e7e-9bb2-7730-a97b-942d7b09b9a7": {
+   "key": {
+    "title": "T16 — Project context (retrospective, 2026-11-23)"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-2581-7212-84f9-bfd27a9d5d6d"
+  },
+  "01a20e7e-9cc6-76bc-8df7-bd4ad9bb0c44": {
+   "key": {
+    "title": "T16 — Benefits (retrospective, 2026-11-23)"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-25ed-7179-bfae-2f21076ed569"
+  },
+  "01a20e7e-9dde-714d-a714-03dc0e5cc084": {
+   "key": {
+    "title": "T16 — Gap analysis (retrospective, 2026-11-23)"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-2656-715e-b7fd-9d8fa69e3bf6"
+  },
+  "01a20e7e-a42d-7247-8b82-001bde13563e": {
+   "key": {
+    "title": "T16 — Change control (retrospective, 2026-11-23)"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-28d7-70ae-962e-944536e9b271"
+  },
+  "01a20e7e-a548-7787-aeea-f2327df1b494": {
+   "key": {
+    "title": "T16 — Project baseline (retrospective, 2026-11-23)"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-2942-7649-aca2-2e10eb2a8bdc"
+  },
+  "01a20e7e-bf2d-71ae-aecb-bcbdb45e733f": {
+   "key": {
+    "title": "T4 — Change control (retrospective, 2026-11-24)"
+   },
+   "kind": "document",
+   "r2_id": "01a211c9-3325-7070-aa4d-fab74f3b04c8"
+  },
+  "01a20e7e-c3b7-79ac-b2b0-dcc6e1e595c0": {
+   "key": {
+    "gate": "closure",
+    "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+    "project_key": "T4"
+   },
+   "kind": "approval",
+   "r2_id": "01a211c9-355e-73ae-9303-06b09cc93059"
+  },
+  "01a20e84-325b-7fef-8f40-50b5e53550e9": {
+   "key": {
+    "decision": "continue",
+    "natural_key": "tranche-review:3"
+   },
+   "kind": "tranche_review",
+   "r2_id": "01a211c9-0ef6-7a66-92b7-d114dc40a886"
+  }
+ },
+ "schema": "conv526-pack-id-map/v1",
+ "snapshot": "/tmp/conv526-r2-snap/data",
+ "source": "staging DB :55451 + replay snapshot r2"
+}

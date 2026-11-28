@@ -1,0 +1,8 @@
+{
+ "title": "T3 \u2014 Gap analysis",
+ "project_id": "01a1d039-0d33-7915-8833-75f4dc31cc07",
+ "category": "gap-analysis",
+ "body": "# T3 \u2014 Gap analysis\n\n## Baseline\n\nBefore the record was completed, T3 was closed without a baseline, a delivery contract or a Phase-G\nreview: the PM path had code but no governed record.\n\n## Target\n\nThe T3 gate: PM runs a request end to end; cannot approve its own gate; a baseline change requires\na change request \u2014 with the charter, frozen baseline, contract, review and closure recorded.\n\n## Gaps and work packages\n\n- The vacuous closure \u2192 reopened and re-closed with the record (this document set).\n- The missing typed artefacts \u2192 seven approved artefact rows.\n- The missing TOGAF documents \u2192 the seven published documents of this set.\n- The acceptance of the deliverables \u2192 change `01a2052e-5648\u2026`, approved.\n",
+ "publishable": true,
+ "unit": "T3"
+}

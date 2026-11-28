@@ -1,0 +1,971 @@
+{
+  "actions": "docs/design/data/actions.json",
+  "categories": {
+    "adm-profile": {
+      "check": "generate-standards.py --check#adm-profile",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "adr-register": {
+      "check": "generate-standards.py --check#adr-register",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "architecture-analysis": {
+      "check": "generate-standards.py --check#architecture-analysis",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "architecture-artifact": {
+      "check": "generate-standards.py --check#architecture-artifact",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "architecture-artifact-instance": {
+      "check": "generate-standards.py --check#architecture-artifact-instance",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "architecture-capability": {
+      "check": "generate-standards.py --check#architecture-capability",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "architecture-design": {
+      "check": "generate-standards.py --check#architecture-design",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "architecture-governance-log": {
+      "check": "generate-standards.py --check#architecture-governance-log",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "architecture-principles": {
+      "check": "generate-standards.py --check#architecture-principles",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "artifact-standard": {
+      "check": "generate-standards.py --check#artifact-standard",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "benefit-evaluation": {
+      "check": "generate-standards.py --check#benefit-evaluation",
+      "spec": "§8.3",
+      "standard": "MSP"
+    },
+    "benefit-profile": {
+      "check": "generate-standards.py --check#benefit-profile",
+      "spec": "§8.3",
+      "standard": "MSP"
+    },
+    "benefit-transition": {
+      "check": "generate-standards.py --check#benefit-transition",
+      "spec": "§8.3",
+      "standard": "MSP"
+    },
+    "benefits-diagram": {
+      "check": "generate-standards.py --check#benefits-diagram",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "benefits-map": {
+      "check": "generate-standards.py --check#benefits-map",
+      "spec": "§8.3",
+      "standard": "MSP"
+    },
+    "benefits-registry": {
+      "check": "generate-standards.py --check#benefits-registry",
+      "spec": "§8.3",
+      "standard": "MSP"
+    },
+    "benefits-strategy": {
+      "check": "generate-standards.py --check#benefits-strategy",
+      "spec": "§8.3",
+      "standard": "MSP"
+    },
+    "blueprint": {
+      "check": "generate-standards.py --check#blueprint",
+      "spec": "§8.3",
+      "standard": "MSP"
+    },
+    "brief-template": {
+      "check": "generate-standards.py --check#brief-template",
+      "spec": "§8.3",
+      "standard": "MSP"
+    },
+    "business-case": {
+      "check": "generate-standards.py --check#business-case",
+      "spec": "§8.3",
+      "standard": "MSP"
+    },
+    "candidate-solutions": {
+      "check": "generate-standards.py --check#candidate-solutions",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "change-control": {
+      "check": "generate-standards.py --check#change-control",
+      "spec": "§8.4",
+      "standard": "PMP"
+    },
+    "closure-review": {
+      "check": "generate-standards.py --check#closure-review",
+      "spec": "§8.4",
+      "standard": "PMP"
+    },
+    "compliance-review": {
+      "check": "generate-standards.py --check#compliance-review",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "decision": {
+      "check": "generate-standards.py --check#decision",
+      "spec": "§10.4",
+      "standard": "SPEC"
+    },
+    "delivery-contract": {
+      "check": "generate-standards.py --check#delivery-contract",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "evidence": {
+      "check": "generate-standards.py --check#evidence",
+      "spec": "§8.5",
+      "standard": "Delivery"
+    },
+    "gap-analysis": {
+      "check": "generate-standards.py --check#gap-analysis",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "governance": {
+      "check": "generate-standards.py --check#governance",
+      "spec": "§8.3",
+      "standard": "MSP"
+    },
+    "inception-analysis": {
+      "check": "generate-standards.py --check#inception-analysis",
+      "spec": "§8.4",
+      "standard": "PMP"
+    },
+    "inspect-adapt": {
+      "check": "generate-standards.py --check#inspect-adapt",
+      "spec": "§8.2",
+      "standard": "SAFe"
+    },
+    "mandate": {
+      "check": "generate-standards.py --check#mandate",
+      "spec": "§8.3",
+      "standard": "MSP"
+    },
+    "maturity-assessment": {
+      "check": "generate-standards.py --check#maturity-assessment",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "phase-a": {
+      "check": "generate-standards.py --check#phase-a",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "phase-b": {
+      "check": "generate-standards.py --check#phase-b",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "phase-c": {
+      "check": "generate-standards.py --check#phase-c",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "phase-d": {
+      "check": "generate-standards.py --check#phase-d",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "phase-e": {
+      "check": "generate-standards.py --check#phase-e",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "phase-f": {
+      "check": "generate-standards.py --check#phase-f",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "phase-g": {
+      "check": "generate-standards.py --check#phase-g",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "phase-h": {
+      "check": "generate-standards.py --check#phase-h",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "phase-preliminary": {
+      "check": "generate-standards.py --check#phase-preliminary",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "pi-objectives": {
+      "check": "generate-standards.py --check#pi-objectives",
+      "spec": "§8.2",
+      "standard": "SAFe"
+    },
+    "pi-plan": {
+      "check": "generate-standards.py --check#pi-plan",
+      "spec": "§8.2",
+      "standard": "SAFe"
+    },
+    "programme-baselines": {
+      "check": "generate-standards.py --check#programme-baselines",
+      "spec": "§8.3",
+      "standard": "MSP"
+    },
+    "programme-brief": {
+      "check": "generate-standards.py --check#programme-brief",
+      "spec": "§8.3",
+      "standard": "MSP"
+    },
+    "programme-plan": {
+      "check": "generate-standards.py --check#programme-plan",
+      "spec": "§8.3",
+      "standard": "MSP"
+    },
+    "programme-report": {
+      "check": "generate-standards.py --check#programme-report",
+      "spec": "§8.3",
+      "standard": "MSP"
+    },
+    "programme-risk-register": {
+      "check": "generate-standards.py --check#programme-risk-register",
+      "spec": "§8.3",
+      "standard": "MSP"
+    },
+    "programme-strategies": {
+      "check": "generate-standards.py --check#programme-strategies",
+      "spec": "§8.3",
+      "standard": "MSP"
+    },
+    "project-baseline": {
+      "check": "generate-standards.py --check#project-baseline",
+      "spec": "§8.4",
+      "standard": "PMP"
+    },
+    "project-brief": {
+      "check": "generate-standards.py --check#project-brief",
+      "spec": "§8.4",
+      "standard": "PMP"
+    },
+    "project-context-diagram": {
+      "check": "generate-standards.py --check#project-context-diagram",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "project-registers": {
+      "check": "generate-standards.py --check#project-registers",
+      "spec": "§8.4",
+      "standard": "PMP"
+    },
+    "project-wbs": {
+      "check": "generate-standards.py --check#project-wbs",
+      "spec": "§8.4",
+      "standard": "PMP"
+    },
+    "projects-dossier": {
+      "check": "generate-standards.py --check#projects-dossier",
+      "spec": "§8.3",
+      "standard": "MSP"
+    },
+    "realization-plan": {
+      "check": "generate-standards.py --check#realization-plan",
+      "spec": "§8.3",
+      "standard": "MSP"
+    },
+    "refined-vision": {
+      "check": "generate-standards.py --check#refined-vision",
+      "spec": "§8.3",
+      "standard": "MSP"
+    },
+    "request-for-architecture-work": {
+      "check": "generate-standards.py --check#request-for-architecture-work",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "requirements-catalog": {
+      "check": "generate-standards.py --check#requirements-catalog",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "reuse-map": {
+      "check": "generate-standards.py --check#reuse-map",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "safe-art": {
+      "check": "generate-standards.py --check#safe-art",
+      "spec": "§8.2",
+      "standard": "SAFe"
+    },
+    "safe-cadence": {
+      "check": "generate-standards.py --check#safe-cadence",
+      "spec": "§8.2",
+      "standard": "SAFe"
+    },
+    "safe-portfolio": {
+      "check": "generate-standards.py --check#safe-portfolio",
+      "spec": "§8.2",
+      "standard": "SAFe"
+    },
+    "skills-assessment": {
+      "check": "generate-standards.py --check#skills-assessment",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "spec": {
+      "check": "generate-standards.py --check#spec",
+      "spec": "§5",
+      "standard": "SPEC"
+    },
+    "stakeholder-profiles": {
+      "check": "generate-standards.py --check#stakeholder-profiles",
+      "spec": "§8.3",
+      "standard": "MSP"
+    },
+    "statement-of-architecture-work": {
+      "check": "generate-standards.py --check#statement-of-architecture-work",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "statement-of-intent": {
+      "check": "generate-standards.py --check#statement-of-intent",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "system-demo": {
+      "check": "generate-standards.py --check#system-demo",
+      "spec": "§8.2",
+      "standard": "SAFe"
+    },
+    "tranche-plan": {
+      "check": "generate-standards.py --check#tranche-plan",
+      "spec": "§8.3",
+      "standard": "MSP"
+    },
+    "tranche-review": {
+      "check": "generate-standards.py --check#tranche-review",
+      "spec": "§8.3",
+      "standard": "MSP"
+    },
+    "vision": {
+      "check": "generate-standards.py --check#vision",
+      "spec": "§8.3",
+      "standard": "MSP"
+    },
+    "waiver": {
+      "check": "generate-standards.py --check#waiver",
+      "spec": "§8.1",
+      "standard": "TOGAF"
+    },
+    "epic": {
+      "check": "generate-standards.py --check#epic",
+      "spec": "§8.2",
+      "standard": "SAFe"
+    }
+  },
+  "description": "Every audit rule's output category, live source and verifier, and every output-standard category's standard, spec and verifier (WP11). The checker enforces: no orphan rule or category, a known verifier (a registry name, a manifest clause, or generate-standards.py --check for a category), a standard/spec that matches its source, and a source that resolves (or an explicitly live-only projection that is still absent from the committed pack).",
+  "entries": {
+    "backlog_refinement_missing": {
+      "categories": [
+        "pi-plan"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/cadences"
+      },
+      "spec": "§8.2",
+      "standard": "SAFe",
+      "verifier": {
+        "kind": "registry",
+        "name": "backlog_refinement_missing"
+      }
+    },
+    "benefit_baseline_placeholder": {
+      "categories": [
+        "benefit-profile"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/benefit_profiles"
+      },
+      "spec": "§8.3",
+      "standard": "MSP",
+      "verifier": {
+        "clause": "benefit-baseline",
+        "kind": "manifest"
+      }
+    },
+    "benefit_profile_incomplete": {
+      "categories": [
+        "benefit-profile"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/benefit_profiles"
+      },
+      "spec": "§8.3",
+      "standard": "MSP",
+      "verifier": {
+        "kind": "registry",
+        "name": "benefit_profile_incomplete"
+      }
+    },
+    "board_not_approved": {
+      "categories": [
+        "architecture-governance-log"
+      ],
+      "source": {
+        "file": "architecture.json",
+        "pointer": "/board"
+      },
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "verifier": {
+        "kind": "registry",
+        "name": "board_not_approved"
+      }
+    },
+    "cadence_absent": {
+      "categories": [
+        "safe-cadence"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/cadences"
+      },
+      "spec": "§8.2",
+      "standard": "SAFe",
+      "verifier": {
+        "clause": "pi-cadence",
+        "kind": "manifest"
+      }
+    },
+    "capability_artefacts": {
+      "categories": [
+        "architecture-capability",
+        "phase-preliminary"
+      ],
+      "source": {
+        "file": "architecture.json",
+        "pointer": "/artifacts"
+      },
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "verifier": {
+        "kind": "registry",
+        "name": "capability_artefacts"
+      }
+    },
+    "closed_without_closure_review": {
+      "categories": [
+        "closure-review"
+      ],
+      "source": {
+        "file": "artefacts.json",
+        "pointer": "/documents"
+      },
+      "spec": "§8.4",
+      "standard": "MSP",
+      "verifier": {
+        "clause": "closure-gate",
+        "kind": "manifest"
+      }
+    },
+    "closure_outputs_undeclared": {
+      "categories": [
+        "programme-brief",
+        "closure-review"
+      ],
+      "source": {
+        "file": "programme.json",
+        "pointer": "/projects"
+      },
+      "spec": "§8.3",
+      "standard": "MSP",
+      "verifier": {
+        "clause": "closure-outputs",
+        "kind": "manifest"
+      }
+    },
+    "compliance_review_missing": {
+      "categories": [
+        "compliance-review"
+      ],
+      "source": {
+        "file": "architecture.json",
+        "pointer": "/compliance_reviews"
+      },
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "verifier": {
+        "clause": "review",
+        "kind": "manifest"
+      }
+    },
+    "contract_missing": {
+      "categories": [
+        "delivery-contract"
+      ],
+      "source": {
+        "file": "architecture.json",
+        "pointer": "/contracts"
+      },
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "verifier": {
+        "clause": "contract",
+        "kind": "manifest"
+      }
+    },
+    "contract_unapproved": {
+      "categories": [
+        "delivery-contract"
+      ],
+      "source": {
+        "file": "architecture.json",
+        "pointer": "/contracts"
+      },
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "verifier": {
+        "clause": "contract",
+        "kind": "manifest"
+      }
+    },
+    "demo_credit_missing": {
+      "categories": [
+        "system-demo",
+        "pi-objectives"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/demo_credits"
+      },
+      "spec": "§8.2",
+      "standard": "SAFe",
+      "verifier": {
+        "clause": "demo-credits",
+        "kind": "manifest"
+      }
+    },
+    "dependency_cycle": {
+      "categories": [
+        "projects-dossier"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/project_dependencies"
+      },
+      "spec": "§5.1",
+      "standard": "SPEC",
+      "verifier": {
+        "kind": "registry",
+        "name": "dependency_cycle"
+      }
+    },
+    "dependency_unknown_target": {
+      "categories": [
+        "projects-dossier"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/project_dependencies"
+      },
+      "spec": "§5.1",
+      "standard": "SPEC",
+      "verifier": {
+        "kind": "registry",
+        "name": "dependency_unknown_target"
+      }
+    },
+    "dependency_untyped": {
+      "categories": [
+        "projects-dossier"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/project_dependencies"
+      },
+      "spec": "§5.1",
+      "standard": "SPEC",
+      "verifier": {
+        "kind": "registry",
+        "name": "dependency_untyped"
+      }
+    },
+    "derivation_missing": {
+      "categories": [
+        "requirements-catalog",
+        "artifact-standard"
+      ],
+      "source": {
+        "file": "architecture.json",
+        "pointer": "/links"
+      },
+      "spec": "§5.3",
+      "standard": "SPEC",
+      "verifier": {
+        "kind": "registry",
+        "name": "derivation_missing"
+      }
+    },
+    "mandatory_artefacts": {
+      "categories": [
+        "phase-preliminary",
+        "phase-a",
+        "phase-b",
+        "phase-c",
+        "phase-d",
+        "phase-e",
+        "phase-f",
+        "phase-g",
+        "phase-h"
+      ],
+      "source": {
+        "file": "architecture.json",
+        "pointer": "/artifacts"
+      },
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "verifier": {
+        "kind": "registry",
+        "name": "artefact_standard"
+      }
+    },
+    "pi_cadence_missing": {
+      "categories": [
+        "pi-plan",
+        "safe-cadence"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/cadences"
+      },
+      "spec": "§8.2",
+      "standard": "SAFe",
+      "verifier": {
+        "clause": "pi-cadence",
+        "kind": "manifest"
+      }
+    },
+    "pi_objectives_missing": {
+      "categories": [
+        "pi-objectives"
+      ],
+      "source": {
+        "file": "artefacts.json",
+        "pointer": "/documents"
+      },
+      "spec": "§8.2",
+      "standard": "SAFe",
+      "verifier": {
+        "clause": "pi-objectives",
+        "kind": "manifest"
+      }
+    },
+    "pi_plan_missing": {
+      "categories": [
+        "pi-plan"
+      ],
+      "source": {
+        "file": "artefacts.json",
+        "pointer": "/documents"
+      },
+      "spec": "§8.2",
+      "standard": "SAFe",
+      "verifier": {
+        "clause": "pi-plan",
+        "kind": "manifest"
+      }
+    },
+    "profile_adopted": {
+      "categories": [
+        "adm-profile"
+      ],
+      "source": {
+        "file": "architecture.json",
+        "pointer": "/profiles"
+      },
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "verifier": {
+        "kind": "registry",
+        "name": "profile_adopted"
+      }
+    },
+    "programme_baselines": {
+      "categories": [
+        "programme-baselines"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/programme_baselines"
+      },
+      "spec": "§8.3",
+      "standard": "MSP",
+      "verifier": {
+        "kind": "registry",
+        "name": "programme_baselines"
+      }
+    },
+    "programme_outputs": {
+      "categories": [
+        "programme-brief"
+      ],
+      "source": {
+        "file": "programme.json",
+        "pointer": "/projects"
+      },
+      "spec": "§8.3",
+      "standard": "MSP",
+      "verifier": {
+        "kind": "registry",
+        "name": "programme_outputs"
+      }
+    },
+    "project_in_unauthorised_tranche": {
+      "categories": [
+        "tranche-review"
+      ],
+      "source": {
+        "file": "programme.json",
+        "pointer": "/projects"
+      },
+      "spec": "§8.3",
+      "standard": "MSP",
+      "verifier": {
+        "kind": "registry",
+        "name": "project_in_unauthorised_tranche"
+      }
+    },
+    "realized_without_transition": {
+      "categories": [
+        "benefit-transition",
+        "benefits-map"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/benefit_transitions"
+      },
+      "spec": "§8.3",
+      "standard": "MSP",
+      "verifier": {
+        "kind": "registry",
+        "name": "realized_without_transition"
+      }
+    },
+    "requester_is_approver": {
+      "categories": [
+        "delivery-contract"
+      ],
+      "source": {
+        "file": "architecture.json",
+        "pointer": "/contracts"
+      },
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "verifier": {
+        "kind": "registry",
+        "name": "requester_is_approver"
+      }
+    },
+    "retro_lesson_missing": {
+      "categories": [
+        "inspect-adapt"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/lessons"
+      },
+      "spec": "§8.2",
+      "standard": "SAFe",
+      "verifier": {
+        "clause": "lessons",
+        "kind": "manifest"
+      }
+    },
+    "seed_live_drift": {
+      "categories": [
+        "programme-brief"
+      ],
+      "source": {
+        "file": "programme.json",
+        "pointer": "/projects"
+      },
+      "spec": "§5.3",
+      "standard": "SPEC",
+      "verifier": {
+        "kind": "registry",
+        "name": "seed_live_drift"
+      }
+    },
+    "snapshot_schema_stale": {
+      "categories": [],
+      "source": {
+        "file": "manifest.json",
+        "pointer": "/schema"
+      },
+      "spec": "§10.3",
+      "standard": "SPEC",
+      "verifier": {
+        "kind": "registry",
+        "name": "snapshot_schema_stale"
+      }
+    },
+    "status_source_drift": {
+      "categories": [
+        "programme-brief"
+      ],
+      "source": {
+        "file": "programme.json",
+        "pointer": "/projects"
+      },
+      "spec": "§5.3",
+      "standard": "SPEC",
+      "verifier": {
+        "kind": "registry",
+        "name": "status_source_drift"
+      }
+    },
+    "tranche_plan": {
+      "categories": [
+        "tranche-plan"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/tranches"
+      },
+      "spec": "§8.3",
+      "standard": "MSP",
+      "verifier": {
+        "kind": "registry",
+        "name": "tranche_plan"
+      }
+    },
+    "tranche_review_without_authorisation": {
+      "categories": [
+        "tranche-review"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/tranche_reviews"
+      },
+      "spec": "§8.3",
+      "standard": "MSP",
+      "verifier": {
+        "kind": "registry",
+        "name": "tranche_review_without_authorisation"
+      }
+    },
+    "transition_order": {
+      "categories": [
+        "benefit-transition"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/benefit_transitions"
+      },
+      "spec": "§8.3",
+      "standard": "MSP",
+      "verifier": {
+        "kind": "registry",
+        "name": "transition_order"
+      }
+    },
+    "unpublished_declared_output": {
+      "categories": [
+        "programme-brief"
+      ],
+      "source": {
+        "file": "artefacts.json",
+        "pointer": "/documents"
+      },
+      "spec": "§8.3",
+      "standard": "MSP",
+      "verifier": {
+        "kind": "registry",
+        "name": "published_proof"
+      }
+    },
+    "waiver_invalid": {
+      "categories": [
+        "waiver"
+      ],
+      "source": {
+        "file": "architecture.json",
+        "pointer": "/waivers"
+      },
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "verifier": {
+        "clause": "waivers",
+        "kind": "manifest"
+      }
+    },
+    "waiver_not_permitted": {
+      "categories": [
+        "waiver"
+      ],
+      "source": {
+        "file": "architecture.json",
+        "pointer": "/waivers"
+      },
+      "spec": "ADR 0012 §Decision 1",
+      "standard": "MSP",
+      "verifier": {
+        "kind": "registry",
+        "name": "waiver_not_permitted"
+      }
+    },
+    "wbs_absent": {
+      "categories": [
+        "project-wbs"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/wbs_nodes"
+      },
+      "spec": "§5.1",
+      "standard": "SPEC",
+      "verifier": {
+        "kind": "registry",
+        "name": "wbs_absent"
+      }
+    },
+    "wsjf_inputs_missing": {
+      "categories": [
+        "project-wbs",
+        "safe-art",
+        "pi-plan"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/wbs_nodes"
+      },
+      "spec": "§8.2",
+      "standard": "SAFe",
+      "verifier": {
+        "clause": "wsjf",
+        "kind": "manifest"
+      }
+    }
+  },
+  "output_standard": "seed/output-standard.json",
+  "snapshot": "docs/design/data",
+  "standard": "governance/conformance.json",
+  "version": 1
+}

@@ -89,6 +89,15 @@ async fn andon_release(
     ctx: HandlerCtx,
     _input: EmptyIn,
 ) -> Result<AndonOut, ActionError> {
+    // The release is a person's act: an agent or a service may detect and report an incident,
+    // but it may not take the cord down and resume the queue on its own.
+    if ctx.actor_kind != "user" {
+        return Err(ActionError::new(
+            403,
+            "person_required",
+            "andon.release is a person's act; a machine may engage but not release the cord",
+        ));
+    }
     let Some(state) = store::andon::release_tx(&mut *tx, ctx.tenant)
         .await
         .map_err(|error| store_error(error, "andon.release"))?

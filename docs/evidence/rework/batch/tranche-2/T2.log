@@ -1,0 +1,213 @@
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project T2 --content docs/evidence/rework/tranche-2/rework-content-T2.json --tranche-label tranche 2 --demo-cadence 01a2004a-87d8-77e9-b06a-171361548e38
+
+  01 projects.reopen ok
+  charter: already approved
+  closure outputs: already ['closure-review']
+  SoAW: already live
+  artefact: Stakeholder Map — T2 Decision ladder (Phase A) already present
+  artefact: Driver/Goal/Objective Catalog — T2 Decision ladder (Phase A) already present
+  artefact: Requirements Catalog — T2 Decision ladder (Phase A) already present
+  artefact: Solution Concept Diagram — T2 Decision ladder (Phase A) already present
+  artefact: Business Capability Map — T2 Decision ladder (Phase B) already present
+  artefact: Data Entity/Data Component Catalog — T2 Decision ladder (Phase C) already present
+  artefact: Technology Standards Catalog — T2 Decision ladder (Phase D) already present
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  08 architecture.artifacts_link ok
+  09 architecture.contracts_request ok
+  10 architecture.board_decide ok
+  11 architecture.contracts_approve ok
+  delivery contract: revised to carry the authored body
+  register risk: The create path attaches a generated draft without the gate already present
+  register risk: A human decision cites an approval that did not gate it already present
+  register risk: L1 records a decision without asking laya already present
+  register issue: `refinements.publish` changes a threshold without the gate already present
+  register issue: Options and questions are inline free text already present
+  register assumption: The standing delegation remains the authority for this rework already present
+  register assumption: The ladder keeps three distinct rungs and actors already present
+  register dependency: T1 and the T0 decision-table contracts hold already present
+  register dependency: Postgres 18 with FORCE RLS stays the only store already present
+  register benefit: Every rung reads as one audit shape already present
+  register benefit: A tenant threshold changes without a build already present
+  register benefit: No decision passes without its own gate approval already present
+  benefit transitions: none in the content
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
+  closure-review output: already published
+  project-brief output: current
+  evidence output: current
+  12 architecture.reviews_record ok
+  13 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 1 change row(s) present
+  record fixes: none in the content
+  card discharge: no open rework card owned by the project
+  14 projects.close_request ok
+  15 approvals.decide ok
+  16 approvals.request ok
+  17 approvals.decide ok
+  18 projects.close ok
+  closed T2: 01a1d039-0d33-7282-b7b0-6dde32c38ab1
+T2: 18 acts recorded
+
+
+[exit 0]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T2 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T2-snap-45ofs4l9/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T2-snap-45ofs4l9/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-2/T2-bodies --local-bin /tmp/conv526-bin-c6341a8a
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [],
+  "skipped": [
+    {
+      "project_key": "T2",
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T2",
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "category": "closure-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T2",
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T2",
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T2",
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T2",
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T2",
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "category": "project-registers",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T2",
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T2",
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "T2",
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T2",
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Document' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T2",
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T2",
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T2",
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "NO_EVIDENCE",
+        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
+      }
+    }
+  ],
+  "counts": {
+    "due": 5,
+    "present": 5,
+    "missing-edge": 0,
+    "stale": 4,
+    "ambiguous": 0
+  }
+}
+
+
+[exit 1]
+

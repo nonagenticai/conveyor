@@ -56,10 +56,32 @@ if [ -n "${GENERATED_AT:-}" ]; then
 fi
 "$conveyor" "${snapshot_args[@]}"
 
+# 2a. The audit evaluates the coverage the pack ships. A temp snapshot carries no `coverage.json`,
+#     so `status_source_drift` would never fire on the live record even though the committed pack,
+#     which ships `data/coverage.json`, reports the same drift — the live register and the
+#     committed-pack derivation then disagree and `publish-standards.sh` cannot write the record
+#     (measured 2026-11-26: status_source_drift:T18, P2). Copy the installed coverage in so both
+#     derivations read the same bytes; the install replaces it and `build-coverage.py` regenerates
+#     it to the same fixpoint below. A pack that has never been published has none yet: the
+#     snapshot's own coverage (or the generator below) is then the only input, which is correct.
+if [ -f "$data/coverage.json" ]; then
+  cp "$data/coverage.json" "$tmp/data/coverage.json"
+fi
+# The standards generator's computed sources (`blueprint / Action registry and data model`)
+# read the action-registry dump from the snapshot directory. It is not a snapshot output, so
+# without this copy pass 2 counts zero actions and publishes a false `absent` section that
+# `generate-standards --check` (which reads the installed dump) then reports as stale.
+if [ -f "$data/actions.json" ]; then
+  cp "$data/actions.json" "$tmp/data/actions.json"
+fi
+
 # 3. The conformance gap register runs on the draft BEFORE anything is published. It is the
 #    authorisation ledger the artefact generator dedupes against: a gap owns its package, so the
 #    same defect never becomes a second card.
-audit_args=(--snapshot "$tmp/data" --out "$tmp/conformance")
+# The register's acceptance commands and the page name the checked-in pack, not this run's temp
+# copy: a random /var/folders path would change every run and leak into the public tree.
+audit_args=(--snapshot "$tmp/data" --out "$tmp/conformance" --snapshot-label docs/design/data)
+audit_args+=(--path-label "$tmp/conformance/standards-findings.json=docs/evidence/standards-findings.json")
 python3 "$root/scripts/audit-programme-conformance.py" "${audit_args[@]}" --report
 test -f "$tmp/conformance/conformance-gap-register.json" || {
   echo "publish-data: the audit produced no gap register" >&2
@@ -83,11 +105,19 @@ test -f "$tmp/conformance/standards-findings.json" || {
 python3 "$root/scripts/audit-programme-conformance.py" "${audit_args[@]}" \
   --findings "$root/docs/evidence/v1-conformance-findings.json" \
   --findings "$tmp/conformance/standards-findings.json" \
+  --deep-review "$root/docs/evidence/record-w3/deep-review-findings.json" \
+  --deep-review "$root/docs/evidence/record-w4/deep-review-findings.json" \
+  --deep-review "$root/docs/evidence/record-w5/deep-review-findings.json" \
   --report --rework-out "$tmp/conformance/rework.json"
 test -f "$tmp/conformance/rework.json" || {
   echo "publish-data: the audit produced no rework register" >&2
   exit 1
 }
+
+# The live register is public: evidence quotes code and plans, and must never carry a private
+# address. Redact before it is embedded in the snapshot, so the pack and the committed register
+# are the same document. publish-standards.sh does the same for the committed-pack half.
+python3 "$root/scripts/redact-public-register.py" "$tmp/conformance/rework.json"
 
 # 3b. The FINAL snapshot carries that register (`rework.json` and `snapshot.js.rework`), and the
 #     strict gate below audits THESE bytes — not the draft's.
@@ -146,17 +176,59 @@ test -f "$tmp/docs/standards/index.html" || {
 #       platform outputs and the standards pack) are restored from `$tmp` afterwards.
 #     The strict gate above has already passed; every step here is deterministic and re-runnable,
 #     and a failure stops the publish before anything is mirrored to the homepage.
-rsync -a "$tmp/data/" "$data/"
+# 3f. The snapshot wrote its manifest before generate-standards wrote `standards.json` into
+#     `$tmp/data`; rehash the pack as it now stands so the installed manifest covers every file.
+#     Nothing is regenerated, and no database is read.
+"$conveyor" snapshot --manifest-only --out "$tmp/data"
+# `actions.json` is the installed action-registry dump (build-coverage's input), not a snapshot
+# output: the snapshot never produces it, so `--delete` would destroy the registry the coverage
+# check below reads. It is refreshed by `conveyor admin actions dump`, a separate step, exactly
+# as `issues.json` is the raw GitHub export and is not a snapshot output either.
+rsync -a --delete --exclude 'actions.json' --exclude 'output-standard.js' "$tmp/data/" "$data/"
 # The canonical register is an evidence ledger as well as a published row: the committed-pack
-# publish (`publish-standards.sh`) compares its build against this copy.
-cp "$tmp/conformance/rework.json" "$root/docs/evidence/rework-register.json"
-python3 "$root/scripts/build-coverage.py"
+# publish (`publish-standards.sh`) compares its build against this copy. Copy the register the
+# SNAPSHOT embedded (`$tmp/data/rework.json`), not the pre-snapshot file: the snapshot masks
+# absolute home paths (`[redacted-path]`), and the committed ledger must be byte-identical to the
+# document the pack publishes or check-data refuses the pack.
+cp "$tmp/data/rework.json" "$root/docs/evidence/rework-register.json"
+for _ in 1 2 3; do
+  # The programme seed is frozen (#782 P4): build-programme-seed.py is retired, so the loop
+  # re-derives only the measured coverage until it agrees with itself.
+  python3 "$root/scripts/build-coverage.py"
+  if python3 "$root/scripts/build-coverage.py" --check; then
+    break
+  fi
+done
 python3 "$root/scripts/build-coverage.py" --check
 python3 "$root/scripts/build-v2-coverage.py"
 python3 "$root/scripts/build-v2-coverage.py" --check
+# The console reads the output standard as a data file (`window.CONVEYOR_OUTPUT_STANDARD`);
+# it is not a snapshot output, so the rsync above preserves it and this step keeps it
+# byte-identical to the seed the pack was generated from.
+python3 - "$root" <<'PY'
+import json, sys
+from pathlib import Path
+
+root = Path(sys.argv[1])
+seed = json.loads((root / "seed/output-standard.json").read_text(encoding="utf-8"))
+target = root / "docs/design/data/output-standard.js"
+target.write_text(
+    "window.CONVEYOR_OUTPUT_STANDARD = "
+    + json.dumps(seed, indent=2, ensure_ascii=False)
+    + ";\n",
+    encoding="utf-8",
+)
+PY
 python3 "$pack/scripts/build-docs.py"
 rsync -a --delete "$tmp/docs/standards/" "$pack/docs/standards/"
 rsync -a "$tmp/docs/" "$pack/docs/"
+# 3g. The manifest must name every file the installed pack carries. The files written after 3f
+#     (actions.json, coverage.*, output-standard.js, the rendered pages) are not snapshot outputs,
+#     so the hash taken at 3f predates them; rehash the installed pack once the tree is final.
+#     Nothing is regenerated, and no database is read. check-data refuses a data/ file the
+#     manifest does not name, so this rehash is what makes the published pack pass its own gate.
+"$conveyor" snapshot --manifest-only --out "$data"
+
 
 # 4. Mirror the pack (including data/ and docs/) and let the homepage's own gate decide.
 # `issues.json` is an INPUT to the snapshot (the redacted registry is inside programme.json).

@@ -7,7 +7,9 @@
 //! - `departments.*` — extended in `handlers.rs` with the industry placement;
 //! - `job_catalogue.*` — the position, its draft anatomy and its ordered departments;
 //! - `job_releases.*` — publish compiles and hashes; a release is never edited;
-//! - `job_bindings.*` — pin one release to one executor; the registry refuses an unserved kind.
+//! - `job_bindings.*` — pin one release to one executor; the registry refuses an unserved kind;
+//! - `job_authorities.*` — the tenant's meta-role × action matrix (SPEC_V2 §6.7), read and
+//!   changed as tenant data rather than as a database edit.
 //!
 //! Writes are `organisation:write` (admin/kata_executor); reads are `organisation:read` (open).
 //! No action here writes a raw SQL update: the store functions own the invariants and the
@@ -25,7 +27,8 @@ use uuid::Uuid;
 
 use crate::control::{invalid, store_error};
 use crate::invoke::{ActionError, HandlerCtx};
-use crate::views::EmptyIn;
+use crate::spec::FieldError;
+use crate::views::{EmptyIn, Page, PageIn};
 
 // ── views ────────────────────────────────────────────────────────────────────────────────
 
@@ -166,6 +169,29 @@ pub struct JobUpdateIn {
     /// A replacement placement; omit to keep the current one.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub departments: Option<Vec<JobDepartmentIn>>,
+    /// `active` requests activation: the job stays `draft` until a different principal approves
+    /// the `job_activation` gate this opens. `draft` and `retired` are refused — a job is
+    /// created as a draft, and retirement is `job_catalogue.retire`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status: Option<String>,
+}
+
+/// `job_catalogue.list` — the catalogue's search filters and page (SPEC_V2 §4.6).
+#[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
+pub struct JobListIn {
+    /// Case-insensitive substring of the job key (the position's code).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub code: Option<String>,
+    /// Case-insensitive substring of a capability the job declares in its draft anatomy or has
+    /// bound to a release.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub capability: Option<String>,
+    /// Case-insensitive substring of the name of a department the job is placed in.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub department: Option<String>,
+    /// The shared pagination envelope.
+    #[serde(flatten)]
+    pub page: PageIn,
 }
 
 /// `job_catalogue.retire`.
@@ -269,7 +295,9 @@ pub struct BindingCreateIn {
     /// `department_scope`, authority, limits override.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<Value>,
-    /// `draft | active`; defaults to `active`.
+    /// `draft`, or omitted to open the activation gate; `active` is refused
+    /// (`409 job_binding_approval_required`). A binding is never born live: only an approved
+    /// decision flips it to active.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub status: Option<String>,
 }
@@ -384,6 +412,44 @@ fn organisation_error(error: OrganisationStoreError, action: &str) -> ActionErro
             "invalid_placement",
             "the placement must be ordered 1..=n with exactly one primary",
         ),
+        // SPEC_V2 §4.1: the compile refuses an unresolved draft instead of hashing it.
+        OrganisationStoreError::ReleaseNotReady { kind, department } => ActionError::new(
+            409,
+            "release_not_ready",
+            format!(
+                "the required kind {kind:?} has no resolvable value for department {department:?}"
+            ),
+        )
+        .with_errors(vec![FieldError {
+            field: "kind".to_owned(),
+            code: "required".to_owned(),
+            detail: format!(
+                "kind {kind:?} is required by {department:?} and no layer sets a value"
+            ),
+        }]),
+        OrganisationStoreError::DepartmentConflict {
+            kind,
+            left_department,
+            left_value,
+            right_department,
+            right_value,
+        } => ActionError::new(
+            422,
+            "department_conflict",
+            format!(
+                "kind {kind:?} is {left_value} in department {left_department:?} and \
+                 {right_value} in department {right_department:?}; a job-layer value must \
+                 resolve it"
+            ),
+        )
+        .with_errors(vec![FieldError {
+            field: "kind".to_owned(),
+            code: "department_conflict".to_owned(),
+            detail: format!(
+                "departments {left_department:?} and {right_department:?} set {kind:?} to \
+                 different values"
+            ),
+        }]),
         OrganisationStoreError::ReleaseJobMismatch => invalid(
             "release_id",
             "release_job_mismatch",
@@ -392,6 +458,16 @@ fn organisation_error(error: OrganisationStoreError, action: &str) -> ActionErro
         OrganisationStoreError::VersionMismatch(what) => {
             ActionError::precondition(format!("the {what} moved; re-read it and retry"))
         }
+        OrganisationStoreError::JobNotLive { status } => ActionError::new(
+            409,
+            "job_not_live",
+            format!("the job is {status}; only an active job may publish a release or be bound"),
+        ),
+        OrganisationStoreError::JobNotDraft { status } => ActionError::new(
+            409,
+            "job_not_draft",
+            format!("the job is {status}; only a draft job can be activated"),
+        ),
         OrganisationStoreError::Executor(error) => executor_error(error),
         OrganisationStoreError::UnknownStatus(raw) => {
             tracing::error!(status = %raw, "a stored organisation status is outside the domain");
@@ -427,14 +503,14 @@ fn organisation_error(error: OrganisationStoreError, action: &str) -> ActionErro
             "binding_kind_mismatch",
             format!("the binding names {binding:?} but the release declares {release:?}"),
         ),
-        OrganisationStoreError::ReleaseNotReady { kind, department } => ActionError::new(
+        OrganisationStoreError::LayerReleaseNotReady { kind, department } => ActionError::new(
             409,
             "release_not_ready",
             format!(
                 "the required knowledge kind {kind:?} has no value for department {department:?}"
             ),
         ),
-        OrganisationStoreError::DepartmentConflict { kind, departments } => ActionError::new(
+        OrganisationStoreError::LayerDepartmentConflict { kind, departments } => ActionError::new(
             422,
             "department_conflict",
             format!(
@@ -497,19 +573,84 @@ fn placement_in(input: &[JobDepartmentIn]) -> Vec<store::organisation::Placement
         .collect()
 }
 
-fn status_in(raw: Option<&str>) -> Result<BindingStatus, ActionError> {
-    match raw.unwrap_or("active") {
-        "draft" => Ok(BindingStatus::Draft),
-        "active" => Ok(BindingStatus::Active),
-        "retired" => Err(invalid(
+/// The approval gate kind that authorises a job binding going live (v1-p44-2, SPEC_V2 §4.4).
+pub(crate) const BINDING_GATE_KIND: &str = "job_binding";
+
+/// The activation gate's name: the action whose effect it authorises, so the approvals screen
+/// renders it as that action. §5.4's requester exclusion is unconditional (ledger v1-w4b-4), so
+/// the person who created the binding can never approve its activation.
+pub(crate) const BINDING_GATE: &str = "job_bindings.create";
+
+/// What a `job_bindings.create` request asks for.
+///
+/// A binding is never born live: only an approved decision flips it to `active`, so there are
+/// exactly two shapes — an explicit `draft` (inert, no gate) or no status (a draft plus the
+/// activation gate). An explicit `active` is refused rather than silently downgraded, so a
+/// caller that asks to bypass the gate learns it did not succeed.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum BindingActivation {
+    /// An explicit `draft`: create the binding inert and open no gate.
+    Draft,
+    /// No status: create the binding draft and open the gate that activates it.
+    Gated,
+}
+
+fn status_in(raw: Option<&str>) -> Result<BindingActivation, ActionError> {
+    match raw {
+        None => Ok(BindingActivation::Gated),
+        Some("draft") => Ok(BindingActivation::Draft),
+        Some("active") => Err(ActionError::new(
+            409,
+            "job_binding_approval_required",
+            "a binding goes live only through an approved decision: omit `status` to open the \
+             activation gate and have it decided by another principal",
+        )),
+        Some("retired") => Err(invalid(
             "status",
             "invalid_value",
-            "a new binding is draft or active; retire is its own action",
+            "a new binding is draft; retire is its own action",
         )),
         other => Err(invalid(
             "status",
             "invalid_value",
-            format!("{other:?} is not draft or active"),
+            format!("{other:?} is not draft"),
+        )),
+    }
+}
+
+/// The approval gate kind that authorises a job going live (v1-w1a-4, SPEC_V2 §4.3).
+pub(crate) const JOB_ACTIVATION_GATE_KIND: &str = "job_activation";
+
+/// The job activation gate's name: the action whose effect it authorises, so the approvals
+/// screen renders it as that action. The requester exclusion is §5.4's and unconditional, so
+/// the person who requested activation can never approve it.
+pub(crate) const JOB_ACTIVATION_GATE: &str = "job_catalogue.update";
+
+/// Whether a `job_catalogue.update` request asks for activation (SPEC_V2 §4.3).
+///
+/// `status: "active"` is the one lifecycle request this action carries: the patch applies to
+/// the draft and a `job_activation` gate opens; only an approved decision flips the job. The
+/// other statuses are the birth state or have their own action, so they are refused `422
+/// invalid_value` rather than silently ignored.
+fn job_status_update(raw: Option<&str>) -> Result<bool, ActionError> {
+    match raw {
+        None => Ok(false),
+        Some("active") => Ok(true),
+        Some("draft") => Err(invalid(
+            "status",
+            "invalid_value",
+            "a job is created as a draft; `active` requests activation and `retired` is \
+             `job_catalogue.retire`",
+        )),
+        Some("retired") => Err(invalid(
+            "status",
+            "invalid_value",
+            "retirement is its own action (`job_catalogue.retire`)",
+        )),
+        other => Err(invalid(
+            "status",
+            "invalid_value",
+            format!("{other:?} is not a job status"),
         )),
     }
 }
@@ -671,6 +812,22 @@ async fn job_catalogue_update(
     ctx: HandlerCtx,
     input: JobUpdateIn,
 ) -> Result<JobOut, ActionError> {
+    let activation = job_status_update(input.status.as_deref())?;
+    if activation {
+        // Only a draft is curated into a live job; an active or retired one has no activation
+        // edge (SPEC_V2 §4.3: `409 job_not_draft`).
+        let current = store::organisation::job_get_tx(&mut *tx, ctx.tenant, input.id)
+            .await
+            .map_err(|error| organisation_error(error, "job_catalogue.update"))?;
+        if current.status != "draft" {
+            return Err(organisation_error(
+                OrganisationStoreError::JobNotDraft {
+                    status: current.status,
+                },
+                "job_catalogue.update",
+            ));
+        }
+    }
     let patch = store::organisation::JobPatch {
         title: input.title.map(|title| title.trim().to_owned()),
         family: input.family.map(|family| family.trim().to_owned()),
@@ -682,6 +839,10 @@ async fn job_catalogue_update(
         store::organisation::job_update_tx(&mut *tx, ctx.tenant, input.id, input.version, &patch)
             .await
             .map_err(|error| organisation_error(error, "job_catalogue.update"))?;
+    if activation {
+        // The job stays draft; the gate is the only path to `active` (v1-w1a-4).
+        open_job_activation_gate(&mut *tx, &ctx, &row).await?;
+    }
     job_view(&mut *tx, ctx.tenant, &row).await
 }
 
@@ -731,7 +892,8 @@ async fn job_catalogue_get(
     job_view(&mut *tx, ctx.tenant, &row).await
 }
 
-/// Every catalogue position of the tenant.
+/// One page of catalogue positions: searchable by code, capability and department, with a
+/// stable `(job_key, id)` keyset (SPEC_V2 §4.6).
 #[crate::action(
     name = "job_catalogue.list",
     version = 1,
@@ -746,16 +908,62 @@ async fn job_catalogue_get(
 async fn job_catalogue_list(
     tx: &mut PgConnection,
     ctx: HandlerCtx,
-    _input: EmptyIn,
-) -> Result<Vec<JobOut>, ActionError> {
-    let rows = store::organisation::jobs_list_tx(&mut *tx, ctx.tenant)
-        .await
-        .map_err(|error| store_error(error, "job_catalogue.list"))?;
-    let mut out = Vec::with_capacity(rows.len());
+    input: JobListIn,
+) -> Result<Page<JobOut>, ActionError> {
+    let limit = store::actions::clamp_limit(input.page.limit);
+    let after = decode_job_cursor(input.page.cursor.as_deref())?;
+    // One extra row decides whether a next page exists; it is not returned.
+    let mut rows = store::organisation::jobs_list_tx(
+        &mut *tx,
+        ctx.tenant,
+        &store::organisation::JobListQuery {
+            code: search_term(input.code.as_deref()),
+            capability: search_term(input.capability.as_deref()),
+            department: search_term(input.department.as_deref()),
+            after: after.as_ref().map(|(job_key, id)| (job_key.as_str(), *id)),
+            limit: limit + 1,
+        },
+    )
+    .await
+    .map_err(|error| store_error(error, "job_catalogue.list"))?;
+    let next_cursor = if rows.len() as i64 > limit {
+        rows.pop();
+        rows.last()
+            .map(|row| encode_job_cursor(&row.job_key, row.id))
+    } else {
+        None
+    };
+    let mut items = Vec::with_capacity(rows.len());
     for row in &rows {
-        out.push(job_view(&mut *tx, ctx.tenant, row).await?);
+        items.push(job_view(&mut *tx, ctx.tenant, row).await?);
     }
-    Ok(out)
+    Ok(Page { items, next_cursor })
+}
+
+/// Encode the `(job_key, id)` keyset cursor.
+fn encode_job_cursor(job_key: &str, id: Uuid) -> String {
+    serde_json::to_string(&(job_key, id)).unwrap_or_else(|_| "[]".to_owned())
+}
+
+/// Decode a catalogue cursor; a malformed one is a 422 naming the field.
+fn decode_job_cursor(cursor: Option<&str>) -> Result<Option<(String, Uuid)>, ActionError> {
+    let Some(raw) = cursor else {
+        return Ok(None);
+    };
+    serde_json::from_str::<(String, Uuid)>(raw)
+        .map(Some)
+        .map_err(|_| {
+            invalid(
+                "cursor",
+                "invalid_cursor",
+                "a job cursor is the [job_key, id] pair the previous page returned",
+            )
+        })
+}
+
+/// A search term, trimmed; blank means no filter.
+fn search_term(raw: Option<&str>) -> Option<&str> {
+    raw.map(str::trim).filter(|term| !term.is_empty())
 }
 
 // ── releases ─────────────────────────────────────────────────────────────────────────────
@@ -849,7 +1057,7 @@ async fn job_bindings_create(
     input: BindingCreateIn,
 ) -> Result<BindingOut, ActionError> {
     let executor_kind = ExecutorKind::parse(input.executor_kind.trim()).map_err(executor_error)?;
-    let status = status_in(input.status.as_deref())?;
+    let activation = status_in(input.status.as_deref())?;
     // T16 P5.1: a binding pins a PUBLISHED process, and a derived one only while its source is
     // reviewed. The existence check lives in the store; these are the two facts a binding must
     // never be able to grant by naming a draft or an unreviewed document's output.
@@ -908,13 +1116,175 @@ async fn job_bindings_create(
             capability_agent_id: input.capability_agent_id,
             capability_id: input.capability_id,
             meta: input.meta.unwrap_or_else(|| serde_json::json!({})),
-            status,
+            // v1-p44-2: a binding is never born live. The default create opens the activation
+            // gate below and an approved decision is the only thing that flips this draft to
+            // `active`; an explicit draft create writes no gate because nothing is activated.
+            status: BindingStatus::Draft,
         },
         &Registry::builtin(),
     )
     .await
     .map_err(|error| organisation_error(error, "job_bindings.create"))?;
+    if activation == BindingActivation::Gated {
+        open_binding_activation_gate(&mut *tx, &ctx, &row).await?;
+    }
     Ok(binding_view(&row))
+}
+
+/// Open the gate that authorises `row` going live (v1-p44-2, SPEC_V2 §4.4).
+///
+/// The binding id travels in `meta.job_binding_id` — the only reader is
+/// [`apply_binding_gate_effect_tx`], in the decision's transaction. `requested_by` is the
+/// authenticated person and never a machine identity: §5.4's requester exclusion is what stops
+/// the one `organisation:write` holder approving their own activation.
+async fn open_binding_activation_gate(
+    conn: &mut PgConnection,
+    ctx: &HandlerCtx,
+    row: &store::organisation::BindingRow,
+) -> Result<(), ActionError> {
+    let mut gate = store::approval::NewApproval::new(BINDING_GATE, BINDING_GATE_KIND);
+    gate.requested_by = (ctx.actor_kind == "user").then_some(ctx.actor_id);
+    gate.meta = serde_json::json!({
+        "job_binding_id": row.id.to_string(),
+        "job_id": row.job_id.to_string(),
+        "release_id": row.release_id.to_string(),
+        "release_hash": row.release_hash,
+        "executor_kind": row.executor_kind,
+        "description": format!(
+            "Activate job binding {} — {} on release {}",
+            row.id, row.executor_kind, row.release_hash
+        ),
+    });
+    store::approval::insert_approval_tx(conn, ctx.tenant, &gate)
+        .await
+        .map(|_| ())
+        .map_err(|error| {
+            tracing::error!(%error, binding = %row.id, "open the job binding activation gate");
+            ActionError::internal()
+        })
+}
+
+/// Apply an approved `job_binding` gate: the binding it names flips `draft → active`.
+///
+/// Runs inside `approvals.decide`'s transaction, so a failed flip rolls the decision back. A
+/// rejection writes nothing here and the binding stays draft — a run pinning it is still refused
+/// `409 job_binding_stale`. Retirement wins: a decision that lands after the binding was retired
+/// does not resurrect it.
+pub(crate) async fn apply_binding_gate_effect_tx(
+    conn: &mut PgConnection,
+    tenant: conveyor_domain::TenantId,
+    record: &store::approval::ApprovalRecord,
+) -> Result<(), ActionError> {
+    if record.approval.kind != BINDING_GATE_KIND {
+        return Ok(());
+    }
+    let Some(binding_id) = record
+        .meta
+        .get("job_binding_id")
+        .and_then(Value::as_str)
+        .and_then(|raw| Uuid::parse_str(raw).ok())
+    else {
+        tracing::error!(
+            approval = %record.approval.id,
+            "an approved job_binding gate names no binding"
+        );
+        return Err(ActionError::new(
+            422,
+            "gate_incomplete",
+            "the job_binding gate names no binding",
+        ));
+    };
+    store::organisation::job_binding_activate_tx(conn, tenant, binding_id)
+        .await
+        .map(|_| ())
+        .map_err(|error| {
+            tracing::error!(
+                %error,
+                approval = %record.approval.id,
+                binding = %binding_id,
+                "activate the job binding an approved gate names"
+            );
+            ActionError::internal()
+        })
+}
+
+/// Open the gate that authorises `row` going live (v1-w1a-4, SPEC_V2 §4.3).
+///
+/// The job id travels in `meta.job_id` — the only reader is
+/// [`apply_job_activation_gate_effect_tx`], in the decision's transaction. `requested_by` is the
+/// authenticated person and never a machine identity: §5.4's requester exclusion is what stops
+/// the one `organisation:write` holder approving their own activation.
+async fn open_job_activation_gate(
+    conn: &mut PgConnection,
+    ctx: &HandlerCtx,
+    row: &store::organisation::JobRow,
+) -> Result<(), ActionError> {
+    let mut gate = store::approval::NewApproval::new(JOB_ACTIVATION_GATE, JOB_ACTIVATION_GATE_KIND);
+    gate.requested_by = (ctx.actor_kind == "user").then_some(ctx.actor_id);
+    gate.meta = serde_json::json!({
+        "job_id": row.id.to_string(),
+        "job_key": row.job_key.clone(),
+        "description": format!("Activate job {} — {}", row.job_key, row.title),
+    });
+    store::approval::insert_approval_tx(conn, ctx.tenant, &gate)
+        .await
+        .map(|_| ())
+        .map_err(|error| {
+            tracing::error!(%error, job = %row.id, "open the job activation gate");
+            ActionError::internal()
+        })
+}
+
+/// Apply an approved `job_activation` gate: the job it names flips `draft → active`.
+///
+/// Runs inside `approvals.decide`'s transaction, so a failed flip rolls the decision back. A
+/// rejection writes nothing here and the job stays draft, where publish and bind refuse it
+/// `409 job_not_live`. A decision that lands after the job left draft activates nothing;
+/// retirement is terminal, so the refusal is swallowed and the decision stands.
+pub(crate) async fn apply_job_activation_gate_effect_tx(
+    conn: &mut PgConnection,
+    tenant: conveyor_domain::TenantId,
+    record: &store::approval::ApprovalRecord,
+) -> Result<(), ActionError> {
+    if record.approval.kind != JOB_ACTIVATION_GATE_KIND {
+        return Ok(());
+    }
+    let Some(job_id) = record
+        .meta
+        .get("job_id")
+        .and_then(Value::as_str)
+        .and_then(|raw| Uuid::parse_str(raw).ok())
+    else {
+        tracing::error!(
+            approval = %record.approval.id,
+            "an approved job_activation gate names no job"
+        );
+        return Err(ActionError::new(
+            422,
+            "gate_incomplete",
+            "the job_activation gate names no job",
+        ));
+    };
+    match store::organisation::job_activate_tx(conn, tenant, job_id).await {
+        Ok(_) => Ok(()),
+        Err(OrganisationStoreError::JobNotDraft { status }) => {
+            tracing::info!(
+                job = %job_id,
+                %status,
+                "activation no longer applies; the job left draft"
+            );
+            Ok(())
+        }
+        Err(error) => {
+            tracing::error!(
+                %error,
+                approval = %record.approval.id,
+                job = %job_id,
+                "activate the job an approved gate names"
+            );
+            Err(ActionError::internal())
+        }
+    }
 }
 
 /// Retire a binding; new runs naming it are refused `409 job_binding_stale`.
@@ -987,6 +1357,259 @@ async fn job_bindings_list(
     Ok(rows.iter().map(binding_view).collect())
 }
 
+// ── job authorities ──────────────────────────────────────────────────────────────────────
+
+/// The five §6.7 meta-role columns, in SPEC order.
+const META_ROLES: [&str; 5] = ["pm", "coach", "kata", "delivery", "ops"];
+
+/// `job_authorities.get`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct JobAuthoritiesGetIn {
+    /// The §6.7 meta-role whose stored overrides are returned.
+    pub meta_role: String,
+}
+
+/// `job_authorities.set`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct JobAuthoritySetIn {
+    /// The §6.7 meta-role column.
+    pub meta_role: String,
+    /// The action's registry name (`coach.remedy`).
+    pub action: String,
+    /// `true` grants the action; `false` revokes it.
+    pub allowed: bool,
+}
+
+/// One stored override.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct JobAuthorityOut {
+    /// The §6.7 meta-role.
+    pub meta_role: String,
+    /// The action's registry name.
+    pub action: String,
+    /// The tenant's decision.
+    pub allowed: bool,
+    /// The principal that wrote the decision, for audit.
+    pub updated_by: Option<String>,
+    /// When the decision was last written.
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}
+
+/// One effective cell of the matrix: what a screen renders as "granted / not granted, and why".
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct JobAuthorityCellOut {
+    /// The §6.7 meta-role.
+    pub meta_role: String,
+    /// The action's registry name.
+    pub action: String,
+    /// Whether the role may call the action.
+    pub allowed: bool,
+    /// `stored` when a tenant row decided the cell; else `compiled_default`.
+    pub source: String,
+}
+
+/// The matrix a screen renders.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct JobAuthoritiesOut {
+    /// The role whose overrides are listed.
+    pub meta_role: String,
+    /// Every override the tenant stored for `meta_role`.
+    pub overrides: Vec<JobAuthorityOut>,
+    /// The five roles' effective cells over the matrix's bounded action list.
+    pub effective: Vec<JobAuthorityCellOut>,
+}
+
+fn job_authority_view(row: &store::job_authority::JobAuthority) -> JobAuthorityOut {
+    JobAuthorityOut {
+        meta_role: row.meta_role.clone(),
+        action: row.action.clone(),
+        allowed: row.allowed,
+        updated_by: row.updated_by.clone(),
+        updated_at: row.updated_at,
+    }
+}
+
+/// Trim and validate a caller-named meta-role against the five §6.7 columns.
+fn known_meta_role(raw: &str) -> Result<&'static str, ActionError> {
+    let role = raw.trim();
+    META_ROLES
+        .iter()
+        .copied()
+        .find(|known| *known == role)
+        .ok_or_else(|| {
+            invalid(
+                "meta_role",
+                "unknown_meta_role",
+                format!("{role:?} is not one of: {}", META_ROLES.join(", ")),
+            )
+        })
+}
+
+/// Trim and validate a caller-named action against the compiled registry.
+fn known_action(raw: &str) -> Result<&'static str, ActionError> {
+    let action = raw.trim();
+    crate::registry()
+        .get(action)
+        .map(|spec| spec.static_name())
+        .ok_or_else(|| {
+            invalid(
+                "action",
+                "unknown_action",
+                format!("{action:?} is not a registered action"),
+            )
+        })
+}
+
+/// The bounded action list the matrix speaks about: the five families a meta-role owns, the
+/// four cross-family verbs §6.7 names, plus every action the tenant stored a decision for.
+///
+/// Derived from the registry, so it can never name an action this build does not serve; a
+/// stored decision for an action outside the families is still shown, because a matrix that
+/// hid a tenant's own grant would lie.
+fn matrix_actions(stored: &[store::job_authority::JobAuthority]) -> Vec<&'static str> {
+    let mut actions: Vec<&'static str> = crate::registry()
+        .names()
+        .into_iter()
+        .filter(|name| {
+            name.starts_with("pm.")
+                || name.starts_with("projects.")
+                || name.starts_with("kata.")
+                || name.starts_with("coach.")
+                || name.starts_with("ops.")
+                || matches!(
+                    *name,
+                    "cards.create" | "cards.move" | "job_bindings.create" | "job_bindings.retire"
+                )
+        })
+        .collect();
+    for row in stored {
+        if let Some(spec) = crate::registry().get(row.action.as_str())
+            && !actions.contains(&spec.static_name())
+        {
+            actions.push(spec.static_name());
+        }
+    }
+    actions.sort_unstable();
+    actions
+}
+
+/// A store refusal from the authority matrix is a database failure; the run-bound refusals
+/// (`Forbidden`, `RunNotFound`) belong to `enforce_run_tx` and cannot arise here.
+fn job_authority_error(
+    error: store::job_authority::JobAuthorityError,
+    action: &str,
+) -> ActionError {
+    match error {
+        store::job_authority::JobAuthorityError::Database(error) => store_error(error, action),
+        other => {
+            tracing::error!(%other, action, "job authority store refusal");
+            ActionError::internal()
+        }
+    }
+}
+
+/// Read the tenant's meta-role × action matrix.
+///
+/// The stored overrides are the queried role's rows; the effective matrix is the five §6.7
+/// roles over [`matrix_actions`], each cell attributed to its stored row, the compiled §6.7
+/// cell, or `ungoverned` (an action the matrix does not name, left to the RBAC scope check).
+/// Read-only: `effect = "read"`, no audit event.
+#[crate::action(
+    name = "job_authorities.get",
+    version = 1,
+    kind = "internal",
+    scopes = ["organisation:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn job_authorities_get(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: JobAuthoritiesGetIn,
+) -> Result<JobAuthoritiesOut, ActionError> {
+    let meta_role = known_meta_role(&input.meta_role)?;
+    let rows = store::job_authority::list(&mut *tx, ctx.tenant)
+        .await
+        .map_err(|error| job_authority_error(error, "job_authorities.get"))?;
+    let actions = matrix_actions(&rows);
+    let stored: std::collections::HashMap<(String, String), bool> = rows
+        .iter()
+        .map(|row| ((row.meta_role.clone(), row.action.clone()), row.allowed))
+        .collect();
+    let overrides: Vec<JobAuthorityOut> = rows
+        .iter()
+        .filter(|row| row.meta_role == meta_role)
+        .map(job_authority_view)
+        .collect();
+    let mut effective = Vec::with_capacity(META_ROLES.len() * actions.len());
+    for role in META_ROLES {
+        for action in &actions {
+            let stored_allowed = stored
+                .get(&(role.to_owned(), (*action).to_owned()))
+                .copied();
+            // A stored row wins. An absent row is the compiled §6.7 cell when the matrix governs
+            // this action; an ungoverned action is allowed and left to the RBAC scope check.
+            let (allowed, source) = match stored_allowed {
+                Some(allowed) => (allowed, "stored"),
+                None => match store::job_authority::compiled_default(role, action) {
+                    Some(allowed) => (allowed, "compiled_default"),
+                    None => (true, "ungoverned"),
+                },
+            };
+            effective.push(JobAuthorityCellOut {
+                meta_role: role.to_owned(),
+                action: (*action).to_owned(),
+                allowed,
+                source: source.to_owned(),
+            });
+        }
+    }
+    Ok(JobAuthoritiesOut {
+        meta_role: meta_role.to_owned(),
+        overrides,
+        effective,
+    })
+}
+
+/// Change one cell of the tenant's meta-role × action matrix.
+///
+/// This is the only write that can widen [`store::job_authority::compiled_default`]; the
+/// module's governance-write convention applies (`effect = "write"`, no approval gate, the
+/// same as `job_bindings.*`). An unknown role or action is a `422`, never a stored typo.
+#[crate::action(
+    name = "job_authorities.set",
+    version = 1,
+    kind = "internal",
+    scopes = ["organisation:write"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn job_authorities_set(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: JobAuthoritySetIn,
+) -> Result<JobAuthorityOut, ActionError> {
+    let meta_role = known_meta_role(&input.meta_role)?;
+    let action = known_action(&input.action)?;
+    let updated_by = ctx.actor_id.to_string();
+    let row = store::job_authority::set(
+        &mut *tx,
+        ctx.tenant,
+        meta_role,
+        action,
+        input.allowed,
+        &updated_by,
+    )
+    .await
+    .map_err(|error| job_authority_error(error, "job_authorities.set"))?;
+    Ok(job_authority_view(&row))
+}
 // ── knowledge layers (SPEC_V2 §4.1) ──────────────────────────────────────────────────────
 
 /// `organisation_layers.set`'s input: one release knowledge layer by level and scope.

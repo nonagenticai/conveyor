@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Project Registers — Kanban coach · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T4-bodies/T4/project-registers.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="project-registers--kanban-coach">Project Registers — Kanban coach</h1>
+<h2 id="risks">Risks</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The pack names the twelve tests and the executable instrument scripts/check-t4-coach-gate.py, but the 2026-11-24 snapshot contains no docs/evidence/rework/T4-coach-gate.json run bound to HEAD, and docs/evidence/rework/T4.json is red on T4-charter, T4-review, T4-artefact-standard and T4-rework. Until a sha-bound run is recorded under the repository&#39;s CI route, the four SPEC_V2 \u00a712 clauses remain named rather than demonstrated and this retrospective cannot claim acceptance.&quot;,
+      &quot;code&quot;: &quot;T4-R1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T22:00:30.76776+00:00&quot;,
+      &quot;id&quot;: &quot;01a219df-db33-702b-a339-41fa3ea6e2c8&quot;,
+      &quot;impact&quot;: 4,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;R9 \u2014 the gate is executable and its evidence is sha-bound (Requirements Catalog \u2014 T4 Kanban coach (Phase A))&quot;,
+          &quot;acceptance/programme/T4.toml&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;high&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7e7e-890e-b437b0c78db9&quot;,
+      &quot;response&quot;: &quot;Run scripts/check-t4-coach-gate.py under the GitHub-hosted preflight at the rework head and publish the resulting docs/evidence/rework/T4-coach-gate.json; keep the project active until the run is green.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-15&quot;,
+      &quot;severity&quot;: &quot;high&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;No sha-bound green run of the coach gate exists, so T4&#39;s acceptance is unproven&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T22:00:30.76776+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;docs/evidence/rework/T4.json fails T4-charter because CONVEYOR_SSH_KEY is not set in the 2026-11-24 run environment; the failure is the transport, not a missing charter asset. While the transport is unset no run can evidence the charter, and the manifest gate aggregates the failure on every pass.&quot;,
+      &quot;code&quot;: &quot;T4-R2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T22:00:30.932548+00:00&quot;,
+      &quot;id&quot;: &quot;01a219df-dbd8-7f34-8f67-4d67f3f4886c&quot;,
+      &quot;impact&quot;: 4,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;T4-charter check \u2014 docs/evidence/rework/T4.json&quot;,
+          &quot;docs/SPEC_V2.md#12&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;high&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7e7e-890e-b437b0c78db9&quot;,
+      &quot;response&quot;: &quot;Provide the transport to the acceptance runner and re-run the record; do not paper over the failure by editing the charter the run cannot read.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-08&quot;,
+      &quot;severity&quot;: &quot;high&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The acceptance run cannot reach the charter transport, so the governance gate fails at its first check&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T22:00:30.932548+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="issues">Issues</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Closed in an unauthorised tranche before the tranche review; accepted by the delegate as a retrospective exception under the standing delegation. The project is reworked in its batch and re-closed through the gates.&quot;,
+      &quot;code&quot;: &quot;U3-EXC-T4&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T01:17:05.226071+00:00&quot;,
+      &quot;id&quot;: &quot;01a1fbad-ac1e-709a-8410-9e8553098661&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7e7e-890e-b437b0c78db9&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;P0&quot;,
+      &quot;status&quot;: &quot;accepted&quot;,
+      &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (T4)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T01:17:05.226071+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The project acceptance record fails T4-charter (CONVEYOR_SSH_KEY unset), T4-review (the live review 01a2028e-a1be-779d-a762-8d118fc2ec0b is non_conformant without a published delegation_ref or waiver), T4-artefact-standard (fifteen mandatory artefact packages open) and T4-rework (the P1 package std-togaf-phase-g-t4-g:T4 unresolved); the manifest gate aggregates all four. The retrospective records this state and leaves the project active rather than waiving it.&quot;,
+      &quot;code&quot;: &quot;T4-I1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T22:00:31.10124+00:00&quot;,
+      &quot;id&quot;: &quot;01a219df-dc8a-76a5-b704-ca9594a47142&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7e7e-890e-b437b0c78db9&quot;,
+      &quot;response&quot;: &quot;Keep the project active, publish this retrospective record unwaived, and re-run the acceptance record once the live governance failures are fixed.&quot;,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;high&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;docs/evidence/rework/T4.json is red: four governance checks fail at 2026-11-24T21:07:28Z&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T22:00:31.10124+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="assumptions">Assumptions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The delivery contract places observe, analyse, hypothesise, propose, measure and adopt after open with T5 (issue #77), and the project brief repeats that boundary. The coach opens exactly one measured kata for a systemic class and never adopts one; adoption is a human decision carrying evals:approve. If that boundary moved, the coach&#39;s systemic-learning obligation would be incomplete, so the pack records the hand-off and claims nothing beyond it.&quot;,
+      &quot;code&quot;: &quot;T4-A1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T22:00:31.263948+00:00&quot;,
+      &quot;id&quot;: &quot;01a219df-dd22-7e2b-ad6f-0f76e18551d0&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7e7e-890e-b437b0c78db9&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The kata lifecycle after open stays with T5 (issue #77), so the pack stops at the kata.open hand-off&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T22:00:31.263948+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="dependencies">Dependencies</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The project row records meta.depends_on [T3, P0]. T3 supplies the failed-run provenance from which the interruption signature is derived; P0 supplies the board card, the process run, the action registry with HTTP/MCP parity and the approval primitive behind coach.escalation, coach.ask and coach.kata. Neither dependency is owned by this project, and a slip in either changes what the coach can record.&quot;,
+      &quot;code&quot;: &quot;T4-D1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T22:00:31.404079+00:00&quot;,
+      &quot;id&quot;: &quot;01a219df-ddaf-70dc-be82-8a9b07598298&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7e7e-890e-b437b0c78db9&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The coach depends on T3&#39;s failed-run provenance and on P0&#39;s board, process, action and approval primitives&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T22:00:31.404079+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;kata.open is the coach&#39;s hand-off; observe, analyse, hypothesise, propose, measure and adopt belong to T5 (issue #77). The coach opens one measured kata per systemic class against a pinned instrument, and the held-out measurement and human adoption that follow are outside this pack, so a systemic class cannot reach adoption on the coach&#39;s record alone.&quot;,
+      &quot;code&quot;: &quot;T4-D2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T22:00:31.551016+00:00&quot;,
+      &quot;id&quot;: &quot;01a219df-de42-71c9-924f-ffe835793d31&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7e7e-890e-b437b0c78db9&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Systemic-class learning depends on T5 (issue #77) for the kata lifecycle after open&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T22:00:31.551016+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="benefits">Benefits</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The one-card rule turns an opaque interruption into exactly one coach card carrying one triage from the closed five-term set and at most one remedy from the closed six-term set; a repeat signature inside the coach.window escalates through coach.escalation and an escalated signature is not retried. Board users stop seeing duplicate cards for the same fault, and the remedy that is applied is one the code owns rather than one a model chose.&quot;,
+      &quot;code&quot;: &quot;T4-B1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T22:00:31.693366+00:00&quot;,
+      &quot;id&quot;: &quot;01a219df-ded0-79ba-8b56-47d09fda12e8&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7e7e-890e-b437b0c78db9&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;One coach card, one triage and at most one remedy per interruption, with a repeat signature escalating instead of flooding the board&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T22:00:31.693366+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;A systemic class (conveyor_defect by default) opens one kata through kata.open with a pinned instrument, prediction, split and split hash; without a pin the interruption escalates rather than opening an unmeasurable kata, and a transient class opens none. Recurring defects enter the kata family&#39;s held-out measurement instead of returning as fresh interruptions, and no coach card is ever raised about a coach card.&quot;,
+      &quot;code&quot;: &quot;T4-B2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T22:00:31.834683+00:00&quot;,
+      &quot;id&quot;: &quot;01a219df-df5e-72fa-87da-54776c9c7360&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7e7e-890e-b437b0c78db9&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Systemic classes become one measured kata rather than a recurring fault&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T22:00:31.834683+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="changes">Changes</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: &quot;01a2028d-e17b-793d-9ea2-fe4f7f8e2b72&quot;,
+      &quot;body&quot;: &quot;The 2026-11-22 Phase-G review recorded T4 non_conformant and named v1-p6-2, v1-p6-4, v1-p6-5 and v1-p6-6. All four are resolved with named commits and tests; delivery contract v2 records the remediated scope and this change authorises the record.&quot;,
+      &quot;code&quot;: &quot;CH-T4-4fc0c2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T07:45:37.780744+00:00&quot;,
+      &quot;id&quot;: &quot;01a216d1-2ffc-74e6-ac7e-132b1b4fc0c2&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;change&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {
+        &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+        &quot;impact&quot;: {
+          &quot;baseline&quot;: &quot;unchanged&quot;,
+          &quot;scope&quot;: &quot;no scope change; the coach loop&#39;s four findings are remediated and re-reviewed&quot;
+        }
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7e7e-890e-b437b0c78db9&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;approved&quot;,
+      &quot;title&quot;: &quot;Remediate T4&#39;s four Phase-G findings&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T22:00:40.96741+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-4/T4-bodies/T4/project-registers.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

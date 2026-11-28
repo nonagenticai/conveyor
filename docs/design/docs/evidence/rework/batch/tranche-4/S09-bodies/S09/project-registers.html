@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Project Registers — Documents, repositories, secrets, workers UI, reports/metrics, billing display · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S09-bodies/S09/project-registers.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="project-registers--documents-repositories-secrets-workers-ui-reportsmetrics-billing-display">Project Registers — Documents, repositories, secrets, workers UI, reports/metrics, billing display</h1>
+<h2 id="risks">Risks</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The Phase-G review findings, the delivery contract compliance statement, the closure review&#39;s Outcome vs acceptance and the evidence Gap all record that at the 2026-11-24 snapshot no run of the plan section 7 properties exists: round-trip, cap, secret, workers, reports, externals and billing are each named with a test target, but no receipt is recorded. The project row is closed with meta.measured_status built, but built is a record claim, not a gate pass.&quot;,
+      &quot;code&quot;: &quot;S09-R1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:54:11.284016+00:00&quot;,
+      &quot;id&quot;: &quot;01a219da-10d6-7be2-b485-ce64cd134677&quot;,
+      &quot;impact&quot;: 4,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;R1 Property (a) round-trip&quot;,
+          &quot;R2 Property (b) cap&quot;,
+          &quot;R3 Property (c) secret&quot;,
+          &quot;R4 Property (d) workers&quot;,
+          &quot;R5 Property (e) reports&quot;,
+          &quot;R6 Property (f) externals&quot;,
+          &quot;R7 Property (g) billing&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;high&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-71f1-a403-c9abe52c1888&quot;,
+      &quot;response&quot;: &quot;Run acceptance/programme/S09.toml and the named targets documents_roundtrip, documents_limits, secrets_never_revealed, externals_declared and reports_match_sql plus the workers and billing checks on a live stack, keep one receipt per property, and re-read the closure review on that evidence rather than inferring a pass from the built status.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-15&quot;,
+      &quot;severity&quot;: &quot;high&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The seven gate properties a to g have no recorded run, so the built claim is unproven&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:54:11.284016+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The Solution Concept Diagram and the Business Capability Map record the deployed MinIO credentials and bucket policy as unproven, with scripts/prove-s3.sh proving only the S3 wire; strata_ingest is not reachable from a local gate, and documents.ingest is the one declared action of 27 that is not registered. The round-trip property may pass against an ephemeral bucket while the store the product will use stays unestablished.&quot;,
+      &quot;code&quot;: &quot;S09-R2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:54:11.427063+00:00&quot;,
+      &quot;id&quot;: &quot;01a219da-1166-714a-95e2-f34853019804&quot;,
+      &quot;impact&quot;: 4,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;R1 Property (a) round-trip&quot;,
+          &quot;R9 27 declared actions, 26 registered&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;operators&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;medium&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-71f1-a403-c9abe52c1888&quot;,
+      &quot;response&quot;: &quot;Have operators confirm the MinIO endpoint, credentials and bucket policy, run the byte route against the deployed bucket, and register documents.ingest once a live strata_ingest target and a sealed per-tenant token exist.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-15&quot;,
+      &quot;severity&quot;: &quot;high&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The deployed MinIO leg and the live strata_ingest path behind documents.ingest are unproven&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:54:11.427063+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The Solution Concept Diagram&#39;s Links section and the Phase-G review findings both record that the strata_rag base-URL contract and the /query versus /api/query discrepancy remain a stated risk rather than a verified contract. Until the path is measured against a live target, any external action that reaches strata_rag rests on an unconfirmed interface.&quot;,
+      &quot;code&quot;: &quot;S09-R3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:54:11.571091+00:00&quot;,
+      &quot;id&quot;: &quot;01a219da-11f6-7260-9afc-f1db04bc5116&quot;,
+      &quot;impact&quot;: 2,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;R6 Property (f) externals&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;medium&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-71f1-a403-c9abe52c1888&quot;,
+      &quot;response&quot;: &quot;Measure the live strata_rag path against its published contract, record which base URL and route the registered external uses, and close the discrepancy in the plan of record.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-15&quot;,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The strata_rag path contract is unresolved: /query versus /api/query&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:54:11.571091+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="issues">Issues</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 4,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Closed in an unauthorised tranche before the tranche review; accepted by the delegate as a retrospective exception under the standing delegation. The project is reworked in its batch and re-closed through the gates.&quot;,
+      &quot;code&quot;: &quot;U3-EXC-S09&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T01:16:41.056796+00:00&quot;,
+      &quot;id&quot;: &quot;01a1fbad-4daf-72dd-a94c-32adec780aee&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-71f1-a403-c9abe52c1888&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;P0&quot;,
+      &quot;status&quot;: &quot;accepted&quot;,
+      &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (S09)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T01:16:41.056796+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The Requirements Catalog&#39;s R9 row, the Business Capability Map&#39;s strata ingest handoff and the evidence Gap record that 26 of the front matter&#39;s 27 actions are registered and documents.ingest is the single gap, because it needs a live strata_ingest target and a sealed per-tenant token. The action is recorded as a follow-up with a live target rather than as proven code.&quot;,
+      &quot;code&quot;: &quot;S09-I1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:54:11.71108+00:00&quot;,
+      &quot;id&quot;: &quot;01a219da-1281-7e9c-8740-ce93ff1dee40&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-71f1-a403-c9abe52c1888&quot;,
+      &quot;response&quot;: &quot;Register documents.ingest as kind internal once a reachable strata_ingest target and a sealed strata_ingest.token exist, then exercise the POST /api/ingest/jobs path and store jobs[0].job_id in document.external_ref.&quot;,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;documents.ingest is the one declared action of 27 not registered&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:54:11.71108+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The project brief&#39;s Plan section, the Phase-G review findings and the evidence Gap all record that docs/plans/slices/S09-documents-integrations.md still carries status planned while the project row has meta.measured_status built and meta.plan_status planned. The two records are not reconciled, so a reader can take an unaccepted plan for an accepted one.&quot;,
+      &quot;code&quot;: &quot;S09-I2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:54:11.852914+00:00&quot;,
+      &quot;id&quot;: &quot;01a219da-130f-7b04-a105-e682983da0e1&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-71f1-a403-c9abe52c1888&quot;,
+      &quot;response&quot;: &quot;Reconcile the plan frontmatter with the project meta at the tranche-4 review and record the decision in the plan of record.&quot;,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The plan frontmatter reads planned while the project meta says measured_status built&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:54:11.852914+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The closure review&#39;s Open items and the evidence Gap record that issues 156, 168, 183, 195, 231, 245, 571, 577 and 579 are recorded closed in the snapshot, and that their acceptance is not re-verified by this retrospective. The re-close therefore rests on the closed record, not on a fresh acceptance check of each issue.&quot;,
+      &quot;code&quot;: &quot;S09-I3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:54:11.992971+00:00&quot;,
+      &quot;id&quot;: &quot;01a219da-139b-7e21-9d19-68b4daeb0020&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-71f1-a403-c9abe52c1888&quot;,
+      &quot;response&quot;: &quot;Re-verify each linked issue&#39;s acceptance at the tranche-4 review or carry the closed record as the accepted basis for the retrospective close; do not infer a fresh pass.&quot;,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The nine linked issues are recorded closed but their acceptance is not re-verified&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:54:11.992971+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="assumptions">Assumptions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The delivery contract judges acceptance against the record at the 2026-11-24 rework snapshot, project 01a1d039-0d2d-71f1-a403-c9abe52c1888 status closed at version 10, and the content checker refuses any id that appears nowhere in that snapshot. Every judgement in this pack is read from that snapshot; if it is incomplete or stale for S09, the pack&#39;s facts and the re-close move with it.&quot;,
+      &quot;code&quot;: &quot;S09-A1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:54:12.138927+00:00&quot;,
+      &quot;id&quot;: &quot;01a219da-142d-7b80-a053-cf239641ba4c&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-71f1-a403-c9abe52c1888&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;held&quot;,
+      &quot;title&quot;: &quot;The 2026-11-24 rework snapshot is the authoritative record for S09&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:54:12.138927+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The project brief&#39;s Dependencies section makes S09 blocked-by S03 for tenant, trace_link, revision and the tenancy convention of the four new tables, and the Data Entity/Data Component Catalog&#39;s ArtifactRef row treats the trace_link projection as S03-supplied. The four tables&#39; FORCE RLS and the ArtifactRef value rest on that contract holding without change.&quot;,
+      &quot;code&quot;: &quot;S09-A2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:54:12.283485+00:00&quot;,
+      &quot;id&quot;: &quot;01a219da-14be-771c-84b6-e55430fd6a9c&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-71f1-a403-c9abe52c1888&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;held&quot;,
+      &quot;title&quot;: &quot;S03 supplies tenant, trace_link and revision exactly as the project brief records&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:54:12.283485+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="dependencies">Dependencies</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The project brief makes S09 blocked-by S03 (tenant, trace_link, revision and the tenancy convention for the four new tables), S04 (the ActionSpec derive, action_registry, POST /api/actions/{name}/invocations and the OpenAPI and MCP projection) and S02 (event, job, audit_event and the outbox that carries the nine S09 event types). S09 adds no second write path, so its build and its gate stand on those three slices.&quot;,
+      &quot;code&quot;: &quot;S09-D1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:54:12.438145+00:00&quot;,
+      &quot;id&quot;: &quot;01a219da-1569-7e7d-be4d-e6c4fc5ab6f4&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-71f1-a403-c9abe52c1888&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;satisfied&quot;,
+      &quot;title&quot;: &quot;S09 is blocked by S03, S04 and S02&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:54:12.438145+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The Statement of Architecture Work assigns the KEK source and the MinIO bucket policy to operators, the Business Capability Map records the deployed MinIO credentials and bucket policy as unproven, and the closure review&#39;s Open items name operators as the owner of the deployed MinIO endpoint, credentials and bucket policy. The byte route cannot be proven end to end until that leg is confirmed.&quot;,
+      &quot;code&quot;: &quot;S09-D2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:54:12.610171+00:00&quot;,
+      &quot;id&quot;: &quot;01a219da-1605-7778-b1b7-5484ffb5035e&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-71f1-a403-c9abe52c1888&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The deployed leg depends on the operators&#39; MinIO endpoint, credentials and bucket policy&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:54:12.610171+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The Business Capability Map, the Requirements Catalog&#39;s R9 row and the closure review&#39;s Open items record that documents.ingest needs a reachable strata_ingest target and a sealed strata_ingest.token before it can be registered and exercised; without them a tenant is refused 422 ingest_not_configured before a byte is read.&quot;,
+      &quot;code&quot;: &quot;S09-D3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:54:12.754928+00:00&quot;,
+      &quot;id&quot;: &quot;01a219da-1695-7c73-94b5-e018635e1628&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-71f1-a403-c9abe52c1888&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;documents.ingest depends on a live strata_ingest target and a sealed per-tenant token&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:54:12.754928+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="benefits">Benefits</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The Driver/Goal/Objective Catalog&#39;s D1/G1 records the benefit: bytes move out of Postgres TOAST into bucket conveyor-documents at key t/&lt;tenant&gt;/&lt;document&gt;/&lt;version&gt;, every byte streams through /api/documents/{id}/content authenticated against tenant_id and membership, and no presigned URL exists. Rows and dumps stop carrying document content, and there is one authorizer, not two.&quot;,
+      &quot;code&quot;: &quot;S09-B1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:54:12.942035+00:00&quot;,
+      &quot;id&quot;: &quot;01a219da-1751-7226-87f1-836b5415ad58&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-71f1-a403-c9abe52c1888&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Document bytes leave Postgres: content lives in MinIO behind one authorized stream&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:54:12.942035+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The Driver/Goal/Objective Catalog&#39;s D2/G2 and the Requirements Catalog&#39;s R3 record the benefit: create and rotate take value marked x-secret, get and list return id, name, scope, key_id, version and created_at only, and the served OpenAPI and MCP projection publish no default or example for the marked field. The whole-leak failure of a one-time reveal is removed by design.&quot;,
+      &quot;code&quot;: &quot;S09-B2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:54:13.09076+00:00&quot;,
+      &quot;id&quot;: &quot;01a219da-17e5-7c58-9e51-70dd68e52bd0&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-71f1-a403-c9abe52c1888&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Secrets are write-only: no response returns a plaintext, value key or ciphertext&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:54:13.09076+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The Driver/Goal/Objective Catalog&#39;s D3/G3 and the Technology Standards Catalog&#39;s external-calls standard record the benefit: every adjacent service is a declared action with a 5 s read or 30 s write timeout and a process-local breaker opening after five failures in 30 s, and reqwest:: appears only inside the executor. The conveyor does not absorb a worker manager, billing engine or KAG.&quot;,
+      &quot;code&quot;: &quot;S09-B3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:54:13.238793+00:00&quot;,
+      &quot;id&quot;: &quot;01a219da-1879-7e81-b32a-506e11d0aa45&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-71f1-a403-c9abe52c1888&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Adjacent services stay external: a call absent from action_registry does not exist&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:54:13.238793+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="changes">Changes</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: &quot;01a219da-1919-75c5-97c0-6c9e766306df&quot;,
+      &quot;body&quot;: &quot;The retrospective MSP/TOGAF/SAFe rework changed this project&#39;s record: its artefacts were re-versioned with documents and links, its register was written, and its schedule and cost baselines were taken. This change records that rework against the frozen scope baseline.&quot;,
+      &quot;code&quot;: &quot;CH-S09-4220a4&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:54:23.46468+00:00&quot;,
+      &quot;id&quot;: &quot;01a219da-406f-7ecb-a58f-d50f964220a4&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;change&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {
+        &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+        &quot;impact&quot;: {
+          &quot;scope&quot;: &quot;the retrospective rework&#39;s record acts&quot;
+        }
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-71f1-a403-c9abe52c1888&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;approved&quot;,
+      &quot;title&quot;: &quot;The retrospective rework of S09&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T22:03:08.648927+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-4/S09-bodies/S09/project-registers.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

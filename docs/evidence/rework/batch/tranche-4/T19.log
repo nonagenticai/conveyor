@@ -1,0 +1,213 @@
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project T19 --content docs/evidence/rework/tranche-4/rework-content-T19.json --tranche-label tranche 4 --demo-cadence 01a202a1-f4ee-7acc-8e57-50ac6f0417fd
+
+  01 projects.reopen ok
+  charter: already approved
+  closure outputs: already ['closure-review']
+  SoAW: already live
+  artefact: T19 — Stakeholder map already present
+  artefact: T19 — Drivers, goals and objectives already present
+  artefact: T19 — Requirements catalog already present
+  artefact: T19 — Solution concept already present
+  artefact: T19 — Business capability map already present
+  artefact: T19 — Data entity catalog already present
+  artefact: T19 — Technology standards already present
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  08 architecture.artifacts_link ok
+  09 architecture.artifacts_link ok
+  10 architecture.artifacts_link ok
+  document architecture-artifact: already present and published
+  delivery contract: already live
+  register risk: The eight meetings suites and meetings.spec.ts have no rework-time run, so the closed record is unproven already present
+  register risk: A meeting_position row could be read as a decision, creating the second decision store R-12 forbids already present
+  register issue: No receipt exists for acceptance/programme/T19.toml, the eight meetings suites or meetings.spec.ts at the rework head already present
+  register issue: The tranche-4 authorisation postdates the contract reviews, so the governance acts precede the tranche that authorised them already present
+  register issue: The live owner-seat gate has no record at the rework head already present
+  register assumption: The 2026-11-24 rework snapshot is the authoritative record for T19 already present
+  register assumption: The consistent verdict stands without a waiver because the record shows no refused gate already present
+  register dependency: T1, T2 and T3 supply the approval, card, governed-asset and dependency primitives the meetings reference already present
+  register dependency: P0 supplies the acceptance instrument and the ledger discipline the re-close stands on already present
+  register benefit: Every decision is one approval_decision row per qualifying seat with via='meeting', so no decision escapes the governed store already present
+  register benefit: A meeting is a card under the existing DoD and WIP limits, so forums inherit the board's governance for free already present
+  register benefit: Minutes, commitments and metering are recorded on the typed rows, so the deliberation outlives the room already present
+  benefit transitions: none in the content
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
+  closure-review output: already published
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  11 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 1 change row(s) present
+  record fixes: none in the content
+  card discharge: no open rework card owned by the project
+  12 projects.close_request ok
+  13 approvals.decide ok
+  14 approvals.request ok
+  15 approvals.decide ok
+  16 projects.close ok
+  closed T19: 01a20c80-b9b8-7214-abc6-f2c4f75a1fc1
+T19: 16 acts recorded
+
+
+[exit 0]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T19 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T19-snap-c_1hptuk/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T19-snap-c_1hptuk/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/T19-bodies --local-bin /tmp/conv526-t14-bin-20261126
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [],
+  "skipped": [
+    {
+      "project_key": "T19",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T19",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T19",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T19",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "category": "closure-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T19",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T19",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T19",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "category": "inception-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T19",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T19",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T19",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "category": "project-registers",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T19",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T19",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "T19",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T19",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T19",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "NO_EVIDENCE",
+        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
+      }
+    }
+  ],
+  "counts": {
+    "due": 3,
+    "present": 7,
+    "missing-edge": 0,
+    "stale": 5,
+    "ambiguous": 0
+  }
+}
+
+
+[exit 1]
+

@@ -1,0 +1,493 @@
+# Project Registers — Requirements, catalogues, revisions, quality scoring, search
+
+## Risks
+
+The record the section derives from, or an explicit absence.
+
+```json
+{
+  "category": "project-registers",
+  "count": 3,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The charter, the Phase-G review, the closure and its review all record that plan \u00a77's seven properties (a)\u2013(g), the six named test targets and the EXPLAIN index check have no run at the snapshot; the close stands on the record-level checks of acceptance/programme/S07.toml alone. The slice could therefore close with a gate that has never refused anything outside this pack's checker.",
+      "code": "S07-R1",
+      "created_at": "2026-11-26T21:53:20.551275+00:00",
+      "id": "01a219d9-4aaa-7180-8433-4eafaf4a3f49",
+      "impact": 4,
+      "kind": "risk",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          "R-14 Gate The plan \u00a77 gate names its targets and its index"
+        ]
+      },
+      "meta": {
+        "owner": "the programme architect (conveyor-e2e)"
+      },
+      "owner_job_id": null,
+      "probability": "high",
+      "programme_id": null,
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "response": "run search_index, s07_assets, s07_requests, s07_store, s07_seed and s07_governance plus the EXPLAIN block in the lane and attach the output to the project's evidence page",
+      "review_at": "2026-12-15",
+      "severity": "high",
+      "status": "open",
+      "title": "The plan \u00a77 functional gate has no recorded run",
+      "updated_at": "2026-11-26T21:53:20.551275+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "No A/B/C/D numbers and no completion record exist for the 40-query eval. The Phase-G review records the level consistent rather than compliant because recall@5 \u2265 0.75, MRR \u2265 0.60 and B \u2265 C are unmeasured, and the pgvector contingency (loss above 0.05 or C unreachable) cannot be decided without them.",
+      "code": "S07-R2",
+      "created_at": "2026-11-26T21:53:20.695018+00:00",
+      "id": "01a219d9-4b3a-73e3-9f52-6ce5536c9de7",
+      "impact": 3,
+      "kind": "risk",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          "R-10 Eval A human-labelled 40-query eval set with explicit targets"
+        ]
+      },
+      "meta": {
+        "owner": "the programme architect (conveyor-e2e)"
+      },
+      "owner_job_id": null,
+      "probability": "high",
+      "programme_id": null,
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "response": "run search_eval with BASELINE=ab, BASELINE=c and GRID=1, record the \u00a75.6 decision on pgvector, and publish the numbers",
+      "review_at": "2026-12-15",
+      "severity": "medium",
+      "status": "open",
+      "title": "The \u00a75.6 relevance targets have no measured eval numbers",
+      "updated_at": "2026-11-26T21:53:20.695018+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "The Technology Standards Catalog records that ts_match_vq and word_similarity_op must be LEAKPROOF or both GIN indexes are dead under FORCE ROW LEVEL SECURITY, and that the 2026-11-08 measurement showed a degraded plan satisfying a loose grep before the check was tightened. No run at the snapshot proves the operators are provisioned.",
+      "code": "S07-R3",
+      "created_at": "2026-11-26T21:53:20.838835+00:00",
+      "id": "01a219d9-4bc9-7feb-a6f2-082b7e349ca2",
+      "impact": 4,
+      "kind": "risk",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          "R-01 Schema Five \u00a75.1 tables with full tenancy and the trigram indexes",
+          "R-09 Search Three ranked arms with SQL-side predicates"
+        ]
+      },
+      "meta": {
+        "owner": "the programme architect (conveyor-e2e)"
+      },
+      "owner_job_id": null,
+      "probability": "medium",
+      "programme_id": null,
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "response": "re-run the EXPLAIN block under enable_seqscan=off as conveyor_runtime and assert the named GIN index in search_index",
+      "review_at": "2026-12-15",
+      "severity": "high",
+      "status": "open",
+      "title": "Both GIN indexes are dead if the trigram operators are not LEAKPROOF",
+      "updated_at": "2026-11-26T21:53:20.838835+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+```
+
+## Issues
+
+The record the section derives from, or an explicit absence.
+
+```json
+{
+  "category": "project-registers",
+  "count": 3,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "Closed in an unauthorised tranche before the tranche review; accepted by the delegate as a retrospective exception under the standing delegation. The project is reworked in its batch and re-closed through the gates.",
+      "code": "U3-EXC-S07",
+      "created_at": "2026-11-21T01:16:32.794909+00:00",
+      "id": "01a1fbad-2d6e-7c68-9968-af101d0acb0c",
+      "impact": null,
+      "kind": "issue",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "response": null,
+      "review_at": null,
+      "severity": "P0",
+      "status": "accepted",
+      "title": "Out-of-sequence closure accepted as a retrospective exception (S07)",
+      "updated_at": "2026-11-21T01:16:32.794909+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "The Phase-G review records that the snapshot carries no charter, Statement of Architecture Work, delivery contract, artefact set, Phase-G review, closure review, baseline row or linked issue, and meta.issues is empty. This retrospective supplies the record set but creates no GitHub issue link or baseline row for S07.",
+      "code": "S07-I1",
+      "created_at": "2026-11-26T21:53:20.981562+00:00",
+      "id": "01a219d9-4c58-755f-98a5-dd6fad64f344",
+      "impact": null,
+      "kind": "issue",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "response": null,
+      "review_at": null,
+      "severity": "medium",
+      "status": "open",
+      "title": "The snapshot carries no linked issue and no baseline row",
+      "updated_at": "2026-11-26T21:53:20.981562+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "The Data Entity/Data Component Catalog records that outline and outline_node were built by migration 0007 and dropped by 0011 after S00 measured zero usage, while the plan's \u00a710.3 open question still assumes they exist; the plan text and the schema record disagree.",
+      "code": "S07-I2",
+      "created_at": "2026-11-26T21:53:21.123659+00:00",
+      "id": "01a219d9-4ce6-7807-b901-ad527ab2c609",
+      "impact": null,
+      "kind": "issue",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "response": null,
+      "review_at": null,
+      "severity": "low",
+      "status": "open",
+      "title": "The plan \u00a710.3 open question still assumes outline and outline_node exist",
+      "updated_at": "2026-11-26T21:53:21.123659+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+```
+
+## Assumptions
+
+The record the section derives from, or an explicit absence.
+
+```json
+{
+  "category": "project-registers",
+  "count": 2,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The delivery contract judges acceptance against the record at the 2026-11-24 rework snapshot, where project 01a1d039-0d2c-7322-b2f9-4dd041153894 is closed at version 7 and last updated 2026-11-21T01:06:16Z; the checker refuses any id that appears nowhere in that snapshot, so the pack assumes the snapshot is complete and current for S07.",
+      "code": "S07-A1",
+      "created_at": "2026-11-26T21:53:21.265631+00:00",
+      "id": "01a219d9-4d74-78e7-a237-ef8f79d94942",
+      "impact": null,
+      "kind": "assumption",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "held",
+      "title": "The 2026-11-24 snapshot is the authoritative record for S07",
+      "updated_at": "2026-11-26T21:53:21.265631+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "S07 reuses S03's governed_asset, revision, catalogue_entry and trace_link with their fixed kind vocabulary and tenancy conventions, and ships all 32 actions through S04's registry, ActionSpec derive and OpenAPI and MCP projection; the pack assumes those surfaces stay as the record declares them.",
+      "code": "S07-A2",
+      "created_at": "2026-11-26T21:53:21.413976+00:00",
+      "id": "01a219d9-4e09-747a-a808-68ae58bca75f",
+      "impact": null,
+      "kind": "assumption",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "held",
+      "title": "S03 and S04 keep the surfaces S07 reuses",
+      "updated_at": "2026-11-26T21:53:21.413976+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+```
+
+## Dependencies
+
+The record the section derives from, or an explicit absence.
+
+```json
+{
+  "category": "project-registers",
+  "count": 3,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The Requirements Catalog and the Data Entity/Data Component Catalog reuse S03's four tables, columns, constraints and tenancy verbatim rather than redefining them, and the Solution Concept Diagram treats S03's schema as the transaction boundary; a change to those surfaces invalidates the slice's schema requirements.",
+      "code": "S07-D1",
+      "created_at": "2026-11-26T21:53:21.598328+00:00",
+      "id": "01a219d9-4ec1-72e1-a6de-b6538a702c09",
+      "impact": null,
+      "kind": "dependency",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "satisfied",
+      "title": "S03 keeps governed_asset, revision, catalogue_entry and trace_link",
+      "updated_at": "2026-11-26T21:53:21.598328+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "The 32 actions (requirements.*, principles.*, decisions.*, catalogues.list|import, quality.score, search.query, trace_links.* and project_requests.*) are declared through the S04 ActionSpec derive and served as unversioned /api/<resource> routes; the action surface depends on the registry remaining the single write path.",
+      "code": "S07-D2",
+      "created_at": "2026-11-26T21:53:21.744111+00:00",
+      "id": "01a219d9-4f53-7191-b52f-8becbdc4977b",
+      "impact": null,
+      "kind": "dependency",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "satisfied",
+      "title": "S04 projects every S07 action through the registry",
+      "updated_at": "2026-11-26T21:53:21.744111+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "The Technology Standards Catalog fixes pg_trgm, the generated tsv with a literal english config and the LEAKPROOF provisioning in scripts/db-roles.sql; without the operators both GIN indexes are dead under FORCE RLS, so the search requirements depend on that provisioning.",
+      "code": "S07-D3",
+      "created_at": "2026-11-26T21:53:21.891281+00:00",
+      "id": "01a219d9-4fe6-7681-a1e9-5d7a9bbfc6fb",
+      "impact": null,
+      "kind": "dependency",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "PostgreSQL 18 carries pg_trgm and the LEAKPROOF operators",
+      "updated_at": "2026-11-26T21:53:21.891281+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+```
+
+## Benefits
+
+The record the section derives from, or an explicit absence.
+
+```json
+{
+  "category": "project-registers",
+  "count": 3,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "D1 and G1 in the Driver/Goal/Objective Catalog put requirements, principles and decisions on one handler bound to a fixed kind at declaration; the Business Capability Map records the lifecycle capability as claimed built in the record, with the functional gate run not evidenced.",
+      "code": "S07-B1",
+      "created_at": "2026-11-26T21:53:22.042552+00:00",
+      "id": "01a219d9-507d-75f8-9bf9-73f4dda099e7",
+      "impact": null,
+      "kind": "benefit",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "claimed",
+      "title": "One governed_asset lifecycle replaces RM's 57 domain tables",
+      "updated_at": "2026-11-26T21:53:22.042552+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "D2/G2 and R-05/R-06 give each mutation one revision with seq = version and a SHA-256 hash of JCS-canonical JSON, and requirements.compare diffs two revisions in Rust with acceptance matched by criterion id; the capability map records it as claimed built in the record, with the functional gate run not evidenced.",
+      "code": "S07-B2",
+      "created_at": "2026-11-26T21:53:22.189182+00:00",
+      "id": "01a219d9-5110-7b35-aac4-b56d80ef5d59",
+      "impact": null,
+      "kind": "benefit",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "claimed",
+      "title": "Every mutation leaves an immutable revision with a Rust field-level compare",
+      "updated_at": "2026-11-26T21:53:22.189182+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "D4/G4 and R-10 target a 40-query eval over three ranked arms with recall@5 \u2265 0.75, MRR \u2265 0.60 and B \u2265 C, with pgvector only when the loss exceeds 0.05; no eval numbers are recorded at the snapshot, so the measurement benefit remains planned.",
+      "code": "S07-B3",
+      "created_at": "2026-11-26T21:53:22.335568+00:00",
+      "id": "01a219d9-51a2-7a77-ba70-e09fb54bde15",
+      "impact": null,
+      "kind": "benefit",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "planned",
+      "title": "A measured relevance baseline over 40 human-labelled queries",
+      "updated_at": "2026-11-26T21:53:22.335568+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+```
+
+## Changes
+
+The record the section derives from, or an explicit absence.
+
+```json
+{
+  "category": "project-registers",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": "01a219d9-5241-7d98-8c54-550959dc4138",
+      "body": "The retrospective MSP/TOGAF/SAFe rework changed this project's record: its artefacts were re-versioned with documents and links, its register was written, and its schedule and cost baselines were taken. This change records that rework against the frozen scope baseline.",
+      "code": "CH-S07-a564ff",
+      "created_at": "2026-11-26T21:53:31.547823+00:00",
+      "id": "01a219d9-75a2-794b-b341-d5229aa564ff",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "the retrospective rework's record acts"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "The retrospective rework of S07",
+      "updated_at": "2026-11-26T22:02:33.217025+00:00",
+      "version": 2
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+```

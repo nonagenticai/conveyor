@@ -59,8 +59,15 @@ crates/actions/src/control/{cards,runs,approvals,andong,messages,channels}.rs
 crates/actions/src/channel/{mod,telegram,web,reply}.rs
 crates/api/src/{runs,approvals,events,telegram}.rs   apps/server/src/worker.rs
 crates/store/src/jobs/{runner,schedule,kind}.rs
-crates/api/tests/{golden_path,claim_race,run_retry,approval_dual,approval_expire,andon,delivery_retry,telegram_reply,notifications,sse_control}.rs
+crates/api/tests/{golden_path,claim_race,approval_dual,notifications,sse_control}.rs
+crates/api/tests/channel_inbound.rs                 # the Telegram reply path; the old `telegram_reply` target never existed
+apps/server/tests/{run_retry,approval_expire,andon,delivery_retry}.rs
 ```
+
+⚠️ **Corrected 2026-11-21 (v1-s06-1).** Four of the five worker-level proofs (`run_retry`,
+`approval_expire`, `andon`, `delivery_retry`) live in the server package, not `conveyor-api`; the
+fifth, the Telegram reply→`approvals.decide` path, is `channel_inbound.rs` in `conveyor-api`.
+A missing target hard-errors the whole gate, so §7 and the build order name the real files.
 
 ### 5.1 Tables — §2.6 verbatim, six only
 
@@ -156,13 +163,13 @@ At most one pending per `(run, gate)`: the partial unique index, not a handler. 
 6. Schedule materialiser — one advisory lock. `cargo test -p conveyor-store jobs::schedule`
 7. `worker` subcommand draining any kind. `cargo run -p conveyor-server -- worker & sleep 2; kill %1`
 8. `card.claim` waiter + `card.lease_sweep` + the lease events. `cargo test -p conveyor-api --test claim_race`
-9. Runs: 5 actions, `run.execute`, `run.reap`; one-live-run invariant. `cargo test -p conveyor-api --test run_retry`
+9. Runs: 5 actions, `run.execute`, `run.reap`; one-live-run invariant. `cargo test -p conveyor-server --test run_retry`
 10. Approvals: 2 actions, dual control, `approval.expire`. `cargo test -p conveyor-api --test approval_dual`
 11. Human vs agent: one approval decided twice, `decided_by_kind` `human` then `agent`. `cargo test -p conveyor-api --test approval_dual -- decided_by_kind`
-12. Approval events + `approval.closed.emit` (payload only). `cargo test -p conveyor-api --test approval_expire`
-13. Andon: 2 actions, poller pause, gauge + timeout. `cargo test -p conveyor-api --test andon`
-14. `messages.send`, fan-out, `delivery.send` + backoff. `cargo test -p conveyor-api --test delivery_retry`
-15. `channel`: preferences, web delivery, Telegram webhook + reply→action. `cargo test -p conveyor-api --test telegram_reply`
+12. Approval events + `approval.closed.emit` (payload only). `cargo test -p conveyor-server --test approval_expire`
+13. Andon: 2 actions, poller pause, gauge + timeout. `cargo test -p conveyor-server --test andon`
+14. `messages.send`, fan-out, `delivery.send` + backoff. `cargo test -p conveyor-server --test delivery_retry`
+15. `channel`: preferences, web delivery, Telegram webhook + reply→action. `cargo test -p conveyor-api --test channel_inbound`
 16. `notifications.list|update`. `cargo test -p conveyor-api --test notifications`
 17. SSE: 3 topics, replay bound, keepalive. `cargo test -p conveyor-api --test sse_control`
 18. `channels.bind`/`channels.unbind` (platform-admin, audited). `cargo run -p conveyor-server -- --print-openapi | jq -e '.paths["/api/actions/channels.bind/invocations"]'`
@@ -173,9 +180,13 @@ At most one pending per `(run, gate)`: the partial unique index, not a handler. 
 ```bash
 set -euo pipefail
 source ~/.cargo/env          # CONTRACT §16 — cargo is not on PATH
-cargo test -p conveyor-api --test golden_path --test claim_race --test run_retry \
-  --test approval_dual --test approval_expire --test andon --test delivery_retry \
-  --test telegram_reply --test notifications --test sse_control
+# v1-s06-1: every target below exists at this head. The four worker-level proofs run in the
+# server package; `channel_inbound` is the Telegram reply→`approvals.decide` path that the
+# old `telegram_reply` target named (there is no such file in either package).
+cargo test -p conveyor-api --test golden_path --test claim_race --test approval_dual \
+  --test notifications --test sse_control --test channel_inbound
+cargo test -p conveyor-server --test run_retry --test approval_expire --test andon \
+  --test delivery_retry
 test -z "$(rg -n 'setInterval' crates apps || true)"            # empty
 ```
 
@@ -183,9 +194,9 @@ test -z "$(rg -n 'setInterval' crates apps || true)"            # empty
 |---|---|---|
 | a | golden path (`golden_path.rs`) | card → claim → run → gate → decide → `cards.move(done)`: run `succeeded`, approval `approved`, one `audit_event`+`action_invocation`+`event` each |
 | b | dual control | `required_decisions=2`: one `approve` leaves `pending`; the same approver again `409`; a second closes |
-| c | retry | `kill -9` mid-run: `run.reap` → `failed`/`crashed`, next `runs.create` is `attempt=2`; two rows, never two live |
-| d | andon | engaged: `409`, a queued `run.execute` stays pending 60 s; released: runs within one poll |
-| e | delivery retry | stub returns 500 → `attempts=5`, `state='failed'`, one row |
+| c | retry (`apps/server/tests/run_retry.rs`) | `kill -9` mid-run: `run.reap` → `failed`/`crashed`, next `runs.create` is `attempt=2`; two rows, never two live |
+| d | andon (`apps/server/tests/andon.rs`) | engaged: `409`, a queued `run.execute` stays pending 60 s; released: runs within one poll |
+| e | delivery retry (`apps/server/tests/delivery_retry.rs`) | stub returns 500 → `attempts=5`, `state='failed'`, one row |
 | f | no timers | `rg` empty; every cadence is a `schedule` row |
 | g | human vs agent | `required_decisions=2`: one decision from a human, one from a seeded `app_user(kind='agent')` — both persist with different `decided_by_kind`, driven through `approvals.decide` (S06a depends on S06, not the reverse) |
 

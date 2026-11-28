@@ -1,0 +1,196 @@
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project S05 --content docs/evidence/rework/tranche-4/rework-content-S05.json --tranche-label tranche 4 --demo-cadence 01a202a1-f4ee-7acc-8e57-50ac6f0417fd --keep-active
+
+  reopen: not needed
+  charter: already approved
+  closure outputs: not applicable (the project stays active)
+  SoAW: already live
+  artefact: Stakeholder Map — S05 Board (Phase A) already present
+  artefact: Driver/Goal/Objective Catalog — S05 Board (Phase A) already present
+  artefact: Requirements Catalog — S05 Board (Phase A) already present
+  artefact: Solution Concept Diagram — S05 Board (Phase A) already present
+  artefact: Business Capability Map — S05 Board (Phase B) already present
+  artefact: Data Entity/Data Component Catalog — S05 Board (Phase C) already present
+  artefact: Technology Standards Catalog — S05 Board (Phase D) already present
+  01 architecture.artifacts_link ok
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  08 architecture.artifacts_link ok
+  document architecture-artifact: already present and published
+  delivery contract: already live
+  register risk: The six gate properties have no recorded run, so the built claim is unproven already present
+  register risk: The plan frontmatter says planned while the project meta says built already present
+  register issue: The close preceded tranche 4's authorisation by three days and rests only on an accepted P0 exception already present
+  register issue: The Planka fork is absent, so the per-event envelope and List.type transitions stay unverified already present
+  register assumption: The 2026-11-24 rework snapshot is the authoritative record for S05 already present
+  register assumption: The live Planka database is test data and never gate evidence already present
+  register dependency: S05 is blocked by S03, S04 and S02 already present
+  register dependency: S12 and S06 consume the board surface; S05 never writes claims, assignee or stopwatch already present
+  register benefit: The 280 board↔project lookup flows become one foreign-key read through the project_type matrix already present
+  register benefit: One comment store and one membership model replace the Planka and fr duplication already present
+  register benefit: The re-close is decidable from the acceptance instrument's P0 checks already present
+  benefit transitions: none in the content
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
+  closure-review output: not applicable (the project stays active)
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  09 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 1 change row(s) present
+  10 registers.update ok
+  record fixes: none in the content
+  card discharge: no open rework card owned by the project
+  closure: not applicable (the project stays active)
+S05: 10 acts recorded
+
+
+[exit 0]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S05 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S05-snap-k_rynl5b/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S05-snap-k_rynl5b/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/S05-bodies --local-bin /tmp/conv526-t14-bin-20261126
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [
+    {
+      "project_key": "S05",
+      "project_id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
+      "category": "change-control",
+      "document_id": "01a21a0c-15c2-7648-918c-12c72aaa3155",
+      "natural_key": "artefact:S05:change-control:908f1168b4874aea",
+      "body_sha256": "908f1168b4874aea868d0d15975777117a06679ec3855f4d8778f396bf00b24a"
+    },
+    {
+      "project_key": "S05",
+      "project_id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
+      "category": "project-registers",
+      "document_id": "01a21a0c-178d-75e2-9baa-8ddbe40712b2",
+      "natural_key": "artefact:S05:project-registers:0a504c774daee2f2",
+      "body_sha256": "0a504c774daee2f2100b6d15d9d771cd855ff4a940554c094ed89f3c1a74d4df"
+    }
+  ],
+  "skipped": [
+    {
+      "project_key": "S05",
+      "project_id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "S05",
+      "project_id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S05",
+      "project_id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S05",
+      "project_id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S05",
+      "project_id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "S05",
+      "project_id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S05",
+      "project_id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "S05",
+      "project_id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S05",
+      "project_id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S05",
+      "project_id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S05",
+      "project_id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "NO_EVIDENCE",
+        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
+      }
+    }
+  ],
+  "counts": {
+    "due": 6,
+    "present": 5,
+    "missing-edge": 0,
+    "stale": 2,
+    "ambiguous": 0
+  }
+}
+
+
+[exit 1]
+

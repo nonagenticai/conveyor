@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Project Registers — Skeleton — workspace, tenancy, auth, jobs, SSE · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/S02-bodies/S02/project-registers.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="project-registers--skeleton--workspace-tenancy-auth-jobs-sse">Project Registers — Skeleton — workspace, tenancy, auth, jobs, SSE</h1>
+<h2 id="risks">Risks</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The snapshot carries the S02 contracts, review, baseline and published documents but zero artefact rows. This pack re-creates the seven A\u2013D artefacts, and the check before the run is that no row with the same title and phase survives; if one does, the factory must link it rather than create a duplicate. The risk is recorded because the earlier 2026-11-21 attempt is visible in the transcript while its artefact rows are not visible in the record.&quot;,
+      &quot;code&quot;: &quot;R-S02-01&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:50:28.406403+00:00&quot;,
+      &quot;id&quot;: &quot;01a217e8-47b9-792b-a55f-dc7eba8cb02c&quot;,
+      &quot;impact&quot;: 3,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/evidence/rework/S02/transcript.jsonl&quot;,
+          &quot;acceptance/programme/S02.toml&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect under the #526 rework delegation&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;medium&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d27-7b45-abb5-bf851a4c3d4a&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: &quot;2026-12-15&quot;,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The replay record lost the artefact rows, so a re-creation could duplicate a surviving row&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:04:01.022794+00:00&quot;,
+      &quot;version&quot;: 4
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The proof holds one handler past a two-second lease while a second worker polls. It is a real child-process test against a real Postgres, so it is honest, but it depends on the handler outliving the lease reliably. The risk is a false red under heavy machine load, not a false green; the response is to re-run in isolation rather than to loosen the assertion.&quot;,
+      &quot;code&quot;: &quot;R-S02-02&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:50:28.538463+00:00&quot;,
+      &quot;id&quot;: &quot;01a217e8-483d-7858-a47d-cfa2a5d547bf&quot;,
+      &quot;impact&quot;: 2,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;apps/server/tests/jobs_lease_two_workers.rs&quot;,
+          &quot;issue #2 P2&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the S02 executor&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;medium&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d27-7b45-abb5-bf851a4c3d4a&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: &quot;2026-12-15&quot;,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The two-worker lease proof is timing-sensitive and could flake under load&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:04:01.159311+00:00&quot;,
+      &quot;version&quot;: 4
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The acceptance manifest pins S02 to closed, so the batch would close it without consulting the open issue. That is why the order is proof first, then the issue comment and close, then the project run: a closure that contradicts its own linked issue is the exact fake green this rework exists to prevent.&quot;,
+      &quot;code&quot;: &quot;R-S02-03&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:50:28.708671+00:00&quot;,
+      &quot;id&quot;: &quot;01a217e8-48e8-78b9-b262-178c9120880b&quot;,
+      &quot;impact&quot;: 4,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;issue #2&quot;,
+          &quot;acceptance/programme/S02.toml&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect under the #526 rework delegation&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;low&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d27-7b45-abb5-bf851a4c3d4a&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: &quot;2026-12-15&quot;,
+      &quot;severity&quot;: &quot;high&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The rework could close S02 while issue #2 still reads open&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:04:01.296086+00:00&quot;,
+      &quot;version&quot;: 4
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="issues">Issues</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The issue&#39;s current-state table, measured 2026-11-11, still says P2 is absent, but the lane carries apps/server/tests/jobs_lease_two_workers.rs in commit d367a4a9. The issue is stale, not the code. The rework runs the test, records the result on the issue and closes it; it does not close it on the strength of the file existing.&quot;,
+      &quot;code&quot;: &quot;I-S02-01&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:50:28.889408+00:00&quot;,
+      &quot;id&quot;: &quot;01a217e8-499c-7d4f-89f5-5b169a5ae506&quot;,
+      &quot;impact&quot;: 3,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;issue #2&quot;,
+          &quot;commit d367a4a9&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the S02 executor&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;high&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d27-7b45-abb5-bf851a4c3d4a&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: &quot;2026-12-15&quot;,
+      &quot;severity&quot;: &quot;high&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Issue #2 was open at the start of the rework although its P2 test was already written&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:04:01.433111+00:00&quot;,
+      &quot;version&quot;: 4
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Act 3 of the earlier transcript sets closure_outputs to closure-review, yet the current project meta carries an empty list. The pack declares the closure review again through the factory rather than by editing the row, so the record and the evidence agree after the run.&quot;,
+      &quot;code&quot;: &quot;I-S02-02&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:50:29.047601+00:00&quot;,
+      &quot;id&quot;: &quot;01a217e8-4a3d-753c-8eaf-224b6673bf8f&quot;,
+      &quot;impact&quot;: 2,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/evidence/rework/S02/transcript.jsonl&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect under the #526 rework delegation&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;high&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d27-7b45-abb5-bf851a4c3d4a&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: &quot;2026-12-15&quot;,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The closure outputs were declared in the 2026-11-21 transcript but are absent from the replay row&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:04:01.566283+00:00&quot;,
+      &quot;version&quot;: 4
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="assumptions">Assumptions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The baseline 01a1ff85-faae-7c2e-b897-fe957985ca78 is approved and the rework adds no scope: the artefacts, registers and closure describe the same eleven tables, five crates and two apps. If the plan&#39;s scope had changed, the baseline would need a change request before this pack could cite it.&quot;,
+      &quot;code&quot;: &quot;A-S02-01&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:50:29.204951+00:00&quot;,
+      &quot;id&quot;: &quot;01a217e8-4ad8-71ba-983c-f2753c475a9d&quot;,
+      &quot;impact&quot;: 2,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S02-skeleton.md&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect under the #526 rework delegation&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;low&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d27-7b45-abb5-bf851a4c3d4a&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: &quot;2026-12-15&quot;,
+      &quot;severity&quot;: &quot;low&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The scope baseline taken on 2026-11-21 still describes S02&#39;s boundary&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:04:01.700415+00:00&quot;,
+      &quot;version&quot;: 4
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="dependencies">Dependencies</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;S02 consumes S00&#39;s parity ids as the authoritative list of surfaces; a function not on that list is not built here. The dependency is a needs edge in the project meta and is the reason S02 follows S00 in tranche 1 rather than running beside it.&quot;,
+      &quot;code&quot;: &quot;D-S02-01&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:50:29.379083+00:00&quot;,
+      &quot;id&quot;: &quot;01a217e8-4b86-790c-897b-e9ca5483da48&quot;,
+      &quot;impact&quot;: 3,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;parity/parity.yaml&quot;,
+          &quot;docs/plans/slices/S02-skeleton.md&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect under the #526 rework delegation&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;low&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d27-7b45-abb5-bf851a4c3d4a&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: &quot;2026-12-15&quot;,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;S00&#39;s signed parity inventory fixes the surfaces S02 must expose&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:04:01.840779+00:00&quot;,
+      &quot;version&quot;: 4
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="benefits">Benefits</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Eleven tables with forced RLS and one auth boundary mean S03, S04 and S06 add aggregates and actions, not tenancy. The benefit is measured by the absence of a per-slice tenancy implementation and by the tenant-isolation gate continuing to pass on every later snapshot.&quot;,
+      &quot;code&quot;: &quot;B-S02-01&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:50:29.524594+00:00&quot;,
+      &quot;id&quot;: &quot;01a217e8-4c17-79e9-b360-904c1348f30d&quot;,
+      &quot;impact&quot;: 4,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;acceptance/programme/S02.toml&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme owner&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;high&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d27-7b45-abb5-bf851a4c3d4a&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: &quot;2026-12-15&quot;,
+      &quot;severity&quot;: &quot;low&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The skeleton makes every later slice inherit isolation instead of re-implementing it&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:04:01.976273+00:00&quot;,
+      &quot;version&quot;: 4
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The lease is the only coordination primitive between workers, and the proof shows a long handler runs exactly once while a second worker polls. That is the evidence the kill gate alone cannot give: a reclaimed job proves liveness, not exactly-once.&quot;,
+      &quot;code&quot;: &quot;B-S02-02&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:50:29.667105+00:00&quot;,
+      &quot;id&quot;: &quot;01a217e8-4ca6-7926-9329-9fae825190d8&quot;,
+      &quot;impact&quot;: 4,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;apps/server/tests/jobs_lease_two_workers.rs&quot;,
+          &quot;issue #2&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme owner&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;high&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d27-7b45-abb5-bf851a4c3d4a&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: &quot;2026-12-15&quot;,
+      &quot;severity&quot;: &quot;low&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The two-worker proof turns the lease policy from a declaration into evidence&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:04:02.132774+00:00&quot;,
+      &quot;version&quot;: 4
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="changes">Changes</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: &quot;01a1ff85-faae-7c2e-b897-fe957985ca78&quot;,
+      &quot;body&quot;: &quot;Change request: rebuild S02&#39;s record under the owner&#39;s 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project&#39;s record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner&#39;s standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.&quot;,
+      &quot;code&quot;: &quot;U5-CHG-S02&quot;,
+      &quot;created_at&quot;: &quot;2026-11-22T06:45:38.446695+00:00&quot;,
+      &quot;id&quot;: &quot;01a20200-d8b6-77fc-a176-76d4ea3f4567&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;change&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          {
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;number&quot;: 526
+          },
+          {
+            &quot;id&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+            &quot;kind&quot;: &quot;delegation&quot;
+          }
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;change_request&quot;: &quot;the retrospective rework of S02 under #526&quot;,
+        &quot;decision&quot;: {
+          &quot;decided_at&quot;: &quot;2026-11-21&quot;,
+          &quot;decided_by&quot;: &quot;the programme owner&#39;s standing delegation&quot;,
+          &quot;decision&quot;: &quot;accepted&quot;,
+          &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+          &quot;record&quot;: &quot;#526&quot;
+        },
+        &quot;impact&quot;: {
+          &quot;cost&quot;: &quot;no separate cost baseline; the rework runs inside the existing programme tranche&quot;,
+          &quot;quality&quot;: &quot;every owned finding executed or waived by a named owner; manifest re-run at the closing head&quot;,
+          &quot;schedule&quot;: &quot;no change to the delivery tranche; the work runs in its rework batch&quot;,
+          &quot;scope&quot;: &quot;the record and declared outputs are rebuilt and republished&quot;
+        }
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d27-7b45-abb5-bf851a4c3d4a&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;accepted&quot;,
+      &quot;title&quot;: &quot;Retrospective MSP/TOGAF/SAFe rework of S02 under the #526 scope change&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-22T06:45:38.446695+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-1/S02-bodies/S02/project-registers.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

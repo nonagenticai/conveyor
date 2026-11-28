@@ -1,14 +1,16 @@
 //! The pre-spend token-budget gate.
 //!
 //! One HTTP call to billing's `POST /api/budget/reserve`, on the inference hot path, with a
-//! sub-second budget and **no retries**. The gate is deliberately fail-open: only two reasons
-//! refuse, every transport or parsing problem allows and counts. A slow billing must degrade to
-//! "allowed" quickly rather than hold the caller's request.
+//! sub-second budget and **no retries**. A transport or parsing problem fails open; a billing
+//! **verdict** fails closed. `over_budget` and `tenant_archived` refuse, and so does
+//! `no_active_budget`: SPEC_V2 §7.5 requires an undeclared budget to be a refusal, not an
+//! unlimited allowance. A slow billing must degrade to "allowed" quickly rather than hold the
+//! caller's request.
 //!
 //! `INFERENCE_ROUTER_BUDGET_GATE_MODE` has three states — `off` makes no call at all, `shadow`
-//! adjudicates and counts but never refuses, `enforce` refuses `over_budget` with 429. The metric
-//! that matters counts **adjudications**, not refusals: an armed gate that is never asked looks
-//! identical to one that works.
+//! adjudicates and counts but never refuses, `enforce` (the default) refuses `over_budget` with
+//! 429. The metric that matters counts **adjudications**, not refusals: an armed gate that is
+//! never asked looks identical to one that works.
 //!
 //! The trait and the decision live here; the HTTP client is the ledger slice's.
 
@@ -51,10 +53,16 @@ impl GateReason {
         }
     }
 
-    /// The only two reasons that deny. Everything else — including `redis_unavailable` and
-    /// `no_active_budget` — must allow; refusing on them turns a billing blip into an outage.
+    /// The reasons that deny. Three are billing's **verdicts** — over the cap, the tenant is
+    /// archived, or there is no active budget at all. The third is the §7.5 fix: an undeclared
+    /// budget used to be indistinguishable from an unlimited one, so an unbudgeted run spent
+    /// indefinitely. Transport, timeout, bad status and bad body still allow: a billing blip
+    /// must not become an inference outage.
     pub fn deniable(self) -> bool {
-        matches!(self, Self::OverBudget | Self::TenantArchived)
+        matches!(
+            self,
+            Self::OverBudget | Self::TenantArchived | Self::NoActiveBudget
+        )
     }
 }
 
@@ -210,5 +218,37 @@ impl BudgetGate for HttpBudgetGate {
             }
             GateDecision::allow(GateReason::BadStatus)
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::GateReason;
+
+    /// SPEC_V2 §7.5: a billing verdict denies — including `no_active_budget`, because an
+    /// undeclared budget is not an unlimited one. A transport or parse problem allows.
+    #[test]
+    fn a_billing_verdict_denies_and_an_unreachable_billing_allows() {
+        for reason in [
+            GateReason::OverBudget,
+            GateReason::TenantArchived,
+            GateReason::NoActiveBudget,
+        ] {
+            assert!(reason.deniable(), "{} must deny", reason.as_str());
+        }
+        for reason in [
+            GateReason::Ok,
+            GateReason::RedisUnavailable,
+            GateReason::NoTenant,
+            GateReason::NoClient,
+            GateReason::Disabled,
+            GateReason::Timeout,
+            GateReason::Transport,
+            GateReason::BadStatus,
+            GateReason::BadBody,
+            GateReason::Unexpected,
+        ] {
+            assert!(!reason.deniable(), "{} must allow", reason.as_str());
+        }
     }
 }

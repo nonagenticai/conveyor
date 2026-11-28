@@ -1,0 +1,21 @@
+{
+  "approvals": 1,
+  "card_id": null,
+  "created_at": "2026-11-26T22:54:06.381371Z",
+  "decisions": [],
+  "description": "Record the tranche-4 review: continue on the ten green member receipts at 18276de5, the approved baselines, the benefit status and the risk register; closes tranche 4 and authorises tranche 5",
+  "expires_at": null,
+  "gate": "tranches.review",
+  "id": "01a21a10-ec32-7400-a452-d6930b7231a5",
+  "kind": "action",
+  "project_id": null,
+  "proposed_answer": "continue",
+  "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+  "requested_by_label": "conveyor-e2e",
+  "required_decisions": 1,
+  "requires_answer": false,
+  "run_id": null,
+  "status": "approved",
+  "target": "tranche/01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce/review",
+  "version": 2
+}

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Inspect and Adapt — conveyor buildout, tranche 3 · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="inspect-adapt" data-provenance-version="1" data-provenance-hash="886f74f06a74d940f1f14344c652cacad8321dcb56cc5979645009474d3b460e" data-provenance-status="active" data-provenance-owner="georgiedekker" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>inspect-adapt</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>886f74f06a74d940f1f14344c652cacad8321dcb56cc5979645009474d3b460e</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>georgiedekker</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Inspect and Adapt — conveyor buildout, tranche 3</h1>
+<p>The tranche-3 retro: what went well, what did not, the lessons recorded on the retro cadence,
+the actions they produce and the kata candidates they raise.</p>
+<h2>What went well</h2>
+<ul>
+<li>The three registers are operated, not merely modelled: fourteen risks with owners and review
+dates, fifty-seven ADR rows seeded through the decisions actions, and B1–B7 baselined with
+B1/B2/B4/B5/B6 active under approved changes.</li>
+<li>The clean-build discipline produced a trustworthy binary and lock at <code>9ac63b41</code> (548 actions,
+579 operations, <code>--check-lock</code> OK) after the shared target had polluted an earlier build.</li>
+<li>The delegated rule path worked on every programme gate it was used on: PI plan, tranche
+review, change approvals, all recorded <code>rule</code> with a published <code>via.delegation_ref</code>.</li>
+</ul>
+<h2>What did not</h2>
+<ul>
+<li>The promotion journal lost its last row when a trim by line count ignored a header object; the
+<code>--check</code> grammar caught it, but only after the fact.</li>
+<li>The first lock was generated from a binary built against a stale shared target and had to be
+regenerated from a clean build.</li>
+<li>A benefit baseline edit resets the profile to <code>draft</code>; activation is a second recorded write,
+which cost an extra version on every profile.</li>
+<li>The schema-drift kata cannot open: a destination 422 has no eval/benchmark instrument, and T5
+refuses an unmeasurable kata.</li>
+</ul>
+<h2>Lessons</h2>
+<ul>
+<li><strong>k1.</strong> A clean build before a lock regeneration is the only trustworthy verdict.</li>
+<li><strong>k2.</strong> The promotion journal must be validated after every append.</li>
+<li><strong>k3.</strong> A delegation document's owner project is part of its contract; the guard must accept
+every owner the delegation actually uses.</li>
+<li><strong>k4.</strong> A measurement change resets a benefit profile to draft; activation is its own write.</li>
+<li><strong>k5.</strong> A defect with no instrument cannot open a kata; re-anchor rather than fabricate.</li>
+</ul>
+<h2>Actions</h2>
+<ul>
+<li><code>v1-w4a-5</code> proceeds as a deliberate slice (timeout from <code>timeout_secs</code>, pending + resume_token,
+a status tool).</li>
+<li><code>promote-record.py</code> gains <code>decisions.create</code>/<code>decisions.transition</code> replay before the
+deploy-bound promotion.</li>
+<li>The three programme screens (Risk, Decisions, Benefits evaluation) and the per-project factory
+cards follow in tranche 4.</li>
+</ul>
+<h2>Kata candidates</h2>
+<p>The schema-drift kata is a candidate under T5, contingent on the contract-test instrument class.
+No kata row is opened until that instrument exists; the finding is re-anchored to T5 and stays
+open.</p>
+<h2>Links</h2>
+<ul>
+<li>Retro cadence: <code>01a20281-09ba-709a-b61e-51a22f2ed172</code> (closed; lessons k1–k5 on the record).</li>
+<li>Refinement cadence: <code>01a20280-d52b-7791-a9b1-ebc2a10b5c3d</code>.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

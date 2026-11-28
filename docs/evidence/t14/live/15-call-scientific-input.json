@@ -1,0 +1,20 @@
+{
+ "input": {
+  "run_id": "01a21277-77e8-75d0-8711-26e51ddc6705",
+  "tool": "scientific.meta_analysis",
+  "input": {
+   "studies": [
+    {
+     "effect_size": 0.2,
+     "standard_error": 0.1,
+     "sample_size": 100
+    },
+    {
+     "effect_size": 0.5,
+     "standard_error": 0.2,
+     "sample_size": 120
+    }
+   ]
+  }
+ }
+}

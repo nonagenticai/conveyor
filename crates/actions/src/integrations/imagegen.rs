@@ -24,11 +24,12 @@
 
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use std::borrow::Cow;
 
 use crate::registry::ActionRegistration;
 use crate::spec::{
     ActionKind, ActionSpec, AgentHints, AgentTier, Artefact, ArtefactEncoding, Confirm, Effect,
-    HandlerRef, Schema, Scope, Tenancy,
+    HandlerRef, Schema, SchemaRef, Scope, Tenancy,
 };
 
 /// The service key: `CONVEYOR_EXTERNAL_IMAGE_GEN_URL`. Underscores, not hyphens: the engine's env
@@ -147,14 +148,14 @@ fn generate_image_output() -> Schema {
 /// `media.generate_image`.
 fn generate_image() -> ActionSpec {
     ActionSpec {
-        name: "media.generate_image",
+        name: Cow::Borrowed("media.generate_image"),
         version: 1,
         kind: ActionKind::External,
-        input: generate_image_input,
-        output: generate_image_output,
+        input: SchemaRef::Compiled(generate_image_input),
+        output: SchemaRef::Compiled(generate_image_output),
         // The media family's write scope: this is the same capability surface as `media.render_html`
         // and `media.compile_video`, one step further along the production chain.
-        scopes: &[Scope::CapabilitiesWrite],
+        scopes: Cow::Borrowed(&[Scope::CapabilitiesWrite]),
         // A replay with the same key returns the first render — one image, one charge.
         idempotent: true,
         // A render is a diffusion run plus three checkpoint loads — and it QUEUES: the host serves
@@ -184,9 +185,9 @@ fn generate_image() -> ActionSpec {
         }),
         approval_target: None,
         handler: HandlerRef::External {
-            service: SERVICE,
-            method: "POST",
-            path: "/v1/images/generations",
+            service: Cow::Borrowed(SERVICE),
+            method: Cow::Borrowed("POST"),
+            path: Cow::Borrowed("/v1/images/generations"),
             auth: None,
             auth_optional: false,
             upload: None,

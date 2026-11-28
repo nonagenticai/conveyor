@@ -41,6 +41,18 @@ impl From<&ApprovalPolicy> for ApprovalPolicyOut {
     }
 }
 
+/// The project gates `pm::open_gate` opens.
+///
+/// A gate is not an action: nothing in the registry carries its name, yet its decision is
+/// tenant policy data all the same. These are the gate names the `open_gate` call sites use
+/// (`charter`, `baseline`, `closure`, `change`, and `design` through `pm.route_gate`).
+pub(crate) const GATE_POLICY_NAMES: &[&str] =
+    &["charter", "baseline", "design", "closure", "change"];
+
+fn is_gate_policy(name: &str) -> bool {
+    GATE_POLICY_NAMES.contains(&name)
+}
+
 /// The action this policy names, refused unless the registry carries it.
 ///
 /// A row for an unknown name is unreadable configuration: it would sit in the table looking like
@@ -95,17 +107,23 @@ async fn approval_policies_get(
     ctx: HandlerCtx,
     input: ApprovalPolicyGetIn,
 ) -> Result<ApprovalPolicyOut, ActionError> {
-    let spec = known_action(&input.action)?;
-    let policy = store::approval_policy::get(&mut *tx, ctx.tenant, spec.name)
+    // A project gate is a policy name even though the registry does not carry it.
+    if !is_gate_policy(&input.action) {
+        known_action(&input.action)?;
+    }
+    let policy = store::approval_policy::get(&mut *tx, ctx.tenant, &input.action)
         .await
         .map_err(|error| policy_error(error, "approval_policies.get"))?
         // ⛔ An unset policy answers with the strict default, never with "no policy": the reader
         // that reported `null` here would invite a caller to treat absence as a waiver.
-        .unwrap_or_else(|| ApprovalPolicy::default_for(spec.name));
+        .unwrap_or_else(|| ApprovalPolicy::default_for(&input.action));
     Ok(ApprovalPolicyOut::from(&policy))
 }
 
 /// `approval_policies.set` — record this tenant's decision about one action.
+///
+/// A write that waives a gate or names an `auto` approver is itself gated: the caller must name
+/// an approved `approval_policies.set` gate for exactly this action (SPEC_V2 §6.4 / §9.3, D34).
 #[crate::action(
     name = "approval_policies.set",
     version = 1,
@@ -122,13 +140,25 @@ async fn approval_policies_set(
     ctx: HandlerCtx,
     input: ApprovalPolicySetIn,
 ) -> Result<ApprovalPolicyOut, ActionError> {
-    let spec = known_action(&input.action)?;
+    // A project gate (`pm::open_gate`'s names) is policy data even though no registry action
+    // carries it. It has its own narrower contract below; the action path is unchanged.
+    let gate_policy = is_gate_policy(&input.action);
+    let spec = if gate_policy {
+        None
+    } else {
+        Some(known_action(&input.action)?)
+    };
     // A waiver for an action nothing gates is dead configuration that reads like a decision. The
     // destructive gate only ever consults policies for destructive actions; T6's development
     // gates are the one other governed surface (their policy row is §6.4's auto-merge).
-    let governed = crate::development::is_governed_gate(spec.name)
-        || crate::tool_authoring::is_governed_gate(spec.name);
-    if spec.effect != Effect::Destructive && !governed {
+    let governed = spec.is_some_and(|spec| {
+        crate::development::is_governed_gate(&spec.name)
+            || crate::tool_authoring::is_governed_gate(&spec.name)
+    });
+    if let Some(spec) = spec
+        && spec.effect != Effect::Destructive
+        && !governed
+    {
         return Err(invalid(
             "action",
             "invalid_value",
@@ -150,19 +180,49 @@ async fn approval_policies_set(
         invalid(
             "self_approval",
             "invalid_value",
-            "must be `forbidden` or `allowed`",
+            "must be `forbidden`: SPEC_V2 §5.4 makes self-approval an invariant, not a tenant \
+             permission",
         )
     })?;
+    // ⛔ §5.4 / P4 is an invariant, not a permission (ledger v1-w4b-4). The historical `allowed`
+    // spelling still parses so old rows read, but no caller may record it as a decision.
+    if self_approval == SelfApproval::Allowed {
+        return Err(invalid(
+            "self_approval",
+            "invalid_value",
+            "SPEC_V2 §5.4: the requester can never decide their own gate, so `allowed` cannot be \
+             stored; use `forbidden`",
+        ));
+    }
     let approver_kind = match input.approver_kind.as_deref() {
         None => ApproverKind::Human,
         Some(raw) => ApproverKind::from_str(raw).map_err(|_| {
             invalid(
                 "approver_kind",
                 "invalid_value",
-                "must be `human` or `auto`",
+                "must be `human`, `auto`, `triage_agent`, `rule`, `agent` or `service`",
             )
         })?,
     };
+    if gate_policy {
+        // A project gate's policy names who decides and how many decisions resolve it; it can
+        // neither waive the gate nor carry an auto-merge condition set.
+        if approval != ApprovalRequirement::Required {
+            return Err(invalid(
+                "approval",
+                "invalid_value",
+                "a project gate is always required; its policy sets the quorum, never a waiver",
+            ));
+        }
+        if approver_kind == ApproverKind::Auto {
+            return Err(invalid(
+                "approver_kind",
+                "invalid_value",
+                "a project gate names a deciding kind; `auto` is a development-gate auto-merge \
+                 policy",
+            ));
+        }
+    }
     let conditions = input.conditions.unwrap_or_else(|| json!({}));
     if !conditions.is_object() {
         return Err(invalid(
@@ -172,10 +232,44 @@ async fn approval_policies_set(
         ));
     }
 
+    // ⛔ §9.3 / D34: a waiver is never an unconditional off switch. It is an EARNED auto policy —
+    // the tenant's rule engine as approver, typed conditions and a future expiry. Anything less
+    // would let one `approvals:write` holder disable a destructive gate permanently.
+    if approval == ApprovalRequirement::Waived {
+        if approver_kind != ApproverKind::Auto {
+            return Err(invalid(
+                "approver_kind",
+                "invalid_value",
+                "a waiver must be earned by an `auto` approver kind; a human policy cannot waive \
+                 its gate (SPEC_V2 §9.3 / D34)",
+            ));
+        }
+        AutoMergeConditions::parse(&conditions)
+            .map_err(|error| invalid("conditions", "invalid_value", error.to_string()))?;
+        let expires_at = input.expires_at.ok_or_else(|| {
+            invalid(
+                "expires_at",
+                "missing",
+                "an earned waiver is time-bounded and must carry an expiry",
+            )
+        })?;
+        if expires_at <= Utc::now() {
+            return Err(invalid(
+                "expires_at",
+                "invalid_value",
+                "an earned waiver must expire in the future",
+            ));
+        }
+    }
+
     match approver_kind {
-        ApproverKind::Human => {
-            // A human policy does not carry terms. Silently accepting them would store a row
-            // that reads like an auto policy while a person still decides.
+        // A human (or the lane's explicit non-human decider) policy does not carry terms.
+        // Silently accepting them would store a row that reads like an auto policy.
+        ApproverKind::Human
+        | ApproverKind::TriageAgent
+        | ApproverKind::Rule
+        | ApproverKind::Agent
+        | ApproverKind::Service => {
             if conditions
                 .as_object()
                 .is_some_and(|object| !object.is_empty())
@@ -184,11 +278,13 @@ async fn approval_policies_set(
                 return Err(invalid(
                     "conditions",
                     "invalid_value",
-                    "a `human` policy carries no conditions and no expiry; use `auto`",
+                    "a non-auto policy carries no conditions and no expiry; use `auto`",
                 ));
             }
         }
-        ApproverKind::Auto => {
+        // `waived` on an auto row is the earned waiver validated above. `required` is §6.4's
+        // auto-merge policy and keeps its full validation set.
+        ApproverKind::Auto if approval == ApprovalRequirement::Required => {
             if !governed {
                 return Err(invalid(
                     "approver_kind",
@@ -196,23 +292,14 @@ async fn approval_policies_set(
                     format!(
                         "{} is not a governed gate; an auto policy applies only to a \
                          development gate or the tool-authoring publication gate",
-                        spec.name
+                        input.action
                     ),
-                ));
-            }
-            // Auto-merge lowers no approval: the row is the tenant's earned decision, not a
-            // waiver. A waiver would bypass the gate and its conditions entirely.
-            if approval != ApprovalRequirement::Required {
-                return Err(invalid(
-                    "approval",
-                    "invalid_value",
-                    "an auto-merge policy still requires the gate; it never waives it",
                 ));
             }
             // A development gate carries §6.4's typed auto-merge conditions; the publication
             // gate carries `max_effect`, the highest effect a rule may publish. The action that
             // evaluates the policy reads the shape it owns.
-            if crate::development::is_governed_gate(spec.name) {
+            if crate::development::is_governed_gate(input.action.as_str()) {
                 AutoMergeConditions::parse(&conditions)
                     .map_err(|error| invalid("conditions", "invalid_value", error.to_string()))?;
             } else if let Some(raw) = conditions
@@ -240,19 +327,8 @@ async fn approval_policies_set(
                     "an auto-merge policy must expire in the future",
                 ));
             }
-            // §6.4: the policy is itself a gated change. The approval is opened by the tenant's
-            // governance path (`approvals.request`, gate `approval_policies.set`) and its target
-            // is the action this policy governs, so an approval for one gate can never authorise
-            // another.
-            super::approvals::require_approval_tx(
-                &mut *tx,
-                &ctx,
-                "approval_policies.set",
-                spec.name,
-                ctx.approval_id,
-            )
-            .await?;
         }
+        ApproverKind::Auto => {}
     }
 
     let required_decisions = input.required_decisions.unwrap_or(1);
@@ -270,8 +346,23 @@ async fn approval_policies_set(
             "an auto policy is one rule decision; the quorum is 1",
         ));
     }
+    // §6.4 / D34: the policy change is itself a gated change. Both a waiver and an auto policy
+    // reach this point, so no `approvals:write` holder can switch a gate off — or hand it to the
+    // rule engine — behind a plain write. The approval is opened by the tenant's governance path
+    // (`approvals.request`, gate `approval_policies.set`) and its target is the action this
+    // policy governs, so an approval for one gate can never authorise another.
+    if approval == ApprovalRequirement::Waived || approver_kind == ApproverKind::Auto {
+        super::approvals::require_approval_tx(
+            &mut *tx,
+            &ctx,
+            "approval_policies.set",
+            input.action.as_str(),
+            ctx.approval_id,
+        )
+        .await?;
+    }
     let policy = ApprovalPolicy {
-        action: spec.name.to_owned(),
+        action: input.action.clone(),
         approval,
         self_approval,
         approver_kind,
@@ -292,6 +383,12 @@ fn policy_error(
     action: &str,
 ) -> ActionError {
     match error {
+        store::approval_policy::ApprovalPolicyStoreError::SelfApprovalAllowed => invalid(
+            "self_approval",
+            "invalid_value",
+            "SPEC_V2 §5.4: the requester can never decide their own gate, so `allowed` cannot be \
+             stored; use `forbidden`",
+        ),
         store::approval_policy::ApprovalPolicyStoreError::Database(error) => {
             store_error(error, action)
         }

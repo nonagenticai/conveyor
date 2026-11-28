@@ -1,6 +1,6 @@
 import { expect, test, type APIRequestContext } from "./fixture";
 
-import { createBoardCard, invoke } from "./helpers";
+import { activateJob, createActiveBinding, createBoardCard, invoke, isDevAuth } from "./helpers";
 
 // #563 T18-2 — Jobs: the catalogue, the release, the binding, and the server's stale-pin
 // refusal. The start control sends the caller's expected hash; the 409 is the server's own.
@@ -36,6 +36,9 @@ async function fixture(
     },
     departments: [{ department_id: department.id, ordinal: 1, is_primary: true }],
   });
+  // A job is born a draft (v1-w1a-4): activation opens a gate, and a second principal must
+  // approve it before a release may publish or a binding may pin it.
+  await activateJob(request, position.id);
   const release = await invoke<{ id: string; release_hash: string }>(
     request,
     "job_releases.publish",
@@ -46,7 +49,7 @@ async function fixture(
   });
   const agent = agents.items[0];
   expect(agent, "the dev seed carries one fixture capability agent").toBeTruthy();
-  const binding = await invoke<{ id: string }>(request, "job_bindings.create", {
+  const binding = await createActiveBinding<{ id: string }>(request, {
     job_id: position.id,
     release_id: release.id,
     executor_kind: "internal_agent",
@@ -64,6 +67,10 @@ async function fixture(
 }
 
 test("a stale binding refuses with the server code", async ({ page, request }) => {
+  test.skip(
+    !isDevAuth(),
+    "activating a job needs the dev seed's second principal to approve the gate",
+  );
   const title = unique("e2e job");
   const built = await fixture(request, title);
   const card = await createBoardCard(request, unique("e2e stale run"));

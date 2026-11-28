@@ -210,6 +210,71 @@ async fn baselined(
     baseline_id
 }
 
+/// v1-close-1: a standalone project that has a closure gate owes the standard's mandatory set.
+/// This project declares no track (so no class) and holds no delivery contract (so it is not
+/// governed); its set is the four PMP documents plus the `change` register row. The baseline
+/// `pm.plan` approved is the `project-baseline` row.
+async fn satisfy_mandatory_set(
+    pg: &support::Pg,
+    running: &support::Running,
+    seeded: &support::Seeded,
+    project: Uuid,
+    baseline: Uuid,
+) {
+    const DOCUMENTS: [&str; 4] = [
+        "project-brief",
+        "closure-review",
+        "project-wbs",
+        "project-registers",
+    ];
+    for category in DOCUMENTS {
+        let body = conveyor_domain::output_standard::template(category)
+            .map(|template| template.skeleton)
+            .unwrap_or_else(|| format!("# {category}\n\nWritten by the close gate test.\n"));
+        let (status, body) = running
+            .invoke(
+                "documents.compose",
+                PM,
+                json!({
+                    "title": format!("{category} of {project}"),
+                    "project_id": project,
+                    "body": body,
+                    "category": category,
+                }),
+                None,
+                None,
+                None,
+            )
+            .await;
+        assert_eq!(status, 201, "{body}");
+        let document = id_of(output(&body), "id");
+        let version = output(&body)["version"].as_i64().expect("a version");
+        let (status, body) = running
+            .invoke(
+                "documents.publish",
+                PM,
+                json!({"id": document, "publish": true}),
+                Some(&format!("\"{version}\"")),
+                None,
+                None,
+            )
+            .await;
+        assert_eq!(status, 200, "{body}");
+    }
+    sqlx::query(
+        "INSERT INTO project_register_item
+            (tenant_id, project_id, kind, code, title, body, baseline_ref, meta)
+         VALUES ($1, $2, 'change', 'CHG-1', 'An approved change', 'A change to the baseline.',
+                 $3, '{\"impact\": {\"scope\": \"the accepted scope widens\"}}'::jsonb)",
+    )
+    .bind(seeded.tenant_id)
+    .bind(project)
+    .bind(baseline)
+    .execute(&pg.super_pool)
+    .await
+    .expect("insert the change register row");
+}
+
 /// `pm.close` as the PM.
 ///
 /// #283: the close is destructive, so it names an approved gate for this binding and project.
@@ -237,6 +302,26 @@ async fn close(
             None,
         )
         .await
+}
+
+/// The project aggregate's own events, oldest first:
+/// `(type, aggregate_type, aggregate_id, payload)`.
+async fn project_events(
+    pg: &support::Pg,
+    tenant: Uuid,
+    project: Uuid,
+) -> Vec<(String, String, Uuid, Value)> {
+    sqlx::query_as(
+        "SELECT type, aggregate_type, aggregate_id, payload
+           FROM event
+          WHERE tenant_id = $1 AND aggregate_type = 'project' AND aggregate_id = $2
+          ORDER BY seq",
+    )
+    .bind(tenant)
+    .bind(project)
+    .fetch_all(&pg.super_pool)
+    .await
+    .expect("read the project's events")
 }
 
 /// P1.2 — the closure gate is routed, refused before it approves, and the close lands after.
@@ -334,6 +419,12 @@ async fn a_project_closes_only_after_the_closure_gate() {
         project_status, "active",
         "a refused pm.close changed the project's status"
     );
+    assert!(
+        project_events(&pg, seeded.tenant_id, project_id)
+            .await
+            .is_empty(),
+        "the refused pm.close appended a project event"
+    );
     let closures: i64 = sqlx::query_scalar(
         "SELECT count(*) FROM governed_asset
           WHERE tenant_id = $1 AND project_id = $2 AND kind = 'closure'",
@@ -363,6 +454,10 @@ async fn a_project_closes_only_after_the_closure_gate() {
     let (status, body) = decide(&running, closure_gate, "approve").await;
     assert_eq!(status, 200, "{body}");
     assert_eq!(output(&body)["status"], "approved", "{body}");
+
+    // v1-close-1: the close reads the standard directly, so the standalone project's PMP set
+    // must exist before the gate lets it through.
+    satisfy_mandatory_set(&pg, &running, &seeded, project_id, baseline_id).await;
 
     let (status, body) = close(&pg, seeded.tenant, &running, bindings.pm, project_id).await;
     // The closure request wrote the asset; the gate's deciding approver approved it, and
@@ -413,6 +508,17 @@ async fn a_project_closes_only_after_the_closure_gate() {
         assets[0].1, "approved",
         "the closure governed asset is not at approved"
     );
+
+    // The close is a domain event (v1-project-1): exactly one `project.updated` on the project
+    // aggregate, written in the close's own transaction.
+    let events = project_events(&pg, seeded.tenant_id, project_id).await;
+    assert_eq!(events.len(), 1, "exactly one project event: {events:?}");
+    let (event_type, aggregate_type, aggregate_id, payload) = &events[0];
+    assert_eq!(event_type, "project.updated", "{events:?}");
+    assert_eq!(aggregate_type, "project", "{events:?}");
+    assert_eq!(*aggregate_id, project_id, "{events:?}");
+    assert_eq!(payload["id"], project_id.to_string(), "{payload}");
+    assert_eq!(payload["changed"], json!(["status"]), "{payload}");
 
     running.shutdown().await;
 }
