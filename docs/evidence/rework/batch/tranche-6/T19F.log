@@ -20,52 +20,42 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   07 architecture.artifacts_link ok
   document architecture-artifact: already present and published
   08 architecture.contracts_supersede ok
-  09 architecture.board_decide ok
-  10 architecture.contracts_approve ok
-  delivery contract: approved the pending revision over the superseded row
-  11 registers.create ok
-  12 registers.create ok
-  13 registers.create ok
-  14 registers.create ok
-  15 registers.create ok
-  16 registers.create ok
-  17 registers.create ok
-  18 registers.create ok
-  19 registers.create ok
-  20 registers.create ok
-  21 registers.create ok
-  22 registers.create ok
+  09 architecture.contracts_request ok
+  10 architecture.board_decide ok
+  11 architecture.contracts_approve ok
+  delivery contract: revised to carry the authored body
+  register risk: The live gate's approval lookup does not page, so a busy record can hide the sitting's row already present
+  register risk: The live gate depends on the record the transport reaches, not on a hermetic fixture already present
+  register issue: The record carried no lifecycle set for T19F; this pack supplies it retrospectively already present
+  register issue: Closure is deferred to the tranche-6 review by the plan's own §10 already present
+  register assumption: The 2026-11-27 rework snapshot is the authoritative record for T19F already present
+  register assumption: The direct architecture.board_decide path stays unchanged already present
+  register assumption: T19's uq_meeting_live remains the slot rule already present
+  register dependency: T19F depends on T19 and T17 and on the tranche-5 authority already present
+  register dependency: T19F is the last delivery member of tranche 6 already present
+  register benefit: Forum policy changes without mutating history already present
+  register benefit: Board decisions are bound to the forum that took them already present
+  register benefit: One meeting per cadence slot, without a stronger scheduling contract already present
   benefit transitions: none in the content
-  23 projects.baseline ok
-  24 projects.baseline ok
-  25 approvals.decide ok
-  26 projects.baseline ok
-  27 approvals.decide ok
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
   closure-review output: not applicable (the project stays active)
-  28 documents.publish ok
-  29 documents.update ok
-  30 documents.publish ok
-  project-brief output: body corrected and republished
-  31 documents.publish ok
-  32 documents.update ok
-  33 documents.publish ok
-  evidence output: body corrected and republished
-  34 architecture.reviews_record ok
-  35 wbs.update ok
-  36 cadences.credit_demo ok
-  37 approvals.decide ok
-  38 changes.request ok
-  39 registers.update ok
-  40 approvals.decide ok
+  project-brief output: current
+  evidence output: current
+  12 architecture.reviews_record ok
+  13 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 1 change row(s) present
   record fixes: none in the content
   card discharge: no open rework card owned by the project
   closure: not applicable (the project stays active)
-T19F: 40 acts recorded
+T19F: 13 acts recorded
 
 
 [exit 0]
 
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-838/scripts/publish-artefact-bodies.py --apply --project T19F --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T19F-snap-8ggwjhxl/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T19F-snap-8ggwjhxl/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-838/docs/evidence/rework/batch/tranche-6/T19F-bodies --local-bin /tmp/issue838-bin/conveyor
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-838/scripts/publish-artefact-bodies.py --apply --project T19F --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T19F-snap-bmqcqbq1/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T19F-snap-bmqcqbq1/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-838/docs/evidence/rework/batch/tranche-6/T19F-bodies --local-bin /tmp/issue838-bin/conveyor
 
 
 {"code": "TRANSPORT", "message": "documents.compose: error: documents.compose refused (413): the output body is 580626 bytes; the cap is 262144\nFAILED: documents.compose: transport exited 1"}

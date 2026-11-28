@@ -1,6 +1,6 @@
 {
   "blocked": 0,
-  "generated_at": "2026-11-28T07:34:27+00:00",
+  "generated_at": "2026-11-28T07:39:02+00:00",
   "green": 0,
   "members": [
     {
@@ -28,6 +28,6 @@
     }
   ],
   "red": 1,
-  "snapshot_sha": "24e4d7c035946561a4082b46c1420d344a664394",
+  "snapshot_sha": "5fbc8b670e3382714e106abd83f44037ca937e9e",
   "tranche": 6
 }

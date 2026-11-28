@@ -43,7 +43,7 @@
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "review 01a22113-53c4-72ff-9929-00904ace2f2e (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "detail": "review 01a22117-9190-7b70-b318-030c6d6126e7 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "T19F-review",
       "kind": "snapshot",
       "result": "pass",
@@ -167,7 +167,7 @@
     "gate (P0): the gate check 'T19F-artefact-standard' did not pass"
   ],
   "gate": "A policy change is authored through the tenant's authoring route and published as a new immutable meeting_type version while an in-flight meeting keeps its pinned version; a board subject decision is taken in a board sitting with one approval_decision row per qualifying seat carrying via='meeting'; a cadence row names its meeting type and materialises exactly one meeting; the direct architecture.board_decide path is unchanged; and the project's closure review defers closure to the tranche-6 review.",
-  "generated_at": "2026-11-28T07:34:27.421628+00:00",
+  "generated_at": "2026-11-28T07:39:02.420023+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T19F.toml",
   "name": "Decision-forum governance (follow-on)",
@@ -175,8 +175,8 @@
   "schema": "project-acceptance/v1",
   "snapshot": {
     "generated_at": "2026-11-28T07:34:20.139919+00:00",
-    "git_sha": "24e4d7c035946561a4082b46c1420d344a664394",
-    "path": "retained-snapshot/24e4d7c035946561a4082b46c1420d344a664394"
+    "git_sha": "5fbc8b670e3382714e106abd83f44037ca937e9e",
+    "path": "retained-snapshot/5fbc8b670e3382714e106abd83f44037ca937e9e"
   },
   "verdict": "red",
   "warnings": []
