@@ -4587,12 +4587,21 @@ function readBody(req, done) {
         "the plan reaches projects.update",
       );
       const createPatch = consoleState.createPatches.at(-1);
-      assert.deepEqual(createPatch.expected_outputs, [
-        "project-brief",
-        "inception-analysis",
-        "architecture-design",
-      ]);
-      assert.deepEqual(createPatch.closure_outputs, ["evidence", "closure-review"]);
+      // The class's own declaration is the expectation: the console must write the facts the
+      // standard declares, so a standard change (v4 widened v2-proposed) does not need a second
+      // hard-coded copy here to rot (measured on #852: the pinned three-category list failed
+      // once the regenerated standard carried the sixteen).
+      const classFacts = await page.evaluate(() => {
+        const std = window.CONVEYOR_OUTPUT_STANDARD;
+        const cls = (std.classes || []).find((c) => c.name === "v2-proposed") || {};
+        return { now: cls.now || [], closure: cls.closure || [] };
+      });
+      assert.deepEqual(
+        createPatch.expected_outputs,
+        classFacts.now,
+        "the class's declared outputs reach projects.update",
+      );
+      assert.deepEqual(createPatch.closure_outputs, classFacts.closure);
       assert.equal(createPatch.track, "v2", "the class facts are written");
       assert.equal(createPatch.measured_status, "proposed");
       assert.equal(createPatch.tranche, 4, "the tranche reaches projects.programme_meta");
