@@ -200,3 +200,157 @@ test("a signed-out visit is the sign-in gate", async ({ page }) => {
   await page.goto("/plan");
   await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
 });
+
+// #912. The seven write verbs apps/web carries and the walk did not: a lane's name and position,
+// a card's labels, its custom-field values, and an archived card. Each is manifest-gated and each
+// sends the input keys its action declares.
+const LABEL_ID = "00000000-0000-4000-8000-000000000084";
+const FIELD_ID = "00000000-0000-4000-8000-000000000085";
+
+async function boardRoutes(page: any, opts: { labels?: any[]; fields?: any[] } = {}) {
+  await page.route(`**/api/boards/${BOARD_ID}`, (route: any) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        board: { id: BOARD_ID, name: "S1 board" },
+        lists: [{ list: { id: LANE_ID, name: "Queue", kind: "queue" } }],
+        labels: opts.labels ?? [],
+        fields: opts.fields ?? [],
+      }),
+    }),
+  );
+  await page.route(`**/api/boards/${BOARD_ID}/cards?limit=200`, (route: any) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ items: [CARD] }),
+    }),
+  );
+}
+
+test("a lane can be renamed and moved, and each sends the lane id", async ({ page }) => {
+  await boardRoutes(page);
+  const sent: Record<string, any> = {};
+  await page.route("**/api/actions/lists.update/invocations", async (route: any) => {
+    sent.update = route.request().postDataJSON();
+    await json(route, {});
+  });
+  await page.route("**/api/actions/lists.move/invocations", async (route: any) => {
+    sent.move = route.request().postDataJSON();
+    await json(route, {});
+  });
+  await page.goto(`/board/${BOARD_ID}`);
+
+  await page.getByRole("button", { name: "Rename lane" }).click();
+  const rename = page.getByRole("dialog", { name: "Rename lane" });
+  await expect(rename.locator('input[name="name"]')).toHaveValue("Queue");
+  await rename.getByRole("button", { name: "Submit" }).click();
+  await expect.poll(() => sent.update?.id).toBe(LANE_ID);
+
+  await page.getByRole("button", { name: "Move lane" }).click();
+  const move = page.getByRole("dialog", { name: "Move lane" });
+  await move.getByRole("button", { name: "Submit" }).click();
+  await expect.poll(() => sent.move?.id).toBe(LANE_ID);
+});
+
+test("a card's label is added and removed with the board's own label", async ({ page }) => {
+  await boardRoutes(page, { labels: [{ id: LABEL_ID, name: "bug", colour: "red" }] });
+  const sent: Record<string, any> = {};
+  for (const verb of ["cards.add_label", "cards.remove_label"]) {
+    await page.route(`**/api/actions/${verb}/invocations`, async (route: any) => {
+      sent[verb] = route.request().postDataJSON();
+      await json(route, {});
+    });
+  }
+  await page.goto(`/board/${BOARD_ID}`);
+
+  await page.getByRole("button", { name: "Add label" }).click();
+  await page.getByRole("dialog", { name: "Add label" }).getByRole("button", { name: "Submit" }).click();
+  await expect
+    .poll(() => [sent["cards.add_label"]?.card_id, sent["cards.add_label"]?.label_id])
+    .toEqual([CARD.id, LABEL_ID]);
+
+  await page.getByRole("button", { name: "Remove label" }).click();
+  await page
+    .getByRole("dialog", { name: "Remove label" })
+    .getByRole("button", { name: "Submit" })
+    .click();
+  await expect
+    .poll(() => [sent["cards.remove_label"]?.card_id, sent["cards.remove_label"]?.label_id])
+    .toEqual([CARD.id, LABEL_ID]);
+});
+
+test("a field value is set, and clearing it is destructive", async ({ page }) => {
+  await boardRoutes(page, { fields: [{ id: FIELD_ID, name: "points", kind: "number" }] });
+  let set: any = null;
+  await page.route("**/api/actions/custom_fields.set_value/invocations", async (route: any) => {
+    set = route.request().postDataJSON();
+    await json(route, {});
+  });
+  await page.goto(`/board/${BOARD_ID}`);
+
+  await page.getByRole("button", { name: "Set value" }).click();
+  await page
+    .getByRole("dialog", { name: "Set field value" })
+    .getByRole("button", { name: "Submit" })
+    .click();
+  await expect.poll(() => [set?.card_id, set?.custom_field_id]).toEqual([CARD.id, FIELD_ID]);
+
+  // `custom_fields.clear_value` is effect = "destructive": the sheet demands an approval id.
+  await page.getByRole("button", { name: "Clear value" }).click();
+  const clear = page.getByRole("dialog", { name: "Clear field value" });
+  await clear.getByRole("button", { name: "Submit with approval" }).click();
+  await expect(clear.locator(".form-error")).toContainText(
+    "an approval id is required for a destructive action",
+  );
+});
+
+test("a card archived in this session is offered for unarchive", async ({ page }) => {
+  await boardRoutes(page);
+  await page.route("**/api/actions/cards.archive/invocations", (route: any) => json(route, {}));
+  let unarchived: any = null;
+  await page.route("**/api/actions/cards.unarchive/invocations", async (route: any) => {
+    unarchived = route.request().postDataJSON();
+    await json(route, {});
+  });
+  await page.goto(`/board/${BOARD_ID}`);
+
+  await page.getByRole("button", { name: "Archive" }).click();
+  const archive = page.getByRole("dialog", { name: "Archive card" });
+  await archive.getByLabel("Approval id").fill("00000000-0000-4000-8000-0000000000aa");
+  await archive.getByRole("button", { name: "Submit with approval" }).click();
+
+  // The server has no archived-card read, so the list is this session's own — as apps/web keeps it.
+  await expect(page.getByRole("heading", { name: "Archived this session" })).toBeVisible();
+  await page.getByRole("button", { name: "Unarchive" }).click();
+  await page
+    .getByRole("dialog", { name: "Unarchive card" })
+    .getByRole("button", { name: "Submit" })
+    .click();
+  await expect.poll(() => unarchived?.id).toBe(CARD.id);
+});
+
+test("with the verbs absent from the manifest, none of the new controls render", async ({ page }) => {
+  await boardRoutes(page, { labels: [{ id: LABEL_ID, name: "bug" }], fields: [{ id: FIELD_ID, name: "points" }] });
+  await page.route(/\/api\/actions$/, async (route: any) => {
+    const response = await route.fetch();
+    const body = await response.json();
+    const hidden = new Set([
+      "lists.update",
+      "lists.move",
+      "cards.add_label",
+      "cards.remove_label",
+      "custom_fields.set_value",
+      "custom_fields.clear_value",
+      "cards.unarchive",
+    ]);
+    body.actions = (body.actions ?? []).filter((entry: any) => !hidden.has(entry.name));
+    await route.fulfill({ response, body: JSON.stringify(body) });
+  });
+  await page.goto(`/board/${BOARD_ID}`);
+  await expect(page.getByRole("heading", { name: "Queue" })).toBeVisible();
+  for (const name of ["Rename lane", "Move lane", "Add label", "Remove label", "Set value", "Clear value"]) {
+    await expect(page.getByRole("button", { name })).toHaveCount(0);
+  }
+});

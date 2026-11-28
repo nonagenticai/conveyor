@@ -207,6 +207,10 @@ async function plan(ctx) {
 /** @param {any} ctx @param {string} id */
 async function board(ctx, id) {
   const body = el("div", { class: "destination" });
+  // Cards archived in this session. The server serves no archived-card read
+  // (crates/api/src/board.rs is live-only), so this is the only honest list an Unarchive control
+  // can name — the same session-state parity apps/web keeps (screens/boards.rs:544,1123).
+  const archived = [];
   const section = el(
     "section",
     { class: "destination" },
@@ -221,6 +225,8 @@ async function board(ctx, id) {
       ctx.api.request(`/api/boards/${id}/cards?limit=200`),
     ]);
     const lanes = rows(view?.lists).map((entry) => entry?.list ?? entry);
+    const labels = rows(view?.labels);
+    const fields = rows(view?.fields);
     const cards = rows(page);
     body.replaceChildren();
     section.querySelector("h1").textContent = text(view?.board, "name");
@@ -250,7 +256,38 @@ async function board(ctx, id) {
     const laneHost = el("div", { class: "destination" });
     for (const lane of lanes) {
       const laneId = text(lane, "id");
-      const block = el("section", {}, el("h2", { text: text(lane, "name") }));
+      const laneHead = el("div", { class: "lane-head" }, el("h2", { text: text(lane, "name") }));
+      if (ctx.hasAction("lists.update")) {
+        laneHead.append(
+          el("button", {
+            class: "button ghost",
+            type: "button",
+            text: "Rename lane",
+            onClick: () =>
+              ctx.shell.openAction("lists.update", {
+                title: "Rename lane",
+                initial: { id: laneId, name: text(lane, "name") },
+                onDone: load,
+              }),
+          }),
+        );
+      }
+      if (ctx.hasAction("lists.move")) {
+        laneHead.append(
+          el("button", {
+            class: "button ghost",
+            type: "button",
+            text: "Move lane",
+            onClick: () =>
+              ctx.shell.openAction("lists.move", {
+                title: "Move lane",
+                initial: { id: laneId },
+                onDone: load,
+              }),
+          }),
+        );
+      }
+      const block = el("section", {}, laneHead);
       const laneCards = cards.filter((card) => text(card, "list_id") === laneId);
       if (laneCards.length === 0) {
         block.append(el("div", { class: "empty" }, el("p", { text: "No card in this lane." })));
@@ -318,10 +355,80 @@ async function board(ctx, id) {
                   ctx.shell.openAction("cards.archive", {
                     title: "Archive card",
                     initial: { id: cardId },
-                    onDone: load,
+                    // The server exposes no archived-card read (api/board.rs is live-only), so an
+                    // archived card is remembered for this session exactly as apps/web does
+                    // (screens/boards.rs:544,1123). It is what "Unarchive" can offer.
+                    onDone: () => {
+                      archived.push({ id: cardId, name: text(card, "name") });
+                      load();
+                    },
                   }),
               }),
             );
+          }
+          if (labels.length > 0 && (ctx.hasAction("cards.add_label") || ctx.hasAction("cards.remove_label"))) {
+            const pick = /** @type {HTMLSelectElement} */ (
+              el("select", { "aria-label": `Label for ${text(card, "name")}` })
+            );
+            for (const label of labels) {
+              pick.append(el("option", { value: text(label, "id"), text: text(label, "name") }));
+            }
+            cells[4].append(pick);
+            for (const [name, verb] of [["cards.add_label", "Add label"], ["cards.remove_label", "Remove label"]]) {
+              if (!ctx.hasAction(name)) continue;
+              cells[4].append(
+                el("button", {
+                  class: "button ghost",
+                  type: "button",
+                  text: verb,
+                  onClick: () =>
+                    ctx.shell.openAction(name, {
+                      title: verb,
+                      initial: { card_id: cardId, label_id: pick.value },
+                      onDone: load,
+                    }),
+                }),
+              );
+            }
+          }
+          if (fields.length > 0 && (ctx.hasAction("custom_fields.set_value") || ctx.hasAction("custom_fields.clear_value"))) {
+            const pick = /** @type {HTMLSelectElement} */ (
+              el("select", { "aria-label": `Field for ${text(card, "name")}` })
+            );
+            for (const field of fields) {
+              pick.append(el("option", { value: text(field, "id"), text: text(field, "name") }));
+            }
+            cells[4].append(pick);
+            if (ctx.hasAction("custom_fields.set_value")) {
+              cells[4].append(
+                el("button", {
+                  class: "button ghost",
+                  type: "button",
+                  text: "Set value",
+                  onClick: () =>
+                    ctx.shell.openAction("custom_fields.set_value", {
+                      title: "Set field value",
+                      initial: { card_id: cardId, custom_field_id: pick.value },
+                      onDone: load,
+                    }),
+                }),
+              );
+            }
+            if (ctx.hasAction("custom_fields.clear_value")) {
+              cells[4].append(
+                el("button", {
+                  class: "button ghost",
+                  type: "button",
+                  text: "Clear value",
+                  onClick: () =>
+                    ctx.shell.openAction("custom_fields.clear_value", {
+                      title: "Clear field value",
+                      initial: { card_id: cardId, custom_field_id: pick.value },
+                      onDone: load,
+                    }),
+                }),
+              );
+            }
           }
           tbody.append(el("tr", {}, ...cells));
         }
@@ -329,6 +436,33 @@ async function board(ctx, id) {
         block.append(node);
       }
       laneHost.append(block);
+    }
+    if (archived.length > 0) {
+      const list = el("section", { class: "destination" }, el("h2", { text: "Archived this session" }));
+      for (const card of archived) {
+        const row = el("div", { class: "archived-card" }, el("span", { text: card.name }));
+        if (ctx.hasAction("cards.unarchive")) {
+          row.append(
+            el("button", {
+              class: "button ghost",
+              type: "button",
+              text: "Unarchive",
+              onClick: () =>
+                ctx.shell.openAction("cards.unarchive", {
+                  title: "Unarchive card",
+                  initial: { id: card.id },
+                  onDone: () => {
+                    const at = archived.findIndex((entry) => entry.id === card.id);
+                    if (at >= 0) archived.splice(at, 1);
+                    load();
+                  },
+                }),
+            }),
+          );
+        }
+        list.append(row);
+      }
+      body.append(list);
     }
     body.append(laneHost);
   }
