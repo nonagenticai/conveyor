@@ -76,10 +76,24 @@ findings). Recorded, not a defect.
 
 ## P3 — the evidence
 
-- Inputs: `docs/evidence/tranche-review/inputs/` — eight files (the T3 contract, board decision,
-  contract approval, Phase-G review, the two schedule baselines, the two closes).
-- Commands: `/tmp/conv852-verify.sh` — `verify-project`, `check-tranche-exit`, `audit`. Their
+- Inputs: `docs/evidence/tranche-review/inputs/` — the T3 contract, board decision, contract
+  approval, Phase-G review, the schedule and cost baselines, the two closes, the two register
+  sets, `t3-artefacts.json`, and `delivery/` (the 12 authored v4 delivery documents).
+- Tooling defect found and fixed on this lane (`f20389980`): `compose-artefact-bodies.py` and
+  `publish-artefact-bodies.py` called `gen.applies()` without `class_by_key`, so every
+  class-declared category answered `NOT_APPLICABLE` while the generator listed the instance —
+  `--check-category` could never pass for the four v4 delivery categories. A self-test fails if
+  the argument is dropped. The composer's self-test fixture was additionally red on main since
+  standards v4 removed the blanket it relied on; the fixture now declares its category.
+- Commands: `runbook/conv852-verify.sh` — `verify-project`, `check-tranche-exit`, `audit`; the
+  exit check reads the receipts the verify pass writes (`--evidence-dir`; a fix made here). Their
   outputs are recorded at the live pass.
+- **Rehearsal measured on the restore** (`9e2ebbeac`, schema 110): every act above ran; T13
+  closed and T3 closed through the full gate (the gate refused, in order: the cost baseline, the
+  register kinds, the seven ADM artefacts — each added). With standards v4 the exit is **still
+  red**: the members owe the full retrospective lifecycle (`rework-project.py` scale: the
+  register documents, one typed page per ADM artefact, the phase pages — ~35 packages). That
+  rework and the live pass are the next unit; see `runbook/conv852-production-runbook.md`.
 
 ## P4 — the review
 
