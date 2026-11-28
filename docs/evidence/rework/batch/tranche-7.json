@@ -1,61 +1,52 @@
 {
-  "blocked": 2,
-  "generated_at": "2026-11-28T14:56:52+00:00",
+  "blocked": 3,
+  "generated_at": "2026-11-28T15:02:11+00:00",
   "green": 0,
   "members": [
     {
       "factory_exit": 1,
       "gaps": [
         {
-          "detail": "rework: projects.close refused at act 103: error: projects.close refused (409): project S06c cannot close until its mandatory artefacts exist (missing: project-registers, project-wbs)",
+          "detail": "rework: documents.compose refused at act 8: error: documents.compose refused (422): the input does not match the action schema [category: user-stories is not an output category in seed/output-standard.json (unknown_category)]",
           "gap": "instrument",
           "id": null
         }
       ],
       "key": "S06c",
       "log": "docs/evidence/rework/batch/tranche-7/S06c.log",
-      "publish_exit": 1,
+      "publish_exit": null,
       "state": "BLOCKED"
-    },
-    {
-      "factory_exit": 0,
-      "gaps": [
-        {
-          "detail": "4 unresolved P0/P1 package(s): std-delivery-acceptance-criteria-s15:S15 (P1), std-delivery-definition-of-done-s15:S15 (P1), std-delivery-definition-of-ready-s15:S15 (P1), std-delivery-user-stories-s15:S15 (P1)",
-          "gap": "record",
-          "id": "S15-rework",
-          "kind": "snapshot",
-          "severity": "P0"
-        },
-        {
-          "detail": "the gate check 'S15-rework' did not pass",
-          "gap": "code",
-          "id": "gate",
-          "kind": "manifest",
-          "severity": "P0"
-        }
-      ],
-      "key": "S15",
-      "log": "docs/evidence/rework/batch/tranche-7/S15.log",
-      "publish_exit": 1,
-      "state": "RECEIPT_RED"
     },
     {
       "factory_exit": 1,
       "gaps": [
         {
-          "detail": "rework: projects.close refused at act 103: error: projects.close refused (409): project S16 cannot close until its mandatory artefacts exist (missing: project-registers, project-wbs)",
+          "detail": "rework: documents.compose refused at act 8: error: documents.compose refused (422): the input does not match the action schema [category: user-stories is not an output category in seed/output-standard.json (unknown_category)]",
+          "gap": "instrument",
+          "id": null
+        }
+      ],
+      "key": "S15",
+      "log": "docs/evidence/rework/batch/tranche-7/S15.log",
+      "publish_exit": null,
+      "state": "BLOCKED"
+    },
+    {
+      "factory_exit": 1,
+      "gaps": [
+        {
+          "detail": "rework: documents.compose refused at act 8: error: documents.compose refused (422): the input does not match the action schema [category: user-stories is not an output category in seed/output-standard.json (unknown_category)]",
           "gap": "instrument",
           "id": null
         }
       ],
       "key": "S16",
       "log": "docs/evidence/rework/batch/tranche-7/S16.log",
-      "publish_exit": 1,
+      "publish_exit": null,
       "state": "BLOCKED"
     }
   ],
-  "red": 1,
+  "red": 0,
   "snapshot_sha": "7e93a325fe0176ba6e98ce47cae7e1ea2115543f",
   "tranche": 7
 }
