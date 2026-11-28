@@ -115,23 +115,29 @@ tranche 10 is 'planned'; only authorised/closed/in_review may be reworked
 exit=1
 ```
 
+(the refusal is on stderr; stdout is empty, so a check that captures only stdout sees nothing)
+
 This is the **only** refusal: `rework-batch.py::ensure_authorised` refuses a `planned` tranche
 before it reads the roster or the packs. #755 records the tranche-9 review and authorises tranche 10;
 on a fresh snapshot after that, the same command must exit 0 with S12 and T5 `PREFLIGHTED`.
 
 ## Receipt previews at the pin
 
-Both previews were written with `--evidence-dir /tmp/tr10/verify` (never into the repo's evidence
-directory) and are the factory's to replace:
+Both previews were written with `/tmp/tr10/env` sourced (so the charter check can reach the record
+through `PROGRAMME_RECORD_LOCAL_BIN`) and `--evidence-dir /tmp/tr10/verify` (never into the repo's
+evidence directory). A preview run without that env crashes the charter check on a JSON decode —
+an instrument artifact, not a finding. The previews are the factory's to replace; what the factory
+clears is **not claimed here**.
 
-- **S12** — red on `S12-baseline`, `S12-charter`, `S12-closure-outputs`, `S12-contract`, `S12-review`,
-  `S12-closure-gate`, `S12-wsjf`, `S12-demo-credits`, `S12-artefact-standard`, `S12-rework` and the
-  two gate rows. The pack clears the document, artefact, contract, review and WBS checks; the
-  closure rows stay red until #965 and the closure review.
-- **T5** — red on `T5-baseline`, `T5-charter`, `T5-contract`, `T5-review`, `T5-wsjf`,
-  `T5-demo-credits`, `T5-artefact-standard`, `T5-rework` and the two gate rows. `T5-project` now
-  passes on the corrected pin. The pack clears everything except the three CODE packages until #962
-  lands.
+- **S12** — 12 failures: `S12-baseline`, `S12-charter` (`AssertionError: no charter asset`),
+  `S12-closure-outputs`, `S12-contract`, `S12-review`, `S12-closure-gate`, `S12-wsjf`,
+  `S12-demo-credits`, `S12-artefact-standard`, `S12-rework` and the two gate rows. The two closure
+  P1s (`closed_without_closure_review`, `closure_outputs_undeclared`) are open by design until #965
+  and the closure review; the rest are rows the pack's act creates.
+- **T5** — 10 failures: `T5-baseline`, `T5-charter` (`no charter asset`), `T5-contract`,
+  `T5-review`, `T5-wsjf`, `T5-demo-credits`, `T5-artefact-standard`, `T5-rework` and the two gate
+  rows. `T5-project` passes on the corrected pin; `T5-rework` names the three CODE packages among
+  six unresolved P0/P1 packages.
 
 The exit gate refuses too, as a preparation must: `python3 scripts/check-tranche-exit.py --tranche 10
 --snapshot /tmp/snap-10/data --json-out /tmp/tr10/tranche-exit-preview.json` → exit 1, with both
