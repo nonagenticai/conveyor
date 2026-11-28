@@ -24,9 +24,8 @@ on:
   # merge-group ref: the queue waits for the required checks to appear on THAT ref. Without this
   # trigger those checks never run, and every queued PR sits in AWAITING_CHECKS forever (measured
   # on this very PR before this line existed). classify treats any non-pull_request event as
-  # docs_only=false, so the queue runs the same gates the PR did. dco also runs on a push to
-  # main: the scheduled acceptance check reads the release sha's check-runs, and a PR-only dco
-  # job leaves the required `dco` context missing there (the four-day red fixed 2026-11-24).
+  # docs_only=false, and dco is pull_request-only and not a required context, so the queue runs
+  # the same gates the PR did.
   merge_group:
   push:
     branches: [main]
@@ -193,7 +192,7 @@ jobs:
   # Runs on the queue too: a required context that never reports on `merge_group` stalls every
   # entry until timeout, so `dco` could not become required until this job ran there.
   dco:
-    if: ${{ !github.event.repository.private && (github.event_name == 'pull_request' || github.event_name == 'merge_group' || (github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000')) }}
+    if: ${{ !github.event.repository.private && (github.event_name == 'pull_request' || github.event_name == 'merge_group') }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -203,8 +202,8 @@ jobs:
           persist-credentials: false
       - name: every commit is signed off
         env:
-          BASE_SHA: ${{ github.event.merge_group.base_sha || github.event.pull_request.base.sha || github.event.before }}
-          HEAD_SHA: ${{ github.event.merge_group.head_sha || github.event.pull_request.head.sha || github.sha }}
+          BASE_SHA: ${{ github.event.merge_group.base_sha || github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.merge_group.head_sha || github.event.pull_request.head.sha }}
           EVENT_NAME: ${{ github.event_name }}
           MERGE_BASE_REF: ${{ github.event.merge_group.base_ref }}
           MERGE_HEAD_REF: ${{ github.event.merge_group.head_ref }}
@@ -213,14 +212,11 @@ jobs:
           # The merge queue SQUASHES: `merge_group.head_sha` is one synthetic commit, and a
           # squash cannot carry a trailer of its own, so checking it fails for every PR whose
           # history has more than one commit while single-commit PRs pass by accident (their
-          # message is reused verbatim). Check the commits the queue actually squashes — the PR
-          # branch the event names — so the gate means the same thing on both events.
+          # message is reused verbatim). `merge_group.head_ref` is the queue's synthetic ref
+          # (`refs/heads/gh-readonly-queue/<base>/pr-<n>-<sha>`), not the PR branch; the commits
+          # the queue squashes are published as `refs/pull/<n>/head`.
           range="$BASE_SHA..$HEAD_SHA"
           if [ "$EVENT_NAME" = "merge_group" ]; then
-            # `merge_group.head_ref` is the queue's synthetic ref
-            # (`refs/heads/gh-readonly-queue/<base>/pr-<n>-<sha>`), not the PR's branch, and the
-            # commits the queue squashes are published as `refs/pull/<n>/head`. Read the number
-            # from the synthetic ref and fetch that.
             pr="$(printf '%s' "$MERGE_HEAD_REF" | sed -n 's|.*/pr-\([0-9][0-9]*\)-.*|\1|p')"
             if [ -z "$pr" ]; then
               echo "::error::DCO: cannot read the PR number from merge_group.head_ref=$MERGE_HEAD_REF"
