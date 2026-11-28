@@ -1796,6 +1796,26 @@ class Runner:
             )
             self.decide(taken["approval_id"], f"approve the {kind} baseline")
 
+    def documents_only(self) -> None:
+        """Publish the content file's authored documents, without the lifecycle.
+
+        The campaign route (#930): the content file carries the category bodies, and the record
+        already holds the project and its lifecycle. Nothing is reopened, chartered, contracted
+        or closed; the project id comes from the committed snapshot, so no live snapshot is
+        needed to start.
+        """
+        data = json.loads(
+            (ROOT / "docs" / "design" / "data" / "programme.json").read_text(encoding="utf-8")
+        )
+        project = next(
+            (row for row in data.get("projects") or [] if row.get("key") == self.project),
+            None,
+        )
+        if project is None:
+            fail(f"{self.project}: no project row in the committed snapshot")
+        self.project_id = str(project["id"])
+        self.ensure_documents()
+
     def ensure_documents(self) -> None:
         """Publish the pack's authored category documents.
 
@@ -2302,6 +2322,11 @@ def main() -> None:
     parser.add_argument("--project")
     parser.add_argument("--content", type=Path)
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument(
+        "--documents-only",
+        action="store_true",
+        help="publish the content file's authored documents and stop; run no lifecycle step",
+    )
     parser.add_argument("--self-test", action="store_true")
     parser.add_argument(
         "--tranche-label",
@@ -2344,7 +2369,7 @@ def main() -> None:
             f"Delegation: `{DELEGATION}`. {args.tranche_label.capitalize()}.\n\n",
             encoding="utf-8",
         )
-    Runner(
+    runner = Runner(
         args.project,
         content,
         evidence,
@@ -2354,7 +2379,11 @@ def main() -> None:
         acts_path=args.acts,
         keep_active=args.keep_active,
         closure_asset=args.closure_asset,
-    ).run()
+    )
+    if args.documents_only:
+        runner.documents_only()
+        return
+    runner.run()
 
 
 if __name__ == "__main__":
