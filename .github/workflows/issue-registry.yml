@@ -121,6 +121,12 @@ jobs:
           # `--check` needs no pandoc (the design-pack job runs it on the same stock runner); the
           # generator does, and the registry refresh never changes a Markdown source.
           python3 docs/design/scripts/build-docs.py --check
+          # The manifest indexes every snapshot file with its sha256/bytes/records. The generators
+          # above move data files; re-pin the index from disk, or `design-pack` fails its hash
+          # check (measured on generated PR #907 after #846 expanded the index to every file).
+          # This attests the bytes on disk; the live publish still owns the provenance fields and
+          # overwrites the whole manifest on its next run.
+          python3 docs/design/scripts/repin-manifest.py
           if [ -z "$(git status --porcelain -- docs/design/data)" ]; then
             echo "The registry and its derived data match GitHub; no branch, no PR." >> "$GITHUB_STEP_SUMMARY"
             exit 0
