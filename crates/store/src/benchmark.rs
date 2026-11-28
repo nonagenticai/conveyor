@@ -784,6 +784,43 @@ pub async fn finalise_case_tx(
         })
 }
 
+/// Withhold a produced patch that is not a valid unified diff (#908).
+///
+/// The verdict is `apply_failed` — the class the grader writes when a patch cannot be applied —
+/// with the shape reason in `detail`, and **no sandbox Job is spent**. Conditional on the case
+/// still being pending, so a re-delivered producer cannot rewrite it.
+pub async fn withhold_malformed_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    run_id: Uuid,
+    instance_id: &str,
+    patch: &str,
+    patch_sha256: &str,
+    shape: &str,
+) -> Result<bool, BenchmarkStoreError> {
+    let detail = json!({
+        "reason": "the produced patch is not a valid unified diff",
+        "shape": shape,
+        "source": "producer-shape-check",
+    });
+    let result = sqlx::query(
+        "UPDATE benchmark_case
+            SET produce_status = 'ok', patch = $4, patch_sha256 = $5, verdict = 'apply_failed',
+                detail = $6, produced_at = now(), updated_at = now()
+          WHERE tenant_id = $1 AND benchmark_run_id = $2 AND instance_id = $3
+            AND verdict = 'pending' AND produce_status = 'pending' AND sandbox_ref IS NULL",
+    )
+    .bind(tenant.as_uuid())
+    .bind(run_id)
+    .bind(instance_id)
+    .bind(patch)
+    .bind(patch_sha256)
+    .bind(detail)
+    .execute(&mut *conn)
+    .await?;
+    Ok(result.rows_affected() == 1)
+}
+
 /// One keyset page of cases for a run, optionally filtered by verdict.
 pub async fn list_cases_tx(
     conn: &mut PgConnection,

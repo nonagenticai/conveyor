@@ -45,6 +45,21 @@ const DIFF: &str = "diff --git a/django/core.py b/django/core.py\n\
 -a\n\
 +b\n";
 
+/// The measured 2026-11-27 failure shape (#908): a three-line header over seven changed lines,
+/// which no apply tool accepts.
+const MALFORMED_DIFF: &str = "--- a/django/core.py\n\
++++ b/django/core.py\n\
+@@ -1,3 +1,3 @@\n\
+-a\n\
+-b\n\
++a\n\
++b\n\
++c\n\
++d\n\
++e\n\
++f\n\
++g\n";
+
 fn sha256_hex(text: &str) -> String {
     let mut hasher = Sha256::new();
     hasher.update(text.as_bytes());
@@ -124,7 +139,13 @@ async fn answer(
             Json(json!({"error": {"message": "the router refused the request"}})),
         );
     }
-    let content = if text.contains("EMPTY") { "" } else { DIFF };
+    let content = if text.contains("EMPTY") {
+        ""
+    } else if text.contains("MALFORMED") {
+        MALFORMED_DIFF
+    } else {
+        DIFF
+    };
     (
         StatusCode::OK,
         Json(json!({
@@ -328,6 +349,27 @@ async fn case_row(
     row
 }
 
+/// `(produce_status, patch, verdict, sandbox_ref, detail)` — the whole case row a verdict needs.
+async fn verdict_row(
+    db: &common::TestDb,
+    fixture: &Fixture,
+) -> (String, Option<String>, String, Option<String>, Value) {
+    let mut tx = store::begin_scoped(&db.runtime, fixture.tenant)
+        .await
+        .expect("scoped");
+    let row = sqlx::query_as(
+        "SELECT produce_status, patch, verdict, sandbox_ref, detail
+           FROM benchmark_case WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(fixture.tenant.as_uuid())
+    .bind(fixture.case_id)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("case row");
+    tx.commit().await.expect("commit");
+    row
+}
+
 /// `(prompt_ref, run_id, caller_kind)` of the tenant's most recent model call.
 async fn inference_row(
     db: &common::TestDb,
@@ -466,6 +508,51 @@ async fn an_empty_answer_is_no_attempt_not_a_model_failure() {
     assert!(patch.is_none());
     assert!(sha.is_none());
     assert_eq!(attempts, 1);
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn a_malformed_diff_is_withheld_without_a_sandbox_job() {
+    let _serial = SERIAL.lock().await;
+    let _stub = stub();
+    let db = common::TestDb::fresh().await;
+    let fixture = fixture(
+        &db,
+        "MALFORMED: the ordering endpoint returns the wrong total.",
+    )
+    .await;
+
+    produce(&db.runtime, fixture.tenant, "conveyor", &payload(&fixture))
+        .await
+        .expect("produce");
+
+    let (status, patch, verdict, sandbox_ref, detail) = verdict_row(&db, &fixture).await;
+    assert_eq!(
+        status, "ok",
+        "the model answered; the patch exists and is stored"
+    );
+    assert!(
+        patch.is_some_and(|patch| patch.contains("@@ -1,3 +1,3 @@")),
+        "the malformed patch is kept as evidence"
+    );
+    assert_eq!(
+        verdict, "apply_failed",
+        "the class the grader would have written; no count changes"
+    );
+    assert!(
+        sandbox_ref.is_none(),
+        "a shape that cannot apply spends no sandbox Job"
+    );
+    assert_eq!(
+        detail["reason"], "the produced patch is not a valid unified diff",
+        "the reason separates a malformed diff from a base/patch mismatch"
+    );
+    assert!(
+        detail["shape"]
+            .as_str()
+            .unwrap_or_default()
+            .contains("declares -3 +3"),
+        "the detail names the header's counts: {detail}"
+    );
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
