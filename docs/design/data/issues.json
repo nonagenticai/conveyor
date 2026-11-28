@@ -46,9 +46,9 @@
     {
       "number": 920,
       "title": "standards: the full evidence set (v4), the register and the INVEST/DoD contract",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/920",
-      "updatedAt": "2026-11-28T09:26:28Z",
+      "updatedAt": "2026-11-28T10:17:27Z",
       "labels": [
         {
           "name": "unit",
@@ -69,7 +69,7 @@
       "title": "ci: the registry refresh re-pins the design snapshot manifest after regenerating derived data",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/918",
-      "updatedAt": "2026-11-28T08:48:54Z",
+      "updatedAt": "2026-11-28T09:59:17Z",
       "labels": [
         {
           "name": "unit",
@@ -728,7 +728,7 @@
       "title": "programme: promote the reworked record to production and record the tranche-3 review",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/852",
-      "updatedAt": "2026-11-28T09:10:02Z",
+      "updatedAt": "2026-11-28T09:51:07Z",
       "labels": [
         {
           "name": "unit",
