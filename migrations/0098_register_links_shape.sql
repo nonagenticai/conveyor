@@ -24,6 +24,10 @@
 
 ALTER TABLE project_register_item NO FORCE ROW LEVEL SECURITY;
 
+ALTER TABLE project_register_item
+    DROP CONSTRAINT project_register_item_change_impact;
+
+
 UPDATE project_register_item
    SET links = jsonb_build_object(
            'cards',
@@ -47,6 +51,28 @@ UPDATE project_register_item
     OR jsonb_typeof(links->'cards') IS DISTINCT FROM 'array'
     OR jsonb_typeof(links->'requirements') IS DISTINCT FROM 'array'
     OR jsonb_typeof(links->'decisions') IS DISTINCT FROM 'array';
+
+
+-- 0083 created this constraint NOT VALID so legacy rows are tolerated. The links UPDATE above
+-- touches such a row (CR-WALK-001 carries `impact = 3`), and any UPDATE re-checks the constraint;
+-- it is re-added exactly as 0083 defined it, so new writes stay locked and legacy rows stay exempt.
+ALTER TABLE project_register_item
+    ADD CONSTRAINT project_register_item_change_impact CHECK (
+        kind <> 'change'
+        OR (baseline_ref IS NOT NULL
+            AND meta ? 'impact'
+            AND jsonb_typeof(meta->'impact') = 'object'
+            AND (
+                ((meta->'impact') ? 'scope'
+                    AND (meta->'impact')->'scope' <> 'null'::jsonb)
+                OR ((meta->'impact') ? 'schedule'
+                    AND (meta->'impact')->'schedule' <> 'null'::jsonb)
+                OR ((meta->'impact') ? 'cost'
+                    AND (meta->'impact')->'cost' <> 'null'::jsonb)
+                OR ((meta->'impact') ? 'risk'
+                    AND (meta->'impact')->'risk' <> 'null'::jsonb)
+            ))
+    ) NOT VALID;
 
 ALTER TABLE project_register_item FORCE ROW LEVEL SECURITY;
 
