@@ -24,16 +24,17 @@ async fn lane(
     kind: &str,
     position: i32,
 ) -> Uuid {
-    // `list.position` is `numeric`; a literal keeps the bind set to the columns sqlx types
-    // exactly (the test's own constant, never caller data).
-    sqlx::query_scalar(&format!(
+    // `list.position` is `numeric`; `$5::numeric` binds the test's own constant, so the query
+    // stays a literal (the workspace's dynamic-SQL lint refuses a formatted statement).
+    sqlx::query_scalar(
         "INSERT INTO list (tenant_id, board_id, name, position, kind)
-         VALUES ($1, $2, $3, {position}, $4) RETURNING id"
-    ))
+         VALUES ($1, $2, $3, $5::numeric, $4) RETURNING id",
+    )
     .bind(seeded.tenant)
     .bind(seeded.board)
     .bind(name)
     .bind(kind)
+    .bind(position.to_string())
     .fetch_one(pool)
     .await
     .expect("the lane")
