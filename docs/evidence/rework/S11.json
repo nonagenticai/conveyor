@@ -169,16 +169,16 @@
   ],
   "failures": [],
   "gate": "S11's gate is author \u2192 publish \u2192 execute a procedure run; \u00a77 adds the gate, refusal, retry and publish-time proofs.",
-  "generated_at": "2026-11-28T07:31:40.937766+00:00",
+  "generated_at": "2026-11-28T07:44:11.326454+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S11.toml",
   "name": "Processes, steps and SOPs \u2014 executable documentation",
   "project": "S11",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-28T07:31:14.033638+00:00",
-    "git_sha": "a38b80cdfca23097479d3c237c84e8d11f790a62",
-    "path": "retained-snapshot/a38b80cdfca23097479d3c237c84e8d11f790a62"
+    "generated_at": "2026-11-28T07:39:45.752107+00:00",
+    "git_sha": "cdd32ea2e951f937472c90ad513d4c4a42c75cff",
+    "path": "retained-snapshot/cdd32ea2e951f937472c90ad513d4c4a42c75cff"
   },
   "verdict": "green",
   "warnings": []
