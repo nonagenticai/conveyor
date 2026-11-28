@@ -2312,6 +2312,8 @@ def build_document(
         html_out.mkdir(parents=True, exist_ok=True)
         (html_out / "index.html").write_text(render_index(instances, generated_at, git_sha), encoding="utf-8")
     due = [item for item in instances if item.get("due_state") == "due"]
+    required = [item for item in due if item["mandatory"]]
+    optional = [item for item in due if not item["mandatory"]]
     summary = {
         "artefacts": len(instances),
         "mandatory": sum(1 for item in instances if item["mandatory"]),
@@ -2326,6 +2328,19 @@ def build_document(
         "due_evidenced": sum(1 for item in due if item["status"] == "evidenced"),
         "due_partial": sum(1 for item in due if item["status"] == "partial"),
         "due_absent": sum(1 for item in due if item["status"] == "absent"),
+        # Required is the gate; optional is visible work. A class may declare an artefact whose
+        # presence is useful but not owed (an inception analysis, an ADM phase outside the
+        # engagement). Mixing the two made 173 optional rows read as debt in v4.
+        "required_due": len(required),
+        "required_evidenced": sum(1 for item in required if item["status"] == "evidenced"),
+        "required_partial": sum(1 for item in required if item["status"] == "partial"),
+        "required_absent": sum(1 for item in required if item["status"] == "absent"),
+        "optional_due": len(optional),
+        "optional_absent": sum(1 for item in optional if item["status"] == "absent"),
+        # The denominator is versioned: a later standard cannot retroactively make an earlier
+        # review non-conformant, and the page can say which due set it is showing.
+        "standard_version": std.get("version"),
+        "scope_through_tranche": (std.get("scope") or {}).get("through_tranche"),
         "findings": len(findings),
     }
     by_standard: dict[str, dict[str, int]] = {}

@@ -334,9 +334,10 @@ jobs:
   # Playwright is pinned and installed here: six checks launch a headless chromium, and the
   # pack has no package.json of its own.
   design-pack:
-    # A required context (#789): the merge queue evaluates required checks on the merge-group ref,
-    # so this job must run there or every queued PR waits forever. Measured 2m56s on PR #775
-    # against the 20-minute cap; the pull_request run remains the pre-queue verdict.
+    # Runs on the merge queue so the pack is checked on the exact queued tree (#789). It is NOT
+    # one of the ruleset's required contexts (measured 2026-11-28: checks, image, no-private-refs,
+    # secret-scan, service-image), which is why the evidence ratchet lives in `checks` below, not
+    # here. Measured 2m56s on PR #775 against the 20-minute cap.
     if: ${{ !github.event.repository.private }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -556,14 +557,40 @@ jobs:
           tar -xzf "$RUNNER_TEMP/audit.tgz" -C "$RUNNER_TEMP"
           "$RUNNER_TEMP/cargo-audit-x86_64-unknown-linux-musl-v0.22.2/cargo-audit" audit
 
-  # The REQUIRED context (ruleset 27178695). It runs no tests: its only job is to name the
-  # verdict for every shard, so the ruleset never has to know how many shards exist.
+  # The evidence ratchet (#928). Deliberately NOT in design-pack: design-pack is not a required
+  # context (the ruleset names checks, image, no-private-refs, secret-scan, service-image), so a
+  # rule placed only there would be advice. This job runs on every PR and merge group, including
+  # docs-only and generated-only changes — a standard change is exactly a docs/data change — and
+  # the required `checks` context below fails when it fails.
+  evidence-ratchet:
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: the required-evidence ratchet
+        run: |
+          set -euo pipefail
+          python3 scripts/check-evidence-ratchet.py --self-test
+          # The base repository's main, never the fork's: a fork PR's `origin` is the fork.
+          git fetch --no-tags "https://github.com/${GITHUB_REPOSITORY}.git" \
+            main:refs/remotes/base/main
+          python3 scripts/check-evidence-ratchet.py --base base/main
+
+  # The REQUIRED context (ruleset 27178695). It runs no tests of its own: its job is to name the
+  # verdict for every shard and the evidence ratchet, so the ruleset never has to know how many
+  # shards exist.
   #
   # `always()` so a failed shard still produces a red `checks` rather than a missing context —
   # the file's own classify comment records what a MISSING required context costs (every queued
   # PR sits in AWAITING_CHECKS forever). A docs-only PR skips the shards by design and passes.
   checks:
-    needs: [classify, checks-shard]
+    needs: [classify, checks-shard, evidence-ratchet]
     if: ${{ always() && !github.event.repository.private }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -575,12 +602,19 @@ jobs:
       - name: every shard passed
         env:
           SHARD_RESULT: ${{ needs.checks-shard.result }}
+          RATCHET_RESULT: ${{ needs.evidence-ratchet.result }}
           DOCS_ONLY: ${{ needs.classify.outputs.docs_only }}
           GENERATED_ONLY: ${{ needs.classify.outputs.generated_only }}
           CHECKS_SKIP: ${{ needs.classify.outputs.checks_skip }}
           EVENT_NAME: ${{ github.event_name }}
         run: |
           set -euo pipefail
+          # The ratchet is checked before the docs-only short-circuit on purpose: a standard
+          # change is docs/data-only, and that is exactly when the ratchet must speak.
+          if [ "${RATCHET_RESULT}" != "success" ]; then
+            echo "::error::evidence-ratchet finished '${RATCHET_RESULT}', not 'success'"
+            exit 1
+          fi
           if [ "${DOCS_ONLY}" = "true" ]; then
             echo "docs-only PR: the code gates were skipped by classify"
             exit 0

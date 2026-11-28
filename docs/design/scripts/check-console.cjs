@@ -3508,8 +3508,21 @@ function readBody(req, done) {
       assert.match(scorecardText, /2 open · 1 findings/, "an open-package count renders");
       // #528: the generated standards record at L1 — per-standard evidenced/partial/absent counts.
       const standardsSummary = await page.locator("#main .std-rail").first().innerText();
-      assert.match(standardsSummary, /MSP 0\/1 evidenced/, "L1 counts the MSP artefacts");
-      assert.match(standardsSummary, /TOGAF 0\/1 evidenced/, "L1 counts the TOGAF artefacts");
+      assert.match(
+        standardsSummary,
+        /Required 1\/3 evidenced/,
+        "L1 leads with the required coverage",
+      );
+      assert.match(
+        standardsSummary,
+        /MSP 0\/1 required evidenced/,
+        "L1 counts the MSP artefacts",
+      );
+      assert.match(
+        standardsSummary,
+        /TOGAF 0\/1 required evidenced/,
+        "L1 counts the TOGAF artefacts",
+      );
       assert.match(standardsSummary, /1 partial/, "L1 names the partial artefact");
       assert.match(standardsSummary, /1 absent/, "L1 names the absent artefact");
       // L2: the programme drill — only its projects, grouped by MSP tranche.
