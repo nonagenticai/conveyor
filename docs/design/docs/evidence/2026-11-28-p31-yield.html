@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>P3.1 — the yield after #900, measured at one deployed revision (2026-11-28) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-28-p31-yield.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="p31--the-yield-after-900-measured-at-one-deployed-revision-2026-11-28">P3.1 — the yield after #900, measured at one deployed revision (2026-11-28)</h1>
+<p>Issue #12 (owner-reopened for the missing live proof) and #900's P1 fix (PR #909, <code>70576b12d</code>). Two fresh 12-case arms, the same inputs as the 2026-11-27 measurement, at the first revision that carried the fix through a working deploy (the #922 migration repair, <code>4775b3312</code>, is an ancestor).</p>
+<h2 id="the-deployed-revision">The deployed revision</h2>
+<table>
+<thead>
+<tr>
+<th>item</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CONVEYOR_GIT_SHA</code></td>
+<td><code>e6c36e664ad071a144491b8537be162efd4cd8e0</code> — read with <code>printenv</code> on both <code>deploy/conveyor</code> and <code>deploy/conveyor-worker</code>, not taken from the manifest</td>
+</tr>
+<tr>
+<td>image</td>
+<td><code>ghcr.io/nonagenticai/conveyor:latest@sha256:31f94da4…</code> (the <code>:latest</code> the image policy resolved at the run)</td>
+</tr>
+<tr>
+<td>schema</td>
+<td><code>_sqlx_migrations</code> max <code>110</code>, 107 applied; <code>project_register_item_change_impact</code> <code>convalidated = f</code></td>
+</tr>
+<tr>
+<td>pods</td>
+<td><code>conveyor</code> 2/2, <code>conveyor-worker</code> 1/1 — no <code>Init:CrashLoopBackOff</code></td>
+</tr>
+<tr>
+<td>suite</td>
+<td><code>verified50-v1</code> · <code>01a1d039-0d04-7568-98ab-457e1d84fab0</code></td>
+</tr>
+<tr>
+<td>subset</td>
+<td>the same 12 django instances, <code>concurrency=6</code>, <code>with_failing_test=true</code>, oracle <code>files+test</code></td>
+</tr>
+<tr>
+<td>subject</td>
+<td>capability agent <code>development_source_security_patch</code> · <code>01a1d3e9-5ac3-7bac-90f6-d3fb266147f6</code> · <code>subject_version=4</code> · model <code>local-llm</code></td>
+</tr>
+</tbody>
+</table>
+<p>The deployment itself is the #921/#922 proof: migration 98 applied, the 0083 constraint is back <code>NOT VALID</code> with its 0083 expression, and 99–110 ran clean for the first time on the live database.</p>
+<h2 id="the-two-runs">The two runs</h2>
+<table>
+<thead>
+<tr>
+<th>run</th>
+<th>arm</th>
+<th>id</th>
+<th>n</th>
+<th>graded</th>
+<th>resolved</th>
+<th>unresolved</th>
+<th>apply_failed</th>
+<th>no_attempt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>direct</td>
+<td><code>baseline</code></td>
+<td><code>01a221ff-cc49-7dec-8b4c-84431bc999d4</code></td>
+<td>12</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+<td>4</td>
+<td>6</td>
+</tr>
+<tr>
+<td>pipeline</td>
+<td><code>conveyor</code></td>
+<td><code>01a22202-2624-710c-b089-41316fd203ed</code></td>
+<td>12</td>
+<td>3</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>6</td>
+</tr>
+</tbody>
+</table>
+<p>Both runs <code>succeeded</code>; the windows are 11:52–11:59Z and 11:53–12:01Z on 2026-11-28. No merge or rollout landed inside either window (the worker pods were 10 minutes old at the second run's end).</p>
+<h2 id="the-idempotency-fix-is-live-and-measured">The idempotency fix is live and measured</h2>
+<p>Neither arm recorded an <code>idempotency-conflict</code>. The 2026-11-27 pipeline arm recorded three (<code>a request with this Idempotency-Key is still running</code>, written as a terminal <code>no_attempt</code>). #900's P1 — a claim whose call's own deadline has passed is reclaimable, so the retry executes — is deployed at <code>e6c36e664</code> and works.</p>
+<h2 id="the-compare">The compare</h2>
+<p><code>benchmark_runs.compare {"a_run_id": &lt;pipeline&gt;, "b_run_id": &lt;direct&gt;}</code>:</p>
+<pre class="json"><code>{&quot;comparable&quot;: true, &quot;both&quot;: 0, &quot;neither&quot;: 0, &quot;a_only&quot;: 0, &quot;b_only&quot;: 0,
+ &quot;discordant&quot;: 0, &quot;missing_in_one&quot;: 5, &quot;p_value&quot;: 1.0}</code></pre>
+<p>The paired intersection — <code>both + neither + a_only + b_only</code> — is <strong>0</strong>: no case carries a verdict in both arms. The verdict rule needs six same-direction discordant pairs; the instrument yields none.</p>
+<h2 id="why-the-denominator-is-zero">Why the denominator is zero</h2>
+<ul>
+<li><strong>The baseline arm refuses 5 of 12 cases on a 64 KiB source cap.</strong> <code>source_context</code> (<code>apps/server/src/benchmark_producer.rs</code>, <code>MAX_SOURCE_BYTES = 64 * 1024</code>) fetches every oracle file whole and records <code>no_attempt</code> when one exceeds the cap. The five notes name the file: <code>options.py</code> (11149), <code>compiler.py</code> (11490), <code>related.py</code> (13112), <code>query.py</code> (13158), <code>fields/__init__.py</code> (13401). This is structural: the direct arm cannot grade more than seven of these twelve, whatever the model does.</li>
+<li><strong><code>apply_failed</code> still withholds produced patches</strong> — malformed diffs (#908): 4 of 6 in the direct arm, 3 of 6 in the pipeline arm.</li>
+<li><strong><code>inference answered 524</code></strong> (the gateway's 100 s timeout) hit three produce jobs; one died at attempt 3. The pipeline arm also recorded four <code>the agent produced no patch</code>.</li>
+</ul>
+<h2 id="per-case">Per case</h2>
+<table>
+<thead>
+<tr>
+<th>instance</th>
+<th>direct</th>
+<th>pipeline</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>django__django-10880</code></td>
+<td><code>resolved</code></td>
+<td><code>no_attempt</code> (no patch)</td>
+</tr>
+<tr>
+<td><code>django__django-11149</code></td>
+<td><code>no_attempt</code> (source cap: <code>options.py</code>)</td>
+<td><code>no_attempt</code> (524)</td>
+</tr>
+<tr>
+<td><code>django__django-11163</code></td>
+<td><code>apply_failed</code></td>
+<td><code>apply_failed</code></td>
+</tr>
+<tr>
+<td><code>django__django-11451</code></td>
+<td><code>apply_failed</code></td>
+<td><code>resolved</code></td>
+</tr>
+<tr>
+<td><code>django__django-11490</code></td>
+<td><code>no_attempt</code> (source cap: <code>compiler.py</code>)</td>
+<td><code>no_attempt</code> (no patch)</td>
+</tr>
+<tr>
+<td><code>django__django-11848</code></td>
+<td><code>unresolved</code></td>
+<td><code>no_attempt</code> (no patch)</td>
+</tr>
+<tr>
+<td><code>django__django-11880</code></td>
+<td><code>apply_failed</code></td>
+<td><code>unresolved</code></td>
+</tr>
+<tr>
+<td><code>django__django-13112</code></td>
+<td><code>no_attempt</code> (source cap: <code>related.py</code>)</td>
+<td><code>apply_failed</code></td>
+</tr>
+<tr>
+<td><code>django__django-13158</code></td>
+<td><code>no_attempt</code> (source cap: <code>query.py</code>)</td>
+<td><code>no_attempt</code> (524)</td>
+</tr>
+<tr>
+<td><code>django__django-13401</code></td>
+<td><code>no_attempt</code> (source cap: <code>fields/__init__.py</code>)</td>
+<td><code>apply_failed</code></td>
+</tr>
+<tr>
+<td><code>django__django-13512</code></td>
+<td><code>apply_failed</code></td>
+<td><code>unresolved</code></td>
+</tr>
+<tr>
+<td><code>django__django-14500</code></td>
+<td><code>no_attempt</code> (524, attempt 3)</td>
+<td><code>no_attempt</code> (no patch)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="conclusion">Conclusion</h2>
+<ul>
+<li><strong>#900's P1 is proven live</strong>: zero idempotency conflicts in either arm.</li>
+<li><strong>The P3.1 bar is not met</strong> — <code>paired intersection ≥ 6</code> fails at 0 — and the cause is not #900's fix. The baseline arm's source guard removes five cases by construction, <code>apply_failed</code> removes most produced patches (#908), and the upstream 524s remove more.</li>
+<li><strong>#12's acceptance is not met</strong>: a decisive verdict needs six same-direction discordant pairs and the instrument cannot produce one at this shape. No PR.</li>
+</ul>
+<h2 id="artefacts">Artefacts</h2>
+<ul>
+<li>Run ids above are the durable handles: <code>benchmark_runs.get</code>, <code>benchmark_cases.list</code> and <code>benchmark_runs.compare</code> re-read them.</li>
+<li>The next unit is the baseline arm's source-context cap (a whole-file 64 KiB refusal); #908 remains open for the produced-diff shape. Only after both does a 50-case verdict run have a denominator.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/2026-11-28-p31-yield.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

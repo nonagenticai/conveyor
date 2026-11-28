@@ -407,6 +407,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-19-start-agent-ready.md"
     },
     {
+      "title": "P3.1 — the yield after #900, measured at one deployed revision (2026-11-28)",
+      "path": "docs/evidence/2026-11-28-p31-yield.html",
+      "source": "docs/evidence/2026-11-28-p31-yield.md",
+      "section": "Evidence",
+      "sha256": "ed0f23c6d0ddf5ed7ff87993ed8d4973c5c9c8ffe13d996a6f2cf3ee4afc1efc",
+      "bytes": 5465,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-28-p31-yield.md"
+    },
+    {
       "title": "D23's amendment — the eval caller kind: an eval's model calls are attributable",
       "path": "docs/evidence/D23-EVAL-CALLER.html",
       "source": "docs/evidence/D23-EVAL-CALLER.md",
