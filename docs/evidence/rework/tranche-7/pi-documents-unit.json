@@ -1,0 +1,75 @@
+{
+  "schema": "conveyor-pi-documents-unit/v1",
+  "tranche": 7,
+  "tranche_id": "01a1e9e1-0fab-7068-99f2-a233045b1276",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "measured_at": "2026-11-28",
+  "why": "verify-project.py::_published_for_period reads the literal period token `tranche-7` from the published output's title or unit. The two tranche-7 PI outputs were composed without a unit and their titles say 'tranche 7', so the pi_plan and pi_objectives checks would be red for every member. Every tranche 0-6 PI row carries unit 'tranche-N'; these two rows did not.",
+  "before": {
+    "01a22295-ca02-71ab-bd1b-93d4b1ded72a": {
+      "category": "pi-plan",
+      "title": "PI plan \u2014 tranche 7 (retrospective, 2026-11-28)",
+      "unit": null,
+      "version": 2,
+      "published_at": "2026-11-28T14:36:11.619784Z"
+    },
+    "01a22295-cad4-741d-bf7d-7c6640125518": {
+      "category": "pi-objectives",
+      "title": "PI objectives \u2014 tranche 7 (retrospective, 2026-11-28)",
+      "unit": null,
+      "version": 1,
+      "published_at": "2026-11-28T14:36:11.852778Z"
+    }
+  },
+  "writes": [
+    {
+      "action": "documents.update",
+      "id": "01a22295-ca02-71ab-bd1b-93d4b1ded72a",
+      "input": {
+        "id": "01a22295-ca02-71ab-bd1b-93d4b1ded72a",
+        "unit": "tranche-7"
+      },
+      "if_match": 2,
+      "applied": true
+    },
+    {
+      "action": "documents.update",
+      "id": "01a22295-cad4-741d-bf7d-7c6640125518",
+      "input": {
+        "id": "01a22295-cad4-741d-bf7d-7c6640125518",
+        "unit": "tranche-7"
+      },
+      "if_match": 1,
+      "applied": true
+    }
+  ],
+  "after": {
+    "01a22295-ca02-71ab-bd1b-93d4b1ded72a": {
+      "id": "01a22295-ca02-71ab-bd1b-93d4b1ded72a",
+      "title": "PI plan \u2014 tranche 7 (retrospective, 2026-11-28)",
+      "unit": "tranche-7",
+      "category": "pi-plan",
+      "version": 3,
+      "published_at": "2026-11-28T14:36:11.619784Z",
+      "updated_at": "2026-11-28T14:51:39.595850Z",
+      "status": "active"
+    },
+    "01a22295-cad4-741d-bf7d-7c6640125518": {
+      "id": "01a22295-cad4-741d-bf7d-7c6640125518",
+      "title": "PI objectives \u2014 tranche 7 (retrospective, 2026-11-28)",
+      "unit": "tranche-7",
+      "category": "pi-objectives",
+      "version": 2,
+      "published_at": "2026-11-28T14:36:11.852778Z",
+      "updated_at": "2026-11-28T14:51:39.744677Z",
+      "status": "active"
+    }
+  },
+  "verified": {
+    "documents_get": "both rows read back unit=tranche-7, versions 3 and 2, published_at unchanged",
+    "outputs_js": "fresh snapshot /tmp/snap-7-check (git_sha 7e93a325f) renders both rows with unit=tranche-7 and a published_at",
+    "snapshot_generated_at": "2026-11-28T14:51:39.744677+00:00",
+    "check": "python3 scripts/verify-project.py::_published_for_period matches 'tranche-7' in title+unit"
+  },
+  "note": "The write + read-back is performed through scripts/programme-record.py against the replay copy (conveyor-restore, 127.0.0.1:55458); this file is the required evidence path and is completed with the read-backs after the writes. The receipts are rendered from post-write snapshots that render outputs.js from these rows."
+}
