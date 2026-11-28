@@ -770,6 +770,7 @@ class Runner:
         # the row this pack names: T19F's live gate created its seven artefacts under its own
         # titles, so a title match documented the pack's row and left the original's package open.
         # Repair each undocumented row with the pack's content for its type.
+        repaired: dict[str, str] = {}
         for index, artefact in enumerate(self.content["artifacts"]):
             key = artefact_keys[index]
             type_id = str(standard.get(key) or "")
@@ -816,7 +817,58 @@ class Runner:
                     actor=APPROVER,
                     if_match=draft.get("version", 1),
                 )
+                repaired[str(row["id"])] = str(draft["id"])
                 print(f"  artefact: documented the pre-rework row {row.get('title')}")
+        # A supersede copies neither entries nor links. The instance's Links section is resolved
+        # from the links incident to the row, so a repaired row with no links stays partial
+        # (measured on T19F: seven documented drafts, all partial on an empty Links section).
+        # Carry every link incident to a repaired row onto its successor; a resumed run finds the
+        # successor by the type and title the supersede copied.
+        for row in existing:
+            if row.get("status") != "superseded" or str(row.get("id")) in repaired:
+                continue
+            successor = next(
+                (
+                    candidate
+                    for candidate in existing
+                    if candidate is not row
+                    and candidate.get("status") not in ("superseded", "archived")
+                    and str(candidate.get("artifact_type_id") or "")
+                    == str(row.get("artifact_type_id") or "")
+                    and str(candidate.get("title") or "") == str(row.get("title") or "")
+                ),
+                None,
+            )
+            if successor is not None:
+                repaired[str(row["id"])] = str(successor["id"])
+        if repaired:
+            links = self.snapshot_json("architecture.json").get("links") or []
+            edges = {
+                (str(link.get("from_artifact_id")), str(link.get("to_artifact_id")))
+                for link in links
+            }
+            for link in links:
+                source = repaired.get(str(link.get("from_artifact_id")))
+                target = repaired.get(str(link.get("to_artifact_id")))
+                if source is None and target is None:
+                    continue
+                source = source or str(link.get("from_artifact_id"))
+                target = target or str(link.get("to_artifact_id"))
+                if (source, target) in edges:
+                    continue
+                self.invoke(
+                    "architecture.artifacts_link",
+                    {
+                        "from_artifact_id": source,
+                        "to_artifact_id": target,
+                        "kind": str(link.get("kind") or "derivation"),
+                    },
+                    read_action="architecture.artifacts_links",
+                    read_input={"id": source},
+                    read_match=[f"to_artifact_id={target}"],
+                )
+                edges.add((source, target))
+                print("  artefact: carried the superseded row's links onto the repair")
 
         # 6. the delivery contract
         delivery = [
