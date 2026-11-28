@@ -21,42 +21,69 @@
         {
           "axis_a": "Sponsoring group",
           "axis_b": "the tranche-9 authorisation and the tranche review that reads S21's receipt",
-          "value": {"influence": "high", "interest": "high", "engagement": "decide"},
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
           "position": 1
         },
         {
           "axis_a": "SRO",
           "axis_b": "accountable for the message-construction capability and the tranche outcome",
-          "value": {"influence": "high", "interest": "high", "engagement": "accountable"},
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "accountable"
+          },
           "position": 2
         },
         {
           "axis_a": "Architecture Board",
           "axis_b": "approves the Phase A–D artefact set and the retrospective Phase-G level",
-          "value": {"influence": "high", "interest": "medium", "engagement": "approve"},
+          "value": {
+            "influence": "high",
+            "interest": "medium",
+            "engagement": "approve"
+          },
           "position": 3
         },
         {
           "axis_a": "Tenant admin (recipe and release author)",
           "axis_b": "authors recipes, option sets and release anatomy under prompts:write and jobs:write",
-          "value": {"influence": "medium", "interest": "high", "engagement": "collaborate"},
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "collaborate"
+          },
           "position": 4
         },
         {
           "axis_a": "Internal agent (executor run)",
           "axis_b": "receives the compiled prompt the selector chose and the tools the grant enables, nothing wider",
-          "value": {"influence": "low", "interest": "high", "engagement": "informed"},
+          "value": {
+            "influence": "low",
+            "interest": "high",
+            "engagement": "informed"
+          },
           "position": 5
         },
         {
           "axis_a": "Person at the L3 gate",
           "axis_b": "decides the executor approval that applies a parked draft and resumes the run",
-          "value": {"influence": "high", "interest": "high", "engagement": "decide"},
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
           "position": 6
         }
       ],
       "links": [
-        {"to": "Business Capability Map — S21 Message Construction (Phase B)", "kind": "dependency"}
+        {
+          "to": "Business Capability Map — S21 Message Construction (Phase B)",
+          "kind": "dependency"
+        }
       ],
       "body": "# Stakeholder Map — S21 Message Construction (Phase A)\n\n## Metadata\n\nType matrix; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S21; tranche 9; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Authored by the tranche-9 rework; it does not attest contemporaneous intent.\n\n## Entries\n\nSix stakeholders on the influence, interest and engagement axes. The sponsoring group decides the tranche; the SRO is accountable for the capability; the Architecture Board approves the artefact set and the retrospective Phase-G level; a tenant admin authors recipes, option sets and release anatomy under `prompts:write` and `jobs:write`; the internal agent receives only what the selector chose and the grant enables; and a person decides the L3 gate. The split between the builder and the gate decider is the central relationship, because a generated draft can be applied only by a decision that names it.\n\n## Links\n\nDerives from `docs/plans/slices/S21-message-construction.md` §4, §16 and §21; depends on the Business Capability Map for the value each group receives. The roles are the programme's existing ones; the new authorization facts are the `prompts:read` and `prompts:write` scopes and the human-only `executor` approval, which the approval writer enforces.\n\n## Document\n\nThe artefact sits under the slice plan and the project's retrospective architecture set. It is published as an architecture-artifact-instance document by the rework factory, and its subject is the record the 2026-11-28 snapshot carries for S21.\n"
     },
@@ -69,36 +96,59 @@
         {
           "axis_a": "D1 A fixed section list still decides before the run",
           "axis_b": "G1 The executor selects the smallest set of sources that makes this step decidable; O1 a selector with kinds, limits and a deterministic order",
-          "value": {"measure": "the selector's kinds, limit and query replace a fixed five-section template", "owner": "the programme architect", "source": "plan §2 and §12 P2"},
+          "value": {
+            "measure": "the selector's kinds, limit and query replace a fixed five-section template",
+            "owner": "the programme architect",
+            "source": "plan §2 and §12 P2"
+          },
           "position": 1
         },
         {
           "axis_a": "D2 One compiler for every source",
           "axis_b": "G2 Knowledge, memory, request and card text render through one `prompt::compile`; O2 `compile_for_run` resolves, commits, then retrieves with no transaction open",
-          "value": {"measure": "one retrieval implementation reused by `knowledge.query`", "owner": "conveyor-e2e", "source": "plan §4 and §12 P3"},
+          "value": {
+            "measure": "one retrieval implementation reused by `knowledge.query`",
+            "owner": "conveyor-e2e",
+            "source": "plan §4 and §12 P3"
+          },
           "position": 2
         },
         {
           "axis_a": "D3 Provenance without storing the text",
           "axis_b": "G3 Every recorded call names its recipe pin and a 64-hex SHA-256; O3 `inference_call.prompt_ref`, `prompt_version` and `prompt_sha256`",
-          "value": {"measure": "a past call is reproducible from its pins and source identities", "owner": "conveyor-e2e", "source": "plan §5 and §23 P2"},
+          "value": {
+            "measure": "a past call is reproducible from its pins and source identities",
+            "owner": "conveyor-e2e",
+            "source": "plan §5 and §23 P2"
+          },
           "position": 3
         },
         {
           "axis_a": "D4 A generated draft applies only through a gate",
           "axis_b": "G4 An L1 laya decision or an L3 human approval names the draft; O4 `ladder.apply_draft` admits only those decisions and the handover parks the run",
-          "value": {"measure": "the forgeable gate named by rework v1-w1c-2 is closed", "owner": "the tenant approver", "source": "plan §16 and §23 P1"},
+          "value": {
+            "measure": "the forgeable gate named by rework v1-w1c-2 is closed",
+            "owner": "the tenant approver",
+            "source": "plan §16 and §23 P1"
+          },
           "position": 4
         },
         {
           "axis_a": "D5 The level must close",
           "axis_b": "G5 An accepted draft applies, no model call runs without compiled text, recipes are authorable, and a release compiles its knowledge layers; O5 `on_accept`, `prompt_ref_required`, `budget_chars` and `organisation_layer`",
-          "value": {"measure": "`draft_apply_invalid`, `capability_not_ready`, `release_not_ready` and `department_conflict` are typed refusals", "owner": "conveyor-e2e", "source": "plan §23 P1–P4"},
+          "value": {
+            "measure": "`draft_apply_invalid`, `capability_not_ready`, `release_not_ready` and `department_conflict` are typed refusals",
+            "owner": "conveyor-e2e",
+            "source": "plan §23 P1–P4"
+          },
           "position": 5
         }
       ],
       "links": [
-        {"to": "Requirements Catalog — S21 Message Construction (Phase A)", "kind": "derivation"}
+        {
+          "to": "Requirements Catalog — S21 Message Construction (Phase A)",
+          "kind": "derivation"
+        }
       ],
       "body": "# Driver/Goal/Objective Catalog — S21 Message Construction (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S21; tranche 9; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Authored by the tranche-9 rework; it does not attest contemporaneous intent.\n\n## Entries\n\nFive drivers, each with a goal and an objective that names its measure. D1 records that a fixed section list decides before the run what the agent reads, so the target is a selection over candidate sources with a budget and a deterministic order. D2 records §7.7's one compiler and the one retrieval path. D3 records §5's chain from recipe pin to hash to recorded call. D4 records §7.4's gate and the rework finding `v1-w1c-2` that named the forgeable apply. D5 records §23's four closers — apply on accept, prompt_ref required, budget authorable, release layers compiled — each with its typed refusal.\n\n## Links\n\nDerives from `docs/plans/slices/S21-message-construction.md` §2, §4, §5, §7.7 and §23; each objective is realized by a requirement in the Requirements Catalog. The measures are the fields, actions and refusals the build records name, not aspirations.\n\n## Document\n\nThe catalog is the retrospective statement of why S21 exists. Published as an architecture-artifact-instance by the rework factory, it is read with the Requirements Catalog: the drivers justify the requirements, and the requirements name the suites that hold them at the snapshot.\n"
     },
@@ -111,78 +161,129 @@
         {
           "axis_a": "R-1 A required source refuses by name",
           "axis_b": "A step whose recipe requires `procedure` and whose run has none fails before a model call, and an optional section with no source renders nothing",
-          "value": {"check": "conveyor-domain prompt_compile and conveyor-actions prompt_compile", "state": "built; plan §10", "owner": "conveyor-e2e"},
+          "value": {
+            "check": "conveyor-domain prompt_compile and conveyor-actions prompt_compile",
+            "state": "built; plan §10",
+            "owner": "conveyor-e2e"
+          },
           "position": 1
         },
         {
           "axis_a": "R-2 Byte-identical compile",
           "axis_b": "The same recipe and the same facts compile byte-identically; hash equality is the test",
-          "value": {"check": "conveyor-domain prompt_compile", "state": "built; plan §10", "owner": "conveyor-e2e"},
+          "value": {
+            "check": "conveyor-domain prompt_compile",
+            "state": "built; plan §10",
+            "owner": "conveyor-e2e"
+          },
           "position": 2
         },
         {
           "axis_a": "R-3 The hash moves with the card and not across tenants",
           "axis_b": "Changing the card changes `prompt_sha256`; changing an unrelated tenant's card does not",
-          "value": {"check": "conveyor-actions prompt_compile", "state": "built; plan §10", "owner": "conveyor-e2e"},
+          "value": {
+            "check": "conveyor-actions prompt_compile",
+            "state": "built; plan §10",
+            "owner": "conveyor-e2e"
+          },
           "position": 3
         },
         {
           "axis_a": "R-4 Over budget is a refusal, never truncation",
           "axis_b": "A section or prompt over its ceiling refuses with the measured size; `budget = measured` compiles and `measured - 1` refuses",
-          "value": {"check": "conveyor-domain prompt_compile budget boundary", "state": "built; plan §10", "owner": "conveyor-e2e"},
+          "value": {
+            "check": "conveyor-domain prompt_compile budget boundary",
+            "state": "built; plan §10",
+            "owner": "conveyor-e2e"
+          },
           "position": 4
         },
         {
           "axis_a": "R-5 The audit names the compiled text",
           "axis_b": "A finding names the recipe version and the compiled hash it was found against, by `(prompt_ref, prompt_sha256)`",
-          "value": {"check": "conveyor-actions prompt audit and internal_agent_runtime", "state": "built; plan §9 and §23 P2", "owner": "conveyor-e2e"},
+          "value": {
+            "check": "conveyor-actions prompt audit and internal_agent_runtime",
+            "state": "built; plan §9 and §23 P2",
+            "owner": "conveyor-e2e"
+          },
           "position": 5
         },
         {
           "axis_a": "R-6 The plan projection refuses an unexecutable procedure",
           "axis_b": "Publish refuses a declared output that does not resolve, an unproducible input, a future reference or a gate the runtime cannot read, as `422 procedure.plan_invalid`",
-          "value": {"check": "conveyor-actions procedure and procedure_step", "state": "built; receipt docs/evidence/S21-PLAN.md", "owner": "conveyor-e2e"},
+          "value": {
+            "check": "conveyor-actions procedure and procedure_step",
+            "state": "built; receipt docs/evidence/S21-PLAN.md",
+            "owner": "conveyor-e2e"
+          },
           "position": 6
         },
         {
           "axis_a": "R-7 Recipes are immutable per version",
           "axis_b": "One draft and one active per `(tenant, key)`; activate retires the current active version in one transaction; a pin resolves only an active row",
-          "value": {"check": "conveyor-actions prompt_recipes", "state": "built; receipt docs/evidence/S21-WORKPACKAGE.md", "owner": "the tenant admin"},
+          "value": {
+            "check": "conveyor-actions prompt_recipes",
+            "state": "built; receipt docs/evidence/S21-WORKPACKAGE.md",
+            "owner": "the tenant admin"
+          },
           "position": 7
         },
         {
           "axis_a": "R-8 Memory selection is card-scoped and hashed",
           "axis_b": "Newest un-consolidated hot rows first, one digest only if room remains, prior steps before card rows, and row ids inside the hash",
-          "value": {"check": "conveyor-domain prompt_memory and conveyor-store memory", "state": "built; receipts S21-WORKPACKAGE.md and S21-MEMORY.md", "owner": "conveyor-e2e"},
+          "value": {
+            "check": "conveyor-domain prompt_memory and conveyor-store memory",
+            "state": "built; receipts S21-WORKPACKAGE.md and S21-MEMORY.md",
+            "owner": "conveyor-e2e"
+          },
           "position": 8
         },
         {
           "axis_a": "R-9 The tool grant is the intersection",
           "axis_b": "The model's surface is `bound_tools(run) ∩ enabled(grants) ∩ effect ≤ min(grant.max_side_effect, binding.effect_ceiling)`; an enabled grant with no bound tool refuses before the model call",
-          "value": {"check": "conveyor-actions executor_runtime and internal_agent_runtime", "state": "built; receipt docs/evidence/S21-EXECUTOR.md", "owner": "conveyor-e2e"},
+          "value": {
+            "check": "conveyor-actions executor_runtime and internal_agent_runtime",
+            "state": "built; receipt docs/evidence/S21-EXECUTOR.md",
+            "owner": "conveyor-e2e"
+          },
           "position": 9
         },
         {
           "axis_a": "R-10 A draft applies only through a named decision",
           "axis_b": "`ladder.apply_draft` admits only an accepted `gate.precheck` or `gate.draft_apply` decision whose meta names this draft; a handover parks the run at `waiting_approval` and the resume applies it without a model call",
-          "value": {"check": "conveyor-actions draft_apply, decision_ladder and internal_agent_runtime", "state": "built; receipt docs/evidence/S21-APPLY.md", "owner": "the tenant approver"},
+          "value": {
+            "check": "conveyor-actions draft_apply, decision_ladder and internal_agent_runtime",
+            "state": "built; receipt docs/evidence/S21-APPLY.md",
+            "owner": "the tenant approver"
+          },
           "position": 10
         },
         {
           "axis_a": "R-11 The handoff is one transaction",
           "axis_b": "`cards.assign` sets the binding, writes the note as one hot memory row and starts the bound run through the same helper `runs.create` uses, refusing a card that already has a live root run",
-          "value": {"check": "conveyor-actions card_handoff", "state": "built; receipt docs/evidence/S21-HANDOFF.md", "owner": "conveyor-e2e"},
+          "value": {
+            "check": "conveyor-actions card_handoff",
+            "state": "built; receipt docs/evidence/S21-HANDOFF.md",
+            "owner": "conveyor-e2e"
+          },
           "position": 11
         },
         {
           "axis_a": "R-12 The release compiles its knowledge layers",
           "axis_b": "A required kind with no leaf is `409 release_not_ready`; two sibling departments disagreeing on a kind is `422 department_conflict` unless a job-layer row resolves it",
-          "value": {"check": "conveyor-actions organisation and the release snapshot tests", "state": "built; receipts S21-EXECUTION.md and T0-RELEASE-LAYERS.md", "owner": "conveyor-e2e"},
+          "value": {
+            "check": "conveyor-actions organisation and the release snapshot tests",
+            "state": "built; receipts S21-EXECUTION.md and T0-RELEASE-LAYERS.md",
+            "owner": "conveyor-e2e"
+          },
           "position": 12
         }
       ],
       "links": [
-        {"to": "Solution Concept Diagram — S21 Message Construction (Phase A)", "kind": "realization"}
+        {
+          "to": "Solution Concept Diagram — S21 Message Construction (Phase A)",
+          "kind": "realization"
+        }
       ],
       "body": "# Requirements Catalog — S21 Message Construction (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S21; tranche 9; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Authored by the tranche-9 rework; it does not attest contemporaneous intent.\n\n## Entries\n\nTwelve requirements, each the observable behind one rule or one build step. R-1 to R-5 are the plan's §9 acceptance and were proved in the budget, role, plan-projection and compile steps. R-6 adds the publish-time plan projection. R-7 and R-8 are the recipe lifecycle and the memory selector from the work-package envelope. R-9 is the executor's grant intersection. R-10 is the applying gate and its parked run. R-11 is the handoff's single transaction. R-12 is the release's knowledge layers. Each row names the suite the plan assigns and the receipt that recorded it.\n\n## Links\n\nDerives from the Driver/Goal/Objective Catalog and is realized by the Solution Concept Diagram. The source is `docs/plans/slices/S21-message-construction.md` §9 and its §10–§23 build records; the identifiers are local to this pack and do not claim a live requirement register.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It is the bridge from driver to test: a reader can move from a driver through its requirement to the suite and receipt that would prove it, without reading the plan's prose first.\n"
     },
@@ -195,54 +296,89 @@
         {
           "axis_a": "Recipe and sections",
           "axis_b": "`prompt` and `prompt_section` with kinds system, process, capability, role, knowledge, memory and project_card; draft, active and retired, one draft and one active per key",
-          "value": {"writer": "prompt_recipes.create|activate|retire", "rule": "uq_prompt_draft and the unique active index", "store": "migrations 0030, 0031 and 0062"},
+          "value": {
+            "writer": "prompt_recipes.create|activate|retire",
+            "rule": "uq_prompt_draft and the unique active index",
+            "store": "migrations 0030, 0031 and 0062"
+          },
           "position": 1
         },
         {
           "axis_a": "Selector",
           "axis_b": "the section's `selector` names kinds, limit, include_digest, include_steps, step_limit and the knowledge query",
-          "value": {"order": "trust rank, recipe position as tie-break", "budget": "characters, measured per section and per prompt", "refusal": "SectionOverBudget and PromptOverBudget"},
+          "value": {
+            "order": "trust rank, recipe position as tie-break",
+            "budget": "characters, measured per section and per prompt",
+            "refusal": "SectionOverBudget and PromptOverBudget"
+          },
           "position": 2
         },
         {
           "axis_a": "compile_for_run",
           "axis_b": "resolve recipe, facts, memory and knowledge targets in one transaction, commit, retrieve with no transaction open, then run the pure compiler",
-          "value": {"text": "never stored", "provenance": "prompt_sha256 and the rendered source identities", "retrieval": "one path shared with knowledge.query"},
+          "value": {
+            "text": "never stored",
+            "provenance": "prompt_sha256 and the rendered source identities",
+            "retrieval": "one path shared with knowledge.query"
+          },
           "position": 3
         },
         {
           "axis_a": "internal_agent executor",
           "axis_b": "`run.execute` re-checks the binding, release, snapshot hash and kind, then dispatches through one map keyed by ExecutorKind",
-          "value": {"authority": "release_snapshot.anatomy, with the live agent row as the outer ceiling", "surface": "bound tools intersected with enabled grants and both effect ceilings", "output": "an unattached document with meta.generated"},
+          "value": {
+            "authority": "release_snapshot.anatomy, with the live agent row as the outer ceiling",
+            "surface": "bound tools intersected with enabled grants and both effect ceilings",
+            "output": "an unattached document with meta.generated"
+          },
           "position": 4
         },
         {
           "axis_a": "The ladder",
           "axis_b": "`ladder.prepare` builds the case and its hash, `laya.classify` makes the one external call, `ladder.evaluate` verifies the recorded exchange and writes the decision",
-          "value": {"options": "decision_option_set authored and versioned", "verdict": "a caller-supplied verdict is 422", "outage": "fail_policy applied, never a pass"},
+          "value": {
+            "options": "decision_option_set authored and versioned",
+            "verdict": "a caller-supplied verdict is 422",
+            "outage": "fail_policy applied, never a pass"
+          },
           "position": 5
         },
         {
           "axis_a": "The applying gate",
           "axis_b": "a handover parks the run at waiting_approval; a person's approval records `gate.draft_apply` and enqueues `run.resume`; the worker applies the draft through the one helper",
-          "value": {"writer": "approvals.decide, decided_by_kind human", "apply": "ladder::apply_draft_tx, shared with the executor", "model": "no model call on resume"},
+          "value": {
+            "writer": "approvals.decide, decided_by_kind human",
+            "apply": "ladder::apply_draft_tx, shared with the executor",
+            "model": "no model call on resume"
+          },
           "position": 6
         },
         {
           "axis_a": "Memory",
           "axis_b": "the run's own prior steps, the card's hot rows, one digest if room remains, and the handoff note written by `cards.assign`",
-          "value": {"writer": "record_run_memory on every terminal path", "render": "[kind/source#id] body plus [step/<status>#<position>.<attempt>]", "digest": "excluded from hot reads and reachable by the selector"},
+          "value": {
+            "writer": "record_run_memory on every terminal path",
+            "render": "[kind/source#id] body plus [step/<status>#<position>.<attempt>]",
+            "digest": "excluded from hot reads and reachable by the selector"
+          },
           "position": 7
         },
         {
           "axis_a": "Release knowledge layers",
           "axis_b": "`organisation_layer` carries base, industry, department archetype, each department in declared order and the job; required tightens downward only",
-          "value": {"authoring": "organisation_layers.set|list", "snapshot": "every resolved value's source recorded and sorted", "refusal": "release_not_ready and department_conflict"},
+          "value": {
+            "authoring": "organisation_layers.set|list",
+            "snapshot": "every resolved value's source recorded and sorted",
+            "refusal": "release_not_ready and department_conflict"
+          },
           "position": 8
         }
       ],
       "links": [
-        {"to": "Business Capability Map — S21 Message Construction (Phase B)", "kind": "realization"}
+        {
+          "to": "Business Capability Map — S21 Message Construction (Phase B)",
+          "kind": "realization"
+        }
       ],
       "body": "# Solution Concept Diagram — S21 Message Construction (Phase A)\n\n## Metadata\n\nType diagram; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S21; tranche 9; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Authored by the tranche-9 rework; it does not attest contemporaneous intent.\n\n## Entries\n\nThe concept has eight parts. A recipe names section kinds and budgets; the selector chooses sources; `compile_for_run` resolves and commits before the one retrieval call and then compiles purely; the executor dispatches on the release anatomy and intersects the tool grant; the ladder builds, calls and verifies; the applying gate parks, decides and resumes; memory carries prior steps and the handoff note; and the release compiles its layers. The entries deliberately show the seams each build record defends, including the no-transaction retrieval and the human-only approval.\n\n## Links\n\nRealizes the Requirements Catalog; depends on the Business Capability Map and the Data Entity catalogue. The source is `docs/plans/slices/S21-message-construction.md` §4 and its §12, §14, §16, §18, §20–§23 build plans. The diagram is textual because the record's artefact action carries entries rather than an image.\n\n## Document\n\nThe diagram keeps the boundary the plan draws: no PDDL as storage, no second compiler, no external runtime, and one dispatch point. It is published as an architecture-artifact-instance by the rework factory, and its point is that the selector, the compiler, the executor and the gate are the product, while the stored text does not exist.\n"
     },
@@ -255,42 +391,69 @@
         {
           "axis_a": "Author the prompt recipe",
           "axis_b": "a tenant admin creates a draft with its sections, selectors and ceiling, and activates or retires versions",
-          "value": {"actions": "prompt_recipes.create|list|get|activate|retire", "requirement": "R-7", "outcome": "a recipe that is immutable per version and pinned by an agent"},
+          "value": {
+            "actions": "prompt_recipes.create|list|get|activate|retire",
+            "requirement": "R-7",
+            "outcome": "a recipe that is immutable per version and pinned by an agent"
+          },
           "position": 1
         },
         {
           "axis_a": "Compile the request",
           "axis_b": "the run's sources become one compiled prompt in trust order with a hash and no stored text",
-          "value": {"actions": "compile_for_run inside agent.run and run.execute", "requirement": "R-1 to R-5", "outcome": "a decision-ready message whose provenance is the pin and hash"},
+          "value": {
+            "actions": "compile_for_run inside agent.run and run.execute",
+            "requirement": "R-1 to R-5",
+            "outcome": "a decision-ready message whose provenance is the pin and hash"
+          },
           "position": 2
         },
         {
           "axis_a": "Execute the work package",
           "axis_b": "the internal agent runs one step under the release anatomy with a closed tool grant and produces a draft document",
-          "value": {"actions": "run.execute, tools.call, documents.compose", "requirement": "R-9", "outcome": "a generated draft with meta.generated, unattached"},
+          "value": {
+            "actions": "run.execute, tools.call, documents.compose",
+            "requirement": "R-9",
+            "outcome": "a generated draft with meta.generated, unattached"
+          },
           "position": 3
         },
         {
           "axis_a": "Gate and apply",
           "axis_b": "the L1 laya decision or an L3 human approval decides the draft, and an accepted draft applies through the one helper",
-          "value": {"actions": "ladder.prepare, laya.classify, ladder.evaluate, ladder.apply_draft, approvals.decide", "requirement": "R-10", "outcome": "an applied draft with a decision that names it"},
+          "value": {
+            "actions": "ladder.prepare, laya.classify, ladder.evaluate, ladder.apply_draft, approvals.decide",
+            "requirement": "R-10",
+            "outcome": "an applied draft with a decision that names it"
+          },
           "position": 4
         },
         {
           "axis_a": "Hand off the card",
           "axis_b": "a job hands a card to another job's binding, records what the receiver must know as memory and starts the bound run",
-          "value": {"actions": "cards.assign", "requirement": "R-11", "outcome": "one live root run and one hot memory row"},
+          "value": {
+            "actions": "cards.assign",
+            "requirement": "R-11",
+            "outcome": "one live root run and one hot memory row"
+          },
           "position": 5
         },
         {
           "axis_a": "Pin the release anatomy",
           "axis_b": "a published release types its grants and limits and compiles its knowledge layers, or refuses",
-          "value": {"actions": "job_releases.publish, organisation_layers.set|list", "requirement": "R-12", "outcome": "a snapshot whose hash is reproducible"},
+          "value": {
+            "actions": "job_releases.publish, organisation_layers.set|list",
+            "requirement": "R-12",
+            "outcome": "a snapshot whose hash is reproducible"
+          },
           "position": 6
         }
       ],
       "links": [
-        {"to": "Data Entity/Data Component Catalog — S21 Message Construction (Phase C)", "kind": "dependency"}
+        {
+          "to": "Data Entity/Data Component Catalog — S21 Message Construction (Phase C)",
+          "kind": "dependency"
+        }
       ],
       "body": "# Business Capability Map — S21 Message Construction (Phase B)\n\n## Metadata\n\nType diagram; phase B; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S21; tranche 9; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Authored by the tranche-9 rework; it does not attest contemporaneous intent.\n\n## Entries\n\nSix capabilities. Authoring turns a tenant admin's intent into a versioned recipe. Compiling turns the run's sources into one hashed prompt. Executing runs one step under the release anatomy with a closed grant. Gating and applying turn a draft into a decisioned artefact. Handing off moves a card with its memory and starts the bound run. Pinning types the release that bounds all of it. Each names the action family and the requirement it satisfies.\n\n## Links\n\nDerives from the Solution Concept Diagram and the Requirements Catalog; feeds the Data Entity and Technology Standards catalogs. The capability boundary is the plan's §3 and §12–§23 OUT lists: no capability owns a second compiler, a second apply path, PDDL storage, an external runtime or the budget mechanism.\n\n## Document\n\nThe map is published as an architecture-artifact-instance by the rework factory. It gives the Phase B view a reader uses to go from a business outcome — every model call explicable and every draft gated — to the action families and the requirement that keeps each one honest.\n"
     },
@@ -303,48 +466,79 @@
         {
           "axis_a": "prompt and prompt_section",
           "axis_b": "the recipe, its version, its status and its sections with source kind, selector and budget",
-          "value": {"tenant": "required", "rule": "one draft and one active per (tenant, key)", "migrations": "0030, 0031 and 0062"},
+          "value": {
+            "tenant": "required",
+            "rule": "one draft and one active per (tenant, key)",
+            "migrations": "0030, 0031 and 0062"
+          },
           "position": 1
         },
         {
           "axis_a": "procedure_step.outputs",
           "axis_b": "the declared dot-path outputs the plan projection validates and the Request source renders",
-          "value": {"migration": "0032", "rule": "CHECKed to be an array", "consumer": "conveyor_domain::plan and the process section"},
+          "value": {
+            "migration": "0032",
+            "rule": "CHECKed to be an array",
+            "consumer": "conveyor_domain::plan and the process section"
+          },
           "position": 2
         },
         {
           "axis_a": "decision_option_set and decision_option_set_option",
           "axis_b": "the authored, versioned menu a choice-type policy is asked over",
-          "value": {"migration": "0071", "rule": "one live set per (tenant, kind, gate) with a monotonic version", "refusal": "option_set_missing"},
+          "value": {
+            "migration": "0071",
+            "rule": "one live set per (tenant, kind, gate) with a monotonic version",
+            "refusal": "option_set_missing"
+          },
           "position": 3
         },
         {
           "axis_a": "decision_policy.fire_when",
           "axis_b": "whether a case fires at all, validated at authoring",
-          "value": {"migration": "0071", "rule": "nullable, validated, never free text", "effect": "a case that does not fire writes no decision"},
+          "value": {
+            "migration": "0071",
+            "rule": "nullable, validated, never free text",
+            "effect": "a case that does not fire writes no decision"
+          },
           "position": 4
         },
         {
           "axis_a": "organisation_layer",
           "axis_b": "base, industry, department archetype, each department in declared order and the job",
-          "value": {"migration": "0074", "rule": "required tightens downward only", "snapshot": "every resolved value's source recorded and sorted"},
+          "value": {
+            "migration": "0074",
+            "rule": "required tightens downward only",
+            "snapshot": "every resolved value's source recorded and sorted"
+          },
           "position": 5
         },
         {
           "axis_a": "work_package_memory and run_step",
           "axis_b": "the card's hot rows and digest, the run's own prior steps and the handoff note",
-          "value": {"writer": "record_run_memory and cards.assign", "rule": "one writer per row kind; digest excluded from hot reads", "render": "[kind/source#id] and [step/<status>#<position>.<attempt>]"},
+          "value": {
+            "writer": "record_run_memory and cards.assign",
+            "rule": "one writer per row kind; digest excluded from hot reads",
+            "render": "[kind/source#id] and [step/<status>#<position>.<attempt>]"
+          },
           "position": 6
         },
         {
           "axis_a": "inference_call prompt columns",
           "axis_b": "the recorded identity of every model call: recipe, version and 64-hex hash",
-          "value": {"columns": "prompt_ref, prompt_version and prompt_sha256", "rule": "the compiled text is never stored", "use": "the audit finding names the same pair"},
+          "value": {
+            "columns": "prompt_ref, prompt_version and prompt_sha256",
+            "rule": "the compiled text is never stored",
+            "use": "the audit finding names the same pair"
+          },
           "position": 7
         }
       ],
       "links": [
-        {"to": "Technology Standards Catalog — S21 Message Construction (Phase D)", "kind": "dependency"}
+        {
+          "to": "Technology Standards Catalog — S21 Message Construction (Phase D)",
+          "kind": "dependency"
+        }
       ],
       "body": "# Data Entity/Data Component Catalog — S21 Message Construction (Phase C)\n\n## Metadata\n\nType catalog; phase C; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S21; tranche 9; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Authored by the tranche-9 rework; it does not attest contemporaneous intent.\n\n## Entries\n\nSeven entity groups. The recipe tables carry the versioned instrument; `procedure_step.outputs` carries the declaration the plan projection checks; the option tables carry an authored menu; `fire_when` decides whether a case is asked; `organisation_layer` carries the release's layers; memory and `run_step` carry what a later prompt reads; and the `inference_call` columns carry the call's identity. No entity stores the compiled text, and no entity carries a cost figure — the ledger owns both facts.\n\n## Links\n\nDerives from the Business Capability Map; realizes all six capabilities; depends on the Technology Standards catalog for the invariant and provenance rules. The source is `docs/plans/slices/S21-message-construction.md` §10–§23 and the migrations each record names: 0030, 0031, 0032, 0062, 0071 and 0074.\n\n## Document\nThe catalog is published as an architecture-artifact-instance by the rework factory. The entity choices are the architecture: a pinned version, a declared output, an authored menu, a layered release and a hash-only record, so a reader can see that no row can disagree with the call it describes.\n"
     },
@@ -357,54 +551,89 @@
         {
           "axis_a": "One compiler",
           "axis_b": "`conveyor_domain::prompt::compile` renders every source and no action reconstructs a prompt",
-          "value": {"rule": "a second compiler is refused; PDDL is a read-only projection", "failure_prevented": "two renderers drifting on trust order or budget", "source": "plan §6 and §12"},
+          "value": {
+            "rule": "a second compiler is refused; PDDL is a read-only projection",
+            "failure_prevented": "two renderers drifting on trust order or budget",
+            "source": "plan §6 and §12"
+          },
           "position": 1
         },
         {
           "axis_a": "Hash-only provenance",
           "axis_b": "the compiled text is never stored; the pin and the SHA-256 are the record",
-          "value": {"rule": "source identities render into the text, so they are in the hash's pre-image", "failure_prevented": "an unexplained model call and a prompt store that is the leak", "source": "plan §5 and §23 P2"},
+          "value": {
+            "rule": "source identities render into the text, so they are in the hash's pre-image",
+            "failure_prevented": "an unexplained model call and a prompt store that is the leak",
+            "source": "plan §5 and §23 P2"
+          },
           "position": 2
         },
         {
           "axis_a": "Measured budgets in characters",
           "axis_b": "each section and the whole prompt are measured as written, with an exact boundary and no truncation",
-          "value": {"rule": "budget = measured compiles; measured - 1 refuses", "failure_prevented": "a silently truncated instruction and an unmeasured limit", "source": "plan §10"},
+          "value": {
+            "rule": "budget = measured compiles; measured - 1 refuses",
+            "failure_prevented": "a silently truncated instruction and an unmeasured limit",
+            "source": "plan §10"
+          },
           "position": 3
         },
         {
           "axis_a": "Trust order before content",
           "axis_b": "sections stable-sort by trust rank, so untrusted card text can never precede the instruction block",
-          "value": {"rule": "recipe position is only the tie-break", "failure_prevented": "tenant-supplied text instructing the agent", "source": "plan §3.3 and §10"},
+          "value": {
+            "rule": "recipe position is only the tie-break",
+            "failure_prevented": "tenant-supplied text instructing the agent",
+            "source": "plan §3.3 and §10"
+          },
           "position": 4
         },
         {
           "axis_a": "No network call inside a compile transaction",
           "axis_b": "targets resolve in the transaction, it commits, and the one retrieval path is called with no transaction open",
-          "value": {"rule": "one retrieval implementation reused by knowledge.query", "failure_prevented": "a held transaction and a second retrieval path drifting", "source": "plan §12 P3"},
+          "value": {
+            "rule": "one retrieval implementation reused by knowledge.query",
+            "failure_prevented": "a held transaction and a second retrieval path drifting",
+            "source": "plan §12 P3"
+          },
           "position": 5
         },
         {
           "axis_a": "One dispatch map and a typed release anatomy",
           "axis_b": "ExecutorKind keys the executor map, and ReleaseGrant and ReleaseLimits are parsed at publish before the hash",
-          "value": {"rule": "a malformed grant refuses 422 release.anatomy_invalid", "failure_prevented": "an untyped grant widening the model's surface", "source": "plan §14 and §15"},
+          "value": {
+            "rule": "a malformed grant refuses 422 release.anatomy_invalid",
+            "failure_prevented": "an untyped grant widening the model's surface",
+            "source": "plan §14 and §15"
+          },
           "position": 6
         },
         {
           "axis_a": "SQL as the gate",
           "axis_b": "the partial unique indexes and CHECKs hold the invariants a second writer could otherwise break",
-          "value": {"rule": "one draft and one active per key by index, not by check-then-insert", "failure_prevented": "two racing activations both answering 200", "source": "plan §12 P1 and §13"},
+          "value": {
+            "rule": "one draft and one active per key by index, not by check-then-insert",
+            "failure_prevented": "two racing activations both answering 200",
+            "source": "plan §12 P1 and §13"
+          },
           "position": 7
         },
         {
           "axis_a": "The hosted preflight is the compile verdict",
           "axis_b": "the plan's rbuild lines are the historical gate; the compile and lint verdict comes from the GitHub-hosted preflight and the PR's CI",
-          "value": {"rule": "no local compiling cargo; filters listed by exact name before a run", "failure_prevented": "a zero-match filter reading as a pass", "source": "owner direction 2026-11-20"},
+          "value": {
+            "rule": "no local compiling cargo; filters listed by exact name before a run",
+            "failure_prevented": "a zero-match filter reading as a pass",
+            "source": "owner direction 2026-11-20"
+          },
           "position": 8
         }
       ],
       "links": [
-        {"to": "Solution Concept Diagram — S21 Message Construction (Phase A)", "kind": "reuse"}
+        {
+          "to": "Solution Concept Diagram — S21 Message Construction (Phase A)",
+          "kind": "reuse"
+        }
       ],
       "body": "# Technology Standards Catalog — S21 Message Construction (Phase D)\n\n## Metadata\n\nType catalog; phase D; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S21; tranche 9; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Authored by the tranche-9 rework; it does not attest contemporaneous intent.\n\n## Entries\n\nEight standards, each with the failure it prevents. One compiler; hash-only provenance; measured character budgets with an exact boundary; trust order before content; no network call inside a compile transaction; one dispatch map over a typed release anatomy; SQL indexes as the gate rather than a check-then-insert; and the GitHub-hosted preflight as the compile verdict. Each rule is the one the plan's build records actually leaned on, and each row names the record it comes from.\n\n## Links\n\nDerives from the Data Entity catalog; realizes the technology half of the Solution Concept Diagram; reuses the platform's existing migration, index, approval and registry conventions rather than a parallel one. The source is `docs/plans/slices/S21-message-construction.md` §5, §10, §12, §14, §15 and §23, plus the owner direction of 2026-11-20 that retired local compilation.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. The standards are the ones the plan actually enforces, so a reader can see which failure each convention prevents and a review can hold the build to them instead of to taste.\n"
     }
@@ -414,6 +643,46 @@
       "category": "architecture-artifact",
       "title": "Architecture Artefact Index — S21 (retrospective, 2026-11-28)",
       "body": "# Architecture Artefact Index — S21 (retrospective, 2026-11-28)\n\n## Metadata\n\nThe artefact set for S21 is the seven mandatory Phase A–D artefacts on the delivery track: the Stakeholder Map, the Driver/Goal/Objective Catalog, the Requirements Catalog and the Solution Concept Diagram at phase a, plateau psa; the Business Capability Map at phase b; the Data Entity/Data Component Catalog at phase c; and the Technology Standards Catalog at phase d. Each carries an authored body dated 2026-11-28; the owner is the programme architect under the tranche-9 rework delegation, the reviewer is the Architecture Board, and the subject is this project's record at the pinned snapshot.\n\n## Entries\n\nThe set is seven rows in the order the standard seeds them: a/matrix — Stakeholder Map — S21 Message Construction (Phase A); a/catalog — Driver/Goal/Objective Catalog — S21 Message Construction (Phase A); a/catalog — Requirements Catalog — S21 Message Construction (Phase A); a/diagram — Solution Concept Diagram — S21 Message Construction (Phase A); b/diagram — Business Capability Map — S21 Message Construction (Phase B); c/catalog — Data Entity/Data Component Catalog — S21 Message Construction (Phase C); d/catalog — Technology Standards Catalog — S21 Message Construction (Phase D).\n\n## Links\n\nEvery artefact links to another artefact of the set with one of the four kinds the record's link action allows: derivation, realization, reuse or dependency. The links follow the phase order, so a reader can walk from A to D without an orphan, and each artefact's own Links section names its source in the slice plan and the tree. The deepest source is `docs/plans/slices/S21-message-construction.md` §3–§5, §9 and §10–§23.\n\n## Document\n\nThis index is published as its own architecture-artifact document by the rework factory. It is the document the close gate reads for the project's artefact standard, and it is why the set can be verified without re-reading the plan: the titles, the order and the link kinds are all stated here, and the seven rows match the seven artefacts one for one.\n"
+    },
+    {
+      "title": "Inception Analysis — S21 Message construction (retrospective, 2026-11-28)",
+      "category": "inception-analysis",
+      "body": "# Inception Analysis — S21 Message construction (retrospective, Phase G)\n\n## Current state\n\nBefore S21 the message was a fixed five-section template: the prompt catalogue held a recipe and the pure renderer compiled it, but the run selected no sources, memory never reached the prompt, a generated draft could be attached without a decision that named it, and a release never compiled its knowledge layers. The slice plan records the seam as real — exact-pin resolution, a pure renderer and a recorded hash — and the work as eleven build steps that turn the compile into a selection and budget step over many candidate sources. At the 2026-11-28 snapshot the record measures the project built, all nine linked issues are closed, and the project row stays active in tranche 9.\n\n## Reuse sources\n\nThe plan reuses S15's capability, capability_agent and capability_knowledge rows, S16's prompt audit, S13's `agent.run`, S11's procedure and step rows and S09's `retrieval.query` and `strata` packs, and inside this tree it reuses the prompt catalogue and pure renderer from the v1 seam, the T0 executor contract, the bound-tool projection and the existing approval, job and memory primitives rather than adding a parallel escalation or queue. Each reuse is a live row, action or module at the same snapshot, so the build extends a seam instead of forking one.\n\n## Build vs reuse\n\nThe build side is the selector with kinds, limits and a deterministic order; the recipe CRUD surface with one draft and one active version per key; card-scoped memory selection with its ids inside the hash; the `internal_agent` executor and its closed tool grant; the applying gate with its parked run and resume worker; the declared request source; the handoff's one transaction; and the L1 laya gate that makes and verifies its own call. Refused by the plan: a second prompt compiler, PDDL as storage, an external runtime, a second retrieval path, a second apply path and the executor budget mechanism, which another lane already owns.\n\n## Risks\n\nThree risks are carried. A later unit could reconstruct a prompt in its own code and record a hash that covers a different text, which the one-compiler rule and the recorded `(prompt_ref, prompt_sha256)` pair are there to prevent. The live wire proof against the real inference-router and laya bridge is blocked on the estate's licensed caller, so the product's live evidence is absent while its suites are green. And tenant-authored recipes widen the authoring surface, with the compiler's trust sort and measured budget as the only invariants a tenant-authored version must still pass."
+    },
+    {
+      "title": "Architecture Analysis — S21 Message construction (retrospective, 2026-11-28)",
+      "category": "architecture-analysis",
+      "body": "# Architecture Analysis — S21 Message construction (retrospective, Phase G)\n\n## Current state\n\nAt the pinned snapshot the project carries five tables — `prompt`, `prompt_section`, `decision_option_set`, `decision_option_set_option` and `organisation_layer` — the recipe, handoff, ladder, option and organisation-layer action families, and the prompt, memory, knowledge and executor modules across eleven build steps. The plan's status is built, the nine linked issues are closed, and the record measures built; the project row stays active because its manifest declares no closure checks. The upstream seams the plan reads — the procedure, capability, knowledge, audit and retrieval surfaces — exist at the same snapshot.\n\n## Options considered\n\nFive choices were weighed. A fixed template against run-time selection: selection won, because a present but irrelevant section costs tokens and hides the fact that mattered. Storing the compiled text against storing only the pin and the SHA-256: hash-only won, so the prompt is not a second store to secure. A second retrieval path inside the compile transaction against one path called after the commit: the single path won. A caller-supplied laya verdict against an engine exchange the action verifies: verification won. And auto-applying an accepted draft against parking by default: park won, with the policy opting in.\n\n## Risks\n\nThe same three risks the inception records recur here at architecture level: a second prompt surface drifting from the one compiler; the live proof blocked on a licensed caller and a reachable router and laya bridge; and tenant-authored recipes changing trust order or budget. The design answers each structurally — one renderer, one retrieval implementation, one dispatch map, one apply helper — but a review must still check that a new surface uses them rather than merely citing them. No risk is closed by prose.\n\n## Dependency map\n\nThe slice plan's frontmatter declares seven upstream dependencies: S09 supplies retrieval and the strata packs the knowledge section queries; S11 the procedure and step rows the request renders; S13 the `agent.run` surface the executor extends; S15 the capability and knowledge tables; S16 the prompt audit that names the compiled text; and T2 and T13 the release and executor contract the runtime dispatches on. The project row records the same edges. The executor budget mechanism is outside every S21 step and arrives from another lane, and the live proof depends on the owner provisioning a licensed caller."
+    },
+    {
+      "title": "Architecture Design — S21 Message construction (retrospective, 2026-11-28)",
+      "category": "architecture-design",
+      "body": "# Architecture Design — S21 Message construction (retrospective, Phase G)\n\n## Context and boundary\n\nThe design places message construction at the run boundary: a recipe names section kinds and a character ceiling, a selector chooses concrete sources for this step, one compiler renders them in trust order and hashes the text, and the hash plus the recipe pin are the only record. In scope are the five tables and their migrations, the action families the plan lists, the prompt, memory, knowledge and executor modules, and the eleven build steps. Out of scope are a second compiler, PDDL as storage, an external runtime, a second retrieval or apply path, any UI, parent-run memory in a child's prompt, and the programme record itself.\n\n## Aggregates, tables and actions\n\nFive aggregates carry the design. `prompt` and `prompt_section` carry the versioned recipe with one draft and one active per tenant and key; `procedure_step.outputs` carries the declared dot-path outputs the plan projection checks; `decision_option_set` and its option rows carry the authored menu a choice-type policy is asked over; `organisation_layer` carries base, industry, department archetype, each department in declared order and the job; and the `inference_call` columns carry the call's identity. The actions are the recipe family, `cards.assign`, `ladder.prepare`, `laya.classify`, `ladder.evaluate`, the option and organisation-layer families, and `ladder.apply_draft` as the one apply path.\n\n## Decisions\n\nThe recorded decisions are: budgets in characters, measured on the block as written, with `budget = measured` compiling and `measured - 1` refusing; the role from the capability binding rather than the run principal's scopes; the plan projection derived on demand and enforced at publish, never stored; park by default on an accepted draft, with the policy opting into apply; the prompt pin required for every active internal agent, so no model call runs without compiled text and a 64-hex hash; and the compiled text never stored, with source identities inside the hash's pre-image.\n\n## Acceptance\n\nThe plan's §9 is the acceptance: a step whose recipe requires `procedure` and whose run has none fails by name before a model call; the same recipe and the same facts compile byte-identically, with hash equality as the test; changing the card moves the hash and changing an unrelated tenant's card does not; an over-budget section refuses with its measured size and never truncates; and the prompt audit names the compiled text it audited by `(prompt_ref, prompt_sha256)`. Each build step adds its own named suites and receipt, and the project-level acceptance is the manifest `acceptance/programme/S21.toml`.\n\n## Architecture artefacts\n\nThe set is the seven mandatory Phase A–D artefacts at the delivery profile: the Stakeholder Map, the Driver/Goal/Objective Catalog, the Requirements Catalog and the Solution Concept Diagram at phase A; the Business Capability Map at phase B; the Data Entity/Data Component Catalog at phase C; and the Technology Standards Catalog at phase D, each with an authored body dated 2026-11-28 and linked to another artefact of the set. The Architecture Artefact Index documents their titles, order and link kinds, so the close gate can read one published document per category without re-reading the plan."
+    },
+    {
+      "title": "Statement of Architecture Work — S21 Message construction (retrospective, 2026-11-28)",
+      "category": "statement-of-architecture-work",
+      "body": "# Statement of Architecture Work — S21 Message construction (retrospective, Phase G)\n\n## Assignment\n\nThe architecture work assigns S21 the compiled prompt as a product surface: a recipe with authored sections and a ceiling, a selector that chooses concrete sources per run, a pure compiler that renders them in trust order and hashes the text, an `internal_agent` executor that dispatches on a typed release anatomy under a closed tool grant, an L1 laya gate that makes its own call and records the exchange it verified, an L3 human gate that applies a draft, memory that carries the run's prior steps and the card's handoff note, and a release that compiles its knowledge layers or refuses. The statement is retrospective: it records the assignment the plan set and the state the 2026-11-28 snapshot carries.\n\n## Scope\n\nIn scope are the five tables and the migrations that add them, the recipe, handoff, ladder, option and organisation-layer actions, the `prompts:read` and `prompts:write` scopes, and the prompt, memory, knowledge and executor modules across eleven build steps. Out of scope are a second prompt compiler, PDDL as storage, the executor budget mechanism the plan assigns to another lane, an external runtime, any UI, parent-run memory in a child's prompt, a claim or lane verb, and the programme record itself, which this pack does not own.\n\n## Responsibilities\n\nThe programme architect authors this retrospective set under the standing delegation; the Architecture Board reviews the Phase A–D artefacts and the statement; the SRO is accountable for the capability and the tranche outcome; a tenant admin holds `prompts:write` and `jobs:write` to author recipes and release anatomy; the internal agent receives only the sources the selector chose and the tools the grant enables; and a person holding the approval decides the L3 gate, because the approval writer enforces `decided_by_kind = human`. The session that authored this pack is not the accepting role, so the separation of duties holds.\n\n## Acceptance criteria\n\nThe gate is the plan's §9 acceptance: a required source refuses by name before a model call; equal facts compile byte-identically; the card moves the hash and another tenant's card does not; an over-budget section refuses with the measured size and never truncates; and the audit names `(prompt_ref, prompt_sha256)`. Each build step adds its named suites and its receipt, and the project-level manifest is `acceptance/programme/S21.toml`. The live proof is recorded as blocked on the licensed caller rather than counted as met.\n\n## Contract\n\nThe contract commits to one compiler for every source, one retrieval path called with no transaction open, one executor dispatch keyed by `ExecutorKind`, one `pub(crate)` apply helper shared with the resume worker, the compiled text never stored, and the model's surface as the intersection of the run's bound tools, the enabled grants and both effect ceilings. It also commits to the recipe pin and the SHA-256 as the call's provenance and to `documents.update` staying closed to generated drafts. The project stays active; this contract does not close it."
+    },
+    {
+      "title": "User stories — S21 Message construction (retrospective, 2026-11-28)",
+      "category": "user-stories",
+      "body": "# User stories — S21 Message construction (retrospective, Phase G)\n\n## Personas\n\nFour personas carry the stories: a tenant admin who authors prompt recipes and release anatomy under `prompts:write` and `jobs:write`; an internal agent that executes one step and must receive only the sources the selector chose and the tools the grant enables; a person at the L3 gate who decides a parked draft; and an operator or auditor who must explain a past model call without reading a stored prompt. The SRO and the Architecture Board read the outcome, not the run.\n\n## Stories\n\n- As a tenant admin, I want to author a recipe with section kinds, selectors and a character ceiling and activate an immutable version, so that the prompt a run compiles is a governed instrument rather than a template edited in place.\n- As an internal agent, I want exactly the procedure, capability and role, knowledge, memory and card sources this step needs, in trust order, so that the instruction block cannot be preceded by tenant-supplied text.\n- As a person at the L3 gate, I want to decide a parked draft and have the resume apply it without another model call, so that generated content reaches a card only through a decision that names it.\n- As an auditor, I want each recorded call to carry its recipe pin and a 64-hex hash, so that I can move from a finding to the call and to the text it was found against.\n\n## Scenarios\n\nS1 a required procedure with no source refuses by name before a model call. S2 the same recipe and facts compile byte-identically. S3 a card change moves the hash and another tenant's card does not. S4 an over-budget section refuses with its measured size. S5 the audit names `(prompt_ref, prompt_sha256)`. S6 a handover parks the run and a person's approval applies the draft. S7 `cards.assign` writes the binding, the note and the bound run in one transaction. S8 a release with an unresolved required kind refuses `409 release_not_ready`.\n\n## Verify\n\nThe offline check is `python3 scripts/rework-content-check.py --project S21 --content docs/evidence/rework/tranche-9/rework-content-S21.json --snapshot /tmp/snap-9/data --wsjf 9,6,7,8 --closes true`, followed by the factory run and its receipt assertion. The product half is the suites the plan names — prompt compile and catalogue, recipes, memory and knowledge, the executor and internal-agent runtimes, draft apply, card binding, run memory, card handoff, the decision ladder, ladder laya and organisation — read at the pinned snapshot; the live wire proof remains blocked on the licensed caller."
+    },
+    {
+      "title": "Acceptance criteria — S21 Message construction (retrospective, 2026-11-28)",
+      "category": "acceptance-criteria",
+      "body": "# Acceptance criteria — S21 Message construction (retrospective, Phase G)\n\n## Scenarios\n\nThe acceptance is the plan's §9 five criteria, each also carried at step level: a required source refuses by name before a model call; the same recipe and facts compile byte-identically with hash equality as the test; a card change moves the hash while another tenant's card does not; an over-budget section refuses with the measured size and never truncates; and the audit names the compiled text by `(prompt_ref, prompt_sha256)`. The step records add the recipe lifecycle, the parked run and resume, the handoff transaction and the release's knowledge layers.\n\n## Verify commands\n\n`python3 scripts/rework-content-check.py --project S21 --content docs/evidence/rework/tranche-9/rework-content-S21.json --snapshot /tmp/snap-9/data --wsjf 9,6,7,8 --closes true` proves the pack against the pinned snapshot; the factory command applies it and writes the project receipt. The product evidence remains the named suites and their receipts, read as the plan's measured records; since the owner direction of 2026-11-20 retired local compilation, the compile and lint verdict is the GitHub-hosted preflight and the PR's CI, with every filtered test named before it is run.\n\n## Results\n\nThe plan's build records report the measured suites: prompt compile 7/7, store prompt catalogue 5, prompt recipes 7/7, domain prompt memory 8, prompt knowledge 4/4, the store memory suite 4, executor runtime 5/5, internal agent runtime 16 with two ignored live proofs, draft apply 7, decision ladder 7, and the card binding, run memory, card handoff, ladder laya and organisation suites green, each with reversal proofs fired and reverted. The live proof is recorded blocked, not passed.\n\n## Status\n\nThe project measures built and stays active: the manifest `acceptance/programme/S21.toml` declares the record checks and no closure checks, so no content pack can close it. This Phase-G set is retrospective and answers eleven open packages, three of them P1 — `project_in_unauthorised_tranche`, `unpublished_declared_output` and `mandatory_artefacts` — with the tranche authorisation never a pack's to supply. The product's live evidence stays open on the licensed caller."
+    },
+    {
+      "title": "Definition of ready — S21 Message construction (retrospective, 2026-11-28)",
+      "category": "definition-of-ready",
+      "body": "# Definition of ready — S21 Message construction (retrospective, Phase G)\n\n## Independent\n\nThe pack writes only S21's record rows against the pinned 2026-11-28 snapshot; its product is in the tree and its units are the pack, its receipt and the close-gate documents, not a rebuild. No other member's act depends on this pack, and the pack depends on no member's act: the other tranche-9 packs share the snapshot and the cadence, but not a row S21 writes. Independence is therefore about the record, not about the programme calendar.\n\n## Negotiable\n\nThe pack supplies the lifecycle set the standard binds — charter, baseline, contract, review, the Phase A–D artefacts and the close-gate document set of eight authored documents plus the artefact index — while the tranche review and production promotion belong to other roles. What is not negotiable is the honesty of the record: the live proof is recorded blocked, the tranche authorisation is escalated rather than assumed, and no green product gate is claimed. The scope of the pack can be refined; its evidence standard cannot.\n\n## Valuable\n\nThe benefit is B1: every model call is explicable without storing the prompt text, because the recipe pin, the source identities and the SHA-256 make a past call reproducible and the audit names `(prompt_ref, prompt_sha256)`. A reviewer can move from a finding to the call and to the text it was found against, and the prompt is not a second data store to secure. The pack is what lets the tranche review read that benefit from a record rather than from a claim.\n\n## Estimable\n\nAt the snapshot the project carries eleven open packages, three P1 and eight P2, and the WSJF inputs recorded by the tranche-9 PI plan are business value 9, time criticality 6, risk reduction 7 and job size 8. The factory journals every act, so an interrupted run resumes at the member it stopped on, and each package maps to a row this pack or its receipt supplies or explicitly escalates. The estimate is the package count, not a guess at effort.\n\n## Small\n\nOne pack, one factory run, one receipt and one close-gate document set; no product rebuild, no migration, no cluster change and no service deploy. The unit is one branch and one pull request on the issue lane, and the pack's own content is the deliverable. Anything larger — a second prompt surface, a live wire run, a tranche authorisation — is out of this unit by construction.\n\n## Testable\n\nEvery claim has an executable check: the offline content checker at the pinned snapshot, the factory's post-write receipt with one row per manifest check, the close-gate document set the standard requires, and the tranche exit gate that refuses a stale or red receipt. The audit half of the gate is the one claim whose evidence is stated rather than assumed: the review evidence records that no audit suite in the tree at 2026-11-28 asserts the `(prompt_ref, prompt_sha256)` pair, instead of naming one.\n\n## Dependencies\n\nThe plan declares S09, S11, S13, S15, S16, T2 and T13 as upstream: retrieval and strata packs, procedure and step rows, the `agent.run` surface, the capability and knowledge tables, the prompt audit, and the release and executor contract. The project row records the same edges, and every S21 linked issue is closed at the snapshot. The executor budget mechanism is out of every S21 step and arrives from another lane; the live proof depends on the owner's licensed caller, which is a provisioning act, not a build."
+    },
+    {
+      "title": "Definition of done — S21 Message construction (retrospective, 2026-11-28)",
+      "category": "definition-of-done",
+      "body": "# Definition of done — S21 Message construction (retrospective, Phase G)\n\n## Acceptance criteria\n\nThe manifest `acceptance/programme/S21.toml` is the acceptance of record, with the plan's §9 as its content: a required source refuses by name; equal facts compile byte-identically; the card moves the hash and another tenant's card does not; an over-budget section refuses with its measurement; and the audit names `(prompt_ref, prompt_sha256)`. Each of the eleven open packages maps to a row the pack or its receipt supplies, or to an explicit escalation for the tranche authorisation that no content file can grant.\n\n## Evidence at completion\n\nThe receipt is the evidence: one row per manifest check at the pinned snapshot, the content checker's verdict over this pack, the factory's post-write record and the transcript of the acts. The pack also carries the close-gate document set of eight authored documents plus the artefact index, the charter, baseline, contract and review, and the ten step receipts the plan names. The live wire proof is recorded blocked on the licensed caller rather than met, and the review evidence records the absent audit suite for the pair rather than asserting one.\n\n## Repo gate\n\nThe change is docs-only: the design gates (`build-docs.py --check`, `check-docs.cjs`, `check-data.cjs`) and `git diff --check` run locally, and the repository's GitHub-hosted preflight plus the PR's CI are the compile, lint and final gates at the exact head. No local compiling cargo is run, and every filtered test is named by exact name before it is invoked, because a filter that selects zero tests exits zero and would read as a pass.\n\n## Merge and closure\n\nOne pull request on the issue lane carries the pack, its receipt and the close-gate set, and it merges only after the content check and the local gate are green. The project does not close here: the manifest declares no closure checks and the record stays active, so closure is a later decision with a distinct approver. The tranche-9 authorisation remains the sponsoring group's or the programme owner's decision, and the pack ends by naming it rather than by assuming it."
     }
   ],
   "registers": {
@@ -430,10 +699,14 @@
         "response": "Refuse any new surface that builds a prompt, and read every new action's prompt identity against the one compiler in review; the hash on `inference_call` is the evidence.",
         "links": {
           "cards": [],
-          "requirements": ["docs/plans/slices/S21-message-construction.md#12"],
+          "requirements": [
+            "docs/plans/slices/S21-message-construction.md#12"
+          ],
           "decisions": []
         },
-        "meta": {"owner": "the programme architect (conveyor-e2e)"}
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
       },
       {
         "code": "S21-R2",
@@ -447,10 +720,14 @@
         "response": "Provision the licensed caller, run the two ignored proofs, and record either the measured rows or the exact refusal in the receipt; never substitute a stub.",
         "links": {
           "cards": [],
-          "requirements": ["docs/plans/slices/S21-message-construction.md#17"],
+          "requirements": [
+            "docs/plans/slices/S21-message-construction.md#17"
+          ],
           "decisions": []
         },
-        "meta": {"owner": "the programme architect (conveyor-e2e)"}
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
       },
       {
         "code": "S21-R3",
@@ -464,17 +741,21 @@
         "response": "Hold the compiler's trust sort and budget refusal as the invariant every recipe passes, and check the audit record for each activation of a tenant-authored version.",
         "links": {
           "cards": [],
-          "requirements": ["docs/plans/slices/S21-message-construction.md#12"],
+          "requirements": [
+            "docs/plans/slices/S21-message-construction.md#12"
+          ],
           "decisions": []
         },
-        "meta": {"owner": "the programme architect (conveyor-e2e)"}
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
       }
     ],
     "issue": [
       {
         "code": "S21-I1",
         "title": "The record carried no charter, baseline, artefact set, contract or Phase-G review",
-        "body": "At the 2026-11-28 snapshot the project row is active with the slice plan status built, and the audit carries the PMP and TOGAF packages `std-pmp-change-control-s21:S21`, `std-pmp-project-baseline-s21:S21`, `std-pmp-project-registers-s21:S21`, `std-togaf-architecture-artifact-s21:S21`, `std-togaf-compliance-review-s21:S21`, `std-togaf-delivery-contract-s21:S21`, `std-togaf-phase-g-s21-g:S21` and `mandatory_artefacts:S21`. This pack supplies that lifecycle set retrospectively and records the product's build gate as the plan's and the manifest's, not as this pack's claim.",
+        "body": "At the 2026-11-28 snapshot the project row is active with the slice plan status built, and the audit carries the three P1 packages `project_in_unauthorised_tranche:S21`, `unpublished_declared_output:S21` and `mandatory_artefacts:S21`, and the P2 `wbs_absent:S21`. This pack supplies that lifecycle set retrospectively and records the product's build gate as the plan's and the manifest's, not as this pack's claim.",
         "severity": "P1",
         "status": "open",
         "response": "Supplied by this pack and read off the project's receipt at the pinned snapshot; the product gate stays the build lane's."
@@ -543,7 +824,9 @@
         "body": "The recipe pin, the section source identities and the SHA-256 of the compiled text make a past call reproducible without keeping the text: `inference_call` names `prompt_ref`, `prompt_version` and `prompt_sha256`, and an audit finding names the same pair. The benefit is that the prompt is not a second data store to secure and cannot drift from the call it produced, and a reviewer can move from a finding to the call to the text it was found against.",
         "status": "open",
         "links": {
-          "requirements": ["docs/plans/slices/S21-message-construction.md#5"],
+          "requirements": [
+            "docs/plans/slices/S21-message-construction.md#5"
+          ],
           "cards": [],
           "decisions": []
         }
@@ -554,7 +837,9 @@
         "body": "The selector chooses the smallest set of sources that makes this step decidable, renders them in trust order and measures every section against its ceiling. The failure the plan names is not a missing section but a present, long, irrelevant one that costs tokens and hides the fact that mattered. The benefit is a compiled prompt whose composition is chosen at run time, whose over-budget case is a refusal with the measurement, and whose trust order keeps tenant text after the instructions.",
         "status": "open",
         "links": {
-          "requirements": ["docs/plans/slices/S21-message-construction.md#2"],
+          "requirements": [
+            "docs/plans/slices/S21-message-construction.md#2"
+          ],
           "cards": [],
           "decisions": []
         }
@@ -565,7 +850,9 @@
         "body": "The plan closes the forgeable gate (`v1-w1c-2`): `ladder.apply_draft` admits only an accepted non-rule decision of `gate.precheck` or `gate.draft_apply` whose meta names the draft, the handover parks the run instead of failing it, and `documents.update` stays closed to generated drafts. The benefit is a structural property — a machine cannot attach generated content to a card without a recorded decision, and a person's approval is the one L3 path.",
         "status": "open",
         "links": {
-          "requirements": ["docs/plans/slices/S21-message-construction.md#16"],
+          "requirements": [
+            "docs/plans/slices/S21-message-construction.md#16"
+          ],
           "cards": [],
           "decisions": []
         }
@@ -576,7 +863,9 @@
         "body": "`crates/actions/src/knowledge/retrieval.rs` is extracted as the one retrieval implementation and reused by `knowledge.query`; `compile_for_run` resolves its targets in the transaction, commits, and calls retrieval with no transaction open. Pinned packs stay pinned and a missing or failed required pack keeps the existing `409 knowledge_degraded` semantics. The benefit is that the knowledge half of the prompt cannot diverge between the query action and the compiler, and a slow retrieval cannot hold a transaction.",
         "status": "open",
         "links": {
-          "requirements": ["docs/plans/slices/S21-message-construction.md#12"],
+          "requirements": [
+            "docs/plans/slices/S21-message-construction.md#12"
+          ],
           "cards": [],
           "decisions": []
         }
@@ -587,7 +876,7 @@
     "title": "Delivery Contract — S21 Message Construction (retrospective, 2026-11-28)",
     "body": {
       "commitments": "S21 delivers message construction as product rows: the five tables and their migrations; the recipe, handoff, ladder, option and organisation-layer actions; the prompt, memory, knowledge and executor modules; and eleven build steps whose suites and receipts the plan names. It commits to one compiler for every source, one retrieval path outside any transaction, one executor dispatch point over a typed release anatomy, the compiled text never stored, budgets measured in characters with a refusal at the boundary, memory selection with its ids inside the hash, and a generated draft applying only through a decision that names it.",
-      "compliance": "Compliance is demonstrated by `acceptance/programme/S21.toml` and the plan's §9 acceptance: a required source refusing by name before a model call, byte-identical compile on equal facts, the card's hash independence across tenants, the measured over-budget refusal, and the audit naming `(prompt_ref, prompt_sha256)`. Each build step adds its named suites — prompt_recipes, prompt_memory, prompt_knowledge, executor_runtime, internal_agent_runtime, card_binding, run_memory, draft_apply, card_handoff, decision_ladder, ladder_laya and organisation — with its receipt. The plan records the commands in their historical rbuild form; since the owner direction of 2026-11-20 the compile and lint verdict comes from the GitHub-hosted preflight and the PR's CI, and a filtered test is listed by exact name before it is run.",
+      "compliance": "Compliance is demonstrated by `acceptance/programme/S21.toml` and the plan's §9 acceptance: a required source refusing by name before a model call, byte-identical compile on equal facts, the card's hash independence across tenants, the measured over-budget refusal, and the audit naming `(prompt_ref, prompt_sha256)`, with the pair itself still a design claim: no suite in the tree at 2026-11-28 asserts it (`crates/actions/tests/prompt_audits.rs` asserts `prompt_ref` only). Each build step adds its named suites — prompt_compile, prompt_catalogue, prompt_recipes, prompt_memory, prompt_knowledge, memory, executor_runtime, internal_agent_runtime, draft_apply, card_binding, run_memory, card_handoff, decision_ladder and organisation — with its receipt. The plan records the commands in their historical rbuild form; since the owner direction of 2026-11-20 the compile and lint verdict comes from the GitHub-hosted preflight and the PR's CI, and a filtered test is listed by exact name before it is run.",
       "approval": "The contract is approved under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The approving role is the Architecture Board and the accepting role is the SRO; the session that authored this pack is neither, so the record must carry the approver's own decision rather than an inference from silence. The project stays active, and this contract does not close it.",
       "manifest": "`acceptance/programme/S21.toml` is the manifest of record: it carries the project's record checks and acceptance evidence and declares no closure checks, which is why the project stays active.",
       "acceptance_at": "2026-11-28",
@@ -604,14 +893,15 @@
   },
   "review": {
     "level": "compliant",
-    "findings": "This retrospective Phase-G review records the level compliant for the record set this pack supplies at the 2026-11-28 snapshot under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The open packages it answers are mandatory_artefacts:S21, std-pmp-change-control-s21:S21, std-pmp-project-baseline-s21:S21, std-pmp-project-registers-s21:S21, wbs_absent:S21, std-togaf-architecture-artifact-s21:S21, std-togaf-compliance-review-s21:S21, std-togaf-delivery-contract-s21:S21 and std-togaf-phase-g-s21-g:S21, together with the project-scoped unpublished_declared_output:S21. project_in_unauthorised_tranche:S21 is not a content pack's to discharge: the project is active in tranche 9, and that package clears only on the sponsoring group's or the programme owner's authorisation of the tranche, never on a content file. S21 stays active because its manifest pins it active: acceptance/programme/S21.toml declares the record checks and no closure checks, so this review does not close the project. The pack does not claim the product's build gate has been re-run at this snapshot; the manifest is the acceptance and the build lane's preflight was the compile verdict.",
+    "findings": "This retrospective Phase-G review records the level compliant for the record set this pack supplies at the 2026-11-28 snapshot under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The derived register's measured set for S21 is 4 open packages: the P1s mandatory_artefacts:S21, unpublished_declared_output:S21 and project_in_unauthorised_tranche:S21, and the P2 wbs_absent:S21. The pack answers the first two and the P2. project_in_unauthorised_tranche:S21 is not a content pack's to discharge: the project is active in tranche 9, and that package clears only on the sponsoring group's or the programme owner's authorisation of the tranche, never on a content file. S21 stays active because its manifest pins it active: acceptance/programme/S21.toml declares the record checks and no closure checks, so this review does not close the project. The pack does not claim the product's build gate has been re-run at this snapshot; the manifest is the acceptance and the build lane's preflight was the compile verdict.",
     "evidence": {
       "manifest": "acceptance/programme/S21.toml",
       "plan": "docs/plans/slices/S21-message-construction.md",
       "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-      "gate": "the plan's §9 acceptance: a required procedure with no source fails by name before a model call; the same recipe and facts compile byte-identically; a card change moves the hash and another tenant's card does not; an over-budget section refuses with its measured size and never truncates; the prompt audit names the compiled text by (prompt_ref, prompt_sha256)."
+      "gate": "the plan's §9 acceptance: a required procedure with no source fails by name before a model call; the same recipe and facts compile byte-identically; a card change moves the hash and another tenant's card does not; an over-budget section refuses with its measured size and never truncates; the prompt audit names the compiled text by (prompt_ref, prompt_sha256).",
+      "audit_suite": "no audit suite in the tree at 2026-11-28"
     }
   },
   "project_brief_output": "# Project Brief — S21 Message Construction (retrospective, 2026-11-28)\n\n## Outcome\n\nEvery model call carries a compiled prompt the run selected for this step: the procedure, the capability and its role, pinned knowledge, the run's prior steps and the card's memory, the declared request and the card's data, rendered in trust order with a recipe pin and a 64-hex SHA-256 recorded. A generated draft reaches a card only through an L1 laya decision or an L3 human approval that names it, and a release compiles its knowledge layers or refuses. The owner ruling of 2026-11-09 sets the frame: a prompt is a run-time compilation stored in Postgres, not a template.\n\n## Boundary\n\nS21 owns the compiler, the recipe lifecycle, the executor runtime's message half, the applied-draft gate, the memory selection and the release's knowledge layers. It does not own a second compiler, PDDL as storage, an external runtime, the executor budget mechanism (the #526 lane's `v1-p75-1`), any UI, parent-run memory in a child's prompt, a claim or lane verb, or the programme record. The judge's SOP document stays in the process judge; laya is not a prompt source.\n\n## Reuse sources\n\nThe plan names S15's capability and knowledge tables, S16's prompt audit, S13's `agent.run`, S11's procedure steps and S09's `retrieval.query` and `strata` packs as the seams it extends. Inside the tree it reuses `prompt` and `prompt_section` from migration 0030, the pure renderer in `conveyor_domain::prompt`, the T0 executor contract and the #556/#568 bound-tool projection, and the existing approval and job primitives rather than adding a parallel escalation or queue.\n\n## Inception units\n\nEleven build steps: budgets and the role component; the plan projection and declared step outputs; the work-package prompt envelope (#15); the `internal_agent` executor runtime and its tool grant (#581); the applying gate (#590); the work package's run (#599); the run's episodic memory (#612); the Request source (#624); the handoff (#649); the L1 laya gate (#656); and the level closing — apply on accept, prompt_ref required, the authorable ceiling and the release layers (#697). Each step names its suites and its receipt.\n\n## Dependencies\n\nThe project's recorded dependencies are S09, S11, S13, S15, S16, T2 and T13. All nine linked issues (#15, #581, #590, #599, #612, #624, #649, #656, #697) are closed at the snapshot. The budget mechanism is the #526 lane's and is not carried here. The live wire proof depends on an owner-provisioned licensed caller and reachable inference-router and laya bridge, and the receipt records the proof as blocked on that caller.\n\n## Acceptance\n\n`acceptance/programme/S21.toml` carries the project-level acceptance, and the plan's §9 is its content: a required source refuses by name before a model call; equal facts compile byte-identically; the card moves the hash and another tenant's card does not; an over-budget section refuses with its measured size; and the audit names `(prompt_ref, prompt_sha256)`. Each step's build record adds its measured suites and reversal proofs; a green product gate at this snapshot is the build lane's to report, not this pack's to claim.\n\n## Capabilities\n\nSix. Author the recipe: a tenant admin creates a draft with sections, selectors and a ceiling, and activates or retires versions. Compile the request: the run's sources become one hashed prompt in trust order. Execute the work package: one step under the release anatomy with a closed grant. Gate and apply: L1 or L3 decides and the one helper applies. Hand off the card: binding, note as memory and the bound run in one transaction. Pin the release: typed grants and compiled knowledge layers.\n\n## Plan\n\nThe plan is `docs/plans/slices/S21-message-construction.md`, status built, with its §10–§23 build records and the receipts `docs/evidence/S21-PLAN.md`, `S21-WORKPACKAGE.md`, `S21-EXECUTOR.md`, `S21-APPLY.md`, `S21-RUN.md`, `S21-MEMORY.md`, `S21-REQUEST.md`, `S21-HANDOFF.md`, `S21-LAYA.md` and `S21-EXECUTION.md`. The project stays active: this brief accompanies the record set and the two declared outputs and does not close the project.\n",
-  "evidence_output": "# Evidence — S21 Message Construction (retrospective, 2026-11-28)\n\n## Claim\n\nS21 delivers the compiled prompt as product rows: recipe authoring with draft and active versions; a selector over kinds, limits and the knowledge query; one compiler that renders every source in trust order, measures budgets and hashes the text without storing it; an `internal_agent` executor that dispatches on the release anatomy under a closed tool grant; an L1 laya gate that makes and verifies its own call; an L3 human gate that applies a draft and a resume worker that never calls the model; memory that carries prior steps and the handoff note; and a release that compiles its knowledge layers or refuses.\n\n## Evidence\n\n`acceptance/programme/S21.toml` is the manifest of record. The plan's build records name the measured suites: `prompt_recipes` 7/7, domain `prompt_memory` 8, store `prompt_catalogue` 5 and `memory` 4, `executor_runtime` 5/5, `internal_agent_runtime` 16 with two ignored live proofs, `draft_apply` 7, `card_binding` and `run_memory`, `card_handoff`, `decision_ladder` 7, `ladder_laya`, `organisation` and `prompt_compile` 7/7, with reversal proofs fired and reverted for each. The migrations are 0030, 0031, 0032, 0062, 0071 and 0074; the receipts are `docs/evidence/S21-PLAN.md`, `S21-WORKPACKAGE.md`, `S21-EXECUTOR.md`, `S21-APPLY.md`, `S21-RUN.md`, `S21-MEMORY.md`, `S21-REQUEST.md`, `S21-HANDOFF.md`, `S21-LAYA.md`, `S21-EXECUTION.md` and `T0-RELEASE-LAYERS.md`.\n\n## Verification\n\nThe manifest is read at the pinned snapshot through the programme record, and this Phase-G review reads the same receipt. The plan's rbuild lines are the historical gate: since the 2026-11-20 owner direction retired local compilation, the compile and lint verdict comes from the repository's GitHub-hosted preflight and the PR's CI, with `cargo-guard.py` on m4 only for interactive work. Every libtest filter is listed by exact name first, because a filter that selects zero tests exits zero and would read as a pass, and a piped command's exit status is the pipeline's, so the gate log is captured to a file.\n\n## Links\nThe source of truth is `docs/plans/slices/S21-message-construction.md`; the acceptance is `acceptance/programme/S21.toml`; the artefact set is indexed by the architecture-artifact document in this pack; the decisions are ADR 0009 (prompt selection and recipe authoring), ADR 0015, ADR 0018, ADR 0019 and ADR 0020. The open packages the pack answers are named in the Phase-G review's findings, including the PMP and TOGAF keys and the project-scoped output and WBS rows.\n\n## Gap\nThe project stays active and this pack does not close it. The live wire proof against the real inference-router and laya bridge is blocked on the estate's licensed caller, and the receipt records it blocked rather than passing a stub. `project_in_unauthorised_tranche:S21` needs the sponsoring group's or programme owner's tranche-9 decision, which no content pack can supply. The budget mechanism stays the #526 lane's, and no green product gate or deployed receipt is claimed here.\n"
+  "evidence_output": "# Evidence — S21 Message Construction (retrospective, 2026-11-28)\n\n## Claim\n\nS21 delivers the compiled prompt as product rows: recipe authoring with draft and active versions; a selector over kinds, limits and the knowledge query; one compiler that renders every source in trust order, measures budgets and hashes the text without storing it; an `internal_agent` executor that dispatches on the release anatomy under a closed tool grant; an L1 laya gate that makes and verifies its own call; an L3 human gate that applies a draft and a resume worker that never calls the model; memory that carries prior steps and the handoff note; and a release that compiles its knowledge layers or refuses.\n\n## Evidence\n\n`acceptance/programme/S21.toml` is the manifest of record. The plan's build records name the measured suites — `prompt_compile` 7/7, store `prompt_catalogue` 5, `prompt_recipes` 7/7, domain `prompt_memory` 8, `prompt_knowledge` 4/4, store `memory` 4, `executor_runtime` 5/5, `internal_agent_runtime` 16 with two ignored live proofs, `draft_apply` 7, `card_binding`, `run_memory`, `card_handoff`, `decision_ladder` 7, `organisation` — with reversal proofs fired and reverted for each. The migrations are 0030, 0031, 0032, 0062, 0071 and 0074; the receipts are `docs/evidence/S21-PLAN.md`, `S21-WORKPACKAGE.md`, `S21-EXECUTOR.md`, `S21-APPLY.md`, `S21-RUN.md`, `S21-MEMORY.md`, `S21-REQUEST.md`, `S21-HANDOFF.md`, `S21-LAYA.md`, `S21-EXECUTION.md` and `T0-RELEASE-LAYERS.md`.\n\n## Verification\n\nThe manifest is read at the pinned snapshot through the programme record, and this Phase-G review reads the same receipt. The plan's rbuild lines are the historical gate: since the 2026-11-20 owner direction retired local compilation, the compile and lint verdict comes from the repository's GitHub-hosted preflight and the PR's CI, with `cargo-guard.py` on m4 only for interactive work. Every libtest filter is listed by exact name first, because a filter that selects zero tests exits zero and would read as a pass, and a piped command's exit status is the pipeline's, so the gate log is captured to a file.\n\n## Links\nThe source of truth is `docs/plans/slices/S21-message-construction.md`; the acceptance is `acceptance/programme/S21.toml`; the artefact set is indexed by the architecture-artifact document in this pack; the decisions are ADR 0009 (prompt selection and recipe authoring), ADR 0015, ADR 0018, ADR 0019 and ADR 0020. The open packages the pack answers are named in the Phase-G review's findings, including the PMP and TOGAF keys and the project-scoped output and WBS rows.\n\n## Gap\nThe project stays active and this pack does not close it. The live wire proof against the real inference-router and laya bridge is blocked on the estate's licensed caller, and the receipt records it blocked rather than passing a stub. `project_in_unauthorised_tranche:S21` needs the sponsoring group's or programme owner's tranche-9 decision, which no content pack can supply. The budget mechanism stays the #526 lane's, and no green product gate or deployed receipt is claimed here.\n"
 }

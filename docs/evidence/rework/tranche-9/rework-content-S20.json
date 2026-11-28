@@ -1,818 +1,858 @@
 {
- "charter": "# Charter — S20 Eval Hillclimb (retrospective, 2026-11-28)\n\n- **Project:** S20 'Eval hillclimb', track v1, ADM phase G, delivery plateau, tranche 9, plan `docs/plans/slices/S20-eval-hillclimb.md`. The record's only linked issue is #14, which is closed.\n- **Sponsor:** the programme's sponsoring group, through the tranche-9 PI plan and the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Tranche 9's authorisation is not this pack's to give; the P0 package `project_in_unauthorised_tranche:S20` clears only on that authorisation.\n- **Objective:** the `eval-hillclimb` and `cost-hillclimb` methods become a loop over one eval — a goal, a stopping condition, a fixed train/test split drawn once by S19, and rounds that each propose a change, run the full set, and are kept or reverted on the held-out number. The climb ends with the winning version named, a per-round train/test table, a paired delta with a significance test, two before/after transcript pairs, and failures classified by cause rather than blamed on the model.\n- **Scope in:** `eval_climb` state; `eval_climbs.start/get/list/round/compare/stop`; `eval_runs.regrade`; the `eval_climb.changed` and `eval_climb.round_completed` events; the one new job kind `eval.regrade`; the stall-triage round; the cost-search goal; the final report.\n- **Scope out:** any UI — screen 21 is declared for S12; a second model runtime (the analyzer is an agent principal over `/mcp` or a person writing `change.md`); automatic application of a change to production code; editing an eval mid-climb; a second McNemar.\n- **Retrospective status:** the project row is closed and measured built, while its closure review, change control, baseline, WBS, registers, contract, Phase-G review and artefact set were never published. This pack is authored on 2026-11-28 to supply the lifecycle record; it does not attest a contemporaneous ceremonial review, and it claims no retired gate command ran.",
- "soaw": {
-  "title": "Statement of Architecture Work — S20 Eval Hillclimb (retrospective, 2026-11-28)",
-  "body": {
-   "assignment": "The architecture work assigns S20 the hillclimb loop the eval and benchmark surface must carry: one `eval_climb` state per climb, six `eval_climbs.*` actions plus `eval_runs.regrade`, two events, the stall-triage round, the cost-search goal and the final report. This statement governs the retrospective record of a project the record marks closed and measured built, read at the 2026-11-28 snapshot under the standing delegation.",
-   "scope": "In scope are `migrations/0029_s20_eval_climb_report.sql`, `crates/domain/src/eval/climb.rs` (the loop state machine, the keep/revert rule, the bucket vocabulary and the stopping predicate), `crates/store/src/eval/climb.rs`, `crates/actions/src/eval/climbs.rs`, the registry `EXPECTED` array and one `parity_http_mcp` sample per action. Out of scope are any UI, a second runtime, a second McNemar, mid-climb edits to an eval, its cases or its metrics, and any automatic application of a winning change to production code.",
-   "responsibilities": "The programme architect authors this retrospective statement; the delivery team is accountable for the tree and its suites; the Architecture Board reviews the artefact set; the SRO accepts the project's closure at the tranche-9 review. The eval owner is consulted because the goal, the stopping condition and the plan sign-off are theirs, and the analyzer principal is the consumer the round action must serve without ever letting it set its own budget.",
-   "acceptance_criteria": "The plan's §7 gate names the acceptance: the schema suite proves one table RLS-forced and no spend column; the gate suite proves a climb cannot redraw S19's split and that no round runs before the plan is signed; the regrade suite proves a grader fix lands in a new run; the compare suite proves refusal across versions, graders or splits; the domain rules suite proves the keep/revert rules; the stall suite proves a fourth content round is refused; the cost suite proves no round without registered gates; the final suite proves the report names the winner; and the served lock check holds. The record carries the project as measured built; the gate's commands are `rbuild` invocations, and `rbuild` was retired by the owner on 2026-11-20, so this statement claims no run of them.",
-   "contract": "The contract is the delivery contract this pack carries: one `eval_climb` row per climb with spend read as a sum over `eval_case_result.usage` rather than a maintained column; the split owned by S19's version and not redrawable by the climb; `eval_climbs.start` and `stop` behind `evals:approve` while `round` needs only `evals:write`; and the winning change applied only by a person's ordinary `procedures.update`.",
-   "retrospective": "This statement is authored on 2026-11-28 for the tranche-9 rework. No contemporaneous statement of architecture work exists; the delivery was recorded in the slice plan, its migration and its suites. The statement records what the plan, the record and the tree show today, and it states plainly that the plan's §7 gate text still names `rbuild --gate`, a command the owner retired on 2026-11-20 in favour of the repository's GitHub-hosted preflight workflow for the compile and lint verdict."
-  }
- },
- "artifacts": [
-  {
-   "title": "Stakeholder Map — S20 Eval Hillclimb (Phase A)",
-   "phase_code": "a",
-   "plateau": "psa",
-   "artifact_kind": "matrix",
-   "entries": [
-    {
-     "axis_a": "Sponsoring group",
-     "axis_b": "authorisation of tranche 9 and the close decision",
-     "value": {
-      "influence": "high",
-      "interest": "high",
-      "engagement": "decide"
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "SRO",
-     "axis_b": "accountable for S20's outcome and the tranche-9 review",
-     "value": {
-      "influence": "high",
-      "interest": "high",
-      "engagement": "accountable"
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "Eval owner",
-     "axis_b": "sets the goal, the stopping condition and the split through the plan sign-off",
-     "value": {
-      "influence": "high",
-      "interest": "high",
-      "engagement": "collaborate"
-     },
-     "position": 3
-    },
-    {
-     "axis_a": "Analyzer principal",
-     "axis_b": "an agent identity over /mcp or a person proposing change_md; never sets its own budget",
-     "value": {
-      "influence": "medium",
-      "interest": "high",
-      "engagement": "collaborate"
-     },
-     "position": 4
-    },
-    {
-     "axis_a": "Benchmark owner (S17)",
-     "axis_b": "owns the exact McNemar S20 calls rather than re-implements",
-     "value": {
-      "influence": "medium",
-      "interest": "medium",
-      "engagement": "consult"
-     },
-     "position": 5
-    },
-    {
-     "axis_a": "Architecture Board",
-     "axis_b": "approves the artefact set and the retrospective Phase-G level",
-     "value": {
-      "influence": "high",
-      "interest": "medium",
-      "engagement": "approve"
-     },
-     "position": 6
+  "charter": "# Charter — S20 Eval Hillclimb (retrospective, 2026-11-28)\n\n- **Project:** S20 'Eval hillclimb', track v1, ADM phase G, delivery plateau, tranche 9, plan `docs/plans/slices/S20-eval-hillclimb.md`. The record's only linked issue is #14, which is closed.\n- **Sponsor:** the programme's sponsoring group, through the tranche-9 PI plan and the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Tranche 9's authorisation is not this pack's to give; the P0 package `project_in_unauthorised_tranche:S20` clears only on that authorisation.\n- **Objective:** the `eval-hillclimb` and `cost-hillclimb` methods become a loop over one eval — a goal, a stopping condition, a fixed train/test split drawn once by S19, and rounds that each propose a change, run the full set, and are kept or reverted on the held-out number. The climb ends with the winning version named, a per-round train/test table, a paired delta with a significance test, two before/after transcript pairs, and failures classified by cause rather than blamed on the model.\n- **Scope in:** `eval_climb` state; `eval_climbs.start/get/list/round/compare/stop`; `eval_runs.regrade`; the `eval_climb.changed` and `eval_climb.round_completed` events; the one new job kind `eval.regrade`; the stall-triage round; the cost-search goal; the final report.\n- **Scope out:** any UI — screen 21 is declared for S12; a second model runtime (the analyzer is an agent principal over `/mcp` or a person writing `change.md`); automatic application of a change to production code; editing an eval mid-climb; a second McNemar.\n- **Retrospective status:** the project row is closed and measured built, while its closure review, change control, baseline, WBS, registers, contract, Phase-G review and artefact set were never published. This pack is authored on 2026-11-28 to supply the lifecycle record; it does not attest a contemporaneous ceremonial review, and it claims no retired gate command ran.",
+  "soaw": {
+    "title": "Statement of Architecture Work — S20 Eval Hillclimb (retrospective, 2026-11-28)",
+    "body": {
+      "assignment": "The architecture work assigns S20 the hillclimb loop the eval and benchmark surface must carry: one `eval_climb` state per climb, six `eval_climbs.*` actions plus `eval_runs.regrade`, two events, the stall-triage round, the cost-search goal and the final report. This statement governs the retrospective record of a project the record marks closed and measured built, read at the 2026-11-28 snapshot under the standing delegation.",
+      "scope": "In scope are `migrations/0029_s20_eval_climb_report.sql`, `crates/domain/src/eval/climb.rs` (the loop state machine, the keep/revert rule, the bucket vocabulary and the stopping predicate), `crates/store/src/eval/climb.rs`, `crates/actions/src/eval/climbs.rs`, the registry `EXPECTED` array and one `parity_http_mcp` sample per action. Out of scope are any UI, a second runtime, a second McNemar, mid-climb edits to an eval, its cases or its metrics, and any automatic application of a winning change to production code.",
+      "responsibilities": "The programme architect authors this retrospective statement; the delivery team is accountable for the tree and its suites; the Architecture Board reviews the artefact set; the SRO accepts the project's closure at the tranche-9 review. The eval owner is consulted because the goal, the stopping condition and the plan sign-off are theirs, and the analyzer principal is the consumer the round action must serve without ever letting it set its own budget.",
+      "acceptance_criteria": "The plan's §7 gate names the acceptance: the schema suite proves one table RLS-forced and no spend column; the gate suite proves a climb cannot redraw S19's split and that no round runs before the plan is signed; the regrade suite proves a grader fix lands in a new run; the compare suite proves refusal across versions, graders or splits; the domain rules suite proves the keep/revert rules; the stall suite proves a fourth content round is refused; the cost suite proves no round without registered gates; the final suite proves the report names the winner; and the served lock check holds. The record carries the project as measured built; the gate's commands are `rbuild` invocations, and `rbuild` was retired by the owner on 2026-11-20, so this statement claims no run of them.",
+      "contract": "The contract is the delivery contract this pack carries: one `eval_climb` row per climb with spend read as a sum over `eval_case_result.usage` rather than a maintained column; the split owned by S19's version and not redrawable by the climb; `eval_climbs.start` and `stop` behind `evals:approve` while `round` needs only `evals:write`; and the winning change applied only by a person's ordinary `procedures.update`.",
+      "retrospective": "This statement is authored on 2026-11-28 for the tranche-9 rework. No contemporaneous statement of architecture work exists; the delivery was recorded in the slice plan, its migration and its suites. The statement records what the plan, the record and the tree show today, and it states plainly that the plan's §7 gate text still names `rbuild --gate`, a command the owner retired on 2026-11-20 in favour of the repository's GitHub-hosted preflight workflow for the compile and lint verdict."
     }
-   ],
-   "links": [
-    {
-     "to": "Business Capability Map — S20 Eval Hillclimb (Phase B)",
-     "kind": "dependency"
-    }
-   ],
-   "body": "# Stakeholder Map — S20 Eval Hillclimb (Phase A)\n\n## Metadata\n\nType matrix; phase A; plateau psa; version 1; status draft; owner the programme architect; reviewer the Architecture Board; review date 2026-11-28; project S20; tranche 9; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The map is read from the slice plan's §1 objective and §3 scope, and it is authored by the tranche-9 rework rather than at build time.\n\n## Entries\n\nSix stakeholders: the sponsoring group authorises tranche 9 and decides the close, the SRO is accountable for the outcome, the eval owner sets the goal and the stopping condition, the analyzer principal proposes changes, the benchmark owner owns the exact McNemar S20 calls, and the Architecture Board reviews the artefact set. Each row states what the group gives or receives from the climb.\n\n## Links\n\nDerives from `docs/plans/slices/S20-eval-hillclimb.md` §1 and §3; depends on the Business Capability Map for the capability each group receives, and on the Requirements Catalog for the checks that protect them. No stakeholder is listed without a named responsibility or interest in the climb.\n\n## Document\n\nThe artefact is published as an architecture-artifact-instance by the rework factory. It gives the Phase A view of whom the hillclimb serves: the eval owner's goal and the analyzer's proposal right sit beside the SRO's accountability, which is exactly the split the plan's decision that a round returns to the caller rests on."
   },
-  {
-   "title": "Driver/Goal/Objective Catalog — S20 Eval Hillclimb (Phase A)",
-   "phase_code": "a",
-   "plateau": "psa",
-   "artifact_kind": "catalog",
-   "entries": [
+  "artifacts": [
     {
-     "axis_a": "D1 The method is a loop over one eval, not a second runtime",
-     "axis_b": "G1 Rounds run as eval_run rows under S19's existing eval.run.tick; O1 the analyzer is an agent over /mcp or a person, never a conveyor-hosted model loop",
-     "value": {
-      "measure": "one new job kind, eval.regrade, across the whole slice",
-      "owner": "conveyor-e2e",
-      "source": "plan §3 IN and OUT, and §5"
-     },
-     "position": 1
+      "title": "Stakeholder Map — S20 Eval Hillclimb (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "entries": [
+        {
+          "axis_a": "Sponsoring group",
+          "axis_b": "authorisation of tranche 9 and the close decision",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "SRO",
+          "axis_b": "accountable for S20's outcome and the tranche-9 review",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "accountable"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Eval owner",
+          "axis_b": "sets the goal, the stopping condition and the split through the plan sign-off",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "collaborate"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Analyzer principal",
+          "axis_b": "an agent identity over /mcp or a person proposing change_md; never sets its own budget",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "collaborate"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Benchmark owner (S17)",
+          "axis_b": "owns the exact McNemar S20 calls rather than re-implements",
+          "value": {
+            "influence": "medium",
+            "interest": "medium",
+            "engagement": "consult"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Architecture Board",
+          "axis_b": "approves the artefact set and the retrospective Phase-G level",
+          "value": {
+            "influence": "high",
+            "interest": "medium",
+            "engagement": "approve"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Business Capability Map — S20 Eval Hillclimb (Phase B)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Stakeholder Map — S20 Eval Hillclimb (Phase A)\n\n## Metadata\n\nType matrix; phase A; plateau psa; version 1; status draft; owner the programme architect; reviewer the Architecture Board; review date 2026-11-28; project S20; tranche 9; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The map is read from the slice plan's §1 objective and §3 scope, and it is authored by the tranche-9 rework rather than at build time.\n\n## Entries\n\nSix stakeholders: the sponsoring group authorises tranche 9 and decides the close, the SRO is accountable for the outcome, the eval owner sets the goal and the stopping condition, the analyzer principal proposes changes, the benchmark owner owns the exact McNemar S20 calls, and the Architecture Board reviews the artefact set. Each row states what the group gives or receives from the climb.\n\n## Links\n\nDerives from `docs/plans/slices/S20-eval-hillclimb.md` §1 and §3; depends on the Business Capability Map for the capability each group receives, and on the Requirements Catalog for the checks that protect them. No stakeholder is listed without a named responsibility or interest in the climb.\n\n## Document\n\nThe artefact is published as an architecture-artifact-instance by the rework factory. It gives the Phase A view of whom the hillclimb serves: the eval owner's goal and the analyzer's proposal right sit beside the SRO's accountability, which is exactly the split the plan's decision that a round returns to the caller rests on."
     },
     {
-     "axis_a": "D2 The held-out number decides",
-     "axis_b": "G2 Each round is kept or reverted on the test side; O2 train up/test flat reverts, both up keeps, train down/test up keeps only if it repeats",
-     "value": {
-      "measure": "domain::eval::climb keep_or_revert",
-      "owner": "conveyor-e2e",
-      "source": "plan §6 step 2 and §8 trap 1"
-     },
-     "position": 2
+      "title": "Driver/Goal/Objective Catalog — S20 Eval Hillclimb (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "D1 The method is a loop over one eval, not a second runtime",
+          "axis_b": "G1 Rounds run as eval_run rows under S19's existing eval.run.tick; O1 the analyzer is an agent over /mcp or a person, never a conveyor-hosted model loop",
+          "value": {
+            "measure": "one new job kind, eval.regrade, across the whole slice",
+            "owner": "conveyor-e2e",
+            "source": "plan §3 IN and OUT, and §5"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "D2 The held-out number decides",
+          "axis_b": "G2 Each round is kept or reverted on the test side; O2 train up/test flat reverts, both up keeps, train down/test up keeps only if it repeats",
+          "value": {
+            "measure": "domain::eval::climb keep_or_revert",
+            "owner": "conveyor-e2e",
+            "source": "plan §6 step 2 and §8 trap 1"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "D3 The wall is data access",
+          "axis_b": "G3 A round whose proposal cites a test transcript is void; O3 the round records the transcript ids the analyzer was handed",
+          "value": {
+            "measure": "the transcript-id record carried on the round",
+            "owner": "conveyor-e2e",
+            "source": "plan §8 trap 2"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "D4 A stall is information",
+          "axis_b": "G4 Two flat rounds force a categorisation round; O4 artifact_gap, grader_disagreement, harness, structural or variance, with counts and one line each",
+          "value": {
+            "measure": "the buckets payload eval_climbs.round requires",
+            "owner": "conveyor-e2e",
+            "source": "plan §6 step 6 and §9"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "D5 Cost is a goal, not a mode of the loop",
+          "axis_b": "G5 goal.target='cost_usd' with a quality hold reuses the same rounds and comparison; O5 the guide's search order is state on eval_climb.goal",
+          "value": {
+            "measure": "the cost-walk suite's no_round_without_registered_gates",
+            "owner": "conveyor-e2e",
+            "source": "plan §6 step 7 and §9"
+          },
+          "position": 5
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements Catalog — S20 Eval Hillclimb (Phase A)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Driver/Goal/Objective Catalog — S20 Eval Hillclimb (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; version 1; status draft; owner the programme architect; reviewer the Architecture Board; review date 2026-11-28; project S20; tranche 9; retrospective under the standing delegation. The drivers are read from the slice plan's §1, §3 and §9 decisions and its §8 traps, not invented for the rework.\n\n## Entries\n\nFive driver/goal/objective rows: one loop over one eval instead of a second runtime; the held-out number decides keep or revert; the wall is data access, not an instruction; a stall is information that must be classified; and cost is a goal on the same rounds rather than a mode of the loop. Each row names the measure the plan or the tree carries and the owner accountable for holding it.\n\n## Links\n\nDerives from the slice plan's §1 and §9; each objective is realized by a requirement in the Requirements Catalog, and the measurement column names the observable that carries it. The D1 row is the plan's scope-out of a second runtime, and D5 is its decision that cost search is a goal, not a mode.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It records why the hillclimb exists at all: without it a person edits an eval, reruns it and reads a number with no held-out discipline, which is precisely the cost S20 removes."
     },
     {
-     "axis_a": "D3 The wall is data access",
-     "axis_b": "G3 A round whose proposal cites a test transcript is void; O3 the round records the transcript ids the analyzer was handed",
-     "value": {
-      "measure": "the transcript-id record carried on the round",
-      "owner": "conveyor-e2e",
-      "source": "plan §8 trap 2"
-     },
-     "position": 3
+      "title": "Requirements Catalog — S20 Eval Hillclimb (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "R-1 One round, one action",
+          "axis_b": "The round protocol analyze → apply → run → record → keep or revert is one eval_climbs.round call returning RoundView queued",
+          "value": {
+            "carried_by": "eval_climbs.round (evals:write)",
+            "suite": "crates/actions/tests/eval_climb_gate.rs",
+            "section": "plan §5 action table and §6 step 4"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "R-2 Plan sign-off before round 1",
+          "axis_b": "eval_climbs.start returns planned and carries gate='eval_climb_plan' with the goal, the will/won't-change table and the stop condition",
+          "value": {
+            "carried_by": "eval_climbs.start and the eval_climb_plan gate",
+            "suite": "crates/actions/tests/eval_climb_gate.rs",
+            "section": "plan §6 step 3"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "R-3 The split is S19's and cannot be redrawn",
+          "axis_b": "The climb reads the version's split and its digest and refuses any attempt to move them",
+          "value": {
+            "carried_by": "eval_climbs.* refusing a redraw",
+            "suite": "crates/actions/tests/eval_climb_gate.rs (a_climb_cannot_redraw_the_split)",
+            "section": "plan §7 gate and §8 trap 1"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "R-4 Comparison refuses across versions, graders or splits",
+          "axis_b": "eval_climbs.compare answers 409 not_comparable, and otherwise returns the paired delta and S17's exact McNemar",
+          "value": {
+            "carried_by": "eval_climbs.compare (evals:read)",
+            "suite": "crates/actions/tests/eval_compare.rs",
+            "section": "plan §5 action table and §6 step 5"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "R-5 Keep or revert is the machine's rule",
+          "axis_b": "Train up and test flat reverts; both up keeps; train down and test up keeps only on a repeat; a tie waits for a later round",
+          "value": {
+            "carried_by": "domain::eval::climb keep_or_revert",
+            "suite": "crates/domain/tests/eval_climb_rules.rs",
+            "section": "plan §6 step 2"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "R-6 Stall triage before another content round",
+          "axis_b": "After two consecutive flat test deltas the round requires a buckets payload, and a fourth content round against the same wall is refused",
+          "value": {
+            "carried_by": "eval_climbs.round's buckets requirement",
+            "suite": "crates/actions/tests/eval_stall.rs (a_fourth_content_round_is_refused)",
+            "section": "plan §6 step 6 and §9"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "R-7 A grader fix re-grades into a new run",
+          "axis_b": "eval_runs.regrade writes a new eval_run under the eval's current version and one eval.regrade job per stored slot, never in place",
+          "value": {
+            "carried_by": "eval_runs.regrade and the eval.regrade job",
+            "suite": "crates/actions/tests/eval_regrade.rs",
+            "section": "plan §5 action table and §7"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "R-8 Spend is summed, never a column",
+          "axis_b": "The climb's spend is a sum over its eval_case_result.usage rows at read time, because a maintained counter drifts from the rows it counts",
+          "value": {
+            "carried_by": "the climb read, not a stored counter",
+            "suite": "crates/store/tests/eval_climb_schema.rs (no_climb_spend_column)",
+            "section": "plan §5 and §8 trap 7"
+          },
+          "position": 8
+        }
+      ],
+      "links": [
+        {
+          "to": "Solution Concept Diagram — S20 Eval Hillclimb (Phase A)",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Requirements Catalog — S20 Eval Hillclimb (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; version 1; status draft; owner the programme architect; reviewer the Architecture Board; review date 2026-11-28; project S20; tranche 9; retrospective under the standing delegation. Each requirement maps to a named surface or suite the tree carries at the 2026-11-28 snapshot; the plan's §7 names the gate each suite belongs to.\n\n## Entries\n\nEight requirements: the one-action round protocol, the plan sign-off before round 1, S19's split held immovable, comparison refusing across versions, graders or splits, the machine's keep and revert rules, stall triage before another content round, regrade into a new run, and spend summed rather than counted. Each row names the action or suite that carries it, so no requirement rests on prose alone.\n\n## Links\n\nDerives from the Driver/Goal/Objective Catalog and is realized by the Solution Concept Diagram; the plan's §5 action table and §6 build order are the source for pairing a requirement with its module and suite, and the tree carries `crates/actions/tests/eval_compare.rs`, `eval_stall.rs` and `eval_regrade.rs` as measured on 2026-11-28.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It is the bridge between the plan's decisions and the tree: a reader can move from a driver to its requirement to the suite the plan's §7 assigns, which is the structure the close gate reads."
     },
     {
-     "axis_a": "D4 A stall is information",
-     "axis_b": "G4 Two flat rounds force a categorisation round; O4 artifact_gap, grader_disagreement, harness, structural or variance, with counts and one line each",
-     "value": {
-      "measure": "the buckets payload eval_climbs.round requires",
-      "owner": "conveyor-e2e",
-      "source": "plan §6 step 6 and §9"
-     },
-     "position": 4
+      "title": "Solution Concept Diagram — S20 Eval Hillclimb (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "entries": [
+        {
+          "axis_a": "Caller (agent over /mcp or a person)",
+          "axis_b": "proposes change_md and change_patch to eval_climbs.round",
+          "value": {
+            "surface": "eval_climbs.round",
+            "scope": "evals:write",
+            "guard": "the plan was signed once"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "eval_climb state",
+          "axis_b": "the method's state file: goal, direction, reps, stopping, plateau_k, delta, cost ceiling, current round, status",
+          "value": {
+            "table": "eval_climb",
+            "status_enum": "planned | running | plateaued | stopped",
+            "spend": "never a column"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Round row",
+          "axis_b": "variant v<N>, round, change_md, change_patch, prediction and summary.suspicious",
+          "value": {
+            "table": "eval_runs",
+            "driver": "S19's eval.run.tick",
+            "new_job_kind": "none"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Plan sign-off",
+          "axis_b": "gate='eval_climb_plan' carrying the goal, the will/won't-change table and the stop condition",
+          "value": {
+            "gate": "eval_climb_plan",
+            "must_precede": "round 1",
+            "scope": "evals:approve"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Per-round approval",
+          "axis_b": "approve_each_round emits gate='eval_round' and refuses the run until the gate is decided",
+          "value": {
+            "gate": "eval_round",
+            "set_by": "approve_each_round",
+            "default_cadence": "one round per call"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Comparison",
+          "axis_b": "eval_climbs.compare computes the paired per-case delta and calls S17's exact McNemar",
+          "value": {
+            "surface": "eval_climbs.compare",
+            "test": "S17 benchmark::mcnemar, called",
+            "refusal": "409 not_comparable"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Stall triage",
+          "axis_b": "two consecutive flat test deltas force a buckets payload in place of a diff",
+          "value": {
+            "payload": "artifact_gap | grader_disagreement | harness | structural | variance",
+            "trigger": "two flat test deltas",
+            "refused_next": "a fourth content round"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "Regrade",
+          "axis_b": "a grader fix re-grades stored transcripts into a new run under the current version, then re-runs the comparison",
+          "value": {
+            "surface": "eval_runs.regrade",
+            "jobs": "one eval.regrade per stored slot",
+            "in_place": "never"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "Screen 21 (declared for S12)",
+          "axis_b": "the read model S12 renders; S20 ships no UI",
+          "value": {
+            "screen": "21 Eval hillclimb",
+            "owner": "S12",
+            "events": "eval_climb.changed, eval_climb.round_completed"
+          },
+          "position": 9
+        }
+      ],
+      "links": [
+        {
+          "to": "Driver/Goal/Objective Catalog — S20 Eval Hillclimb (Phase A)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Solution Concept Diagram — S20 Eval Hillclimb (Phase A)\n\n## Metadata\n\nType diagram; phase A; plateau psa; version 1; status draft; owner the programme architect; reviewer the Architecture Board; review date 2026-11-28; project S20; tranche 9; retrospective under the standing delegation. The diagram is textual: the record's artefact action carries entries, so nodes and edges are enumerated rather than drawn.\n\n## Entries\n\nNine nodes and edges: the caller, the eval_climb state, the round row on S19's existing tick, the plan sign-off, the optional per-round approval, the comparison against S17's exact McNemar, the stall-triage payload, the regrade path and the screen declared for S12. Each entry names the node's contract, and the round row records that a round adds no job kind.\n\n## Links\n\nDerives from the Requirements Catalog and realizes R-1 to R-8 on one wire; the source is the plan's §5 action table and §6 build order, whose route, module and event list is the component map. The eval_climb node is the seam that keeps the climb's goal and budget separate from the round it then runs.\n\n## Document\n\nThe diagram is published as an architecture-artifact-instance by the rework factory. It deliberately shows where the loop stops: the round action returns to the caller after one round, and applying the winner is a person's procedures.update, so the conveyor hosts no autonomous model loop."
     },
     {
-     "axis_a": "D5 Cost is a goal, not a mode of the loop",
-     "axis_b": "G5 goal.target='cost_usd' with a quality hold reuses the same rounds and comparison; O5 the guide's search order is state on eval_climb.goal",
-     "value": {
-      "measure": "the cost-walk suite's no_round_without_registered_gates",
-      "owner": "conveyor-e2e",
-      "source": "plan §6 step 7 and §9"
-     },
-     "position": 5
+      "title": "Business Capability Map — S20 Eval Hillclimb (Phase B)",
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "entries": [
+        {
+          "axis_a": "Hillclimb orchestration",
+          "axis_b": "the loop state machine, the keep or revert rule and the stopping predicate",
+          "value": {
+            "level": 2,
+            "delivered_by": "crates/domain/src/eval/climb.rs",
+            "surface": "eval_climbs.start/get/list/stop"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Round execution",
+          "axis_b": "one round as an eval_run row under S19's existing tick",
+          "value": {
+            "level": 2,
+            "delivered_by": "crates/actions/src/eval/climbs.rs",
+            "surface": "eval_climbs.round"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Paired comparison",
+          "axis_b": "the per-case delta with the exact McNemar and its refusal rule",
+          "value": {
+            "level": 2,
+            "delivered_by": "S17's benchmark::mcnemar, called",
+            "surface": "eval_climbs.compare"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Stall triage",
+          "axis_b": "the five-bucket categorisation required before another content round",
+          "value": {
+            "level": 2,
+            "delivered_by": "crates/actions/src/eval/climbs.rs",
+            "surface": "the buckets payload on eval_climbs.round"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Cost search",
+          "axis_b": "the guide's search order as state, with adoption gates registered before round 1",
+          "value": {
+            "level": 2,
+            "delivered_by": "eval_climb.goal state",
+            "surface": "goal.target='cost_usd' with a quality hold"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Final report and winner",
+          "axis_b": "narrative_md, the per-round status table and the four-part summary",
+          "value": {
+            "level": 2,
+            "delivered_by": "crates/domain/src/eval/climb.rs",
+            "surface": "eval_climbs.stop and the report"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Data Entity/Data Component Catalog — S20 Eval Hillclimb (Phase C)",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Business Capability Map — S20 Eval Hillclimb (Phase B)\n\n## Metadata\n\nType diagram; phase B; plateau hld; version 1; status draft; owner the programme architect; reviewer the Architecture Board; review date 2026-11-28; project S20; tranche 9; retrospective under the standing delegation. The level is the retrospective reading: each capability exists in the tree, is delivered by a named module, and is reached through a named action surface.\n\n## Entries\n\nSix capabilities: hillclimb orchestration, round execution, paired comparison, stall triage, cost search and the final report. Each entry pairs the capability with its delivering module and its action surface and states level 2, because the capability is built and carried by the tree at the pinned snapshot.\n\n## Links\n\nRealizes the Phase A drivers; the Data Entity/Data Component Catalog carries the rows and components each capability writes. The source is the plan's §5 action table and §6 build order, which name the state table, the round row, the comparison, the buckets payload and the report.\n\n## Document\n\nThe map is published as an architecture-artifact-instance by the rework factory. It is the Phase B view a reader uses to go from the business outcome — a climb that ends on a held-out verdict — to the modules that deliver it, without reading the crate tree first."
+    },
+    {
+      "title": "Data Entity/Data Component Catalog — S20 Eval Hillclimb (Phase C)",
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "eval_climb",
+          "axis_b": "goal jsonb, direction, reps, stopping, plateau_k, delta, cost_ceiling_cents, current_round, best_round, best_test_score, approve_each_round, off_limits, status",
+          "value": {
+            "writer": "eval_climbs.start/round/stop",
+            "migration": "shipped in S19's 0026",
+            "spend_column": "none"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "eval_climb.narrative_md",
+          "axis_b": "the final report body rewritten at the close of the climb",
+          "value": {
+            "writer": "the final report step",
+            "migration": "0029_s20_eval_climb_report.sql",
+            "carries": "the status table and the four-part summary"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "eval_runs round columns",
+          "axis_b": "variant v<N>, round, change_md, change_patch, prediction and summary.suspicious",
+          "value": {
+            "writer": "eval_climbs.round",
+            "owner": "S19's table",
+            "variant": "v<N> per round"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "eval_case_result.usage",
+          "axis_b": "the usage rows the climb's spend is summed from at read time",
+          "value": {
+            "reader": "the climb's spend read",
+            "rule": "sum, never a counter",
+            "source": "S19's case runner"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "approvals (eval_climb_plan, eval_round)",
+          "axis_b": "the plan sign-off and the optional per-round approval",
+          "value": {
+            "writer": "eval_climbs.start and eval_climbs.round",
+            "gate_values": "eval_climb_plan, eval_round",
+            "scope": "evals:approve"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "jobs (eval.regrade)",
+          "axis_b": "one job per stored slot when a grader fix re-grades transcripts",
+          "value": {
+            "writer": "eval_runs.regrade",
+            "kind": "eval.regrade",
+            "rounds_add": "no job kind"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "eval_version",
+          "axis_b": "the regrade lands the new run under the eval's current version, never an old one",
+          "value": {
+            "owner": "S19",
+            "rule": "never in place",
+            "consequence": "a comparison is valid only within one version"
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Technology Standards Catalog — S20 Eval Hillclimb (Phase D)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Data Entity/Data Component Catalog — S20 Eval Hillclimb (Phase C)\n\n## Metadata\n\nType catalog; phase C; plateau hld; version 1; status draft; owner the programme architect; reviewer the Architecture Board; review date 2026-11-28; project S20; tranche 9; retrospective under the standing delegation. The entities are the `eval_climb` row the migration extends and the round, usage, approval and job rows the climb's actions write or read.\n\n## Entries\n\nSeven entities and components: the climb state, its narrative_md column in 0029, the round columns on eval_runs, the usage rows the spend is summed from, the two approval gates, the eval.regrade job and the eval_version that scopes a regrade. Each names its writer and the rule that keeps it honest; the spend entry records that no counter is maintained.\n\n## Links\n\nDepends on the Technology Standards Catalog for the storage and job rules and on the Business Capability Map for the capability each entity serves. The source is `migrations/0029_s20_eval_climb_report.sql`, the plan's §5 column list, and `crates/store/src/eval/climb.rs`, where the round and state writers live.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It gives the Phase C view of the climb: the rows an auditor would read after a round was kept or reverted, and the module that writes each one."
+    },
+    {
+      "title": "Technology Standards Catalog — S20 Eval Hillclimb (Phase D)",
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "Postgres 18 with forced row-level security",
+          "axis_b": "the eval_climb table and the round rows stay tenant-scoped",
+          "value": {
+            "rule": "RLS forced in the migration",
+            "check": "one_table_rls_forced_and_the_climb_exists",
+            "owner": "S19's migration pattern"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Rust workspace: domain, store, actions",
+          "axis_b": "the loop machine in domain, the rows in store, the actions in actions",
+          "value": {
+            "rule": "one implementation per seam",
+            "crates": "conveyor-domain, conveyor-store, conveyor-actions",
+            "surface": "the registry EXPECTED array"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Exact McNemar from S17",
+          "axis_b": "one implementation of the exact test in the estate, called and not copied",
+          "value": {
+            "owner": "crates/domain/src/benchmark/mcnemar.rs",
+            "rule": "S20 calls it",
+            "consequence": "a second copy would diverge silently in a published number"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "S19's eval runner and tick",
+          "axis_b": "a round rides eval.run.tick and inherits S19's reaper",
+          "value": {
+            "owner": "S19",
+            "rule": "no second driver",
+            "surface": "eval_runs"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "MCP agent principal",
+          "axis_b": "the analyzer proposes a round over /mcp holding evals:write only",
+          "value": {
+            "route": "/mcp",
+            "scope": "evals:write",
+            "denied": "setting its own goal or budget"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Served OpenAPI lock",
+          "axis_b": "the action surface is held by the lock check",
+          "value": {
+            "check": "--print-openapi --check-lock",
+            "rule": "the served surface and the lock agree",
+            "owner": "CI"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "GitHub-hosted preflight",
+          "axis_b": "the compile and lint verdict's current route; the plan's rbuild lines are history",
+          "value": {
+            "workflow": "preflight.yml",
+            "retired": "rbuild, owner decision 2026-11-20",
+            "rule": "never a local compiling gate"
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Solution Concept Diagram — S20 Eval Hillclimb (Phase A)",
+          "kind": "reuse"
+        }
+      ],
+      "body": "# Technology Standards Catalog — S20 Eval Hillclimb (Phase D)\n\n## Metadata\n\nType catalog; phase D; plateau hld; version 1; status draft; owner the programme architect; reviewer the Architecture Board; review date 2026-11-28; project S20; tranche 9; retrospective under the standing delegation. The standards are the ones the tree and the migration actually use; the catalog is a reading of the workspace at the 2026-11-28 snapshot, not a wish list.\n\n## Entries\n\nSeven technology standards: Postgres with forced row-level security, the three-crate Rust seam, S17's exact McNemar called rather than copied, S19's runner and tick, the MCP agent principal, the served OpenAPI lock and the GitHub-hosted preflight that carries the compile and lint verdict since rbuild was retired on 2026-11-20.\n\n## Links\n\nReuses the Solution Concept Diagram's node set and depends on the Data Entity catalog's writers. The source is the workspace crates, `migrations/0029_s20_eval_climb_report.sql`, the plan's §4 source table and the owner decision of 2026-11-20 that retired the local compiling gate.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It closes the Phase D view: a reader can see which platforms the climb stands on, that comparison has exactly one implementation, and that the gate route named in the plan's §7 is historical rather than executable today."
     }
-   ],
-   "links": [
-    {
-     "to": "Requirements Catalog — S20 Eval Hillclimb (Phase A)",
-     "kind": "derivation"
-    }
-   ],
-   "body": "# Driver/Goal/Objective Catalog — S20 Eval Hillclimb (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; version 1; status draft; owner the programme architect; reviewer the Architecture Board; review date 2026-11-28; project S20; tranche 9; retrospective under the standing delegation. The drivers are read from the slice plan's §1, §3 and §9 decisions and its §8 traps, not invented for the rework.\n\n## Entries\n\nFive driver/goal/objective rows: one loop over one eval instead of a second runtime; the held-out number decides keep or revert; the wall is data access, not an instruction; a stall is information that must be classified; and cost is a goal on the same rounds rather than a mode of the loop. Each row names the measure the plan or the tree carries and the owner accountable for holding it.\n\n## Links\n\nDerives from the slice plan's §1 and §9; each objective is realized by a requirement in the Requirements Catalog, and the measurement column names the observable that carries it. The D1 row is the plan's scope-out of a second runtime, and D5 is its decision that cost search is a goal, not a mode.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It records why the hillclimb exists at all: without it a person edits an eval, reruns it and reads a number with no held-out discipline, which is precisely the cost S20 removes."
-  },
-  {
-   "title": "Requirements Catalog — S20 Eval Hillclimb (Phase A)",
-   "phase_code": "a",
-   "plateau": "psa",
-   "artifact_kind": "catalog",
-   "entries": [
-    {
-     "axis_a": "R-1 One round, one action",
-     "axis_b": "The round protocol analyze → apply → run → record → keep or revert is one eval_climbs.round call returning RoundView queued",
-     "value": {
-      "carried_by": "eval_climbs.round (evals:write)",
-      "suite": "crates/actions/tests/eval_climb_gate.rs",
-      "section": "plan §5 action table and §6 step 4"
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "R-2 Plan sign-off before round 1",
-     "axis_b": "eval_climbs.start returns planned and carries gate='eval_climb_plan' with the goal, the will/won't-change table and the stop condition",
-     "value": {
-      "carried_by": "eval_climbs.start and the eval_climb_plan gate",
-      "suite": "crates/actions/tests/eval_climb_gate.rs",
-      "section": "plan §6 step 3"
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "R-3 The split is S19's and cannot be redrawn",
-     "axis_b": "The climb reads the version's split and its digest and refuses any attempt to move them",
-     "value": {
-      "carried_by": "eval_climbs.* refusing a redraw",
-      "suite": "crates/actions/tests/eval_climb_gate.rs (a_climb_cannot_redraw_the_split)",
-      "section": "plan §7 gate and §8 trap 1"
-     },
-     "position": 3
-    },
-    {
-     "axis_a": "R-4 Comparison refuses across versions, graders or splits",
-     "axis_b": "eval_climbs.compare answers 409 not_comparable, and otherwise returns the paired delta and S17's exact McNemar",
-     "value": {
-      "carried_by": "eval_climbs.compare (evals:read)",
-      "suite": "crates/actions/tests/eval_compare.rs",
-      "section": "plan §5 action table and §6 step 5"
-     },
-     "position": 4
-    },
-    {
-     "axis_a": "R-5 Keep or revert is the machine's rule",
-     "axis_b": "Train up and test flat reverts; both up keeps; train down and test up keeps only on a repeat; a tie waits for a later round",
-     "value": {
-      "carried_by": "domain::eval::climb keep_or_revert",
-      "suite": "crates/domain/tests/eval_climb_rules.rs",
-      "section": "plan §6 step 2"
-     },
-     "position": 5
-    },
-    {
-     "axis_a": "R-6 Stall triage before another content round",
-     "axis_b": "After two consecutive flat test deltas the round requires a buckets payload, and a fourth content round against the same wall is refused",
-     "value": {
-      "carried_by": "eval_climbs.round's buckets requirement",
-      "suite": "crates/actions/tests/eval_stall.rs (a_fourth_content_round_is_refused)",
-      "section": "plan §6 step 6 and §9"
-     },
-     "position": 6
-    },
-    {
-     "axis_a": "R-7 A grader fix re-grades into a new run",
-     "axis_b": "eval_runs.regrade writes a new eval_run under the eval's current version and one eval.regrade job per stored slot, never in place",
-     "value": {
-      "carried_by": "eval_runs.regrade and the eval.regrade job",
-      "suite": "crates/actions/tests/eval_regrade.rs",
-      "section": "plan §5 action table and §7"
-     },
-     "position": 7
-    },
-    {
-     "axis_a": "R-8 Spend is summed, never a column",
-     "axis_b": "The climb's spend is a sum over its eval_case_result.usage rows at read time, because a maintained counter drifts from the rows it counts",
-     "value": {
-      "carried_by": "the climb read, not a stored counter",
-      "suite": "crates/store/tests/eval_climb_schema.rs (no_climb_spend_column)",
-      "section": "plan §5 and §8 trap 7"
-     },
-     "position": 8
-    }
-   ],
-   "links": [
-    {
-     "to": "Solution Concept Diagram — S20 Eval Hillclimb (Phase A)",
-     "kind": "realization"
-    }
-   ],
-   "body": "# Requirements Catalog — S20 Eval Hillclimb (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; version 1; status draft; owner the programme architect; reviewer the Architecture Board; review date 2026-11-28; project S20; tranche 9; retrospective under the standing delegation. Each requirement maps to a named surface or suite the tree carries at the 2026-11-28 snapshot; the plan's §7 names the gate each suite belongs to.\n\n## Entries\n\nEight requirements: the one-action round protocol, the plan sign-off before round 1, S19's split held immovable, comparison refusing across versions, graders or splits, the machine's keep and revert rules, stall triage before another content round, regrade into a new run, and spend summed rather than counted. Each row names the action or suite that carries it, so no requirement rests on prose alone.\n\n## Links\n\nDerives from the Driver/Goal/Objective Catalog and is realized by the Solution Concept Diagram; the plan's §5 action table and §6 build order are the source for pairing a requirement with its module and suite, and the tree carries `crates/actions/tests/eval_compare.rs`, `eval_stall.rs` and `eval_regrade.rs` as measured on 2026-11-28.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It is the bridge between the plan's decisions and the tree: a reader can move from a driver to its requirement to the suite the plan's §7 assigns, which is the structure the close gate reads."
-  },
-  {
-   "title": "Solution Concept Diagram — S20 Eval Hillclimb (Phase A)",
-   "phase_code": "a",
-   "plateau": "psa",
-   "artifact_kind": "diagram",
-   "entries": [
-    {
-     "axis_a": "Caller (agent over /mcp or a person)",
-     "axis_b": "proposes change_md and change_patch to eval_climbs.round",
-     "value": {
-      "surface": "eval_climbs.round",
-      "scope": "evals:write",
-      "guard": "the plan was signed once"
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "eval_climb state",
-     "axis_b": "the method's state file: goal, direction, reps, stopping, plateau_k, delta, cost ceiling, current round, status",
-     "value": {
-      "table": "eval_climb",
-      "status_enum": "planned | running | plateaued | stopped",
-      "spend": "never a column"
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "Round row",
-     "axis_b": "variant v<N>, round, change_md, change_patch, prediction and summary.suspicious",
-     "value": {
-      "table": "eval_runs",
-      "driver": "S19's eval.run.tick",
-      "new_job_kind": "none"
-     },
-     "position": 3
-    },
-    {
-     "axis_a": "Plan sign-off",
-     "axis_b": "gate='eval_climb_plan' carrying the goal, the will/won't-change table and the stop condition",
-     "value": {
-      "gate": "eval_climb_plan",
-      "must_precede": "round 1",
-      "scope": "evals:approve"
-     },
-     "position": 4
-    },
-    {
-     "axis_a": "Per-round approval",
-     "axis_b": "approve_each_round emits gate='eval_round' and refuses the run until the gate is decided",
-     "value": {
-      "gate": "eval_round",
-      "set_by": "approve_each_round",
-      "default_cadence": "one round per call"
-     },
-     "position": 5
-    },
-    {
-     "axis_a": "Comparison",
-     "axis_b": "eval_climbs.compare computes the paired per-case delta and calls S17's exact McNemar",
-     "value": {
-      "surface": "eval_climbs.compare",
-      "test": "S17 benchmark::mcnemar, called",
-      "refusal": "409 not_comparable"
-     },
-     "position": 6
-    },
-    {
-     "axis_a": "Stall triage",
-     "axis_b": "two consecutive flat test deltas force a buckets payload in place of a diff",
-     "value": {
-      "payload": "artifact_gap | grader_disagreement | harness | structural | variance",
-      "trigger": "two flat test deltas",
-      "refused_next": "a fourth content round"
-     },
-     "position": 7
-    },
-    {
-     "axis_a": "Regrade",
-     "axis_b": "a grader fix re-grades stored transcripts into a new run under the current version, then re-runs the comparison",
-     "value": {
-      "surface": "eval_runs.regrade",
-      "jobs": "one eval.regrade per stored slot",
-      "in_place": "never"
-     },
-     "position": 8
-    },
-    {
-     "axis_a": "Screen 21 (declared for S12)",
-     "axis_b": "the read model S12 renders; S20 ships no UI",
-     "value": {
-      "screen": "21 Eval hillclimb",
-      "owner": "S12",
-      "events": "eval_climb.changed, eval_climb.round_completed"
-     },
-     "position": 9
-    }
-   ],
-   "links": [
-    {
-     "to": "Driver/Goal/Objective Catalog — S20 Eval Hillclimb (Phase A)",
-     "kind": "derivation"
-    }
-   ],
-   "body": "# Solution Concept Diagram — S20 Eval Hillclimb (Phase A)\n\n## Metadata\n\nType diagram; phase A; plateau psa; version 1; status draft; owner the programme architect; reviewer the Architecture Board; review date 2026-11-28; project S20; tranche 9; retrospective under the standing delegation. The diagram is textual: the record's artefact action carries entries, so nodes and edges are enumerated rather than drawn.\n\n## Entries\n\nNine nodes and edges: the caller, the eval_climb state, the round row on S19's existing tick, the plan sign-off, the optional per-round approval, the comparison against S17's exact McNemar, the stall-triage payload, the regrade path and the screen declared for S12. Each entry names the node's contract, and the round row records that a round adds no job kind.\n\n## Links\n\nDerives from the Requirements Catalog and realizes R-1 to R-8 on one wire; the source is the plan's §5 action table and §6 build order, whose route, module and event list is the component map. The eval_climb node is the seam that keeps the climb's goal and budget separate from the round it then runs.\n\n## Document\n\nThe diagram is published as an architecture-artifact-instance by the rework factory. It deliberately shows where the loop stops: the round action returns to the caller after one round, and applying the winner is a person's procedures.update, so the conveyor hosts no autonomous model loop."
-  },
-  {
-   "title": "Business Capability Map — S20 Eval Hillclimb (Phase B)",
-   "phase_code": "b",
-   "plateau": "hld",
-   "artifact_kind": "diagram",
-   "entries": [
-    {
-     "axis_a": "Hillclimb orchestration",
-     "axis_b": "the loop state machine, the keep or revert rule and the stopping predicate",
-     "value": {
-      "level": 2,
-      "delivered_by": "crates/domain/src/eval/climb.rs",
-      "surface": "eval_climbs.start/get/list/stop"
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "Round execution",
-     "axis_b": "one round as an eval_run row under S19's existing tick",
-     "value": {
-      "level": 2,
-      "delivered_by": "crates/actions/src/eval/climbs.rs",
-      "surface": "eval_climbs.round"
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "Paired comparison",
-     "axis_b": "the per-case delta with the exact McNemar and its refusal rule",
-     "value": {
-      "level": 2,
-      "delivered_by": "S17's benchmark::mcnemar, called",
-      "surface": "eval_climbs.compare"
-     },
-     "position": 3
-    },
-    {
-     "axis_a": "Stall triage",
-     "axis_b": "the five-bucket categorisation required before another content round",
-     "value": {
-      "level": 2,
-      "delivered_by": "crates/actions/src/eval/climbs.rs",
-      "surface": "the buckets payload on eval_climbs.round"
-     },
-     "position": 4
-    },
-    {
-     "axis_a": "Cost search",
-     "axis_b": "the guide's search order as state, with adoption gates registered before round 1",
-     "value": {
-      "level": 2,
-      "delivered_by": "eval_climb.goal state",
-      "surface": "goal.target='cost_usd' with a quality hold"
-     },
-     "position": 5
-    },
-    {
-     "axis_a": "Final report and winner",
-     "axis_b": "narrative_md, the per-round status table and the four-part summary",
-     "value": {
-      "level": 2,
-      "delivered_by": "crates/domain/src/eval/climb.rs",
-      "surface": "eval_climbs.stop and the report"
-     },
-     "position": 6
-    }
-   ],
-   "links": [
-    {
-     "to": "Data Entity/Data Component Catalog — S20 Eval Hillclimb (Phase C)",
-     "kind": "realization"
-    }
-   ],
-   "body": "# Business Capability Map — S20 Eval Hillclimb (Phase B)\n\n## Metadata\n\nType diagram; phase B; plateau hld; version 1; status draft; owner the programme architect; reviewer the Architecture Board; review date 2026-11-28; project S20; tranche 9; retrospective under the standing delegation. The level is the retrospective reading: each capability exists in the tree, is delivered by a named module, and is reached through a named action surface.\n\n## Entries\n\nSix capabilities: hillclimb orchestration, round execution, paired comparison, stall triage, cost search and the final report. Each entry pairs the capability with its delivering module and its action surface and states level 2, because the capability is built and carried by the tree at the pinned snapshot.\n\n## Links\n\nRealizes the Phase A drivers; the Data Entity/Data Component Catalog carries the rows and components each capability writes. The source is the plan's §5 action table and §6 build order, which name the state table, the round row, the comparison, the buckets payload and the report.\n\n## Document\n\nThe map is published as an architecture-artifact-instance by the rework factory. It is the Phase B view a reader uses to go from the business outcome — a climb that ends on a held-out verdict — to the modules that deliver it, without reading the crate tree first."
-  },
-  {
-   "title": "Data Entity/Data Component Catalog — S20 Eval Hillclimb (Phase C)",
-   "phase_code": "c",
-   "plateau": "hld",
-   "artifact_kind": "catalog",
-   "entries": [
-    {
-     "axis_a": "eval_climb",
-     "axis_b": "goal jsonb, direction, reps, stopping, plateau_k, delta, cost_ceiling_cents, current_round, best_round, best_test_score, approve_each_round, off_limits, status",
-     "value": {
-      "writer": "eval_climbs.start/round/stop",
-      "migration": "shipped in S19's 0026",
-      "spend_column": "none"
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "eval_climb.narrative_md",
-     "axis_b": "the final report body rewritten at the close of the climb",
-     "value": {
-      "writer": "the final report step",
-      "migration": "0029_s20_eval_climb_report.sql",
-      "carries": "the status table and the four-part summary"
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "eval_runs round columns",
-     "axis_b": "variant v<N>, round, change_md, change_patch, prediction and summary.suspicious",
-     "value": {
-      "writer": "eval_climbs.round",
-      "owner": "S19's table",
-      "variant": "v<N> per round"
-     },
-     "position": 3
-    },
-    {
-     "axis_a": "eval_case_result.usage",
-     "axis_b": "the usage rows the climb's spend is summed from at read time",
-     "value": {
-      "reader": "the climb's spend read",
-      "rule": "sum, never a counter",
-      "source": "S19's case runner"
-     },
-     "position": 4
-    },
-    {
-     "axis_a": "approvals (eval_climb_plan, eval_round)",
-     "axis_b": "the plan sign-off and the optional per-round approval",
-     "value": {
-      "writer": "eval_climbs.start and eval_climbs.round",
-      "gate_values": "eval_climb_plan, eval_round",
-      "scope": "evals:approve"
-     },
-     "position": 5
-    },
-    {
-     "axis_a": "jobs (eval.regrade)",
-     "axis_b": "one job per stored slot when a grader fix re-grades transcripts",
-     "value": {
-      "writer": "eval_runs.regrade",
-      "kind": "eval.regrade",
-      "rounds_add": "no job kind"
-     },
-     "position": 6
-    },
-    {
-     "axis_a": "eval_version",
-     "axis_b": "the regrade lands the new run under the eval's current version, never an old one",
-     "value": {
-      "owner": "S19",
-      "rule": "never in place",
-      "consequence": "a comparison is valid only within one version"
-     },
-     "position": 7
-    }
-   ],
-   "links": [
-    {
-     "to": "Technology Standards Catalog — S20 Eval Hillclimb (Phase D)",
-     "kind": "dependency"
-    }
-   ],
-   "body": "# Data Entity/Data Component Catalog — S20 Eval Hillclimb (Phase C)\n\n## Metadata\n\nType catalog; phase C; plateau hld; version 1; status draft; owner the programme architect; reviewer the Architecture Board; review date 2026-11-28; project S20; tranche 9; retrospective under the standing delegation. The entities are the `eval_climb` row the migration extends and the round, usage, approval and job rows the climb's actions write or read.\n\n## Entries\n\nSeven entities and components: the climb state, its narrative_md column in 0029, the round columns on eval_runs, the usage rows the spend is summed from, the two approval gates, the eval.regrade job and the eval_version that scopes a regrade. Each names its writer and the rule that keeps it honest; the spend entry records that no counter is maintained.\n\n## Links\n\nDepends on the Technology Standards Catalog for the storage and job rules and on the Business Capability Map for the capability each entity serves. The source is `migrations/0029_s20_eval_climb_report.sql`, the plan's §5 column list, and `crates/store/src/eval/climb.rs`, where the round and state writers live.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It gives the Phase C view of the climb: the rows an auditor would read after a round was kept or reverted, and the module that writes each one."
-  },
-  {
-   "title": "Technology Standards Catalog — S20 Eval Hillclimb (Phase D)",
-   "phase_code": "d",
-   "plateau": "hld",
-   "artifact_kind": "catalog",
-   "entries": [
-    {
-     "axis_a": "Postgres 18 with forced row-level security",
-     "axis_b": "the eval_climb table and the round rows stay tenant-scoped",
-     "value": {
-      "rule": "RLS forced in the migration",
-      "check": "one_table_rls_forced_and_the_climb_exists",
-      "owner": "S19's migration pattern"
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "Rust workspace: domain, store, actions",
-     "axis_b": "the loop machine in domain, the rows in store, the actions in actions",
-     "value": {
-      "rule": "one implementation per seam",
-      "crates": "conveyor-domain, conveyor-store, conveyor-actions",
-      "surface": "the registry EXPECTED array"
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "Exact McNemar from S17",
-     "axis_b": "one implementation of the exact test in the estate, called and not copied",
-     "value": {
-      "owner": "crates/domain/src/benchmark/mcnemar.rs",
-      "rule": "S20 calls it",
-      "consequence": "a second copy would diverge silently in a published number"
-     },
-     "position": 3
-    },
-    {
-     "axis_a": "S19's eval runner and tick",
-     "axis_b": "a round rides eval.run.tick and inherits S19's reaper",
-     "value": {
-      "owner": "S19",
-      "rule": "no second driver",
-      "surface": "eval_runs"
-     },
-     "position": 4
-    },
-    {
-     "axis_a": "MCP agent principal",
-     "axis_b": "the analyzer proposes a round over /mcp holding evals:write only",
-     "value": {
-      "route": "/mcp",
-      "scope": "evals:write",
-      "denied": "setting its own goal or budget"
-     },
-     "position": 5
-    },
-    {
-     "axis_a": "Served OpenAPI lock",
-     "axis_b": "the action surface is held by the lock check",
-     "value": {
-      "check": "--print-openapi --check-lock",
-      "rule": "the served surface and the lock agree",
-      "owner": "CI"
-     },
-     "position": 6
-    },
-    {
-     "axis_a": "GitHub-hosted preflight",
-     "axis_b": "the compile and lint verdict's current route; the plan's rbuild lines are history",
-     "value": {
-      "workflow": "preflight.yml",
-      "retired": "rbuild, owner decision 2026-11-20",
-      "rule": "never a local compiling gate"
-     },
-     "position": 7
-    }
-   ],
-   "links": [
-    {
-     "to": "Solution Concept Diagram — S20 Eval Hillclimb (Phase A)",
-     "kind": "reuse"
-    }
-   ],
-   "body": "# Technology Standards Catalog — S20 Eval Hillclimb (Phase D)\n\n## Metadata\n\nType catalog; phase D; plateau hld; version 1; status draft; owner the programme architect; reviewer the Architecture Board; review date 2026-11-28; project S20; tranche 9; retrospective under the standing delegation. The standards are the ones the tree and the migration actually use; the catalog is a reading of the workspace at the 2026-11-28 snapshot, not a wish list.\n\n## Entries\n\nSeven technology standards: Postgres with forced row-level security, the three-crate Rust seam, S17's exact McNemar called rather than copied, S19's runner and tick, the MCP agent principal, the served OpenAPI lock and the GitHub-hosted preflight that carries the compile and lint verdict since rbuild was retired on 2026-11-20.\n\n## Links\n\nReuses the Solution Concept Diagram's node set and depends on the Data Entity catalog's writers. The source is the workspace crates, `migrations/0029_s20_eval_climb_report.sql`, the plan's §4 source table and the owner decision of 2026-11-20 that retired the local compiling gate.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It closes the Phase D view: a reader can see which platforms the climb stands on, that comparison has exactly one implementation, and that the gate route named in the plan's §7 is historical rather than executable today."
-  }
- ],
- "documents": [
-  {
-   "category": "architecture-artifact",
-   "title": "Architecture Artefact Index — S20 (retrospective, 2026-11-28)",
-   "body": "# Architecture Artefact Index — S20 (retrospective, 2026-11-28)\n\n## Metadata\n\nThe artefact set for S20 is the seven mandatory Phase A–D artefacts on the delivery track: the Stakeholder Map, Driver/Goal/Objective Catalog, Requirements Catalog and Solution Concept Diagram at phase a, plateau psa; the Business Capability Map at phase b; the Data Entity/Data Component Catalog at phase c; and the Technology Standards Catalog at phase d. Each carries an authored body dated 2026-11-28; the owner is the programme architect under the tranche-9 rework delegation, the reviewer is the Architecture Board, and the subject is this project's record.\n\n## Entries\n\nThe set is seven rows in the order the standard seeds them: a/matrix — Stakeholder Map — S20 Eval Hillclimb (Phase A); a/catalog — Driver/Goal/Objective Catalog; a/catalog — Requirements Catalog; a/diagram — Solution Concept Diagram; b/diagram — Business Capability Map; c/catalog — Data Entity/Data Component Catalog; d/catalog — Technology Standards Catalog. The titles match the artefact entries exactly, so the links resolve inside the pack.\n\n## Links\n\nEvery artefact links to another artefact of the set with one of the four §8.1 kinds: derivation, realization, reuse or dependency. The links follow the phase order, so a reader can walk A to D without an orphan, and each artefact's own Links section names its source in the slice plan and in the tree at the pinned snapshot.\n\n## Document\n\nThis index is published as its own architecture-artifact document by the rework factory. It is the document the close gate reads for the project's artefact standard, and it is the reason the set can be verified without re-reading the plan: the rows, the order and the links are all stated here."
-  }
- ],
- "registers": {
-  "risk": [
-   {
-    "code": "S20-R1",
-    "title": "A split redrawn by score destroys the held-out signal",
-    "body": "Hand-picking the worst cases for train guarantees regression to the mean and a flat test set. S19 draws the split and locks it with a digest; a climb that could redraw it would have no held-out signal at all. The plan's §8 trap 1 is the statement of this risk, and the gate suite's a_climb_cannot_redraw_the_split is the check.",
-    "probability": "low",
-    "impact": 4,
-    "review_at": "2026-12-12",
-    "severity": "medium",
-    "status": "open",
-    "response": "Attempt a redraw in the gate suite before any change to the climb's read path; a climb that can move the split is a defect of the action, never a convenience.",
-    "links": {
-     "cards": [],
-     "requirements": [
-      "docs/plans/slices/S20-eval-hillclimb.md#8"
-     ],
-     "decisions": []
-    },
-    "meta": {
-     "owner": "the programme architect (conveyor-e2e)"
-    }
-   },
-   {
-    "code": "S20-R2",
-    "title": "The analyzer reads test transcripts and the round overfits the number it reports",
-    "body": "The wall is data access, not an instruction: a round whose proposal cites a test transcript is void. If the transcript ids the analyzer was handed are not recorded, a round can quietly read the held-out set and the climb reports a number it trained on. The plan's §8 trap 2 names this and requires the ids to be recorded.",
-    "probability": "medium",
-    "impact": 4,
-    "review_at": "2026-12-12",
-    "severity": "medium",
-    "status": "open",
-    "response": "Record the handed transcript ids on every round and refuse a round whose proposal cites one that belongs to the test side; read the record after any round whose gain is surprising.",
-    "links": {
-     "cards": [],
-     "requirements": [
-      "docs/plans/slices/S20-eval-hillclimb.md#8"
-     ],
-     "decisions": []
-    },
-    "meta": {
-     "owner": "the programme architect (conveyor-e2e)"
-    }
-   },
-   {
-    "code": "S20-R3",
-    "title": "A change smaller than the noise floor makes keep or revert a coin flip",
-    "body": "If the best case for a change sits inside the measured noise floor, the keep or revert decision is decided by chance and a full pass is spent learning nothing. The plan's §8 trap 3 requires delta to be set from the measured floor and a proposed change predicting a smaller gain to be refused with the number.",
-    "probability": "medium",
-    "impact": 3,
-    "review_at": "2026-12-12",
-    "severity": "medium",
-    "status": "open",
-    "response": "Read the climb's delta against S19's noise floor before round 1 and refuse a round whose prediction is inside the band; treat a kept round inside the band as a measurement defect.",
-    "links": {
-     "cards": [],
-     "requirements": [
-      "docs/plans/slices/S20-eval-hillclimb.md#8"
-     ],
-     "decisions": []
-    },
-    "meta": {
-     "owner": "the programme architect (conveyor-e2e)"
-    }
-   },
-   {
-    "code": "S20-R4",
-    "title": "A maintained spend counter would drift from the rows it counts",
-    "body": "Spend is deliberately not a column on eval_climb: it is a sum over the climb's eval_case_result.usage at read time, because a maintained counter is the one thing that can drift from the rows it counts. A future refactor that adds a spend column would reintroduce that drift, and the schema suite's no_climb_spend_column is the guard.",
-    "probability": "low",
-    "impact": 2,
-    "review_at": "2026-12-12",
-    "severity": "low",
-    "status": "open",
-    "response": "Read the schema suite before any change to the climb's read model; a spend column is refused as a defect of the table, not accepted as a convenience.",
-    "links": {
-     "cards": [],
-     "requirements": [
-      "docs/plans/slices/S20-eval-hillclimb.md#8"
-     ],
-     "decisions": []
-    },
-    "meta": {
-     "owner": "the programme architect (conveyor-e2e)"
-    }
-   }
   ],
-  "issue": [
-   {
-    "code": "S20-I1",
-    "title": "The row is closed with no closure review and an empty closure-outputs declaration",
-    "body": "At the 2026-11-28 snapshot the project row records status closed and measured built while meta.closure_outputs is empty and no closure review exists for S20. The audit carries this as closed_without_closure_review:S20 and closure_outputs_undeclared:S20. The migration, the modules and the suites exist; the closure record did not until this pack.",
-    "status": "open",
-    "response": "This pack supplies the closure review and the project-brief and evidence outputs the close gate declares; the factory declares the closure outputs and the project is re-closed through the gate with a receipt."
-   },
-   {
-    "code": "S20-I2",
-    "title": "The plan's §7 gate text still names rbuild --gate, retired by the owner on 2026-11-20",
-    "body": "The slice plan's §7 is written as a sequence of rbuild invocations ending in rbuild --gate, and its own banner records that rbuild was retired on 2026-11-20 (CONTRACT §16). The compile and lint verdict's route is now the repository's GitHub-hosted preflight workflow, with cargo-guard on m4 for interactive work. No record in this pack claims a retired command ran for this slice.",
-    "status": "open",
-    "response": "Read the plan's §7 as history; when the slice is re-verified, run the named suites and the preflight workflow and record the exit codes against this issue rather than re-enacting the retired command."
-   },
-   {
-    "code": "S20-I3",
-    "title": "The plan's §6 step 1 cites migration 0027 while its §5 records the build-time correction to 0029",
-    "body": "The plan's §6 step 1 still says 0027_s20_eval_climb.sql and ledger version 27, while the §5 deliverable records the build-time correction: eval_climb shipped in S19's 0026, so S20's only new DDL is eval_climb.narrative_md in 0029. The tree carries migrations/0029_s20_eval_climb_report.sql on 2026-11-28. The drift is a citation defect in the plan, not a missing migration.",
-    "status": "open",
-    "response": "Read 0029 as the delivered migration and treat §6 step 1's number as pre-build text; correct the plan's step 1 when the lane next touches it."
-   }
+  "documents": [
+    {
+      "category": "architecture-artifact",
+      "title": "Architecture Artefact Index — S20 (retrospective, 2026-11-28)",
+      "body": "# Architecture Artefact Index — S20 (retrospective, 2026-11-28)\n\n## Metadata\n\nThe artefact set for S20 is the seven mandatory Phase A–D artefacts on the delivery track: the Stakeholder Map, Driver/Goal/Objective Catalog, Requirements Catalog and Solution Concept Diagram at phase a, plateau psa; the Business Capability Map at phase b; the Data Entity/Data Component Catalog at phase c; and the Technology Standards Catalog at phase d. Each carries an authored body dated 2026-11-28; the owner is the programme architect under the tranche-9 rework delegation, the reviewer is the Architecture Board, and the subject is this project's record.\n\n## Entries\n\nThe set is seven rows in the order the standard seeds them: a/matrix — Stakeholder Map — S20 Eval Hillclimb (Phase A); a/catalog — Driver/Goal/Objective Catalog; a/catalog — Requirements Catalog; a/diagram — Solution Concept Diagram; b/diagram — Business Capability Map; c/catalog — Data Entity/Data Component Catalog; d/catalog — Technology Standards Catalog. The titles match the artefact entries exactly, so the links resolve inside the pack.\n\n## Links\n\nEvery artefact links to another artefact of the set with one of the four §8.1 kinds: derivation, realization, reuse or dependency. The links follow the phase order, so a reader can walk A to D without an orphan, and each artefact's own Links section names its source in the slice plan and in the tree at the pinned snapshot.\n\n## Document\n\nThis index is published as its own architecture-artifact document by the rework factory. It is the document the close gate reads for the project's artefact standard, and it is the reason the set can be verified without re-reading the plan: the rows, the order and the links are all stated here."
+    },
+    {
+      "title": "Inception Analysis — S20 Eval hillclimb (retrospective, 2026-11-28)",
+      "category": "inception-analysis",
+      "body": "# Inception Analysis — S20 Eval hillclimb (retrospective, Phase G)\n\n## Current state\n\nBefore S20 the hillclimb was a person editing an eval, rerunning it and reading a number with no held-out discipline: nothing proposed a change, nothing kept or reverted it, and a stall produced another pass rather than a diagnosis. At the 2026-11-28 snapshot the project row 01a1d039-0d31-7d0f-ab1f-16240952e223 is closed and measured built, and the tree carries the migration, the three modules and the eight suites; this analysis is authored retrospectively for phase G, not as a contemporaneous inception.\n\n## Reuse sources\n\nThe slice plan's §4 names what the climb reuses: the eval-hillclimb method for the wall, the stopping rules, the bucket vocabulary and the revert rules verbatim; the cost-hillclimb method for the search order and the rule that adoption gates are registered before round 1; the audit method's arithmetic for the noise floor against the headroom; the benchmark slice's exact McNemar, called rather than copied; and the eval runner's tables, case runner, four grader kinds, report and fixed split with its digest.\n\n## Build vs reuse\n\nReuse the eval runner's tick, split, report and usage rows, and the benchmark's exact test; build only one climb state, six climb actions, one regrade action, two events and one job kind. Refused: a conveyor-hosted model loop, a second McNemar, any UI, automatic application of a winning change, and a maintained spend column. The build therefore adds one DDL statement — eval_climb.narrative_md in migrations/0029_s20_eval_climb_report.sql — to tables the eval runner already owns.\n\n## Risks\n\nFour traps shape the design. A split chosen by score destroys the held-out signal, so the climb cannot redraw it. An analyzer that reads test transcripts overfits the number it reports, so the round records the transcript ids it was handed. A change inside the noise floor makes keep or revert a coin flip, so delta is set from the measured floor. A maintained spend counter drifts from the rows it counts, so spend is summed at read time. Each has a named suite, and the record's 5 open packages are named rather than waived."
+    },
+    {
+      "title": "Architecture Analysis — S20 Eval hillclimb (retrospective, 2026-11-28)",
+      "category": "architecture-analysis",
+      "body": "# Architecture Analysis — S20 Eval hillclimb (retrospective, Phase G)\n\n## Current state\n\nThe eval runner already ships eval, eval_version, eval_case, eval_metric, eval_runs with variant, round, change_md, change_patch, summary and narrative_md, the case runner, four grader kinds, the report with mean, CI, noise floor and cost, and a split drawn once with a digest. It has no notion of a proposed change and no keep or revert rule. S20 adds exactly that layer: one climb state, a round protocol on the existing tick, comparison, stall triage, a cost goal and a final report.\n\n## Options considered\n\nThree options were weighed. A conveyor-hosted model loop that proposes and applies changes was rejected: the slice plan fixes that a round returns to the caller, and the analyzer is an agent over /mcp or a person writing change_md. One round as an eval_run row under the existing tick was chosen, so the climb inherits the runner's reaper and adds no second driver. Redrawing the split per climb was rejected, because a climb that can move the split has no held-out number to report.\n\n## Risks\n\nThe four named traps are the score-chosen split, analyzer access to test transcripts, a change below the noise floor and a maintained spend counter; a fifth is comparing a regraded run against an old one without regrading every variant. The schema, gate, stall and compare suites carry the checks. On the record, the P0 project_in_unauthorised_tranche:S20 clears only on tranche authorisation, so this pack can resolve the P1 closure packages but cannot make the tranche decision.\n\n## Dependency map\n\nThe climb depends inward on the eval runner for its tables, tick and split, and on the benchmark slice for the exact McNemar, called not copied; it depends outward on the screens slice, which owns the hillclimb screen's read model. The record's only linked issue #14 is closed. Inside the pack the order is climb state, actions, round, compare, stall triage, cost goal and final report, which is the order the eight suites exercise."
+    },
+    {
+      "title": "Architecture Design — S20 Eval hillclimb (retrospective, 2026-11-28)",
+      "category": "architecture-design",
+      "body": "# Architecture Design — S20 Eval hillclimb (retrospective, Phase G)\n\n## Context and boundary\n\nThe design owns the climb state, the round protocol, comparison, stall triage, cost search and the final report; it must not duplicate the eval runner's tables, tick or split, the benchmark's exact test, or the screens slice's UI. The boundary is one eval_climb row per climb with spend summed at read time, and a winner applied only by a person's ordinary procedure update, never by the climb itself.\n\n## Aggregates, tables and actions\n\neval_climb is the aggregate: goal jsonb, direction, reps, stopping, plateau_k, delta, cost_ceiling_cents, current_round, best_round, best_test_score, approve_each_round, off_limits and status. The only new DDL is eval_climb.narrative_md in migrations/0029_s20_eval_climb_report.sql. A round is an eval_runs row with variant v<N>, round, change_md, change_patch, prediction and summary.suspicious. The actions are eval_climbs.start, get, list, round, compare and stop plus eval_runs.regrade; the events are eval_climb.changed and eval_climb.round_completed; the one new job kind is eval.regrade.\n\n## Decisions\n\nA round returns to the caller. The split belongs to the eval runner's version and cannot be redrawn. Comparison calls the benchmark's exact McNemar. Stall triage is a round, not advice. Cost search is a goal, not a mode of the loop. start and stop need evals:approve while round needs only evals:write. Applying the winner is a person's action. Each decision has a refusal in the gate, stall, cost or compare suite, so none of them rests on prose alone.\n\n## Acceptance\n\nThe acceptance set is the eight suites the tree carries — eval_climb_schema, eval_climb_rules, eval_climb_gate, eval_compare, eval_regrade, eval_stall, eval_cost_walk and eval_final — plus the served lock check. The schema suite proves one RLS-forced table and no spend column; the gate suite proves a climb cannot redraw the split and that no round runs before the plan is signed; the stall suite proves a fourth content round is refused.\n\n## Architecture artefacts\n\nThe pack carries the seven Phase A–D artefacts: Stakeholder Map, Driver/Goal/Objective Catalog, Requirements Catalog and Solution Concept Diagram at phase a on the psa plateau; Business Capability Map at phase b; Data Entity/Data Component Catalog at phase c; and Technology Standards Catalog at phase d. The Architecture Artefact Index documents their titles and links. All are authored on 2026-11-28 for this retrospective phase-G record."
+    },
+    {
+      "title": "Statement of Architecture Work — S20 Eval hillclimb (retrospective, 2026-11-28)",
+      "category": "statement-of-architecture-work",
+      "body": "# Statement of Architecture Work — S20 Eval hillclimb (retrospective, Phase G)\n\n## Assignment\n\nAssign S20 the hillclimb loop the eval surface must carry: one climb state per climb, six eval_climbs actions plus eval_runs.regrade, two events, the stall-triage round, the cost-search goal and the final report. The assignment is recorded retrospectively. The project row is already closed and measured built, so this statement supplies the Phase A contract the close gate reads; it does not attest that such a statement was agreed before the build.\n\n## Scope\n\nIn scope are migrations/0029_s20_eval_climb_report.sql, crates/domain/src/eval/climb.rs, crates/store/src/eval/climb.rs and crates/actions/src/eval/climbs.rs, the eight suites the slice plan's gate names, the registry declaration and one parity sample per action. Out of scope are any UI, a second model runtime, a second McNemar, mid-climb edits to an eval or its cases, and any automatic application of a winning change to production code.\n\n## Responsibilities\n\nThe programme architect authors the statement; the delivery team is accountable for the tree and its suites; the Architecture Board reviews the artefact set; the SRO accepts the closure at the tranche-9 review; the eval owner is consulted on the goal, the stopping condition and the split. The author is not the accepting role, so separation of duties holds even though one rework authored the whole record.\n\n## Acceptance criteria\n\nThe gate names one schema check, two gate checks, the regrade suite, the compare suite, the domain rules suite, the stall suite, the cost suite, the final-report suite and the served lock check. The tree carries every named target at the 2026-11-28 snapshot and the record marks the project measured built. The gate's original text invokes a local build command the owner retired on 2026-11-20, so no line here claims that command ran.\n\n## Contract\n\nThe contract commits to one eval_climb row per climb with spend summed over eval_case_result.usage at read time; to the split owned by the eval runner and not redrawable; to start and stop behind evals:approve while round needs only evals:write; and to a winner applied only by a person's ordinary procedure update. The contract is approved by the board decision the factory records, and tranche 9's authorisation is not this pack's to give."
+    },
+    {
+      "title": "User stories — S20 Eval hillclimb (retrospective, 2026-11-28)",
+      "category": "user-stories",
+      "body": "# User stories — S20 Eval hillclimb (retrospective, Phase G)\n\n## Personas\n\nAn eval owner sets the goal, the stopping condition and the plan sign-off; an analyzer principal, an agent over /mcp or a person, proposes one change per round; and a reviewer reads a winner with its held-out evidence attached. All three act through the same actions, and none of them — not the analyzer and not the reviewer — may set the climb's budget or move its split.\n\n## Stories\n\nAs an eval owner, I want a signed plan carrying the goal, the will/won't-change table and the stopping condition, so that no round begins before the method's terms are fixed. As an analyzer, I want one round action that takes change_md, an optional patch and a falsifiable prediction, so that each change is one attributable hypothesis. As a reviewer, I want the climb to end with a per-round train/test table and a paired significance test, so that the winner is named by evidence rather than by memory.\n\n## Scenarios\n\nGiven a climb whose plan is signed, when the first round is submitted, then it is queued as an eval_run row and no second job kind is created. Given two consecutive flat test deltas, when another content round is proposed, then it is refused until a five-bucket categorisation is supplied. Given a grader fix, when the regrade action runs, then a new run is written under the eval's current version and the comparison is re-run, never compared against the old scale.\n\n## Verify\n\nThe gate suite proves the plan sign-off and the immovable split; the stall suite proves a fourth content round is refused; the regrade suite proves the new run is written and never in place; the compare suite proves a refusal across versions, graders or splits; the domain rules suite proves the keep or revert table; the cost suite proves no round runs without registered gates; and the final suite proves the report names the winner."
+    },
+    {
+      "title": "Acceptance criteria — S20 Eval hillclimb (retrospective, 2026-11-28)",
+      "category": "acceptance-criteria",
+      "body": "# Acceptance criteria — S20 Eval hillclimb (retrospective, Phase G)\n\n## Scenarios\n\nEight scenarios, one per suite the slice plan's gate names: one table is RLS-forced and the climb has no spend column; no climb can redraw the split; no round runs before the plan is signed; a grader fix re-grades into a new run; comparison refuses across versions, graders or splits; the domain's keep and revert rules hold; a fourth content round against the same wall is refused; no cost round runs without registered gates; and the final report names the winner.\n\n## Verify commands\n\nThe exact targets are eval_climb_schema, eval_climb_gate, eval_regrade, eval_compare, eval_climb_rules, eval_stall, eval_cost_walk and eval_final, run against a throwaway Postgres the tests migrate themselves, plus the served OpenAPI lock check. The gate's original text wraps these in a local build command the owner retired on 2026-11-20; the executable compile and lint route today is the repository's GitHub-hosted preflight workflow.\n\n## Results\n\nAt the 2026-11-28 snapshot the record marks the project measured built and the tree carries migrations/0029_s20_eval_climb_report.sql, crates/domain/src/eval/climb.rs, crates/store/src/eval/climb.rs and crates/actions/src/eval/climbs.rs, with all eight suites present. No exit code is archived for a fresh re-run in this pack, so the result of record is the snapshot's measured status rather than a captured green line.\n\n## Status\n\nMet for the delivered tree, on the record's measured-built status. The re-close is conditioned on the sponsoring group's authorisation of tranche 9, which clears the P0 project_in_unauthorised_tranche:S20; until then the closure review is the evidence and the close is not asserted ahead of that decision. One P1, closed_without_closure_review, is resolved by the closure review this pack supplies."
+    },
+    {
+      "title": "Definition of ready — S20 Eval hillclimb (retrospective, 2026-11-28)",
+      "category": "definition-of-ready",
+      "body": "# Definition of ready — S20 Eval hillclimb (retrospective, Phase G)\n\n## Independent\n\nThe pack writes S20's record rows only, against the pinned 2026-11-28 snapshot; its product is wholly in-tree and no other project's file must land for it to proceed. The one external act is the sponsoring group's tranche-9 authorisation, carried as a typed dependency and as the P0 package rather than hidden as an ordering assumption.\n\n## Negotiable\n\nThe outcome — a hillclimb loop that keeps or reverts on the held-out number — is fixed by the slice plan; the implementation detail is settled at delivery, not in this brief. The retrospective set records what the tree and the record show, and it does not negotiate the P0 tranche package into a pass or the P1 closure packages into silence.\n\n## Valuable\n\nThe project turns an edit-and-rerun habit into a measured loop with a held-out verdict, a classified stall and a cost goal on the same rounds. For the record, its value is the lifecycle set the close gate was reading as absent and the P1 packages this pack resolves — closed_without_closure_review and closure_outputs_undeclared — and it records the P0 it cannot clear.\n\n## Estimable\n\nEvery artifact is named: four tree paths, eight suites, one migration, one climb state, six climb actions and one regrade action. The record carries 5 open packages — 1 P0 and 4 P1 — against a project whose only linked issue #14 is closed. The work itself is one content file, one factory run and one receipt, so it is sized against the sibling packs already delivered in this tranche.\n\n## Small\n\nOne content file, one factory run, one receipt and one closure; no product rebuild, no migration and no cluster change. The unit is one branch and one pull request, and the only content edited is this pack's documents array and the two closure strings that misstated the record. A defect found mid-flight would be another edit on the same branch, not a second unit.\n\n## Testable\n\nThe content checker at the pinned snapshot is the offline gate; the factory's receipt carries one row per manifest check; the tranche exit refuses a stale or red receipt. Every document's required headings are checked for authored prose of at least 120 characters and for template stubs, so a placeholder or a bare citation cannot pass. The suite names are the acceptance targets the record's measured-built status speaks to.\n\n## Dependencies\n\nThe climb depends on the eval runner's tables, tick and fixed split, and on the benchmark slice's exact McNemar, called not copied; the screens slice consumes the hillclimb screen's read model. Within the record the only linked issue #14 is closed, and the P0 project_in_unauthorised_tranche:S20 clears only on tranche-9 authorisation. No dependency runs outside this repository."
+    },
+    {
+      "title": "Definition of done — S20 Eval hillclimb (retrospective, 2026-11-28)",
+      "category": "definition-of-done",
+      "body": "# Definition of done — S20 Eval hillclimb (retrospective, Phase G)\n\n## Acceptance criteria\n\nOne row per scenario: the eight suites of the slice plan's gate — schema, gate, regrade, compare, domain rules, stall, cost and final — plus the served lock check; the nine authored documents with their required headings; and the two corrected closure strings. The pack is done only when every row is green at the pinned snapshot, with the P0 tranche package named as the one row this pack cannot clear.\n\n## Evidence at completion\n\nThe content checker's pass at the pinned 2026-11-28 snapshot, the factory's receipt with one row per manifest check, and the record's measured-built status for the project. The tree facts carried as evidence are migrations/0029_s20_eval_climb_report.sql, the three modules and the eight suite targets. No retired command is claimed as run and no exit code is invented.\n\n## Repo gate\n\nThe docs-only change must pass the repository's design and data checks and the GitHub-hosted preflight at the exact pull-request head; a bare local compiling gate is not the route, because the owner retired it on 2026-11-20. The unit is one branch, one pull request and one merge, with the content checker green before the pull request opens rather than used as a probe.\n\n## Merge and closure\n\nOne pull request carries the pack and closes the issue once the gate is green. The project is re-closed through its own closure gate after the sponsoring group authorises tranche 9 and the P0 project_in_unauthorised_tranche:S20 clears. The closure review is the declared closure-review output, and the project-brief and evidence outputs the project's meta.expected_outputs declares are published with it."
+    }
   ],
-  "assumption": [
-   {
-    "code": "S20-A1",
-    "title": "The 2026-11-28 rework snapshot is the authoritative record for S20",
-    "body": "The delivery contract judges acceptance against the record at the pinned rework snapshot, and the content checker refuses any id that appears nowhere in it. Every judgement in this pack is read from that snapshot, so if it is incomplete or stale for S20 the pack's facts and the re-close move with it.",
-    "status": "held"
-   },
-   {
-    "code": "S20-A2",
-    "title": "The record's measured built is the build state the tree still carries",
-    "body": "The record marks S20 closed and measured built, and on 2026-11-28 the tree carries the migration 0029, the three modules and every suite the plan's §7 names. The assumption is that the tree has not drifted since the measurement; if it has, the pack's acceptance claims move with the drift rather than being re-asserted.",
-    "status": "held"
-   },
-   {
-    "code": "S20-A3",
-    "title": "The GitHub-hosted preflight, not a local command, is the compile and lint verdict",
-    "body": "Since the owner retired rbuild on 2026-11-20, the compile and lint answer comes from the repository's preflight.yml workflow and never from a local compiling gate. The assumption is that the workflow remains the sanctioned route at the pinned revision; if it changes, the evidence document's verification step changes with it.",
-    "status": "held"
-   }
-  ],
-  "dependency": [
-   {
-    "code": "S20-D1",
-    "title": "S20 depends on S19's eval surface and its fixed split",
-    "body": "The project row records a needs edge to S19. S19 supplies eval, eval_version, eval_case and eval_metric, the case runner, the four grader kinds, eval_runs with variant, round, change_md, change_patch, summary and narrative_md, the report with mean, CI, noise floor and cost, and the split with its digest drawn once. The surface is consumed as recorded; S20 adds no second runner.",
-    "status": "met"
-   },
-   {
-    "code": "S20-D2",
-    "title": "S20 calls S17's exact McNemar rather than porting it",
-    "body": "The comparison reuses crates/domain/src/benchmark/mcnemar.rs from S17: one implementation of the exact test in the estate, because a second would be a silent divergence in a published number. The dependency is a code seam inside the workspace, and the compare suite exercises it through eval_climbs.compare.",
-    "status": "met"
-   },
-   {
-    "code": "S20-D3",
-    "title": "S12 consumes screen 21's declared read model; the UI is out of S20",
-    "body": "Screen 21 Eval hillclimb is declared in this slice for S12, together with the actions it reads and the two events. The dependency runs outward: S12 renders the screen and S20 ships no UI, so the screen's state is declared here and built there. Until S12 lands the screen, the climb is reached through the actions and the events only.",
-    "status": "open"
-   }
-  ],
-  "benefit": [
-   {
-    "code": "S20-B1",
-    "title": "A hillclimb ends on a held-out verdict, not on a claim",
-    "body": "Each round is kept or reverted on the test side, the climb carries a per-round table with train and test side by side, the delta comes from S17's exact McNemar, and the report adds two before/after transcript pairs. The benefit is that a winner is named with its evidence attached, rather than by whoever remembers the best run.",
-    "status": "open"
-   },
-   {
-    "code": "S20-B2",
-    "title": "Failures are classified by cause before more content is ground",
-    "body": "After two consecutive flat test deltas the next round must carry a buckets payload — artifact_gap, grader_disagreement, harness, structural or variance — and a fourth content round against the same wall is refused. The benefit is that a stall produces a diagnosis instead of another pass over the same failure.",
-    "status": "open"
-   },
-   {
-    "code": "S20-B3",
-    "title": "Cost search reuses the same rounds and comparison, with its gates registered first",
-    "body": "goal.target='cost_usd' with a quality hold turns the same round protocol and comparison toward price, and the guide's search order is stored as state on eval_climb.goal so a resumed session does not restart at the top. The benefit is that cost work inherits the eval work's discipline rather than growing a parallel process.",
-    "status": "open"
-   },
-   {
-    "code": "S20-B4",
-    "title": "One McNemar implementation, so a published number cannot diverge",
-    "body": "S20 calls S17's exact two-sided McNemar rather than porting a second copy. The benefit is structural: every paired comparison in the estate speaks through one function, so a fix to the test or its refusal rule reaches every caller instead of one of two implementations drifting quietly.",
-    "status": "open"
-   }
-  ]
- },
- "delivery_contract": {
-  "title": "Delivery Contract — S20 Eval Hillclimb (retrospective, 2026-11-28)",
-  "body": {
-   "commitments": "S20 delivers the hillclimb loop over one eval: one eval_climb state per climb, the six eval_climbs actions and eval_runs.regrade, the two events, the stall-triage round, the cost-search goal and the final report. Each round proposes one change, runs the full case set and is kept or reverted on S19's held-out number; spend is summed from the usage rows rather than counted; and the winning change is applied only by a person's ordinary procedures.update.",
-   "compliance": "Compliance is judged at the pinned 2026-11-28 snapshot against the record, which marks the project closed and measured built, and against the slice plan, whose §7 names the suites the tree carries: eval_climb_schema, eval_climb_gate, eval_regrade, eval_compare, eval_climb_rules, eval_stall, eval_cost_walk, eval_final and the served lock check. The plan's §7 commands are rbuild invocations; rbuild was retired by the owner on 2026-11-20, so this contract records the replacement preflight route and claims no run of a retired command.",
-   "approval": "The contract is approved by the board decision the factory records for this pack, under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Phase-G review is compliant for the record set at the 2026-11-28 snapshot, and the closure decision is taken by an approver other than the requester.",
-   "manifest": "acceptance/programme/S20.toml — the close gate's manifest for this project, pinned by the parent session; this pack does not edit it, and its receipt is read against it at the 2026-11-28 snapshot.",
-   "acceptance_at": "2026-11-28",
-   "retrospective": "This delivery contract is authored retrospectively for the tranche-9 rework. The build carried no contemporaneous contract, so the commitments are read from the slice plan, the record and the tree at the 2026-11-28 snapshot and are not presented as an earlier agreement.",
-   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
-  }
- },
- "wbs_deliverable": {
-  "title": "The eval hillclimb — rounds over one eval that keep or revert on the held-out number, with stall triage, a cost goal and a final report",
-  "business_value": 7,
-  "time_criticality": 5,
-  "risk_reduction": 6,
-  "job_size": 5
- },
- "review": {
-  "level": "compliant",
-  "findings": "This retrospective Phase-G review records the level compliant for the record set it assesses under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, and it names every open package this pack resolves or leaves standing rather than leaving them implicit. The pack supplies the lifecycle record for closed_without_closure_review:S20 and closure_outputs_undeclared:S20 — the row carries status closed with meta.closure_outputs empty and gains the closure review and the closure this pack authors — and it authors both declared outputs, project-brief and evidence, which is the unpublished_declared_output:S20 package. It carries the seven Phase A–D artefacts required by mandatory_artefacts:S20 and std-togaf-architecture-artifact-s20:S20; the five register kinds and the WBS deliverable behind std-pmp-project-registers-s20:S20, std-pmp-project-wbs-s20:S20, std-pmp-project-baseline-s20:S20 and std-pmp-change-control-s20:S20; the delivery contract behind std-togaf-delivery-contract-s20:S20; and this review behind std-togaf-compliance-review-s20:S20 and std-togaf-phase-g-s20-g:S20. It does not clear project_in_unauthorised_tranche:S20, which is P0 and clears only on the sponsoring group's authorisation of tranche 9. It makes no claim that any retired gate command ran: the plan's §7 still names rbuild --gate, the owner retired rbuild on 2026-11-20, and the compile and lint verdict's route is the repository's GitHub-hosted preflight workflow. The record at the 2026-11-28 snapshot marks the project closed and measured built, and the tree carries the migration, the modules and the suites the plan names. No waiver is claimed and no check is weakened.",
-  "evidence": {
-   "manifest": "acceptance/programme/S20.toml",
-   "plan": "docs/plans/slices/S20-eval-hillclimb.md",
-   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-   "gate": "docs/plans/slices/S20-eval-hillclimb.md §7 Gate"
-  }
- },
- "project_brief_output": "# Project Brief — S20 Eval Hillclimb (retrospective, 2026-11-28)\n\n## Outcome\n\nThe eval and cost hillclimb methods become a loop over one eval: a goal with a direction and a hold list, a stopping condition, and rounds that each propose one change, run the full case set, and are kept or reverted on the held-out number. The climb ends with the winning version named, a per-round table with train and test side by side, a paired delta with S17's exact McNemar, two before/after transcript pairs, and the failures nobody could fix classified by cause.\n\n## Boundary\n\nS20 owns the climb state, the six eval_climbs actions and eval_runs.regrade, the two events, the stall-triage round, the cost-search goal and the final report. It does not own a UI — screen 21 is declared here for S12 — a second model runtime, a second McNemar, the eval runner or the split (S19 owns both), the approval state machine, or any automatic application of a change to production code: applying a winner is a person's procedures.update.\n\n## Reuse sources\n\nThe plan's §4 names what S20 reuses: eval-hillclimb.md for the wall, the stopping rules, the bucket vocabulary and the revert rules verbatim; cost-hillclimb.md for the search order and the rule that adoption gates are registered before round 1; eval-audit.md §5 for the noise-floor arithmetic; S17's crates/domain/src/benchmark/mcnemar.rs for the exact test, called rather than copied; and S18's kata improvement plan for the constraint that a measurement loop consumes the public surface.\n\n## Inception units\n\nThe plan's build order is the inception sequence: migration 0029 for eval_climb.narrative_md; the loop machine with keep_or_revert and the stopping predicate in domain::eval::climb; the store and the start/get/list/stop actions with the eval_climb_plan sign-off; the round action with prediction and summary.suspicious; the compare action with the not_comparable refusal; the stall-triage round; the cost walk; and the final report. Part A is steps 1 to 4 and Part B is steps 5 to 8.\n\n## Dependencies\n\nThe record's depends_on carries needs S19: S19 supplies eval, eval_version, eval_case and eval_metric, the case runner, the four grader kinds, eval_runs with variant, round, change_md, change_patch, summary and narrative_md, the report with mean, CI, noise floor and cost, and the split with its digest drawn once. S17 supplies the exact McNemar. S12 is the consumer of screen 21's read model. The dependency that matters most is the split: the climb cannot redraw it, so its held-out number is not one it chose.\n\n## Acceptance\n\nAcceptance is the plan's §7 gate set — eval_climb_schema (one table RLS-forced, no climb spend column), eval_climb_gate (a climb cannot redraw the split, and no round before the plan is signed), eval_regrade, eval_compare, eval_climb_rules, eval_stall (a fourth content round is refused), eval_cost_walk (no round without registered gates), eval_final, and the served OpenAPI lock. The tree carries every named suite at the 2026-11-28 snapshot and the record marks the project measured built; the §7 commands are rbuild invocations, retired by the owner on 2026-11-20, and this brief claims none of them ran.\n\n## Capabilities\n\nHillclimb orchestration with a stopping predicate; round execution as an eval_run under S19's existing tick; paired comparison with the exact McNemar and a refusal across versions, graders or splits; stall triage that forces a five-bucket categorisation; cost search as a goal on the same rounds with adoption gates registered first; and a final report that names the winner and declares screen 21's read model. Each capability is delivered by a named module in the Phase C catalog.\n\n## Plan\n\nThe plan is docs/plans/slices/S20-eval-hillclimb.md; the build is recorded complete in the record at the pinned snapshot, and this brief is the retrospective reading of it. The tranche-9 rework publishes the lifecycle set this brief belongs to, and the tranche-9 review is the forum that accepts the re-close. No further build step is claimed by this brief, and the tranche authorisation remains the sponsoring group's decision.",
- "evidence_output": "# Evidence — S20 Eval Hillclimb (retrospective, 2026-11-28)\n\n## Claim\n\nS20 delivers the hillclimb loop over one eval: rounds propose one change each and are kept or reverted on the held-out number; the split is S19's and cannot be redrawn; comparison calls S17's exact McNemar and refuses across versions, graders or splits; two flat rounds force a five-bucket categorisation before another content round; cost search is a goal whose adoption gates are registered before round 1; and the climb ends with the winner named in the report.\n\n## Evidence\n\nThe tree carries migrations/0029_s20_eval_climb_report.sql, crates/domain/src/eval/climb.rs, crates/store/src/eval/climb.rs and crates/actions/src/eval/climbs.rs, and the suites the plan's §7 names: crates/store/tests/eval_climb_schema.rs, crates/domain/tests/eval_climb_rules.rs, and crates/actions/tests/eval_climb_gate.rs, eval_compare.rs, eval_regrade.rs, eval_stall.rs, eval_cost_walk.rs and eval_final.rs. The plan's §5 records the build-time correction that eval_climb shipped in S19's 0026 and S20's only new DDL is eval_climb.narrative_md in 0029.\n\n## Verification\n\nAn independent reader repeats the check from the repository at the pinned revision: run the plan's §7 suites and take the compile and lint verdict from the GitHub-hosted preflight route, then read the receipt the parent session writes against acceptance/programme/S20.toml. The plan's §7 text is written as rbuild invocations; rbuild was retired by the owner on 2026-11-20 (CONTRACT §16), so this evidence records the replacement instrument and claims that no retired command ran for this slice.\n\n## Links\n\nThe plan is docs/plans/slices/S20-eval-hillclimb.md; the manifest is acceptance/programme/S20.toml; the project row is 01a1d039-0d31-7d0f-ab1f-16240952e223 on programme 01a1d039-0d24-7d16-ae52-4841e96ccfac; tranche 9 is 01a1e9e1-20dd-7cda-bd8b-e4fabe1d5db9; the P0 project is 01a1dcb8-d24b-76de-b901-56fd56e001bc; and the decision authority is the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Gap\n\nTwo limits are recorded. The record carries S20 as measured built, but the plan's §7 acceptance commands were never run in the retired form and no replacement run is archived in this pack, so the pack's acceptance claim rests on the record's measurement and the tree's contents rather than on a captured exit code. And the cost walk's price screen is computed from inference_call, which this pack does not exercise; a cost walk's first live run is the first evidence for that half.",
- "closure": "S20 is closed through the one gate the record carries: the project row is closed only after its charter, baseline, artefacts, registers, contract, WBS, Phase-G review, declared outputs and closure review exist, and the receipt on `acceptance/programme/S20.toml` is read against it at the 2026-11-28 snapshot. The closure records the plan's retired `rbuild --gate` text as history, not as an executed gate, and it names every rework package the pack resolves while leaving the P0 tranche authorisation to the sponsoring group.",
- "closure_review": "# Closure Review — S20 Eval Hillclimb (retrospective, 2026-11-28)\n\n## Outcome vs acceptance\n\nThe outcome is the hillclimb loop the plan's §1 states: the eval-hillclimb and cost-hillclimb methods run as rounds over one eval, each round's change is kept or reverted on the held-out number, and the climb ends with the winner named, a per-round train/test table, a paired delta with S17's exact McNemar, two before/after transcript pairs and failures classified across the five buckets. Against the plan's §7 acceptance set, the tree at the 2026-11-28 snapshot carries the migration `0029_s20_eval_climb_report.sql`, the three modules and every suite that section names, and the record marks the project measured built. No claim is made that the §7 commands ran: they are `rbuild` invocations, and the owner retired `rbuild` on 2026-11-20.\n\n## Evidence\n\nThe evidence is the slice plan and its §5 build-time correction (the only new DDL is `eval_climb.narrative_md` in `0029`, since `eval_climb` itself shipped in S19's `0026`), the modules `crates/domain/src/eval/climb.rs`, `crates/store/src/eval/climb.rs` and `crates/actions/src/eval/climbs.rs`, and the suites `eval_climb_schema` (store), `eval_climb_rules` (domain) and `eval_climb_gate`, `eval_compare`, `eval_regrade`, `eval_stall`, `eval_cost_walk` and `eval_final` (actions), all present in the tree on 2026-11-28. The record at the pinned snapshot is the project row, closed and measured built; the manifest is `acceptance/programme/S20.toml`, which this pack does not read.\n\n## Open items\n\nThree items stay open. `project_in_unauthorised_tranche:S20` is P0 and clears only on the sponsoring group's authorisation of tranche 9, not on anything this pack authors. The plan's §7 gate text still names `rbuild --gate`, retired by the owner on 2026-11-20; the replacement instrument is the repository's GitHub-hosted `preflight.yml` workflow for the compile and lint verdict, and this closure records the retirement rather than claiming either command ran for this slice. And the record's `meta.closure_outputs` is empty, which S20-I1 carries until the factory declares the two outputs this pack authors.\n\n## Decision\n\nThe project is closed. The closure is taken by an approver other than the requester under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, the closure review is recorded in this pack, and the tranche-9 review is the forum that accepts it. No waiver is claimed, no check in the manifest is weakened, and the packages the Phase-G findings name are resolved by the artefacts, registers, contract and outputs this pack supplies — except the P0 tranche authorisation, which remains the sponsoring group's decision."
+  "registers": {
+    "risk": [
+      {
+        "code": "S20-R1",
+        "title": "A split redrawn by score destroys the held-out signal",
+        "body": "Hand-picking the worst cases for train guarantees regression to the mean and a flat test set. S19 draws the split and locks it with a digest; a climb that could redraw it would have no held-out signal at all. The plan's §8 trap 1 is the statement of this risk, and the gate suite's a_climb_cannot_redraw_the_split is the check.",
+        "probability": "low",
+        "impact": 4,
+        "review_at": "2026-12-12",
+        "severity": "medium",
+        "status": "open",
+        "response": "Attempt a redraw in the gate suite before any change to the climb's read path; a climb that can move the split is a defect of the action, never a convenience.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S20-eval-hillclimb.md#8"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
+      },
+      {
+        "code": "S20-R2",
+        "title": "The analyzer reads test transcripts and the round overfits the number it reports",
+        "body": "The wall is data access, not an instruction: a round whose proposal cites a test transcript is void. If the transcript ids the analyzer was handed are not recorded, a round can quietly read the held-out set and the climb reports a number it trained on. The plan's §8 trap 2 names this and requires the ids to be recorded.",
+        "probability": "medium",
+        "impact": 4,
+        "review_at": "2026-12-12",
+        "severity": "medium",
+        "status": "open",
+        "response": "Record the handed transcript ids on every round and refuse a round whose proposal cites one that belongs to the test side; read the record after any round whose gain is surprising.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S20-eval-hillclimb.md#8"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
+      },
+      {
+        "code": "S20-R3",
+        "title": "A change smaller than the noise floor makes keep or revert a coin flip",
+        "body": "If the best case for a change sits inside the measured noise floor, the keep or revert decision is decided by chance and a full pass is spent learning nothing. The plan's §8 trap 3 requires delta to be set from the measured floor and a proposed change predicting a smaller gain to be refused with the number.",
+        "probability": "medium",
+        "impact": 3,
+        "review_at": "2026-12-12",
+        "severity": "medium",
+        "status": "open",
+        "response": "Read the climb's delta against S19's noise floor before round 1 and refuse a round whose prediction is inside the band; treat a kept round inside the band as a measurement defect.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S20-eval-hillclimb.md#8"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
+      },
+      {
+        "code": "S20-R4",
+        "title": "A maintained spend counter would drift from the rows it counts",
+        "body": "Spend is deliberately not a column on eval_climb: it is a sum over the climb's eval_case_result.usage at read time, because a maintained counter is the one thing that can drift from the rows it counts. A future refactor that adds a spend column would reintroduce that drift, and the schema suite's no_climb_spend_column is the guard.",
+        "probability": "low",
+        "impact": 2,
+        "review_at": "2026-12-12",
+        "severity": "low",
+        "status": "open",
+        "response": "Read the schema suite before any change to the climb's read model; a spend column is refused as a defect of the table, not accepted as a convenience.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S20-eval-hillclimb.md#8"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
+      }
+    ],
+    "issue": [
+      {
+        "code": "S20-I1",
+        "title": "The row is closed with no closure review and an empty closure-outputs declaration",
+        "body": "At the 2026-11-28 snapshot the project row records status closed and measured built while meta.closure_outputs is empty and no closure review exists for S20. The audit carries this as closed_without_closure_review:S20 and closure_outputs_undeclared:S20. The migration, the modules and the suites exist; the closure record did not until this pack.",
+        "status": "open",
+        "response": "This pack supplies the closure review and the project-brief and evidence outputs the close gate declares; the factory declares the closure outputs and the project is re-closed through the gate with a receipt."
+      },
+      {
+        "code": "S20-I2",
+        "title": "The plan's §7 gate text still names rbuild --gate, retired by the owner on 2026-11-20",
+        "body": "The slice plan's §7 is written as a sequence of rbuild invocations ending in rbuild --gate, and its own banner records that rbuild was retired on 2026-11-20 (CONTRACT §16). The compile and lint verdict's route is now the repository's GitHub-hosted preflight workflow, with cargo-guard on m4 for interactive work. No record in this pack claims a retired command ran for this slice.",
+        "status": "open",
+        "response": "Read the plan's §7 as history; when the slice is re-verified, run the named suites and the preflight workflow and record the exit codes against this issue rather than re-enacting the retired command."
+      },
+      {
+        "code": "S20-I3",
+        "title": "The plan's §6 step 1 cites migration 0027 while its §5 records the build-time correction to 0029",
+        "body": "The plan's §6 step 1 still says 0027_s20_eval_climb.sql and ledger version 27, while the §5 deliverable records the build-time correction: eval_climb shipped in S19's 0026, so S20's only new DDL is eval_climb.narrative_md in 0029. The tree carries migrations/0029_s20_eval_climb_report.sql on 2026-11-28. The drift is a citation defect in the plan, not a missing migration.",
+        "status": "open",
+        "response": "Read 0029 as the delivered migration and treat §6 step 1's number as pre-build text; correct the plan's step 1 when the lane next touches it."
+      }
+    ],
+    "assumption": [
+      {
+        "code": "S20-A1",
+        "title": "The 2026-11-28 rework snapshot is the authoritative record for S20",
+        "body": "The delivery contract judges acceptance against the record at the pinned rework snapshot, and the content checker refuses any id that appears nowhere in it. Every judgement in this pack is read from that snapshot, so if it is incomplete or stale for S20 the pack's facts and the re-close move with it.",
+        "status": "held"
+      },
+      {
+        "code": "S20-A2",
+        "title": "The record's measured built is the build state the tree still carries",
+        "body": "The record marks S20 closed and measured built, and on 2026-11-28 the tree carries the migration 0029, the three modules and every suite the plan's §7 names. The assumption is that the tree has not drifted since the measurement; if it has, the pack's acceptance claims move with the drift rather than being re-asserted.",
+        "status": "held"
+      },
+      {
+        "code": "S20-A3",
+        "title": "The GitHub-hosted preflight, not a local command, is the compile and lint verdict",
+        "body": "Since the owner retired rbuild on 2026-11-20, the compile and lint answer comes from the repository's preflight.yml workflow and never from a local compiling gate. The assumption is that the workflow remains the sanctioned route at the pinned revision; if it changes, the evidence document's verification step changes with it.",
+        "status": "held"
+      }
+    ],
+    "dependency": [
+      {
+        "code": "S20-D1",
+        "title": "S20 depends on S19's eval surface and its fixed split",
+        "body": "The project row records a needs edge to S19. S19 supplies eval, eval_version, eval_case and eval_metric, the case runner, the four grader kinds, eval_runs with variant, round, change_md, change_patch, summary and narrative_md, the report with mean, CI, noise floor and cost, and the split with its digest drawn once. The surface is consumed as recorded; S20 adds no second runner.",
+        "status": "met"
+      },
+      {
+        "code": "S20-D2",
+        "title": "S20 calls S17's exact McNemar rather than porting it",
+        "body": "The comparison reuses crates/domain/src/benchmark/mcnemar.rs from S17: one implementation of the exact test in the estate, because a second would be a silent divergence in a published number. The dependency is a code seam inside the workspace, and the compare suite exercises it through eval_climbs.compare.",
+        "status": "met"
+      },
+      {
+        "code": "S20-D3",
+        "title": "S12 consumes screen 21's declared read model; the UI is out of S20",
+        "body": "Screen 21 Eval hillclimb is declared in this slice for S12, together with the actions it reads and the two events. The dependency runs outward: S12 renders the screen and S20 ships no UI, so the screen's state is declared here and built there. Until S12 lands the screen, the climb is reached through the actions and the events only.",
+        "status": "open"
+      }
+    ],
+    "benefit": [
+      {
+        "code": "S20-B1",
+        "title": "A hillclimb ends on a held-out verdict, not on a claim",
+        "body": "Each round is kept or reverted on the test side, the climb carries a per-round table with train and test side by side, the delta comes from S17's exact McNemar, and the report adds two before/after transcript pairs. The benefit is that a winner is named with its evidence attached, rather than by whoever remembers the best run.",
+        "status": "open"
+      },
+      {
+        "code": "S20-B2",
+        "title": "Failures are classified by cause before more content is ground",
+        "body": "After two consecutive flat test deltas the next round must carry a buckets payload — artifact_gap, grader_disagreement, harness, structural or variance — and a fourth content round against the same wall is refused. The benefit is that a stall produces a diagnosis instead of another pass over the same failure.",
+        "status": "open"
+      },
+      {
+        "code": "S20-B3",
+        "title": "Cost search reuses the same rounds and comparison, with its gates registered first",
+        "body": "goal.target='cost_usd' with a quality hold turns the same round protocol and comparison toward price, and the guide's search order is stored as state on eval_climb.goal so a resumed session does not restart at the top. The benefit is that cost work inherits the eval work's discipline rather than growing a parallel process.",
+        "status": "open"
+      },
+      {
+        "code": "S20-B4",
+        "title": "One McNemar implementation, so a published number cannot diverge",
+        "body": "S20 calls S17's exact two-sided McNemar rather than porting a second copy. The benefit is structural: every paired comparison in the estate speaks through one function, so a fix to the test or its refusal rule reaches every caller instead of one of two implementations drifting quietly.",
+        "status": "open"
+      }
+    ]
+  },
+  "delivery_contract": {
+    "title": "Delivery Contract — S20 Eval Hillclimb (retrospective, 2026-11-28)",
+    "body": {
+      "commitments": "S20 delivers the hillclimb loop over one eval: one eval_climb state per climb, the six eval_climbs actions and eval_runs.regrade, the two events, the stall-triage round, the cost-search goal and the final report. Each round proposes one change, runs the full case set and is kept or reverted on S19's held-out number; spend is summed from the usage rows rather than counted; and the winning change is applied only by a person's ordinary procedures.update.",
+      "compliance": "Compliance is judged at the pinned 2026-11-28 snapshot against the record, which marks the project closed and measured built, and against the slice plan, whose §7 names the suites the tree carries: eval_climb_schema, eval_climb_gate, eval_regrade, eval_compare, eval_climb_rules, eval_stall, eval_cost_walk, eval_final and the served lock check. The plan's §7 commands are rbuild invocations; rbuild was retired by the owner on 2026-11-20, so this contract records the replacement preflight route and claims no run of a retired command.",
+      "approval": "The contract is approved by the board decision the factory records for this pack, under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Phase-G review is compliant for the record set at the 2026-11-28 snapshot, and the closure decision is taken by an approver other than the requester.",
+      "manifest": "acceptance/programme/S20.toml — the close gate's manifest for this project, pinned by the parent session; this pack does not edit it, and its receipt is read against it at the 2026-11-28 snapshot.",
+      "acceptance_at": "2026-11-28",
+      "retrospective": "This delivery contract is authored retrospectively for the tranche-9 rework. The build carried no contemporaneous contract, so the commitments are read from the slice plan, the record and the tree at the 2026-11-28 snapshot and are not presented as an earlier agreement.",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+    }
+  },
+  "wbs_deliverable": {
+    "title": "The eval hillclimb — rounds over one eval that keep or revert on the held-out number, with stall triage, a cost goal and a final report",
+    "business_value": 7,
+    "time_criticality": 5,
+    "risk_reduction": 6,
+    "job_size": 5
+  },
+  "review": {
+    "level": "compliant",
+    "findings": "This retrospective Phase-G review records the level compliant for the record set it assesses under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, and it names every open package this pack resolves or leaves standing rather than leaving them implicit. The derived register's measured set for S20 is 5 open packages: the P0 project_in_unauthorised_tranche, and the four P1s closed_without_closure_review, closure_outputs_undeclared, unpublished_declared_output and mandatory_artefacts. The pack supplies the lifecycle record for closed_without_closure_review:S20 and closure_outputs_undeclared:S20 — the row carries status closed with meta.closure_outputs empty and gains the closure review and the closure this pack authors — and it authors both declared outputs, project-brief and evidence, which is the unpublished_declared_output:S20 package. It carries the seven Phase A–D artefacts required by mandatory_artefacts:S20, the five register kinds, the WBS deliverable, the delivery contract and this Phase-G review. It does not clear project_in_unauthorised_tranche:S20, which is P0 and clears only on the sponsoring group's authorisation of tranche 9. It makes no claim that any retired gate command ran: the plan's §7 still names rbuild --gate, the owner retired rbuild on 2026-11-20, and the compile and lint verdict's route is the repository's GitHub-hosted preflight workflow. The record at the 2026-11-28 snapshot marks the project closed and measured built, and the tree carries the migration, the modules and the suites the plan names. No waiver is claimed, no check is weakened, and the manifest gains the two closure checks (closure_outputs and closure_gate) that make this closure provable.",
+    "evidence": {
+      "manifest": "acceptance/programme/S20.toml",
+      "plan": "docs/plans/slices/S20-eval-hillclimb.md",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "gate": "docs/plans/slices/S20-eval-hillclimb.md §7 Gate"
+    }
+  },
+  "project_brief_output": "# Project Brief — S20 Eval Hillclimb (retrospective, 2026-11-28)\n\n## Outcome\n\nThe eval and cost hillclimb methods become a loop over one eval: a goal with a direction and a hold list, a stopping condition, and rounds that each propose one change, run the full case set, and are kept or reverted on the held-out number. The climb ends with the winning version named, a per-round table with train and test side by side, a paired delta with S17's exact McNemar, two before/after transcript pairs, and the failures nobody could fix classified by cause.\n\n## Boundary\n\nS20 owns the climb state, the six eval_climbs actions and eval_runs.regrade, the two events, the stall-triage round, the cost-search goal and the final report. It does not own a UI — screen 21 is declared here for S12 — a second model runtime, a second McNemar, the eval runner or the split (S19 owns both), the approval state machine, or any automatic application of a change to production code: applying a winner is a person's procedures.update.\n\n## Reuse sources\n\nThe plan's §4 names what S20 reuses: eval-hillclimb.md for the wall, the stopping rules, the bucket vocabulary and the revert rules verbatim; cost-hillclimb.md for the search order and the rule that adoption gates are registered before round 1; eval-audit.md §5 for the noise-floor arithmetic; S17's crates/domain/src/benchmark/mcnemar.rs for the exact test, called rather than copied; and S18's kata improvement plan for the constraint that a measurement loop consumes the public surface.\n\n## Inception units\n\nThe plan's build order is the inception sequence: migration 0029 for eval_climb.narrative_md; the loop machine with keep_or_revert and the stopping predicate in domain::eval::climb; the store and the start/get/list/stop actions with the eval_climb_plan sign-off; the round action with prediction and summary.suspicious; the compare action with the not_comparable refusal; the stall-triage round; the cost walk; and the final report. Part A is steps 1 to 4 and Part B is steps 5 to 8.\n\n## Dependencies\n\nThe record's depends_on carries needs S19: S19 supplies eval, eval_version, eval_case and eval_metric, the case runner, the four grader kinds, eval_runs with variant, round, change_md, change_patch, summary and narrative_md, the report with mean, CI, noise floor and cost, and the split with its digest drawn once. S17 supplies the exact McNemar. S12 is the consumer of screen 21's read model. The dependency that matters most is the split: the climb cannot redraw it, so its held-out number is not one it chose.\n\n## Acceptance\n\nAcceptance is the plan's §7 gate set — eval_climb_schema (one table RLS-forced, no climb spend column), eval_climb_gate (a climb cannot redraw the split, and no round before the plan is signed), eval_regrade, eval_compare, eval_climb_rules, eval_stall (a fourth content round is refused), eval_cost_walk (no round without registered gates), eval_final, and the served OpenAPI lock. The tree carries every named suite at the 2026-11-28 snapshot and the record marks the project measured built; the §7 commands are rbuild invocations, retired by the owner on 2026-11-20, and this brief claims none of them ran.\n\n## Capabilities\n\nHillclimb orchestration with a stopping predicate; round execution as an eval_run under S19's existing tick; paired comparison with the exact McNemar and a refusal across versions, graders or splits; stall triage that forces a five-bucket categorisation; cost search as a goal on the same rounds with adoption gates registered first; and a final report that names the winner and declares screen 21's read model. Each capability is delivered by a named module in the Phase C catalog.\n\n## Plan\n\nThe plan is docs/plans/slices/S20-eval-hillclimb.md; the build is recorded complete in the record at the pinned snapshot, and this brief is the retrospective reading of it. The tranche-9 rework publishes the lifecycle set this brief belongs to, and the tranche-9 review is the forum that accepts the re-close. No further build step is claimed by this brief, and the tranche authorisation remains the sponsoring group's decision.",
+  "evidence_output": "# Evidence — S20 Eval Hillclimb (retrospective, 2026-11-28)\n\n## Claim\n\nS20 delivers the hillclimb loop over one eval: rounds propose one change each and are kept or reverted on the held-out number; the split is S19's and cannot be redrawn; comparison calls S17's exact McNemar and refuses across versions, graders or splits; two flat rounds force a five-bucket categorisation before another content round; cost search is a goal whose adoption gates are registered before round 1; and the climb ends with the winner named in the report.\n\n## Evidence\n\nThe tree carries migrations/0029_s20_eval_climb_report.sql, crates/domain/src/eval/climb.rs, crates/store/src/eval/climb.rs and crates/actions/src/eval/climbs.rs, and the suites the plan's §7 names: crates/store/tests/eval_climb_schema.rs, crates/domain/tests/eval_climb_rules.rs, and crates/actions/tests/eval_climb_gate.rs, eval_compare.rs, eval_regrade.rs, eval_stall.rs, eval_cost_walk.rs and eval_final.rs. The plan's §5 records the build-time correction that eval_climb shipped in S19's 0026 and S20's only new DDL is eval_climb.narrative_md in 0029.\n\n## Verification\n\nAn independent reader repeats the check from the repository at the pinned revision: run the plan's §7 suites and take the compile and lint verdict from the GitHub-hosted preflight route, then read the receipt the parent session writes against acceptance/programme/S20.toml. The plan's §7 text is written as rbuild invocations; rbuild was retired by the owner on 2026-11-20 (CONTRACT §16), so this evidence records the replacement instrument and claims that no retired command ran for this slice.\n\n## Links\n\nThe plan is docs/plans/slices/S20-eval-hillclimb.md; the manifest is acceptance/programme/S20.toml; the project row is 01a1d039-0d31-7d0f-ab1f-16240952e223 on programme 01a1d039-0d24-7d16-ae52-4841e96ccfac; tranche 9 is 01a1e9e1-20dd-7cda-bd8b-e4fabe1d5db9; the P0 project is 01a1dcb8-d24b-76de-b901-56fd56e001bc; and the decision authority is the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Gap\n\nTwo limits are recorded. The record carries S20 as measured built, but the plan's §7 acceptance commands were never run in the retired form and no replacement run is archived in this pack, so the pack's acceptance claim rests on the record's measurement and the tree's contents rather than on a captured exit code. And the cost walk's price screen is computed from inference_call, which this pack does not exercise; a cost walk's first live run is the first evidence for that half.",
+  "closure": "The record already shows S20 closed and measured built while its closure review was never published — the close was recorded without the `closure-review` output the gate reads, and `closed_without_closure_review` is the P1 package that names the gap. This pack supplies that review together with the `project-brief` and `evidence` outputs the project's `meta.expected_outputs` declares, so the close gate has its document set; `closure_outputs_undeclared` is the companion P1 this resolves. The project is then re-closed through the gate once the sponsoring group authorises tranche 9 and the P0 `project_in_unauthorised_tranche:S20` clears. The closure records the retired local build route as history, not as an executed gate, and claims no retired command ran.",
+  "closure_review": "# Closure Review — S20 Eval Hillclimb (retrospective, 2026-11-28)\n\n## Outcome vs acceptance\n\nThe outcome is the hillclimb loop the plan's §1 states: the eval-hillclimb and cost-hillclimb methods run as rounds over one eval, each round's change is kept or reverted on the held-out number, and the climb ends with the winner named, a per-round train/test table, a paired delta with S17's exact McNemar, two before/after transcript pairs and failures classified across the five buckets. Against the plan's §7 acceptance set, the tree at the 2026-11-28 snapshot carries the migration `0029_s20_eval_climb_report.sql`, the three modules and every suite that section names, and the record marks the project measured built. No claim is made that the §7 commands ran: they are `rbuild` invocations, and the owner retired `rbuild` on 2026-11-20.\n\n## Evidence\n\nThe evidence is the slice plan and its §5 build-time correction (the only new DDL is `eval_climb.narrative_md` in `0029`, since `eval_climb` itself shipped in S19's `0026`), the modules `crates/domain/src/eval/climb.rs`, `crates/store/src/eval/climb.rs` and `crates/actions/src/eval/climbs.rs`, and the suites `eval_climb_schema` (store), `eval_climb_rules` (domain) and `eval_climb_gate`, `eval_compare`, `eval_regrade`, `eval_stall`, `eval_cost_walk` and `eval_final` (actions), all present in the tree on 2026-11-28. The record at the pinned snapshot is the project row, closed and measured built; the manifest is `acceptance/programme/S20.toml`, which this pack does not read.\n\n## Open items\n\nThree items stay open. `project_in_unauthorised_tranche:S20` is P0 and clears only on the sponsoring group's authorisation of tranche 9, not on anything this pack authors. The plan's §7 gate text still names `rbuild --gate`, retired by the owner on 2026-11-20; the replacement instrument is the repository's GitHub-hosted `preflight.yml` workflow for the compile and lint verdict, and this closure records the retirement rather than claiming either command ran for this slice. And the factory declares only `closure-review` in `meta.closure_outputs`, while `project-brief` and `evidence` are the project's `meta.expected_outputs`: this pack supplies all three, and the close remains conditioned on the sponsoring group's authorisation of tranche 9.\n\n## Decision\n\nThe project is re-closed through the gate once the sponsoring group authorises tranche 9 and the P0 `project_in_unauthorised_tranche:S20` clears: this pack supplies the closure review and the declared outputs, but it does not give that authorisation and does not assert the close ahead of it. The closure is taken by an approver other than the requester under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, the closure review is recorded in this pack, and the tranche-9 review is the forum that accepts it. No waiver is claimed, no check in the manifest is weakened, and the packages the Phase-G findings name are resolved by the artefacts, registers, contract and outputs this pack supplies — except the P0 tranche authorisation, which remains the sponsoring group's decision."
 }

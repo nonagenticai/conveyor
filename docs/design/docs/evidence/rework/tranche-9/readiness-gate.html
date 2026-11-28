@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
     <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
-    <title>Tranche-9 readiness gate — measured 2026-11-28 · conveyor documents</title>
+    <title>Tranche-9 readiness gate — measured 2026-11-28 (correction slice) · conveyor documents</title>
     <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
     <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
@@ -23,48 +23,79 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1 id="tranche-9-readiness-gate--measured-2026-11-28">Tranche-9 readiness gate — measured 2026-11-28</h1>
-<p>snapshot: <code>/tmp/snap-9</code> — 17 data files, 981 published outputs, taken from <code>issue/954-tranche-9</code> at <code>87e278f319dd0f8629e80482cb61705677aebd00</code>. The manifest's <code>generated_at</code> is <code>2026-11-28T15:09:49.665752Z</code>; it is <strong>not</strong> the run clock — the product derives it from the newest <code>updated_at</code> among the <code>documents</code> artefacts (<code>crates/pack/src/snapshot.rs::snapshot_generated_at</code>), so it pins the artefact set, not the instant. The run was made on 2026-11-28 after the three packs were committed.</p>
+    <main class="doc-body"><h1 id="tranche-9-readiness-gate--measured-2026-11-28-correction-slice">Tranche-9 readiness gate — measured 2026-11-28 (correction slice)</h1>
+<p>snapshot: <code>/tmp/snap-9b</code> — 17 data files and 1,003 indexed files, taken from the corrected replay record; its manifest <code>generated_at</code> is <code>2026-11-28T16:03:37Z</code> (derived from the newest document <code>updated_at</code>, not the run clock). The branch base is <code>main@9ff85293d</code> (#948's BDD contract included); the pre-correction reads used <code>/tmp/snap-9</code> and are superseded.</p>
+<p>This slice evaluated the preparation reported at <code>bff91455c</code> independently and corrected four hard defects and three quality defects. Every claim below was re-measured after the corrections.</p>
 <h2 id="content-packs">Content packs</h2>
-<pre><code>rework-content-check: S18 content is consistent with the facts
-exit=0
-rework-content-check: S20 content is consistent with the facts
-exit=0
-rework-content-check: S21 content is consistent with the facts
-exit=0</code></pre>
-<p>Commands (all at the pinned snapshot):</p>
+<pre><code>rework-content-check: S18 content is consistent with the facts   exit=0
+rework-content-check: S20 content is consistent with the facts   exit=0
+rework-content-check: S21 content is consistent with the facts   exit=0</code></pre>
+<p>Commands (all at <code>/tmp/snap-9b/data</code>):</p>
 <ul>
-<li><code>python3 scripts/rework-content-check.py --project S18 --content docs/evidence/rework/tranche-9/rework-content-S18.json --snapshot /tmp/snap-9/data --wsjf 9,6,9,13 --closes false</code></li>
-<li><code>python3 scripts/rework-content-check.py --project S20 --content docs/evidence/rework/tranche-9/rework-content-S20.json --snapshot /tmp/snap-9/data --wsjf 7,5,6,5 --closes true</code></li>
-<li><code>python3 scripts/rework-content-check.py --project S21 --content docs/evidence/rework/tranche-9/rework-content-S21.json --snapshot /tmp/snap-9/data --wsjf 9,6,7,8 --closes false</code></li>
+<li><code>python3 scripts/rework-content-check.py --project S18 --content docs/evidence/rework/tranche-9/rework-content-S18.json --snapshot /tmp/snap-9b/data --wsjf 9,6,9,13 --closes false</code></li>
+<li><code>python3 scripts/rework-content-check.py --project S20 --content docs/evidence/rework/tranche-9/rework-content-S20.json --snapshot /tmp/snap-9b/data --wsjf 7,5,6,5 --closes true</code></li>
+<li><code>python3 scripts/rework-content-check.py --project S21 --content docs/evidence/rework/tranche-9/rework-content-S21.json --snapshot /tmp/snap-9b/data --wsjf 9,6,7,8 --closes false</code></li>
 </ul>
-<p>Each pack carries the seven A–D artefacts in the standard's order, the five registers, the charter, the Statement of Architecture Work, the delivery contract, the Phase-G review and both declared output bodies. S18 (level <code>consistent</code>) and S21 (level <code>compliant</code>) carry no closure key; S20 (level <code>compliant</code>) carries <code>closure</code> and <code>closure_review</code>.</p>
-<h2 id="s20s-pin--the-one-acceptance-standard-change">S20's pin — the one acceptance-standard change</h2>
-<p>S20's record row is <code>closed</code> and its only linked issue (#14) is closed, while <code>acceptance/programme/S20.toml</code> pinned <code>S20-project</code> <code>active</code>. That pin failed <code>verify-project.py::check_project</code> as P0 and made <code>rework-batch.py::closes_project</code> return false, so an active pack could not carry the closure review the register demands.</p>
-<p>The pin now states <code>closed</code>, the record's measured status. Verified two ways:</p>
-<ul>
-<li><code>python3 -c '&lt;S20-project regex&gt;'</code> → <code>S20-project pin: closed</code></li>
-<li><code>importlib</code>-loaded <code>rework-batch.py</code> → <code>manifest_status('S20') == 'closed'</code>; <code>closes_project({"key":"S20","meta":{"issues":[14]}}, {14:"CLOSED"}, content) == True</code>; <code>manifest_status('S18') == 'active'</code> and <code>manifest_status('S21') == 'active'</code> both return <code>closes_project(...) == False</code>.</li>
-</ul>
-<p>A <code>closed</code> pin returns true unconditionally, so <code>--closes true</code> proves the pin, not the content. The factory still refuses a close without <code>content["closure"]</code> and <code>content["closure_review"]</code> (<code>scripts/rework-project.py:1038, 1277</code>), which is why the pack authors both. No script or test reads <code>S20-project</code> besides <code>manifest_status</code>.</p>
+<p>Each pack now authors the nine documents the post-v4 class binds (the tranche-7 S16 pack is the exemplar): <code>architecture-artifact</code>, <code>inception-analysis</code>, <code>architecture-analysis</code>, <code>architecture-design</code>, <code>statement-of-architecture-work</code>, <code>user-stories</code>, <code>acceptance-criteria</code>, <code>definition-of-ready</code>, <code>definition-of-done</code>. S18 (level <code>consistent</code>) and S21 (<code>compliant</code>) carry no closure key; S20 (<code>compliant</code>) carries <code>closure</code> and <code>closure_review</code>.</p>
+<h3 id="why-the-nine-s20s-close-gate-reads-published-documents-per-class-category">Why the nine: S20's close gate reads published documents per class category</h3>
+<p><code>crates/actions/src/programme.rs::assert_mandatory_artefacts</code> (the <code>projects.close</code> gate) reads the standard class's <code>now</code> + <code>closure</code> categories. For <code>v1-built</code> that is 14 published documents for S20. <code>scripts/publish-artefact-bodies.py</code> composes only categories applicable without the class (TOGAF-governed or declared), so seven categories can come only from the pack: <code>inception-analysis</code>, <code>architecture-analysis</code>, <code>architecture-design</code>, <code>user-stories</code>, <code>acceptance-criteria</code>, <code>definition-of-ready</code>, <code>definition-of-done</code>. Without them the close is refused <code>409 closure_mandatory_artefacts_missing</code>, and the batch's publish-and-resume cannot clear it.</p>
+<p>Coverage measured on the corrected pack (14/14):</p>
+<table>
+<thead>
+<tr>
+<th>category</th>
+<th>source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>project-brief, evidence</td>
+<td><code>meta.expected_outputs</code>; the factory publishes both</td>
+</tr>
+<tr>
+<td>inception-analysis, architecture-analysis, architecture-design</td>
+<td>pack document</td>
+</tr>
+<tr>
+<td>architecture-artifact, statement-of-architecture-work</td>
+<td>pack document</td>
+</tr>
+<tr>
+<td>user-stories, acceptance-criteria, definition-of-ready, definition-of-done</td>
+<td>pack document</td>
+</tr>
+<tr>
+<td>project-wbs, project-registers</td>
+<td>publisher composes from the record rows</td>
+</tr>
+<tr>
+<td>closure-review</td>
+<td>factory close step (<code>meta.closure_outputs</code>)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="s20s-manifest--two-changes-both-recorded">S20's manifest — two changes, both recorded</h2>
+<ol type="1">
+<li><strong>The pin is aligned, not weakened.</strong> <code>S20-project</code> expected <code>active</code> while the record row was <code>closed</code>; it now states <code>closed</code>, which is what the factory's close step leaves behind and what <code>check_project</code> asserts. A failed close reddens the check. <code>manifest_status</code> is the only script reader of the id.</li>
+<li><strong>Two closure checks are added</strong>, mirroring the closed <code>v1-built</code> exemplar S13: <code>S20-closure-outputs</code> (S20's <code>meta.closure_outputs</code> is non-empty and each declared category is published in the snapshot) and <code>S20-closure-gate</code> (the latest approved closure gate carries an approve decision by an approver other than the requester, targeting this project). The manifest now has 17 checks, all named in <code>gate_checks</code>.</li>
+</ol>
 <h2 id="record-readiness-replay-record-schema-110">Record readiness (replay record, schema 110)</h2>
 <ul>
-<li>Four <code>programme_cadence</code> rows at <code>period='tranche-9'</code>: <code>pi</code> <code>01a222b4-5097-7fee-94ac-e7adeb1bb79c</code>, <code>refinement</code> <code>01a222b4-513e-761c-af98-64ef0334e89b</code>, <code>demo</code> <code>01a222b4-51df-7576-997f-ad1f6fdc66f0</code>, <code>retro</code> <code>01a222b4-5278-757b-aa65-184fd4d5de28</code>.</li>
-<li>The <code>pi</code> row (version 4) carries <code>meta.pi_plan</code> (scope S18/S20/S21, capacity, WIP limits, four objectives, five dependency edges) and <code>meta.documents</code>: <code>pi-plan</code> <code>01a222b4-5dee-7060-a889-af69cf6d2ddf</code>, <code>pi-objectives</code> <code>01a222b4-5eb7-777f-b317-c0e445e762d7</code> — both published, <strong>P0-scoped</strong> (<code>01a1dcb8-d24b-76de-b901-56fd56e001bc</code>) and <code>unit</code> <code>tranche-9</code>, read back from <code>outputs.js</code>.</li>
-<li>The <code>refinement</code> row (version 3) carries <code>meta.refinement.wsjf_inputs</code> — S18 9/6/9/13, S20 7/5/6/5, S21 9/6/7/8 — matching the three packs' WBS integers and the <code>--wsjf</code> each checker ran with.</li>
-<li>The PI-plan gate is <code>approved</code> (approval <code>01a222b4-f15c-7c4e-ae37-153f5bfc3e80</code>) as a <code>rule</code> decision under the standing delegation <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code>; the <code>pi</code> row's own state stays <code>awaiting_approval</code>, as tranche 8's does.</li>
-<li>The tranche lesson <code>01a222b5-1061-79dc-be2f-b1bff735a0e0</code> is linked to the retro cadence with <code>independent_count=2</code> (anchors <code>scripts/verify-project.py#check_project</code> and <code>acceptance/programme/S20.toml</code>).</li>
-<li>Ten readiness acts are journaled (<code>docs/evidence/record/journal.jsonl</code>, 508 entries, <code>promote-record.py --check</code> green), with their inputs under <code>docs/evidence/record/inputs/tr9/</code>.</li>
-<li><code>outputs.js</code> carries both PI rows under <code>unit: "tranche-9"</code>; the period check (<code>verify-project.py::_published_for_period</code>) sees them.</li>
+<li>Four <code>programme_cadence</code> rows at <code>period='tranche-9'</code>: <code>pi</code> <code>01a222b4-5097-7fee-94ac-e7adeb1bb79c</code>, <code>refinement</code> <code>01a222b4-513e-761c-af98-64ef0334e89b</code> (version 4), <code>demo</code> <code>01a222b4-51df-7576-997f-ad1f6fdc66f0</code>, <code>retro</code> <code>01a222b4-5278-757b-aa65-184fd4d5de28</code>.</li>
+<li>The <code>pi</code> row carries <code>meta.pi_plan</code> and <code>meta.documents</code>: <code>pi-plan</code> <code>01a222b4-5dee-7060-a889-af69cf6d2ddf</code>, <code>pi-objectives</code> <code>01a222b4-5eb7-777f-b317-c0e445e762d7</code> — both published, P0-scoped and <code>unit: tranche-9</code>.</li>
+<li>The <code>refinement</code> row carries <code>meta.refinement.wsjf_inputs</code> — S18 9/6/9/13, S20 7/5/6/5, S21 9/6/7/8 — matching the packs' WBS integers and the <code>--wsjf</code> each checker ran with.</li>
+<li>The PI-plan gate is <code>approved</code> as <code>kind=plan</code> (approval <code>01a222b4-f15c-7c4e-ae37-153f5bfc3e80</code>) under the standing delegation <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code>; the row's state stays <code>awaiting_approval</code>, as tranche 7's and tranche 8's do.</li>
+<li>The lesson <code>01a222b5-1061-79dc-be2f-b1bff735a0e0</code> is linked to the retro cadence with <code>independent_count=2</code>.</li>
 </ul>
-<p>The snapshot assertion in the issue's P1.1 passes:</p>
-<pre><code>python3 -c &#39;… msp.json readiness assertion …&#39;
-tranche-9 readiness: ok</code></pre>
-<h2 id="the-37-open-packages-and-the-route-that-clears-each">The 37 open packages and the route that clears each</h2>
+<p><strong>Record correction (live-only).</strong> The earlier PI plan, PI objectives and refinement meta carried a false count — "37 open packages", S18/S21 11 (3 P1, 8 P2), S20 13 (1 P0, 4 P1, 8 P2). The derived register carries none of the eight per-member P2s. The three texts were corrected on the replay record on 2026-11-28 with <code>documents.update</code> + <code>documents.publish</code> (both documents at version 2, <code>published_at</code> set) and <code>cadences.update</code> (refinement at version 4), read back with the corrected counts; the evidence notes are <code>evidence/pi-plan-correction.md</code>, <code>evidence/pi-objectives-correction.md</code> and <code>evidence/refinement-correction.md</code>. These acts are <strong>not journaled</strong>: <code>promote-record.py</code> refuses <code>documents.update</code> as unreplayable, so the promotion ledger (508 entries, still green) does not carry them — #852 must replay the correction when it promotes.</p>
+<p>Reading the replay record requires <code>SET app.current_tenant='01a1cf6d-23af-7e0e-8b07-89c8f06bafb4'</code> (RLS is forced); without it every table reads empty.</p>
+<h2 id="the-measured-register-13-open-packages-not-37">The measured register: 13 open packages, not 37</h2>
+<p>Source: <code>scripts/rework_register.py::build</code> on <code>/tmp/snap-9b</code> (the same derivation the receipt's <code>rework</code> check uses). The committed <code>docs/evidence/rework-register.json</code> agrees on the member sets (4/5/4) but still lists the two tranche-scope packages (<code>pi_cadence_missing:tranche-9</code>, <code>backlog_refinement_missing:tranche-9</code>); the readiness rows clear them in the derived view, which is the one the receipt reads.</p>
 <table>
 <thead>
 <tr>
 <th>scope</th>
+<th>total</th>
 <th>P0</th>
 <th>P1</th>
 <th>P2</th>
@@ -74,47 +105,70 @@ tranche-9 readiness: ok</code></pre>
 <tbody>
 <tr>
 <td>S18</td>
+<td>4</td>
 <td>0</td>
 <td>3</td>
-<td>8</td>
-<td><code>project_in_unauthorised_tranche</code> by authorisation only; <code>unpublished_declared_output</code> and <code>mandatory_artefacts</code> by the pack; the eight P2s by the pack's charter/baseline/registers/WBS/artefacts/contract/review</td>
+<td>1</td>
+<td><code>project_in_unauthorised_tranche</code> by authorisation only; <code>unpublished_declared_output</code> and <code>mandatory_artefacts</code> by the pack's outputs and seven A–D artefacts; <code>wbs_absent</code> by the WBS deliverable</td>
 </tr>
 <tr>
 <td>S20</td>
+<td>5</td>
 <td>1</td>
 <td>4</td>
-<td>8</td>
-<td><code>project_in_unauthorised_tranche</code> by authorisation only; <code>closed_without_closure_review</code> and <code>closure_outputs_undeclared</code> by the published closure review and the factory's <code>closure_outputs</code> declaration; <code>unpublished_declared_output</code> and <code>mandatory_artefacts</code> by the pack; the eight P2s by the pack</td>
+<td>0</td>
+<td><code>project_in_unauthorised_tranche</code> (P0) by authorisation only; <code>closed_without_closure_review</code> and <code>closure_outputs_undeclared</code> by the published closure review and the factory's declaration; <code>unpublished_declared_output</code> and <code>mandatory_artefacts</code> by the pack</td>
 </tr>
 <tr>
 <td>S21</td>
+<td>4</td>
 <td>0</td>
 <td>3</td>
-<td>8</td>
-<td>the same three P1 routes as S18, and its eight P2s by the pack</td>
+<td>1</td>
+<td>the same routes as S18</td>
 </tr>
 <tr>
 <td><code>tranche-9</code></td>
 <td>0</td>
-<td>2</td>
-<td>0</td>
-<td><code>pi_cadence_missing</code> and <code>backlog_refinement_missing</code> by the four cadence rows and the refinement record above</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>the two tranche-scope packages were cleared by the four readiness rows</td>
 </tr>
 </tbody>
 </table>
-<p>The P0 is not a pack's to discharge: only the programme owner's gate decision authorises the tranche, and the package clears when the audit next reports on an authorised tranche.</p>
+<p><code>project_in_unauthorised_tranche:S20</code> is P0 and the only package no pack can clear.</p>
 <h2 id="batch-gate--the-expected-authorisation-precondition">Batch gate — the expected authorisation precondition</h2>
-<pre><code>$ python3 scripts/rework-batch.py --tranche 9 --snapshot /tmp/snap-9/data \
+<pre><code>$ python3 scripts/rework-batch.py --tranche 9 --snapshot /tmp/snap-9b/data \
     --content-dir docs/evidence/rework --journal docs/evidence/rework/batch/tranche-9.jsonl --dry-run
 tranche 9 is &#39;planned&#39;; only authorised/closed/in_review may be reworked
 exit=1</code></pre>
-<p>This is the <strong>only</strong> refusal: <code>rework-batch.py::ensure_authorised</code> refuses a <code>planned</code> tranche before it reads the roster or the packs. #755 records the tranche-8 review and authorises tranche 9; on a fresh snapshot after that, the same command must exit 0 with all three members <code>PREFLIGHTED</code>. Exit 0 is not claimed here — the refusal is construction's boundary, not a readiness proof.</p>
-<h2 id="delivery-gates">Delivery gates</h2>
-<pre><code>python3 docs/design/scripts/build-docs.py --check        -&gt; check-docs: 545 sources, 0 failure(s)
-node docs/design/scripts/check-docs.cjs                  -&gt; check-docs: 12 checks passed
-node docs/design/scripts/check-data.cjs                  -&gt; check-data: 896 checks passed
-python3 scripts/promote-record.py --check                -&gt; 508 entries; journal is well formed
-git diff --check                                         -&gt; clean</code></pre>
+<p>This is the only refusal: <code>ensure_authorised</code> refuses a <code>planned</code> tranche before reading the roster or the packs. #755 records the tranche-8 review and authorises tranche 9; on a fresh snapshot after that, the same command must exit 0 with all three members reported <code>DRY</code> (a dry run writes no journal; <code>PREFLIGHTED</code> is the real run's journal state). Exit 0 is not claimed here.</p>
+<h2 id="delivery-gates-measured-at-this-slice">Delivery gates (measured at this slice)</h2>
+<pre><code>python3 docs/design/scripts/build-docs.py --check   -&gt; exit 0
+node docs/design/scripts/check-docs.cjs             -&gt; 0 failure(s)
+node docs/design/scripts/check-data.cjs             -&gt; 0 failures
+python3 scripts/promote-record.py --check           -&gt; 508 entries; journal is well formed
+python3 scripts/ci/board.py --contract-body …       -&gt; the issue content contract is complete
+python3 scripts/ci/board.py --dor 954               -&gt; ready
+git diff --check                                    -&gt; clean</code></pre>
+<h2 id="corrections-from-the-independent-evaluation">Corrections from the independent evaluation</h2>
+<ul>
+<li><strong>D1 — issue contract.</strong> #948 requires <code>## User story</code> and one DoD row per <code>@verify</code> id for an issue created on/after 2026-11-28. The body now carries both; <code>board.py --contract-body</code> and <code>--dor 954</code> exit 0 on <code>main@9ff85293d</code>.</li>
+<li><strong>D2 — base.</strong> The branch is rebased onto <code>main@9ff85293d</code>; the generated design index was regenerated, never hand-merged.</li>
+<li><strong>D3 — the nine documents.</strong> Added to all three packs; the S20 coverage proof above closes the close-gate hole.</li>
+<li><strong>D4 — S20's closure checks.</strong> Added, mirroring S13.</li>
+<li><strong>Q1 — S20's closure text</strong> no longer claims the review preceded the close; it states the record and conditions the re-close on authorisation.</li>
+<li><strong>Q2 — S18's findings</strong> name the measured 4 packages and no <code>(P0)</code> P2; the artefact checks are exact commands and the states name the suite that proves each or say it has none.</li>
+<li><strong>Q3 — S21's suite inventory</strong> is reconciled against the tree (14 names, each a test target; <code>ladder_laya</code> is stale and dropped), and the <code>(prompt_ref, prompt_sha256)</code> pair is recorded as a design claim with no suite asserting it at this date.</li>
+</ul>
+<h2 id="open-items-recorded-not-this-packs-to-clear">Open items (recorded, not this pack's to clear)</h2>
+<ul>
+<li><code>project_in_unauthorised_tranche:S20</code> is P0 and clears only on the sponsoring group's authorisation of tranche 9 (#755).</li>
+<li>S20's gate text still names <code>rbuild --gate</code>, retired by the owner on 2026-11-20; the replacement is the repository's <code>preflight.yml</code>. The text is the owner's acceptance statement and is not edited here.</li>
+<li>S18's live katas proof is issue #12's; the project stays active and its manifest pins it active.</li>
+<li>The record correction is live-only; #852 must replay it.</li>
+</ul>
 </main>
     <footer class="doc-footer">
       <span>Rendered from <code>docs/evidence/rework/tranche-9/readiness-gate.md</code> at build time.</span>

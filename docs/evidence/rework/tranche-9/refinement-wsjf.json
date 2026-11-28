@@ -25,7 +25,11 @@
       "job_size": 13
     }
   },
-  "order": ["S20", "S21", "S18"],
+  "order": [
+    "S20",
+    "S21",
+    "S18"
+  ],
   "reordered": [
     {
       "item": "S20 first, then S21, then S18",
@@ -35,8 +39,8 @@
     }
   ],
   "reestimate": {
-    "S18": "11 open packages (3 P1, 8 P2)",
-    "S20": "13 open packages (1 P0, 4 P1, 8 P2)",
-    "S21": "11 open packages (3 P1, 8 P2)"
+    "S18": "4 open packages (3 P1, 1 P2)",
+    "S20": "5 open packages (1 P0, 4 P1)",
+    "S21": "4 open packages (3 P1, 1 P2)"
   }
 }

@@ -80,9 +80,9 @@
           }
         ],
         "reestimate": {
-          "S18": "11 open packages (3 P1: project_in_unauthorised_tranche, unpublished_declared_output, mandatory_artefacts; 8 P2: change-control, project-baseline, project-registers, wbs_absent, architecture-artifact, compliance-review, delivery-contract, phase-g)",
-          "S20": "13 open packages (1 P0: project_in_unauthorised_tranche; 4 P1: closed_without_closure_review, closure_outputs_undeclared, unpublished_declared_output, mandatory_artefacts; 8 P2: change-control, project-baseline, project-registers, project-wbs, architecture-artifact, compliance-review, delivery-contract, phase-g)",
-          "S21": "11 open packages (3 P1: project_in_unauthorised_tranche, unpublished_declared_output, mandatory_artefacts; 8 P2: change-control, project-baseline, project-registers, wbs_absent, architecture-artifact, compliance-review, delivery-contract, phase-g)"
+          "S18": "4 open packages (3 P1: project_in_unauthorised_tranche, unpublished_declared_output, mandatory_artefacts; 1 P2: wbs_absent)",
+          "S20": "5 open packages (1 P0: project_in_unauthorised_tranche; 4 P1: closed_without_closure_review, closure_outputs_undeclared, unpublished_declared_output, mandatory_artefacts)",
+          "S21": "4 open packages (3 P1: project_in_unauthorised_tranche, unpublished_declared_output, mandatory_artefacts; 1 P2: wbs_absent)"
         },
         "wsjf_inputs": {
           "S18": {

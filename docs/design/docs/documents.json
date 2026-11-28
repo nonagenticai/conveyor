@@ -3053,6 +3053,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-9/evidence/pi-meta.md"
     },
     {
+      "title": "PI objectives correction — tranche 9 (2026-11-28)",
+      "path": "docs/evidence/rework/tranche-9/evidence/pi-objectives-correction.html",
+      "source": "docs/evidence/rework/tranche-9/evidence/pi-objectives-correction.md",
+      "section": "Evidence",
+      "sha256": "9a687f76872e69dcc5ea4575cb994b82b7bd50d0660a8bf650b96d438e97cb12",
+      "bytes": 399,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-9/evidence/pi-objectives-correction.md"
+    },
+    {
       "title": "Evidence — tranche-9 PI objectives output",
       "path": "docs/evidence/rework/tranche-9/evidence/pi-objectives.html",
       "source": "docs/evidence/rework/tranche-9/evidence/pi-objectives.md",
@@ -3060,6 +3069,15 @@
       "sha256": "3ef84ae22e95b73d5ce28dfbd5ba45779fdb84c590ccd76f0796f2796d8e48fc",
       "bytes": 429,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-9/evidence/pi-objectives.md"
+    },
+    {
+      "title": "PI plan correction — tranche 9 (2026-11-28)",
+      "path": "docs/evidence/rework/tranche-9/evidence/pi-plan-correction.html",
+      "source": "docs/evidence/rework/tranche-9/evidence/pi-plan-correction.md",
+      "section": "Evidence",
+      "sha256": "83b3f78bfc1e37c93213b407c573155517f4a13ad3c8e9c83aba4b97d9a67eed",
+      "bytes": 745,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-9/evidence/pi-plan-correction.md"
     },
     {
       "title": "Evidence — tranche-9 PI plan output",
@@ -3080,6 +3098,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-9/evidence/refinement-cadence.md"
     },
     {
+      "title": "Refinement re-estimate correction — tranche 9 (2026-11-28)",
+      "path": "docs/evidence/rework/tranche-9/evidence/refinement-correction.html",
+      "source": "docs/evidence/rework/tranche-9/evidence/refinement-correction.md",
+      "section": "Evidence",
+      "sha256": "5fd09c9ee1c218b78df661213ca4864dc7250d45687f587837d7dfacc7817e89",
+      "bytes": 535,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-9/evidence/refinement-correction.md"
+    },
+    {
       "title": "Evidence — tranche-9 refinement record",
       "path": "docs/evidence/rework/tranche-9/evidence/refinement-wsjf.html",
       "source": "docs/evidence/rework/tranche-9/evidence/refinement-wsjf.md",
@@ -3098,12 +3125,12 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-9/evidence/retro-cadence.md"
     },
     {
-      "title": "Tranche-9 readiness gate — measured 2026-11-28",
+      "title": "Tranche-9 readiness gate — measured 2026-11-28 (correction slice)",
       "path": "docs/evidence/rework/tranche-9/readiness-gate.html",
       "source": "docs/evidence/rework/tranche-9/readiness-gate.md",
       "section": "Evidence",
-      "sha256": "fdf497916bf867927189d5022c4c32ec36e83014988226914f5af4d2bee2be24",
-      "bytes": 6968,
+      "sha256": "efa410c76c4138d3c9d6e795d19a8206f18d40987dedebd22d3937cd4cd84e0b",
+      "bytes": 10366,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-9/readiness-gate.md"
     },
     {

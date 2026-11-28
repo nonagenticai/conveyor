@@ -172,8 +172,8 @@
           "axis_a": "R-1 The producer consumes the public surface",
           "axis_b": "A run is started, read and compared through actions; the producer reads no benchmark_instance and writes no case verdict",
           "value": {
-            "check": "apps/server/tests/benchmark_arm.rs",
-            "state": "planned gate",
+            "check": "cargo test -p conveyor-api --test benchmark_arm",
+            "state": "verified by crates/api/tests/benchmark_arm.rs (tree 2026-11-28)",
             "source": "docs/plans/slices/S18-kata-improvement.md#5"
           },
           "position": 1
@@ -182,8 +182,8 @@
           "axis_a": "R-2 The arm refuses before the first case",
           "axis_b": "A missing or unready binding is 409 arm_not_ready before the first case of the suite",
           "value": {
-            "check": "conveyor-api benchmark_arm",
-            "state": "planned gate",
+            "check": "cargo test -p conveyor-api --test benchmark_arm",
+            "state": "verified by crates/api/tests/benchmark_arm.rs (tree 2026-11-28)",
             "source": "docs/plans/slices/S18-kata-improvement.md#5"
           },
           "position": 2
@@ -192,8 +192,8 @@
           "axis_a": "R-3 Failures are classified",
           "axis_b": "Scope, prompt or capability failures are recorded as no_attempt, never as a model failure",
           "value": {
-            "check": "conveyor-api benchmark_arm",
-            "state": "planned gate",
+            "check": "cargo test -p conveyor-api --test benchmark_arm",
+            "state": "verified by crates/api/tests/benchmark_arm.rs (tree 2026-11-28)",
             "source": "docs/plans/slices/S18-kata-improvement.md#5"
           },
           "position": 3
@@ -202,8 +202,8 @@
           "axis_a": "R-4 The trend is a query",
           "axis_b": "Rates and deltas are derived from benchmark_run and benchmark_case; no new table and no roll-up",
           "value": {
-            "check": "crates/api/tests/benchmark_trend.rs",
-            "state": "planned gate",
+            "check": "cargo test -p conveyor-api --test benchmark_trend",
+            "state": "verified by crates/api/tests/benchmark_trend.rs (tree 2026-11-28)",
             "source": "docs/plans/slices/S18-kata-improvement.md#5"
           },
           "position": 4
@@ -212,8 +212,8 @@
           "axis_a": "R-5 The regression rule is exact",
           "axis_b": "A regression is McNemar p < 0.05 with a negative delta and both runs control_ok=true; otherwise inconclusive",
           "value": {
-            "check": "conveyor-api benchmark_trend",
-            "state": "planned gate",
+            "check": "cargo test -p conveyor-api --test benchmark_trend",
+            "state": "verified by crates/api/tests/benchmark_trend.rs (tree 2026-11-28)",
             "source": "docs/plans/slices/S18-kata-improvement.md#10"
           },
           "position": 5
@@ -222,8 +222,8 @@
           "axis_a": "R-6 The improvement job does what a person does",
           "axis_b": "It invokes benchmark_runs.start, benchmark_runs.get and benchmark_runs.compare, then records keep, revert or inconclusive",
           "value": {
-            "check": "apps/server/tests/benchmark_improvement.rs",
-            "state": "planned gate",
+            "check": "cargo test -p conveyor-server --test benchmark_improvement",
+            "state": "verified by apps/server/tests/benchmark_improvement.rs (tree 2026-11-28)",
             "source": "docs/plans/slices/S18-kata-improvement.md#5"
           },
           "position": 6
@@ -232,8 +232,8 @@
           "axis_a": "R-7 A dead job does not hold a run",
           "axis_b": "The run keeps its own lifecycle and S17's benchmark.reap owns the stale case",
           "value": {
-            "check": "conveyor-server benchmark_improvement",
-            "state": "planned gate",
+            "check": "cargo test -p conveyor-server --test benchmark_improvement",
+            "state": "verified by apps/server/tests/benchmark_improvement.rs (tree 2026-11-28)",
             "source": "docs/plans/slices/S18-kata-improvement.md#8"
           },
           "position": 7
@@ -242,8 +242,8 @@
           "axis_a": "R-8 One candidate in flight per suite",
           "axis_b": "A second start while a candidate is queued or running is a 409",
           "value": {
-            "check": "conveyor-server benchmark_improvement",
-            "state": "planned gate",
+            "check": "cargo test -p conveyor-server --test benchmark_improvement",
+            "state": "verified by apps/server/tests/benchmark_improvement.rs (tree 2026-11-28)",
             "source": "docs/plans/slices/S18-kata-improvement.md#10"
           },
           "position": 8
@@ -252,7 +252,7 @@
           "axis_a": "R-9 Screen 14's data contract is declared",
           "axis_b": "Version to rate, the baseline line, control badges, regression flags and the Start-candidate control",
           "value": {
-            "check": "apps/web/e2e/improvement.spec.ts",
+            "check": "npx playwright test apps/web/e2e/improvement.spec.ts",
             "state": "declared for S12",
             "source": "docs/plans/slices/S18-kata-improvement.md#5"
           },
@@ -262,8 +262,8 @@
           "axis_a": "R-10 Version pinning is the measurement",
           "axis_b": "A run pins subject_kind and its id; a suite subject with arm conveyor is refused by S17's CHECK",
           "value": {
-            "check": "conveyor-api benchmark_arm",
-            "state": "planned gate",
+            "check": "cargo test -p conveyor-api --test benchmark_arm",
+            "state": "verified by crates/api/tests/benchmark_arm.rs (tree 2026-11-28)",
             "source": "docs/plans/slices/S18-kata-improvement.md#8"
           },
           "position": 10
@@ -273,7 +273,7 @@
           "axis_b": "One action and one operation are added, and the printed document matches served-spec.lock.json",
           "value": {
             "check": "cargo run -q -p conveyor-server -- --print-openapi --check-lock",
-            "state": "planned gate",
+            "state": "open: no suite in the tree 2026-11-28",
             "source": "docs/plans/slices/S18-kata-improvement.md#6"
           },
           "position": 11
@@ -593,6 +593,46 @@
       "category": "architecture-artifact",
       "title": "Architecture Artefact Index — S18 (retrospective, 2026-11-28)",
       "body": "# Architecture Artefact Index — S18 (retrospective, 2026-11-28)\n\n## Metadata\n\nThe artefact set for S18 is the seven mandatory Phase A–D artefacts on the delivery track: the Stakeholder Map, the Driver/Goal/Objective Catalog, the Requirements Catalog and the Solution Concept Diagram at phase a, plateau psa; the Business Capability Map at phase b; the Data Entity/Data Component Catalog at phase c; and the Technology Standards Catalog at phase d, the last three at plateau hld. Each carries an authored body dated 2026-11-28; the owner is the programme architect under the tranche-9 rework delegation, the reviewer is the Architecture Board, and the subject is this project's record at the pinned snapshot.\n\n## Entries\n\nSeven rows in the order the standard seeds them: a/matrix — Stakeholder Map — S18 Kata Continuous Improvement (Phase A); a/catalog — Driver/Goal/Objective Catalog — S18 Kata Continuous Improvement (Phase A); a/catalog — Requirements Catalog — S18 Kata Continuous Improvement (Phase A); a/diagram — Solution Concept Diagram — S18 Kata Continuous Improvement (Phase A); b/diagram — Business Capability Map — S18 Kata Continuous Improvement (Phase B); c/catalog — Data Entity/Data Component Catalog — S18 Kata Continuous Improvement (Phase C); d/catalog — Technology Standards Catalog — S18 Kata Continuous Improvement (Phase D).\n\n## Links\n\nEvery artefact links to another artefact of the set with one of the four kinds the record's link action allows: derivation, realization, reuse or dependency. The links follow the phase order, so a reader can walk from A to D without an orphan, and each artefact's own Links section names its source in the slice plan and the tree. The deepest source is `docs/plans/slices/S18-kata-improvement.md` §3, §5, §7, §8 and §9.\n\n## Document\n\nThis index is published as its own architecture-artifact document by the rework factory. It is the document the close gate reads for the project's artefact standard, and it is why the set can be verified without re-reading the plan: the titles, the order and the link kinds are all stated here, and the seven rows match the seven artefacts one for one. It answers `mandatory_artefacts:S18` at the snapshot; the project stays active, so the index is evidence of the set's existence rather than of a product gate.\n"
+    },
+    {
+      "title": "Inception Analysis — S18 Kata continuous improvement (retrospective, 2026-11-28)",
+      "category": "inception-analysis",
+      "body": "# Inception Analysis — S18 Kata continuous improvement (retrospective, Phase G)\n\n## Current state\n\nThe project row is active, measured built, at ADM phase G on the delivery plateau in tranche 9, while the slice plan still records its status as planned — a mismatch the tranche-9 viability rework exists to reconcile, not to hide. The tree holds the three product suites and the web contract, but the snapshot carried no charter, baseline, registers, contract or Phase-G review, which is why the measured inventory is 4 open packages, 3 P1 and 1 P2 (`wbs_absent`).\n\n## Reuse sources\n\nS17 supplies benchmark_run and benchmark_case, the driver, compare, promote, the arms and the reaper; S13 supplies agent.run with the resolved capability_agent in the step input; S15 supplies capability_agent and the readiness check that refuses an unusable binding before a run. The plan's source table also points at the internal step-invocation path and the executor slot's rules, and the producer reuses the public action surface rather than a private path.\n\n## Build vs reuse\n\nBuild the conveyor arm's producer, benchmark_runs.trend, benchmark.improvement.run and screen 14's declared data contract; reuse S17's stored rows and its start, get, compare and promote, S13's agent.run and S15's readiness check. The plan refuses a new agent runtime or second model loop, automatic code changes, any new table or event and a second benchmark driver, so the trend stays a query over the stored rows and the job stays one queue row.\n\n## Risks\n\nFour risks are carried in the pack's risk register: a non-comparable run averaged into the trend; the improvement job becoming a second state machine that holds a run; a one- or two-instance win read as signal when identical baselines differ by four; and a run with no pinned subject. Each has an owning requirement and existing coverage — crates/api/tests/benchmark_arm.rs and crates/api/tests/benchmark_trend.rs among the suites — and none is discharged by prose alone.\n"
+    },
+    {
+      "title": "Architecture Analysis — S18 Kata continuous improvement (retrospective, 2026-11-28)",
+      "category": "architecture-analysis",
+      "body": "# Architecture Analysis — S18 Kata continuous improvement (retrospective, Phase G)\n\n## Current state\n\nAt the 2026-11-28 snapshot the benchmark is already one instrument on the conveyor's public surface: S17 stores benchmark_run and benchmark_case and offers start, get, compare and promote, while S18 adds the conveyor arm's producer, benchmark_runs.trend behind benchmarks:read and the durable job benchmark.improvement.run. The project row is active and measured built in tranche 9; the lifecycle record is what the 3 P1 packages and `wbs_absent` say is missing.\n\n## Options considered\n\nThree options were weighed. A second benchmark driver or a private executor was refused because it would measure a second implementation of the conveyor rather than the product. A roll-up table for the trend was refused because it would drift from the raw rows; the trend is a query. A job with its own state machine was refused because S17's benchmark.reap owns staleness and the run keeps its own lifecycle. The chosen design keeps one action surface, one statistical path and one promoted baseline per suite.\n\n## Risks\n\nThe comparison is only as good as its pairing: the same 50 instances, suite hashes, grader and prompt/oracle pair, with a non-comparable run refused rather than averaged. The plan records that two byte-identical baselines can differ by four instances, so a small delta is not evidence. A run without a pinned subject measures nothing, and a wedged job must not hold a run; crates/api/tests/benchmark_trend.rs and apps/server/tests/benchmark_improvement.rs exercise the trend and the job.\n\n## Dependency map\n\nS13 supplies agent.run, the bounded internal loop that takes the resolved capability_agent in the step input; S15 supplies capability, capability_agent and the readiness check that refuses an unusable binding before a run; S17 supplies the run and case rows, the driver, compare, promote, the arms and the reaper. None is optional: without S17 there is no measurement, and without S13 and S15 the arm has nothing to invoke. The linked issue #12 is open and carries the live kata proof.\n"
+    },
+    {
+      "title": "Architecture Design — S18 Kata continuous improvement (retrospective, 2026-11-28)",
+      "category": "architecture-design",
+      "body": "# Architecture Design — S18 Kata continuous improvement (retrospective, Phase G)\n\n## Context and boundary\n\nThe design keeps the measurement outside S18's runtime: every benchmark run is a conveyor run started through the action a person uses, with the patch taken from the run's output. In scope are the producer, the subject pinning, benchmark_runs.trend, benchmark.improvement.run, the baseline and regression semantics, and screen 14's declared data contract. Out of scope are a model loop, a private executor, a new table or event, and a second benchmark driver.\n\n## Aggregates, tables and actions\n\nS17's benchmark_run and benchmark_case remain the aggregate; a run pins subject_kind and the capability_agent or procedure id, and S17's CHECK refuses a suite subject with arm conveyor. S18 adds no table. The two new actions are benchmark_runs.trend and benchmark.improvement.run, reusing benchmark_runs.start, benchmark_runs.get, benchmark_runs.compare and benchmark_runs.promote; the job records keep, revert or inconclusive with the McNemar delta on an existing queue row.\n\n## Decisions\n\nThe plan's §9 closes four decisions: the improvement loop is a consumer of the action registry with no private store or privileged path; the baseline is per suite and promoted explicitly, never because a newer run arrived; the trend is a query, not a table; and a trend point is only a run of the same suite and arm. A regression is McNemar p < 0.05 with a negative delta and both runs control_ok=true; the flag is recorded and the revert stays a decision.\n\n## Acceptance\n\nThe plan's §7 gate names three targets: cargo test -p conveyor-api --test benchmark_arm, cargo test -p conveyor-api --test benchmark_trend and cargo test -p conveyor-server --test benchmark_improvement, plus the --print-openapi --check-lock command, the workspace suite and clippy. Re-measured 2026-11-28, the suites sit at crates/api/tests/benchmark_arm.rs, crates/api/tests/benchmark_trend.rs and apps/server/tests/benchmark_improvement.rs, and the web contract at apps/web/e2e/improvement.spec.ts.\n\n## Architecture artefacts\n\nThe seven mandatory Phase A–D artefacts are the pack's architecture-artifact rows: the Stakeholder Map, the Driver/Goal/Objective Catalog, the Requirements Catalog and the Solution Concept Diagram at phase A; the Business Capability Map at phase B; the Data Entity/Data Component Catalog at phase C; and the Technology Standards Catalog at phase D. The Architecture Artefact Index document carries their titles, order and link kinds, so the set can be read without reopening the plan.\n"
+    },
+    {
+      "title": "Statement of Architecture Work — S18 Kata continuous improvement (retrospective, 2026-11-28)",
+      "category": "statement-of-architecture-work",
+      "body": "# Statement of Architecture Work — S18 Kata continuous improvement (retrospective, Phase G)\n\n## Assignment\n\nAssign S18 the kata loop's measuring instrument: the conveyor arm starts one conveyor run per benchmark instance through the public action surface, waits for the terminal state and takes the patch from the run's output; the run pins subject_kind and its version id; two runs are compared with S17's exact McNemar; and the improvement job records keep, revert or inconclusive with the delta. The statement is retrospective — it records the assignment the plan set and the state the 2026-11-28 snapshot carries.\n\n## Scope\n\nIn scope are the conveyor arm producer, the version pinning, benchmark_runs.trend behind benchmarks:read, benchmark.improvement.run, the baseline and regression semantics, and screen 14's declared data contract. Out of scope are a new agent runtime or second model loop, automatic code changes, any new table or event, and a second benchmark driver. The trend is computed from stored benchmark_run and benchmark_case rows; nothing is rolled up into a table.\n\n## Responsibilities\n\nThe programme architect authors the retrospective set; the Architecture Board reviews the Phase A–D artefacts and this statement; the SRO is accountable for the kata improvement capability and the tranche outcome; the kata coach or improvement procedure author chooses the candidate and reads the comparison. S15 owns capability_agent and readiness, S17 owns the run, compare, promote, arms and reaper, and S12 owns screen 14. The pack's author is not the accepting role.\n\n## Acceptance criteria\n\nThe gate is the plan's §7 sequence: cargo test -p conveyor-api --test benchmark_arm proves the arm refuses before S13/S15 data exists and runs when it does; cargo test -p conveyor-api --test benchmark_trend proves two versions of one subject compare with an exact McNemar delta; cargo test -p conveyor-server --test benchmark_improvement proves the job performs the same calls a person does; the OpenAPI lock, the workspace suite and clippy close it. The end-to-end proof is one real katas-tenant iteration on issue #12.\n\n## Contract\n\nThe contract commits to one measurement path: every run is started, read and compared through benchmark_runs.start, benchmark_runs.get and benchmark_runs.compare, and the producer may not read benchmark_instance, write a case verdict, or run an instance in a tenant other than the run's. It commits to the trend as a query, an explicit promote per suite, and a regression flag that records rather than reverts. S17's benchmark.reap owns the stale case, so a dead job never holds a run.\n"
+    },
+    {
+      "title": "User stories — S18 Kata continuous improvement (retrospective, 2026-11-28)",
+      "category": "user-stories",
+      "body": "# User stories — S18 Kata continuous improvement (retrospective, Phase G)\n\n## Personas\n\nA kata coach who runs the improvement loop and decides whether a candidate is kept or reverted; a capability owner who publishes a capability_agent version and needs to see it measured; and a reviewer who must be able to read the same comparison the job invoked. Each is a role the slice plan names, and none is a screen user of S18's own making: screen 14 is declared for S12.\n\n## Stories\n\nAs a kata coach, I want a benchmark run to pin the subject version that produced it, so that a keep or revert decision names what was measured. As a capability owner, I want my candidate compared with the promoted baseline on paired instances, so that a one-instance win is not read as an improvement. As a reviewer, I want the trend and the verdict derived from the same stored rows, so that I can recompute the decision the job recorded.\n\n## Scenarios\n\nS1 a missing or unready binding is 409 arm_not_ready before the first case; S2 a scope, prompt or capability failure is recorded as no_attempt, never as a model failure; S3 two versions of one subject compare with an exact McNemar delta and direction; S4 a non-comparable run is refused and surfaced, not averaged; S5 the job starts, waits, compares and records keep, revert or inconclusive; S6 a dead job leaves the run's lifecycle to S17's benchmark.reap.\n\n## Verify\n\ncargo test -p conveyor-api --test benchmark_arm, cargo test -p conveyor-api --test benchmark_trend and cargo test -p conveyor-server --test benchmark_improvement are the plan's §7 targets, and all three suites exist in the tree on 2026-11-28; the web contract is npx playwright test apps/web/e2e/improvement.spec.ts, whose spec also exists. The pack's own content check and receipt verify the record, not the product gate.\n"
+    },
+    {
+      "title": "Acceptance criteria — S18 Kata continuous improvement (retrospective, 2026-11-28)",
+      "category": "acceptance-criteria",
+      "body": "# Acceptance criteria — S18 Kata continuous improvement (retrospective, Phase G)\n\n## Scenarios\n\nSix scenarios carry S18: the arm's pre-first-case refusal, the no_attempt classification, the exact McNemar between two versions of one subject, the refusal of a non-comparable run, the improvement job's start-wait-compare-record sequence, and the dead job that does not hold a run. Each maps to a requirement in the pack's Requirements Catalog and to one of the plan's §7 gate steps or §8 traps, so no scenario is asserted without an owning clause.\n\n## Verify commands\n\nThe plan's gate is cargo test -p conveyor-api --test benchmark_arm, cargo test -p conveyor-api --test benchmark_trend, cargo test -p conveyor-server --test benchmark_improvement, the --print-openapi --check-lock command, the workspace test suite and clippy. The web contract verifies with npx playwright test apps/web/e2e/improvement.spec.ts. The plan records these in their pre-2026-11-20 local-compile form; the compile and lint verdict is the GitHub-hosted preflight's at the exact PR head.\n\n## Results\n\nRe-measured 2026-11-28: crates/api/tests/benchmark_arm.rs exists, crates/api/tests/benchmark_trend.rs exists, apps/server/tests/benchmark_improvement.rs exists, and apps/web/e2e/improvement.spec.ts exists; apps/server/tests/benchmark_arm.rs does not exist, which is why the arm's check is cargo test -p conveyor-api --test benchmark_arm and its state names the crates/api path. The pack claims no gate execution; the build lane owns the product result.\n\n## Status\n\nOpen. The project row is active and measured built at the 2026-11-28 snapshot in tranche 9; the product gate has not been re-run for this pack and the live kata proof is issue #12's, which is open. The measured inventory is 3 P1 and 1 P2: this pack supplies the lifecycle record the P2 `wbs_absent` asks for, while project_in_unauthorised_tranche needs the tranche decision and unpublished_declared_output and mandatory_artefacts are answered here.\n"
+    },
+    {
+      "title": "Definition of ready — S18 Kata continuous improvement (retrospective, 2026-11-28)",
+      "category": "definition-of-ready",
+      "body": "# Definition of ready — S18 Kata continuous improvement (retrospective, Phase G)\n\n## Independent\n\nThe pack writes S18's own record rows and the eight documents it adds at one pinned snapshot, and no other content pack is edited. The product's three suites and the web contract are already in the tree, so the record work does not wait on S13, S15 or S17's products, which are the build's starting state; the tranche question is recorded rather than absorbed.\n\n## Negotiable\n\nThe content is negotiable in wording but not in the plan's fixed clauses: the §9 decisions, the §8 traps and the §7 gate are carried as given. What the pack may not negotiate is the boundary — no new table, no private executor, no second state machine — and it does not negotiate the open tranche question or the live proof into a claim of completion.\n\n## Valuable\n\nS18 is the kata loop's measuring instrument: without it a candidate's keep or revert decision rests on a raw rate delta that identical baselines can produce by noise. The value is a paired exact test, a promoted baseline and a trend recomputed from the stored rows, so an improvement claim is recomputable by the reviewer who reads the same comparison the job invoked.\n\n## Estimable\n\nThe plan's six build-order steps and three named test targets bound the work, and the pack's inventory is measured: 4 open packages, 3 P1 and 1 P2 (`wbs_absent`). The eight documents have fixed categories and headings, and the three factual corrections are the non-runnable check, the missing suite path and the P0/P2 mislabel, so the remainder is estimable against the plan rather than open-ended.\n\n## Small\n\nOne pack, one review pass and one controlled edit to the existing fields; no product rebuild, no migration and no cluster change. The pack changes one JSON file in one worktree, and its eight documents are authored from the same plan and the same snapshot, so the unit stays a single bounded piece of record work.\n\n## Testable\n\nEvery claim has an executable or observable check: the content checker at the pinned snapshot, the receipt the factory renders, and the state fields that now name an existing suite path or record the absence. The three test commands are exact and their targets exist on 2026-11-28, so a reviewer can re-run each rather than trust the prose.\n\n## Dependencies\n\nS18 depends on S13, S15 and S17: S13 supplies agent.run, S15 supplies capability_agent and the readiness check, and S17 supplies benchmark_run and benchmark_case, the driver, compare, promote, the arms and the reaper. The linked issue #12, which carries the live katas-tenant proof, is open at the snapshot, so the dependency is recorded rather than discharged by this pack.\n"
+    },
+    {
+      "title": "Definition of done — S18 Kata continuous improvement (retrospective, 2026-11-28)",
+      "category": "definition-of-done",
+      "body": "# Definition of done — S18 Kata continuous improvement (retrospective, Phase G)\n\n## Acceptance criteria\n\nThe plan's §7 gate is the acceptance: cargo test -p conveyor-api --test benchmark_arm for the producer and its three failure classes, cargo test -p conveyor-api --test benchmark_trend for the exact McNemar between two versions of one subject, cargo test -p conveyor-server --test benchmark_improvement for the job's person-equivalent calls, the OpenAPI lock, the workspace suite and clippy. A green product gate is the build lane's to report.\n\n## Evidence at completion\n\nThe evidence is the record of this pack at the pinned 2026-11-28 snapshot: nine document categories, the seven Phase A–D artefacts, the registers, the delivery contract, the WBS row with its four typed WSJF inputs 9, 6, 9 and 13, and the corrected Requirements Catalog states. The four named suites — crates/api/tests/benchmark_arm.rs, crates/api/tests/benchmark_trend.rs, apps/server/tests/benchmark_improvement.rs and apps/web/e2e/improvement.spec.ts — are the tree evidence; no product receipt is claimed.\n\n## Repo gate\n\nThe change is docs-only inside one worktree: the content checker at the pinned snapshot must pass, the JSON must stay parseable with nine unique document categories, and the repository's own preflight and CI are the compile and lint verdict at the exact head. No compiling cargo command is run locally under the 2026-11-20 owner direction, and no other pack or issue is touched.\n\n## Merge and closure\n\nThe unit is one branch and one pull request against the issue's lane; this pack does not merge or close it. The project stays active, the tranche-9 question stays with the sponsoring group, and the live kata proof stays with issue #12. Closure is claimed only when the receipt is green and the tranche review accepts it, neither of which this pack performs.\n"
     }
   ],
   "registers": {
@@ -686,7 +726,7 @@
       {
         "code": "S18-I1",
         "title": "The record carried no charter, SoAW, artefact set, registers, contract, WBS or Phase-G review at the snapshot",
-        "body": "At the 2026-11-28 snapshot the project row is active with measured_status built against a plan status of planned, and the audit carries the PMP and TOGAF packages std-pmp-change-control-s18:S18, std-pmp-project-baseline-s18:S18, std-pmp-project-registers-s18:S18, std-togaf-architecture-artifact-s18:S18, std-togaf-compliance-review-s18:S18, std-togaf-delivery-contract-s18:S18 and std-togaf-phase-g-s18-g:S18, plus the artefact gap mandatory_artefacts:S18. This pack supplies that lifecycle set retrospectively and records the product's gate as the manifest's, not as this pack's claim.",
+        "body": "At the 2026-11-28 snapshot the project row is active with measured_status built against a plan status of planned, and the audit carries the three P1 packages `project_in_unauthorised_tranche:S18`, `unpublished_declared_output:S18` and `mandatory_artefacts:S18`, and the P2 `wbs_absent:S18`. This pack supplies that lifecycle set retrospectively and records the product's gate as the manifest's, not as this pack's claim.",
         "severity": "P1",
         "status": "open",
         "response": "Supplied by this pack and read off the project's receipt at the pinned snapshot; the product gate stays the build lane's."
@@ -817,7 +857,7 @@
   },
   "review": {
     "level": "consistent",
-    "findings": "This retrospective Phase-G review records the level consistent for the lifecycle record this pack supplies at the 2026-11-28 snapshot under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The open packages it answers are std-pmp-change-control-s18:S18 and std-pmp-project-baseline-s18:S18 (P0), std-pmp-project-registers-s18:S18, std-togaf-architecture-artifact-s18:S18, std-togaf-compliance-review-s18:S18, std-togaf-delivery-contract-s18:S18 and std-togaf-phase-g-s18-g:S18, together with the artefact gap mandatory_artefacts:S18, which the seven A–D artefacts and their index document supply. The declared-output and WBS gaps unpublished_declared_output:S18 and wbs_absent:S18 are answered by project_brief_output, evidence_output and the wbs_deliverable row with its four typed WSJF inputs 9, 6, 9 and 13. project_in_unauthorised_tranche:S18 clears only on authorisation: the sponsoring group's or the programme owner's gate decision for tranche 9 is the only act that can change it, and this pack records it open rather than writing its own authorisation. The level stays consistent rather than compliant because the record set is now coherent but the product's gate has not been re-run and the tranche is not authorised. The live kata proof is issue #12's, not this pack's: issue #12 is open and carries the end-to-end katas-tenant iteration, while issue #30 is closed. The pack does not claim the plan's §7 gate has been re-run at this snapshot; acceptance/programme/S18.toml is the acceptance and the build lane's preflight is the compile verdict.",
+    "findings": "This retrospective Phase-G review records the level consistent for the lifecycle record this pack supplies at the 2026-11-28 snapshot. The derived register's measured set for S18 is 4 open packages: 3 P1 + 1 P2. The P1 set is project_in_unauthorised_tranche:S18, unpublished_declared_output:S18 and mandatory_artefacts:S18; the P2 set is wbs_absent:S18. The seven A–D artefacts and their index document supply mandatory_artefacts:S18. The declared-output and WBS gaps unpublished_declared_output:S18 and wbs_absent:S18 are answered by project_brief_output, evidence_output and the wbs_deliverable row with its four typed WSJF inputs 9, 6, 9 and 13. The charter, baseline, registers, delivery contract and Phase-G review this pack supplies are the factory's record set; they are not separate packages in the derived register. project_in_unauthorised_tranche:S18 clears only on authorisation: the sponsoring group's or the programme owner's gate decision for tranche 9 is the only act that can change it, and this pack records it open rather than writing its own authorisation. The level stays consistent rather than compliant because the record set is now coherent but the product's gate has not been re-run and the tranche is not authorised. The live kata proof is issue #12's, not this pack's: issue #12 is open and carries the end-to-end katas-tenant iteration. The pack does not claim the plan's §7 gate has been re-run at this snapshot, and the build lane's preflight is the compile verdict.",
     "evidence": {
       "manifest": "acceptance/programme/S18.toml",
       "plan": "docs/plans/slices/S18-kata-improvement.md",
