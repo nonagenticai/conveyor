@@ -1903,15 +1903,37 @@ window.CONVEYOR_DELIVERY = (function () {
     if (!artefacts.length) {
       return `<div class="delivery-rail std-rail"><span class="rail-label">Standards artefacts</span><div class="rail-chips"><span class="rail-chip">the standards record is not published</span></div></div>`;
     }
-    const by = (standards && standards.by_standard) || {};
-    const chips = Object.keys(by)
+    // Required is the gate; optional is visible work. A pre-v4 record has no due_state: every
+    // row was due and `mandatory` is the only split it carries, so the fallbacks keep the page
+    // truthful during the rollout instead of painting 0/0.
+    const isDue = (artefact) =>
+      artefact.due_state ? artefact.due_state === "due" : true;
+    const isRequired = (artefact) => artefact.mandatory !== false;
+    const stat = (rows) => ({
+      total: rows.length,
+      evidenced: rows.filter((artefact) => artefact.status === "evidenced").length,
+      partial: rows.filter((artefact) => artefact.status === "partial").length,
+      absent: rows.filter((artefact) => artefact.status === "absent").length,
+    });
+    const due = artefacts.filter(isDue);
+    const required = due.filter(isRequired);
+    const optional = due.filter((artefact) => !isRequired(artefact));
+    const all = stat(required);
+    const optionalAbsent = stat(optional).absent;
+    const lead = `<span class="rail-chip std-chip"><b>Required</b> ${all.evidenced}/${all.total} evidenced · ${all.partial} partial · ${all.absent} absent</span>`;
+    const optionalChip = optional.length
+      ? `<span class="rail-chip"><b>Optional</b> ${optionalAbsent} absent · ${optional.length} due</span>`
+      : "";
+    const chips = [...new Set(artefacts.map((artefact) => artefact.standard))]
       .sort()
       .map((standard) => {
-        const row = by[standard];
-        return `<span class="rail-chip std-chip"><b>${esc(standard)}</b> ${row.evidenced}/${row.artefacts} evidenced · ${row.partial} partial · ${row.absent} absent</span>`;
+        const row = stat(
+          required.filter((artefact) => artefact.standard === standard),
+        );
+        return `<span class="rail-chip std-chip"><b>${esc(standard)}</b> ${row.evidenced}/${row.total} required evidenced · ${row.partial} partial · ${row.absent} absent</span>`;
       })
       .join("");
-    return `<div class="delivery-rail std-rail"><span class="rail-label">Standards artefacts · <a href="docs/standards/index.html">index</a></span><div class="rail-chips">${chips}</div></div>`;
+    return `<div class="delivery-rail std-rail"><span class="rail-label">Standards artefacts · <a href="docs/standards/index.html">index</a></span><div class="rail-chips">${lead}${optionalChip}${chips}</div></div>`;
   }
 
   function artefactRail(standards, options = {}) {

@@ -9,9 +9,14 @@ name: issue-registry
 #
 # ⛔ THE SCHEDULE ALONE IS NOT ENOUGH. GitHub's `schedule` event is best-effort, and this repo
 # drops most of its triggers: measured 2026-11-17, the hourly `board` cron (live since
-# 2026-11-15T19:35Z) produced 5 runs in ~35 h, and the 04:23Z trigger here produced none. A merge
-# to `main` is the event that always fires, so this workflow also runs on every push to `main`.
-# Both extra cases are cheap: the no-change path below exits without a branch and without a PR.
+# 2026-11-15T19:35Z) produced 5 runs in ~35 h, and the 04:23Z trigger here produced none. Issue
+# events (opened/closed/reopened/labeled) are the events that actually change the registry, so
+# they trigger it; the daily schedule stays as the backstop.
+#
+# ⛔ PUSH TO MAIN IS NOT A TRIGGER (#928). It was, and every merge rewrote the automation PR
+# within minutes and conflicted with open pack/publish PRs. A merge that closes an issue fires
+# `issues: closed`; a merge that changes no issue changes no registry row. The no-change path
+# below still exits without a branch and without a PR.
 #
 # The zero-secret path (docs/decisions/0003-public-ci.md): the only credential is the automatic
 # `GITHUB_TOKEN`, which needs the repository setting
@@ -28,8 +33,8 @@ name: issue-registry
 # Disable with: gh workflow disable issue-registry.yml
 
 on:
-  push:
-    branches: [main]
+  issues:
+    types: [opened, closed, reopened, labeled, unlabeled]
   schedule:
     - cron: "23 4 * * *"
   workflow_dispatch:

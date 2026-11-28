@@ -263133,7 +263133,7 @@ window.CONVEYOR_STANDARDS = {
   },
   "generated_at": "2026-11-27T12:10:18.740973+00:00",
   "git_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
-  "payload_sha256": "9e04b93d3154117659fae5794d1e638be3101461af13740c8e73cd0976a81442",
+  "payload_sha256": "fb4d6b60dc74564d865390b969819421a95136acff561e555cb8db22f193447d",
   "schema": "design-standards/v1",
   "summary": {
     "absent": 515,
@@ -263146,7 +263146,15 @@ window.CONVEYOR_STANDARDS = {
     "excluded": 0,
     "findings": 244,
     "mandatory": 1251,
+    "optional_absent": 173,
+    "optional_due": 190,
     "partial": 73,
-    "scheduled": 178
+    "required_absent": 222,
+    "required_due": 1103,
+    "required_evidenced": 840,
+    "required_partial": 41,
+    "scheduled": 178,
+    "scope_through_tranche": 8,
+    "standard_version": 4
   }
 };
