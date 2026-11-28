@@ -118,6 +118,8 @@
     "cards.release",
     "cards.remove_label",
     "cards.renew",
+    "cards.spec_get",
+    "cards.spec_put",
     "cards.unarchive",
     "cards.update",
     "catalogues.import",

@@ -207,6 +207,10 @@ console_error_panic_hook = "0.1.7"
 # `StreamAutoClaimReply`, `StreamPendingCountReply`, `StreamRangeReply`) sits behind it, so a later
 # `default-features = false` cannot silently remove them.
 redis = { version = "1.8.1", features = ["tokio-comp", "streams"] }
+# T7 (SPEC_V2 §5.8, D69): a work-package spec's `feature` is a Gherkin document and the
+# cucumber-rs parser is the one grammar for it. `parser` is named explicitly with defaults off
+# so a future default feature (juniper/serde) cannot widen what this crate links.
+gherkin = { version = "0.16.0", default-features = false, features = ["parser"] }
 
 # ─────────────────────────────────────────────────────────────────────────────
 # dev profile: line-tables-only debug info.

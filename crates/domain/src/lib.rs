@@ -95,6 +95,9 @@ pub mod prompt;
 pub mod prompt_audit;
 pub mod quality;
 mod run;
+// T7 (SPEC_V2 §5.8, D69): the work-package spec — the BDD story, the Gherkin acceptance
+// scenarios and their stable keys, the INVEST readiness gate and the derived acceptance DoD.
+pub mod work_package_spec;
 // ADR 0007 §Decision 4: the runner/v1 contract between the conveyor and a stateless executor.
 pub mod runner;
 pub mod template;

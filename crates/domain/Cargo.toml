@@ -14,6 +14,9 @@ chrono = { workspace = true }
 rust_decimal = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+# T7 (SPEC_V2 §5.8, D69): the work-package spec's `feature` is parsed with the cucumber-rs
+# Gherkin parser. Pure parsing — the crate still performs no IO (CONTRACT §1).
+gherkin = { workspace = true }
 # ADR 0007 §Decision 4: the runner/v1 schemas are generated from these types, never hand-written.
 schemars = { workspace = true }
 # S07: `content_hash` is SHA-256 of the JCS-canonical revision snapshot. Pure computation —

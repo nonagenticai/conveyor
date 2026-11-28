@@ -13,6 +13,7 @@
 //! Every mutation writes exactly one `event` row in the same transaction (CONTRACT §7).
 
 use chrono::Utc;
+use conveyor_domain::work_package_spec::{Scenario, WorkPackageSpecIn, validate};
 use conveyor_domain::{
     ArchiveError, AssetKind, AssetStatus, Card, CardType, ListKind, TenantId, Version,
 };
@@ -52,6 +53,14 @@ const DELIVERY_CARD_TYPE: &str = "delivery";
 /// (`meta.evidence`), or with the explicit waiver reason the approval stored
 /// (`meta.evidence_waiver`); a gate carrying neither is refused. The gate is card-scoped, so it
 /// cannot be borrowed from another card.
+///
+/// A work package (SPEC_V2 §5.8, D69) owes more: its spec must exist, its stored `feature` must
+/// parse into acceptance scenarios, and — unless the approval recorded a non-empty
+/// `evidence_waiver` — every scenario needs an evidence object that names its key and carries a
+/// `run_id` or `step_id` of *this* card. The spec is read first: a missing spec is the first
+/// §5.8 refusal, and a waiver excuses evidence, never the spec. The type-level acceptance
+/// remains the floor; the scenario rule is additional, and applies even when the type declares
+/// no acceptance.
 async fn assert_card_done_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
@@ -63,37 +72,185 @@ async fn assert_card_done_tx(
         .get("acceptance")
         .and_then(serde_json::Value::as_array)
         .map_or(0, Vec::len);
-    if acceptance == 0 {
+    let work_package =
+        store::work_package_spec::is_work_package_card_tx(&mut *conn, tenant, card.id)
+            .await
+            .map_err(|error| store_error(error, "cards.move"))?;
+    if acceptance == 0 && !work_package {
         return Ok(());
     }
+    let scenarios = if work_package {
+        Some(work_package_scenarios_tx(&mut *conn, tenant, card.id).await?)
+    } else {
+        None
+    };
     let meta =
         store::approval::approved_card_gate_meta_tx(&mut *conn, tenant, card.id, CARD_DONE_GATE)
             .await
             .map_err(|error| store_error(error, "cards.move"))?;
     let Some(meta) = meta else {
-        return Err(ActionError::new(
-            422,
-            "card_done_criteria_unmet",
-            "the card type declares a Definition of Done; entering done needs an approved card_done gate",
-        ));
+        let detail = if work_package {
+            "a work package enters done only with an approved card_done gate carrying \
+             per-scenario evidence"
+        } else {
+            "the card type declares a Definition of Done; entering done needs an approved \
+             card_done gate"
+        };
+        return Err(ActionError::new(422, "card_done_criteria_unmet", detail));
     };
     let evidence = meta
         .get("evidence")
         .and_then(serde_json::Value::as_array)
-        .map_or(0, Vec::len);
+        .cloned()
+        .unwrap_or_default();
     let waiver = meta
         .get("evidence_waiver")
         .and_then(serde_json::Value::as_str)
         .map(str::trim)
         .unwrap_or("");
-    if evidence == 0 && waiver.is_empty() {
-        return Err(ActionError::new(
+    match scenarios {
+        None => {
+            if evidence.is_empty() && waiver.is_empty() {
+                return Err(ActionError::new(
+                    422,
+                    "card_done_evidence_missing",
+                    "the Definition-of-Done gate carries no evidence and no waiver reason",
+                ));
+            }
+            Ok(())
+        }
+        Some(scenarios) => {
+            assert_work_package_done_tx(conn, tenant, card, &scenarios, &evidence, waiver).await
+        }
+    }
+}
+
+/// A work package's acceptance scenarios, re-parsed from its stored spec.
+///
+/// The spec is required before the gate is judged: a work package with no spec has nothing its
+/// `card_done` evidence could name, so the missing spec is the first §5.8 refusal. The stored
+/// `feature` was validated on write, but a document that no longer yields an acceptance
+/// scenario is a typed refusal too, because the gate would have nothing to judge.
+async fn work_package_scenarios_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    card_id: Uuid,
+) -> Result<Vec<Scenario>, ActionError> {
+    let spec = store::work_package_spec::get_tx(&mut *conn, tenant, card_id)
+        .await
+        .map_err(|error| spec_store_error(error, "cards.move"))?
+        .ok_or_else(|| {
+            ActionError::new(
+                422,
+                "work_package_evidence_unmet",
+                "the work package has no spec",
+            )
+        })?;
+    validate(&WorkPackageSpecIn {
+        story_persona: spec.story_persona,
+        story_action: spec.story_action,
+        story_benefit: spec.story_benefit,
+        feature: spec.feature,
+        dor: spec.dor,
+    })
+    .map_err(|error| {
+        ActionError::new(
             422,
-            "card_done_evidence_missing",
-            "the Definition-of-Done gate carries no evidence and no waiver reason",
-        ));
+            "work_package_scenarios_missing",
+            format!("the work package's stored feature yields no acceptance scenario: {error}"),
+        )
+    })
+}
+
+/// The work-package half of the `done` gate (SPEC_V2 §5.8, D69).
+///
+/// A non-empty waiver satisfies the per-scenario requirement (the governance audit reads the
+/// same `meta.evidence_waiver`); otherwise every scenario key needs an evidence object whose
+/// run or step belongs to this card.
+async fn assert_work_package_done_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    card: &Card,
+    scenarios: &[Scenario],
+    evidence: &[serde_json::Value],
+    waiver: &str,
+) -> Result<(), ActionError> {
+    if !waiver.is_empty() {
+        return Ok(());
+    }
+    for scenario in scenarios {
+        let mut verified = false;
+        for item in evidence {
+            if evidence_scenario(item) != Some(scenario.key.as_str()) {
+                continue;
+            }
+            let (run_id, step_id) = evidence_verification(item);
+            if run_id.is_none() && step_id.is_none() {
+                continue;
+            }
+            if store::work_package_spec::evidence_on_card_tx(
+                &mut *conn, tenant, card.id, run_id, step_id,
+            )
+            .await
+            .map_err(|error| store_error(error, "cards.move"))?
+            {
+                verified = true;
+                break;
+            }
+        }
+        if !verified {
+            return Err(ActionError::new(
+                422,
+                "work_package_evidence_unmet",
+                format!(
+                    "the work package's scenario '{}' has no evidence naming it with a run or \
+                     step of this card",
+                    scenario.key
+                ),
+            ));
+        }
     }
     Ok(())
+}
+
+/// The scenario key an evidence object names, in `scenario` or `scenario_id`.
+fn evidence_scenario(item: &serde_json::Value) -> Option<&str> {
+    let object = item.as_object()?;
+    ["scenario", "scenario_id"]
+        .iter()
+        .find_map(|field| object.get(*field).and_then(serde_json::Value::as_str))
+}
+
+/// The `run_id` and `step_id` an evidence object carries, parsed as row ids.
+///
+/// The domain's evidence rule accepts a number as "carries a verification", but a numeric id
+/// cannot name a row; ownership therefore reads a string UUID only.
+fn evidence_verification(item: &serde_json::Value) -> (Option<Uuid>, Option<Uuid>) {
+    let object = item.as_object();
+    let id = |field: &str| {
+        object
+            .and_then(|object| object.get(field))
+            .and_then(serde_json::Value::as_str)
+            .and_then(|text| Uuid::parse_str(text).ok())
+    };
+    (id("run_id"), id("step_id"))
+}
+
+/// A work-package-spec store failure as an action refusal: the card was resolved in-tenant
+/// before this read, so a parent or id failure is a stored-row defect, not a caller error.
+fn spec_store_error(
+    error: store::work_package_spec::WorkPackageSpecStoreError,
+    action: &str,
+) -> ActionError {
+    match error {
+        store::work_package_spec::WorkPackageSpecStoreError::Database(error) => {
+            store_error(error, action)
+        }
+        other => {
+            tracing::error!(error = %other, action, "read the work-package spec");
+            ActionError::internal()
+        }
+    }
 }
 
 use super::events::card_event;

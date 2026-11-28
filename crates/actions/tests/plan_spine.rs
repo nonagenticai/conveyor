@@ -217,6 +217,50 @@ async fn create_card(running: &support::Running, board: &str, lane: &str) -> Str
     id_of(output(&card), "id")
 }
 
+/// The §5.8 definition of ready every work package's run needs: six INVEST criteria, all met.
+fn ready_dor() -> Value {
+    json!({
+        "independent": {"met": true, "evidence": "no blocked-by link"},
+        "negotiable": {"met": true, "evidence": "outcome fixed; approach settled at delivery"},
+        "valuable": {"met": true, "evidence": "the story's so-that names the benefit"},
+        "estimable": {"met": true, "evidence": "baseline and every file are named"},
+        "small": {"met": true, "evidence": "one work package, one run"},
+        "testable": {"met": true, "evidence": "every scenario carries @verify"},
+    })
+}
+
+/// Author the card's work-package spec (`cards.spec_put`).
+///
+/// A card a `wbs_node(kind='work_package')` links to is a work package (SPEC_V2 §5.8, D69), so
+/// `runs.create` refuses it without an INVEST-ready spec.
+async fn author_ready_spec(running: &support::Running, card: &str) {
+    let (status, body) = running
+        .invoke(
+            "cards.spec_put",
+            "dev:alice",
+            json!({
+                "card_id": card,
+                "story_persona": "a planner",
+                "story_action": "the work package's run to start",
+                "story_benefit": "the work starts only when it is ready",
+                "feature": concat!(
+                    "Feature: the work package\n\n",
+                    "  @verify=P1\n",
+                    "  Scenario: the run starts\n",
+                    "    Given a ready work package\n",
+                    "    When its run is created\n",
+                    "    Then the run carries the card\n",
+                ),
+                "dor": ready_dor(),
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+}
+
 /// A baseline row as `baselines.take` writes it: unapproved until a second principal decides.
 async fn create_unapproved_baseline(
     running: &support::Running,
@@ -1586,6 +1630,9 @@ async fn a_work_package_names_its_card_and_run() {
     assert_eq!(status, 201, "{created}");
     let node = id_of(output(&created), "id");
     assert_eq!(output(&created)["card_id"], card, "{created}");
+
+    // The node makes the card a work package; its run starts only from a ready spec.
+    author_ready_spec(&running, &card).await;
 
     let (status, run) = running
         .invoke(
