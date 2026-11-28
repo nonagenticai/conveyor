@@ -52,7 +52,7 @@ STANDARD_PATH = ROOT / "seed/output-standard.json"
 DEFAULT_JOURNAL = ROOT / "docs/evidence/record-w4/replay.jsonl"
 DEFAULT_ACTOR = "01a1efd4-c3e5-7b74-b32b-1b15683a8c4e"
 SCHEMA = "artefact-publication/v1"
-STATES = ("due", "present", "missing-edge", "stale", "ambiguous")
+STATES = ("due", "present", "missing-edge", "stale", "ambiguous", "authored")
 PUBLISHED_STATUSES = {"published", "live", "approved"}
 NATURAL_KEY = "artefact:{project}:{category}:{sha16}"
 
@@ -183,7 +183,7 @@ def matching_document_id(published: list[dict], composed_sha: str) -> str:
 
 
 def public_row(row: dict) -> dict:
-    return {
+    out = {
         "project_key": row["project_key"],
         "project_id": row["project_id"],
         "category": row["category"],
@@ -191,6 +191,9 @@ def public_row(row: dict) -> dict:
         "trigger": row["trigger"],
         "state": row["state"],
     }
+    if row.get("authored"):
+        out["authored"] = True
+    return out
 
 
 def count_states(rows: list[dict]) -> dict:
@@ -246,6 +249,11 @@ def readiness(
             subjects.append(subject)
     subjects.sort(key=lambda item: item["key"])
     documents = snapshot_documents(snapshot)
+    all_subjects = gen.build_subjects(snapshot, gen.load_declared_phases())
+    class_by_key = {
+        str(project["key"]): gen.project_class(std, project)
+        for project in all_subjects.get("project", [])
+    }
     rows: list[dict] = []
     for subject in subjects:
         for category in sorted(templates):
@@ -259,9 +267,30 @@ def readiness(
             trigger = trigger_of(template)
             if mandatory_only and not (bool(template.get("mandatory")) or trigger is not None):
                 continue
-            if not gen.applies(template, category, subject, snapshot, projects_map):
+            # The class-based due set is the standard's own declaration (`classes[].when`); the
+            # generator's instance builder passes it to `applies`, and omitting it here hid every
+            # class-declared category from this factory (measured 2026-11-28).
+            if not gen.applies(
+                template, category, subject, snapshot, projects_map,
+                class_by_key=class_by_key,
+            ):
                 continue
             published = published_for(documents, subject["id"], category)
+            if template.get("document_authored") is True:
+                # An authored body is written, not composed from rows: the document's own text
+                # is the fact. Report it honestly — published is `authored`, missing is `due` —
+                # never a composition refusal dressed as a bug.
+                row = {
+                    "project_key": subject["key"],
+                    "project_id": subject["id"],
+                    "category": category,
+                    "mandatory": bool(template.get("mandatory")),
+                    "trigger": trigger,
+                    "authored": True,
+                    "state": "authored" if published else "due",
+                }
+                rows.append(row)
+                continue
             row: dict[str, Any] = {
                 "project_key": subject["key"],
                 "project_id": subject["id"],
