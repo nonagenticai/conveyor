@@ -74,6 +74,53 @@ async fn second_card(db: &support::TestDb, seed: &support::Seeded) -> Uuid {
     .expect("seed second card")
 }
 
+/// P2.1: the structured metadata a caller writes is the metadata a reader gets back — both on the
+/// insert's own return and on a later hot-row read, with no reconstruction in between.
+#[tokio::test]
+async fn a_memory_round_trips_its_structured_metadata() {
+    let db = support::TestDb::fresh().await;
+    let a = support::seed_tenant(&db.super_pool, "s15-mem-meta").await;
+    let meta = json!({
+        "run": "r-1",
+        "strata": { "pack": "capability@3", "layer": "l1" },
+        "tags": ["provenance", "strata"],
+    });
+
+    let mut tx = begin_scoped(&db.runtime, tenant(&a)).await.expect("scope");
+    let inserted = insert_memory_tx(
+        &mut tx,
+        tenant(&a),
+        &NewMemory {
+            card_id: a.card,
+            run_id: None,
+            capability_id: None,
+            kind: MemoryKind::Fact,
+            source: MemorySource::Agent,
+            body: "written with provenance",
+            supersedes_id: None,
+            meta: meta.clone(),
+        },
+    )
+    .await
+    .expect("insert memory");
+    tx.commit().await.expect("commit");
+    assert_eq!(
+        inserted.meta, meta,
+        "the insert returns the metadata it wrote"
+    );
+
+    let mut tx = begin_scoped(&db.runtime, tenant(&a)).await.expect("scope");
+    let hot = hot_for_card_tx(&mut tx, tenant(&a), a.card, 50)
+        .await
+        .expect("hot rows");
+    tx.commit().await.expect("commit");
+    assert_eq!(hot.len(), 1);
+    assert_eq!(
+        hot[0].meta, meta,
+        "the read returns the structured metadata"
+    );
+}
+
 #[tokio::test]
 async fn memory_is_tenant_scoped_and_newest_first() {
     let db = support::TestDb::fresh().await;

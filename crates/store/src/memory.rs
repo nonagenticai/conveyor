@@ -46,7 +46,7 @@ pub enum MemoryStoreError {
 }
 
 const COLUMNS: &str = "id, project_id, card_id, run_id, capability_id, kind, source, body, \
-     supersedes_id, consolidated_at, created_at";
+     supersedes_id, consolidated_at, created_at, meta";
 
 /// A `memory.remember` write, before it is stored.
 #[derive(Clone, Debug)]
@@ -88,6 +88,8 @@ pub struct MemoryRecord {
     pub source: MemorySource,
     /// The text.
     pub body: String,
+    /// Free structured detail written with the row.
+    pub meta: Value,
     /// The superseded row, when any.
     pub supersedes_id: Option<Uuid>,
     /// When a consolidation covered this row.
@@ -106,6 +108,7 @@ struct MemoryRow {
     kind: String,
     source: String,
     body: String,
+    meta: Value,
     supersedes_id: Option<Uuid>,
     consolidated_at: Option<DateTime<Utc>>,
     created_at: DateTime<Utc>,
@@ -128,6 +131,7 @@ impl TryFrom<MemoryRow> for MemoryRecord {
             kind,
             source,
             body: row.body,
+            meta: row.meta,
             supersedes_id: row.supersedes_id,
             consolidated_at: row.consolidated_at,
             created_at: row.created_at,
